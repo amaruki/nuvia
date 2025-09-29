@@ -143,7 +143,6 @@ docs/               # Documentation
 - [API Patterns](docs/technical/api-patterns.md)
 - [Database Schema](docs/technical/database-schema.md)
 - [Security Guidelines](docs/technical/security-guidelines.md)
-- [AI Code Agent Rules](docs/ai-code-agent-rules.md)
 
 ## Deployment
 
@@ -159,10 +158,9 @@ The platform can also be deployed to Railway or DigitalOcean App Platform with s
 
 ## Contributing
 
-1. Follow the [AI Code Agent Rules](docs/ai-code-agent-rules.md)
-2. Ensure all tests pass
-3. Follow the established code patterns and architecture
-4. Update documentation as needed
+1. Ensure all tests pass
+2. Follow the established code patterns and architecture
+3. Update documentation as needed
 
 ## Security
 

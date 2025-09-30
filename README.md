@@ -131,15 +131,11 @@ src/
 ├── components/      # React components
 ├── types/          # TypeScript type definitions
 └── middleware.ts   # Next.js middleware
-
-docs/               # Documentation
-├── technical/      # Technical specifications
-└── ai-code-agent-rules.md  # AI development guidelines
 ```
 
 ## Documentation
 
-- [Technical Architecture](docs/technical/)
+<!-- - [Technical Architecture](docs/technical/) -->
 - [API Patterns](docs/technical/api-patterns.md)
 - [Database Schema](docs/technical/database-schema.md)
 - [Security Guidelines](docs/technical/security-guidelines.md)

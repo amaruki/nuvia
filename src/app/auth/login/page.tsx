@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import Image from "next/image";
+import { loginAction } from "@/lib/actions/auth.actions";
 
 const loginSchema = z.object({
   emailOrUsername: z.string().min(1, "Email or username is required"),
@@ -21,7 +23,12 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const router = useRouter();
 
   const {
     register,
@@ -36,20 +43,34 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
+    setError(null);
+    setSuccess(null);
     try {
-      // Here you would implement your actual login logic
-      console.log("Login data:", data);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    } catch (error) {
-      console.error("Login error:", error);
+      const formData = new FormData();
+      formData.append("emailOrUsername", emailOrUsername);
+      formData.append("password", password);
+
+      const result = await loginAction(formData);
+
+      if (result.success) {
+        setSuccess("Login successful! Redirecting...");
+        // In a real implementation, you would store the user session/token here
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      } else {
+        setError(result.message || "Login failed");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = () => {
-    // Here you would implement Google OAuth login
+    // TODO: Implement Google OAuth login flow
     console.log("Google login clicked");
   };
 
@@ -62,7 +83,6 @@ export default function LoginPage() {
       easing: "easeOutExpo",
     });
   }, []);
-
 
   return (
     <>
@@ -84,6 +104,62 @@ export default function LoginPage() {
             <p className="text-gray-600 mt-2">Sign in to your account</p>
           </div>
 
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg
+                    className="h-5 w-5 text-red-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">Error</h3>
+                  <div className="mt-2 text-sm text-red-700">
+                    <p>{error}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg
+                    className="h-5 w-5 text-green-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-green-800">
+                    Success
+                  </h3>
+                  <div className="mt-2 text-sm text-green-700">
+                    <p>{success}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Login form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
@@ -95,7 +171,10 @@ export default function LoginPage() {
                 type="text"
                 placeholder="Enter your email or username"
                 className="w-full"
-                {...register("emailOrUsername")}
+                value={emailOrUsername}
+                {...register("emailOrUsername", {
+                  onChange: (e) => setEmailOrUsername(e.target.value)
+                })}
               />
               {errors.emailOrUsername && (
                 <p className="text-red-500 text-sm mt-1">
@@ -121,7 +200,10 @@ export default function LoginPage() {
                 type="password"
                 placeholder="Enter your password"
                 className="w-full"
-                {...register("password")}
+                value={password}
+                {...register("password", {
+                  onChange: (e) => setPassword(e.target.value)
+                })}
               />
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">
@@ -131,14 +213,8 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center space-x-2">
-              <Checkbox
-                id="rememberMe"
-                {...register("rememberMe")}
-              />
-              <Label
-                htmlFor="rememberMe"
-                className="text-gray-700 text-sm"
-              >
+              <Checkbox id="rememberMe" {...register("rememberMe")} />
+              <Label htmlFor="rememberMe" className="text-gray-700 text-sm">
                 Remember me
               </Label>
             </div>
@@ -158,7 +234,9 @@ export default function LoginPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              <span className="px-2 bg-white text-gray-500">
+                Or continue with
+              </span>
             </div>
           </div>
 

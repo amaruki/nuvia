@@ -8,10 +8,10 @@ This platform provides comprehensive community management features including use
 
 ## Technology Stack
 
-- **Frontend**: Next.js 15+ (App Router), React 18+, TypeScript, Tailwind CSS V4, Shadcn/UI
+- **Frontend**: Next.js 15+ (App Router), React 18+, TypeScript, Tailwind CSS V4, Radix UI
 - **Backend**: Next.js API Routes, Server Actions, Node.js 20+
 - **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: NextAuth.js v5
+- **Authentication**: Betterauth
 - **Caching**: Redis
 <!-- - **Monitoring**: Sentry, Vercel Analytics -->
 

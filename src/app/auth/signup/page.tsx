@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { signupAction } from "@/lib/actions/auth.actions";
 
 const signupSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -31,8 +33,18 @@ const signupSchema = z.object({
 type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-  const [isLoading, setIsLoading] = useState(false);
+    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+    const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
+    const router = useRouter();
 
+    
   const {
     register,
     handleSubmit,
@@ -46,16 +58,48 @@ export default function SignupPage() {
 
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
+    setError(null);
+    setSuccess(null);
+    setValidationErrors({});
+    
     try {
-      // Here you would implement your actual signup logic
-      console.log("Signup data:", data);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    } catch (error) {
-      console.error("Signup error:", error);
-    } finally {
-      setIsLoading(false);
-    }
+          const formData = new FormData();
+          formData.append('email', email);
+          formData.append('username', username);
+          formData.append('fullName', fullName);
+          formData.append('password', password);
+          formData.append('confirmPassword', confirmPassword);
+    
+          const result = await signupAction(formData);
+    
+          if (result.success) {
+            setSuccess('Account created successfully! Please check your email to verify your account.');
+            // In a real implementation, you would store the user session/token here
+            setTimeout(() => {
+              router.push('/dashboard');
+            }, 3000);
+          } else {
+            setError(result.message || 'Signup failed');
+            
+            // Set validation errors if they exist
+            if (result.errors) {
+              setValidationErrors(result.errors);
+            }
+          }
+        } catch (err) {
+          setError('An unexpected error occurred. Please try again.');
+          console.error(err);
+        } finally {
+          setIsLoading(false);
+        }
+  };
+
+  const getErrorMessage = (field: string) => {
+    return validationErrors[field]?.[0];
+  };
+
+  const hasError = (field: string) => {
+    return !!validationErrors[field]?.length;
   };
 
   const handleGoogleSignup = () => {
@@ -93,6 +137,42 @@ export default function SignupPage() {
             <p className="text-gray-600 mt-2">Join us today</p>
           </div>
 
+          {error && (
+        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>{error}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-md p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-green-800">Success</h3>
+              <div className="mt-2 text-sm text-green-700">
+                <p>{success}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
           {/* Signup form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
@@ -104,12 +184,18 @@ export default function SignupPage() {
                 type="text"
                 placeholder="Enter your full name"
                 className="w-full"
-                {...register("fullName")}
+                value={fullName}
+                {...register("fullName", {
+                  onChange: (e) => setFullName(e.target.value)
+                })}
               />
               {errors.fullName && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.fullName.message}
                 </p>
+              )}
+              {hasError('fullName') && (
+                <p className="mt-1 text-sm text-red-600">{getErrorMessage('fullName')}</p>
               )}
             </div>
 
@@ -122,7 +208,10 @@ export default function SignupPage() {
                 type="email"
                 placeholder="Enter your email address"
                 className="w-full"
-                {...register("email")}
+                value={email}
+                {...register("email", {
+                  onChange: (e) => setEmail(e.target.value)
+                })}
               />
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">
@@ -140,7 +229,10 @@ export default function SignupPage() {
                 type="text"
                 placeholder="Choose a username"
                 className="w-full"
-                {...register("username")}
+                value={username}
+                {...register("username", {
+                  onChange: (e) => setUsername(e.target.value),
+                })}
               />
               {errors.username && (
                 <p className="text-red-500 text-sm mt-1">
@@ -158,7 +250,10 @@ export default function SignupPage() {
                 type="password"
                 placeholder="Create a password"
                 className="w-full"
-                {...register("password")}
+                value={password}
+                {...register("password", {
+                  onChange: (e) => setPassword(e.target.value),
+                })}
               />
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">
@@ -176,7 +271,10 @@ export default function SignupPage() {
                 type="password"
                 placeholder="Confirm your password"
                 className="w-full"
-                {...register("confirmPassword")}
+                value={confirmPassword}
+                {...register("confirmPassword", {
+                  onChange: (e) => setConfirmPassword(e.target.value),
+                })}
               />
               {errors.confirmPassword && (
                 <p className="text-red-500 text-sm mt-1">

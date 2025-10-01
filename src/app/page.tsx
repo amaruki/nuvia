@@ -23,7 +23,7 @@ export default function Home() {
           <Link href="#contribute" className="text-gray-600 hover:text-gray-900">Contribute</Link>
         </div>
         <div>
-          <Link href="/dashboard" className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors">
+          <Link href="/auth/login" className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors">
             Get Started
           </Link>
         </div>

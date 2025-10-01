@@ -13,10 +13,9 @@ export default function OAuthCallbackPage() {
   useEffect(() => {
     const handleOAuthCallback = async () => {
       try {
-        // Check if we have a session after OAuth redirect
         const { data: session, error } = await authClient.getSession({
           fetchOptions: {
-            onSuccess: () => {
+            onSuccess: (sessionData) => {
               setStatus("success");
               setMessage("Authentication successful! Redirecting to dashboard...");
 
@@ -33,9 +32,9 @@ export default function OAuthCallbackPage() {
               }, 2000);
             },
             onError: (error) => {
+              console.error("OAuth callback session retrieval failed:", error?.message || error);
               setStatus("error");
               setMessage("Authentication failed. Please try again.");
-              console.error("OAuth callback error:", error);
 
               // Redirect to login page after showing error
               setTimeout(() => {
@@ -49,7 +48,7 @@ export default function OAuthCallbackPage() {
           throw error;
         }
       } catch (error) {
-        console.error("OAuth callback handling error:", error);
+        console.error("OAuth callback error:", error instanceof Error ? error.message : String(error));
         setStatus("error");
         setMessage("An error occurred during authentication. Please try again.");
 

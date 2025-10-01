@@ -87,12 +87,12 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Built for the Community</h2>
           <p className="text-lg text-gray-600 mb-8">
             Nuvia is designed as a modular, extensible platform that starts as a monolith but can evolve
-            with your community's needs. We're focused on keeping hosting costs low while providing
+            with your community&apos;s needs. We&apos;re focused on keeping hosting costs low while providing
             professional-grade features for organizations of all sizes.
           </p>
           <p className="text-lg text-gray-600">
             Starting with core MVP features like user management, events, membership, and basic content,
-            we'll gradually expand to include more complex modules like finance, real-time integrations,
+            we&apos;ll gradually expand to include more complex modules like finance, real-time integrations,
             multi-tenancy, and analytics.
           </p>
         </div>
@@ -125,7 +125,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Contribute to Nuvia</h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-10">
             We welcome developers, designers, and community organizers to help shape the future of
-            community management platforms. Whether you're contributing code, documentation, or feedback,
+            community management platforms. Whether you&apos;re contributing code, documentation, or feedback,
             your involvement makes Nuvia better for everyone.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">

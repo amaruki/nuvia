@@ -243,7 +243,7 @@ export default function ForgotPasswordPage() {
                     />
                   </svg>
                   <p className="text-green-700">
-                    We've sent password reset instructions to your email
+                    We&apos;ve sent password reset instructions to your email
                     address.
                   </p>
                 </div>

@@ -96,52 +96,38 @@ model PasswordResetToken {
 // NextAuth.js models
 
 model Account {
-  id                String  @id @default(uuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
+  id                            String  @id @default(uuid())
+  userId                        String
+  providerId                    String
+  accountId                     String
+  refreshToken                  String? @db.Text
+  accessToken                   String? @db.Text
+  accessTokenExpiresAt          DateTime?
+  scope                         String?
+  idToken                       String? @db.Text
+  
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  accountId             String
-  providerId            String
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@unique([provider, providerAccountId])
+  @@unique([providerId, accountId])
   @@map("accounts")
 }
 
 model Session {
   id           String   @id @default(uuid())
-  sessionToken String   @unique
+  token        String   @unique
   userId       String
-  expires      DateTime
+  expiresAt    DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  expiresAt DateTime
-  token     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   ipAddress String?
   userAgent String?
 
   @@map("sessions")
-  @@unique([token])
 }
 
 model VerificationToken {
@@ -162,4 +148,21 @@ model Verification {
   updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("verification")
+}
+
+// Authentication log model for security monitoring
+model AuthLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  eventType  String
+  severity   String
+  message    String
+  ipAddress  String?
+  userAgent  String?
+  deviceId   String?
+  location   String?
+  metadata   Json?
+  timestamp  DateTime @default(now())
+
+  @@map("auth_logs")
 }

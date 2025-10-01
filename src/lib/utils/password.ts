@@ -1,22 +1,3 @@
-/**
- * Generate a secure random token
- * @param length - The length of the token to generate (default: 32)
- * @returns string - A secure random token
- */
-export function generateSecureToken(length: number = 32): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  
-  // Use Web Crypto API for secure random generation
-  const randomValues = new Uint32Array(length);
-  crypto.getRandomValues(randomValues);
-  
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(randomValues[i] % chars.length);
-  }
-  
-  return result;
-}
 
 /**
  * Validate password strength

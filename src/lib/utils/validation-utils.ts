@@ -144,16 +144,6 @@ export function isValidEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-/**
- * Check if a password meets security requirements
- * @param password - Password to validate
- * @returns True if valid, false otherwise
- */
-export function isValidPassword(password: string): boolean {
-  // At least 8 characters, with at least one uppercase, one lowercase, one number, and one special character
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  return passwordRegex.test(password);
-}
 
 /**
  * Check if a username meets requirements

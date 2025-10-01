@@ -2,17 +2,6 @@
  * Application configuration
  */
 
-// JWT Secret - In a real application, this should be stored in environment variables
-export const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-
-// JWT Expiration times
-export const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
-
-// Password reset token expiration (in hours)
-export const PASSWORD_RESET_EXPIRES_IN = 1;
-
-// Email verification token expiration (in hours)
-export const EMAIL_VERIFICATION_EXPIRES_IN = 24;
 
 // Rate limiting configuration
 export const RATE_LIMITING = {

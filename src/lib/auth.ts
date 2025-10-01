@@ -3,9 +3,6 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { prisma } from "./prisma";
 import { validatePasswordStrength } from "./utils/password";
-import { validateWithSchema } from "./utils/validation-utils";
-import { formatDate, getRelativeTime } from "./utils/date-utils";
-import { authenticateRequest, authorizeResourceAccess, withAuth, withResourceAuth, authorizeByRole, withRoleAuth } from "./middleware/auth-middleware";
 import { SOCIAL_PROVIDERS, FEATURES, APP_URL } from "./config";
 
 // Validate Better Auth secret is properly configured
@@ -38,13 +35,32 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       enabled: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-      // Add explicit redirect URI configuration
-      redirectUri: `${APP_URL}/api/auth/callback/google`
+      redirectUri: `${APP_URL}/api/auth/callback/google`,
+      prompt: "select_account consent",
+      scopes: ["openid", "profile", "email"],
+    },
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+      enabled: !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
+      redirectUri: `${APP_URL}/api/auth/callback/github`,
+      scopes: ["user:email", "read:user"],
+    },
+    linkedin: {
+      clientId: process.env.LINKEDIN_CLIENT_ID || "",
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET || "",
+      enabled: !!(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET),
+      redirectUri: `${APP_URL}/api/auth/callback/linkedin`,
+      scopes: ["openid", "profile", "email"],
     },
   },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
   },
   user: {
     additionalFields: {
@@ -81,22 +97,37 @@ export const auth = betterAuth({
   secret: BETTER_AUTH_SECRET || "fallback-secret-for-development",
   // Add advanced configuration for cookies and state management
   advanced: {
-    useSecureCookies: APP_URL.startsWith('https://'),
-    cookieAttributes: {
-      secure: APP_URL.startsWith('https://'),
+    useSecureCookies: process.env.NODE_ENV === "production",
+    cookieOptions: {
       sameSite: "lax",
-      path: "/",
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
+      path: "/",
     },
-    // Configure cookie prefix for better state management
     cookiePrefix: "nuvia-auth",
-    // Add trusted origins for OAuth flow
-    trustedOrigins: [APP_URL, new URL(APP_URL).origin]
+    trustedOrigins: [
+      APP_URL,
+      new URL(APP_URL).origin,
+      "http://localhost:3000",
+      "https://localhost:3000",
+    ],
+    generateState: true,
+    // Add hooks for debugging OAuth state
+    hooks: {
+      onError: async (event: any) => {
+        console.error("Better Auth Error:", {
+          event: event.name,
+          error: event.error,
+        });
+      }
+    }
   },
-  // Add proper error handling
-  onError: (error:any) => {
-    console.error("Better Auth Error:", error);
-    // You can add logging service integration here
+   logger: {
+    level: process.env.NODE_ENV === "development" ? "debug" : "warn",
+    disabled: process.env.NODE_ENV === "production",
+  },
+  onError: (error: any) => {
+    console.error("Better Auth Error:", error?.message || error);
   },
 });
 
@@ -105,23 +136,3 @@ export const passwordUtils = {
   validatePasswordStrength,
 };
 
-// Export validation utilities for use in auth actions
-export const validationUtils = {
-  validateWithSchema,
-};
-
-// Export date utilities for use in auth actions
-export const dateUtils = {
-  formatDate,
-  getRelativeTime,
-};
-
-// Export auth middleware for use in routes and actions
-export const authMiddleware = {
-  authenticateRequest,
-  authorizeResourceAccess,
-  withAuth,
-  withResourceAuth,
-  authorizeByRole,
-  withRoleAuth,
-};

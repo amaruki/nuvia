@@ -102,6 +102,7 @@ export async function signupAction(formData: FormData): Promise<AuthResponse> {
     const fullName = formData.get('fullName') as string;
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
+    const agreeToTerms = formData.get('agreeToTerms') === 'true';
     
     // Validate input
     const validatedData = signupSchema.parse({
@@ -110,6 +111,7 @@ export async function signupAction(formData: FormData): Promise<AuthResponse> {
       fullName,
       password,
       confirmPassword,
+      agreeToTerms,
     });
     
     // Process signup

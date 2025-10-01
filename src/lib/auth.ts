@@ -6,9 +6,19 @@ import { validatePasswordStrength } from "./utils/password";
 import { validateWithSchema } from "./utils/validation-utils";
 import { formatDate, getRelativeTime } from "./utils/date-utils";
 import { authenticateRequest, authorizeResourceAccess, withAuth, withResourceAuth, authorizeByRole, withRoleAuth } from "./middleware/auth-middleware";
-import { SOCIAL_PROVIDERS, FEATURES } from "./config";
+import { SOCIAL_PROVIDERS, FEATURES, APP_URL } from "./config";
+
+// Validate Better Auth secret is properly configured
+const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
+if (!BETTER_AUTH_SECRET || BETTER_AUTH_SECRET === "your-secret-key-here") {
+  console.warn("WARNING: BETTER_AUTH_SECRET is not properly configured. Please set a secure secret in your environment variables.");
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("BETTER_AUTH_SECRET must be set in production environment");
+  }
+}
 
 export const auth = betterAuth({
+  baseURL: APP_URL,
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
@@ -25,9 +35,11 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: SOCIAL_PROVIDERS.GOOGLE.CLIENT_ID,
-      clientSecret: SOCIAL_PROVIDERS.GOOGLE.CLIENT_SECRET,
-      enabled: FEATURES.SOCIAL_LOGIN,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      enabled: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
+      // Add explicit redirect URI configuration
+      redirectUri: `${APP_URL}/api/auth/callback/google`
     },
   },
   session: {
@@ -65,6 +77,27 @@ export const auth = betterAuth({
     max: 100, // 100 requests per window
   },
   plugins: [nextCookies()],
+  // Add secret for Better Auth
+  secret: BETTER_AUTH_SECRET || "fallback-secret-for-development",
+  // Add advanced configuration for cookies and state management
+  advanced: {
+    useSecureCookies: APP_URL.startsWith('https://'),
+    cookieAttributes: {
+      secure: APP_URL.startsWith('https://'),
+      sameSite: "lax",
+      path: "/",
+      httpOnly: true,
+    },
+    // Configure cookie prefix for better state management
+    cookiePrefix: "nuvia-auth",
+    // Add trusted origins for OAuth flow
+    trustedOrigins: [APP_URL, new URL(APP_URL).origin]
+  },
+  // Add proper error handling
+  onError: (error:any) => {
+    console.error("Better Auth Error:", error);
+    // You can add logging service integration here
+  },
 });
 
 // Export password utilities for use in auth actions

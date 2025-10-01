@@ -22,17 +22,12 @@ export async function signInWithOAuthAction(
   provider: string,
   callbackURL?: string
 ) {
-  console.log("signInWithOAuthAction called:", { provider, callbackURL });
-
   try {
     const result = await signInWithOAuth(provider, callbackURL);
 
-    console.log("OAuth sign-in result:", result);
-
     // better-auth OAuth response structure
-    // The response might have different structures depending on the auth state
     let redirectUrl: string | undefined;
-    
+
     // Check if result has a direct URL property
     if ('url' in result && result.url) {
       redirectUrl = result.url as string;
@@ -58,12 +53,7 @@ export async function signInWithOAuthAction(
       'OAUTH_NO_REDIRECT_URL'
     );
   } catch (error) {
-    console.error("OAuth sign-in action error:", {
-      provider,
-      callbackURL,
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+    console.error("OAuth sign-in error:", error instanceof Error ? error.message : String(error));
 
     if (error instanceof BusinessLogicError) {
       return createErrorResponse(
@@ -121,6 +111,30 @@ export async function getAvailableOAuthProvidersAction() {
     return createErrorResponse(
       'Failed to get available OAuth providers',
       'OAUTH_PROVIDERS_RETRIEVAL_FAILED'
+    );
+  }
+}
+
+/**
+ * Get OAuth provider configuration
+ *
+ * @param provider - OAuth provider to check
+ * @returns Success response with provider configuration
+ */
+export async function getOAuthProviderConfigurationAction(provider: string) {
+  try {
+    const isConfigured = checkProviderConfig(provider);
+    const redirectUri = `${process.env.APP_URL}/api/auth/callback/${provider}`;
+
+    return createSuccessResponse({
+      provider,
+      configured: isConfigured,
+      redirectUri,
+    });
+  } catch {
+    return createErrorResponse(
+      'Failed to get OAuth provider configuration',
+      'OAUTH_CONFIG_RETRIEVAL_FAILED'
     );
   }
 }

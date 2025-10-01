@@ -6,6 +6,7 @@ import { validatePasswordStrength } from "./utils/password";
 import { validateWithSchema } from "./utils/validation-utils";
 import { formatDate, getRelativeTime } from "./utils/date-utils";
 import { authenticateRequest, authorizeResourceAccess, withAuth, withResourceAuth, authorizeByRole, withRoleAuth } from "./middleware/auth-middleware";
+import { SOCIAL_PROVIDERS, FEATURES } from "./config";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -20,6 +21,13 @@ export const auth = betterAuth({
         throw new Error(validation.errors.join(", "));
       }
       return true;
+    },
+  },
+  socialProviders: {
+    google: {
+      clientId: SOCIAL_PROVIDERS.GOOGLE.CLIENT_ID,
+      clientSecret: SOCIAL_PROVIDERS.GOOGLE.CLIENT_SECRET,
+      enabled: FEATURES.SOCIAL_LOGIN,
     },
   },
   session: {

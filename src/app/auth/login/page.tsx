@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import Image from "next/image";
 import { loginAction } from "@/lib/actions/auth.actions";
+import { getOAuthAuthorizationUrlAction } from "@/lib/actions/oauth.actions";
 
 const loginSchema = z.object({
   emailOrUsername: z.string().min(1, "Email or username is required"),
@@ -69,9 +70,24 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    // TODO: Implement Google OAuth login flow
-    console.log("Google login clicked");
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await getOAuthAuthorizationUrlAction("google");
+      
+      if (result.success) {
+        // Redirect to Google OAuth authorization URL
+        if (result.data?.authorizationUrl) {
+          window.location.href = result.data.authorizationUrl;
+        } else {
+          setError("Invalid authorization URL received");
+        }
+      } else {
+        setError(result.message || "Failed to initialize Google login");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred with Google login. Please try again.");
+      console.error(err);
+    }
   };
 
   useEffect(() => {

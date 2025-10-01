@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
+import type { OAuthProvider } from '@/types/auth.types';
 
 /**
  * Sign up a new user with email and password
@@ -78,14 +79,16 @@ export async function updateProfile(data: {
   displayName?: string;
   bio?: string;
   profilePhoto?: string;
-  externalLinks?: any;
+  externalLinks?: Record<string, string>;
 }) {
-  // Map displayName to name for better-auth compatibility
-  const { displayName, ...rest } = data;
+  
+  const { displayName, bio, profilePhoto, externalLinks } = data;
   return await auth.api.updateUser({
     body: {
-      name: displayName,
-      ...rest,
+      ...(displayName && { name: displayName }),
+      ...(bio && { bio }),
+      ...(profilePhoto && { image: profilePhoto }),
+      // externalLinks is not supported by better-auth
     },
     headers: await headers(),
   });
@@ -166,6 +169,54 @@ export async function revokeSession(token: string) {
  */
 export async function revokeOtherSessions() {
   return await auth.api.revokeOtherSessions({
+    headers: await headers(),
+  });
+}
+
+/**
+ * OAuth utility functions using better-auth
+ */
+
+/**
+ * Sign in with OAuth provider
+ * @param provider - OAuth provider (google, github, etc.)
+ * @param callbackURL - URL to redirect to after successful authentication
+ * @returns Promise with the OAuth sign-in result
+ */
+export async function signInWithOAuth(provider: string, callbackURL?: string) {
+  return await auth.api.signInSocial({
+    body: {
+      provider: provider as OAuthProvider,
+      callbackURL: callbackURL || "/dashboard",
+    },
+  });
+}
+
+/**
+ * Link OAuth account to current user
+ * @param provider - OAuth provider
+ * @returns Promise with the link result
+ */
+export async function linkOAuthAccount(provider: string) {
+  return await auth.api.linkSocialAccount({
+    body: {
+      provider: provider as OAuthProvider,
+    },
+    headers: await headers(),
+  });
+}
+
+/**
+ * Unlink OAuth account from current user
+ * @param provider - OAuth provider
+ * @returns Promise with the unlink result
+ */
+export async function unlinkOAuthAccount(provider: string, accountId: string) {
+  return await auth.api.unlinkAccount({
+    body: {
+      providerId: provider as OAuthProvider,
+      accountId: accountId,
+    },
     headers: await headers(),
   });
 }

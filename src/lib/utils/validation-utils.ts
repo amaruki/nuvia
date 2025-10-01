@@ -39,7 +39,7 @@ export function validateFormData<T>(schema: z.ZodSchema<T>, formData: FormData):
   const data: Record<string, unknown> = {};
   
   // Use a traditional for loop to iterate through FormData entries
-  const entries = (formData as any).entries();
+  const entries = formData.entries();
   let entry = entries.next();
   while (!entry.done) {
     const [key, value] = entry.value;

@@ -7,7 +7,7 @@ export type SafeUser = {
   displayName?: string;
   profilePhoto?: string;
   bio?: string;
-  externalLinks?: any;
+  externalLinks?: Record<string, string>;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;

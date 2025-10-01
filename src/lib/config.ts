@@ -109,14 +109,22 @@ export const SOCIAL_PROVIDERS = {
   GOOGLE: {
     CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
     CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
+    ISENABLED: process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? true : false,
   },
   GITHUB: {
     CLIENT_ID: process.env.GITHUB_CLIENT_ID || '',
     CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET || '',
+    ISENABLED: process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET ? true : false,
   },
   FACEBOOK: {
     CLIENT_ID: process.env.FACEBOOK_CLIENT_ID || '',
     CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET || '',
+    ISENABLED: process.env.FACEBOOK_CLIENT_ID && process.env.FACEBOOK_CLIENT_SECRET ? true : false,
+  },
+  LINKEDIN: {
+    CLIENT_ID: process.env.LINKEDIN_CLIENT_ID || '',
+    CLIENT_SECRET: process.env.LINKEDIN_CLIENT_SECRET || '',
+    ISENABLED: process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET ? true : false,
   },
 };
 

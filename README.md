@@ -128,6 +128,9 @@ openssl rand -base64 32
 
     g. Copy the Client ID and Client Secret to your .env.local file
 
+    IMPORTANT: The redirect URI must exactly match `http://localhost:3000/api/auth/callback/google`
+    Make sure there are no trailing slashes or additional parameters in the Google Cloud Console.
+
 6. Set up the database:
 ```bash
 # Generate Prisma client

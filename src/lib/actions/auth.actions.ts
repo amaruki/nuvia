@@ -22,18 +22,18 @@ import type {
 /**
  * Transform better-auth user to SafeUser
  */
-function transformUserToSafeUser(user: any): SafeUser {
+function transformUserToSafeUser(user: { [key: string]: unknown }): SafeUser {
   return {
-    id: user.id,
-    username: user.username || user.name || '',
-    email: user.email,
-    emailVerified: user.emailVerified,
-    displayName: user.name || undefined,
-    profilePhoto: user.image || undefined,
-    bio: user.bio || undefined,
-    externalLinks: user.externalLinks || undefined,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
+    id: user.id as string,
+    username: (user.username || user.name || '') as string,
+    email: user.email as string,
+    emailVerified: user.emailVerified as boolean,
+    displayName: (user.name || undefined) as string,
+    profilePhoto: (user.image || undefined) as string,
+    bio: (user.bio || undefined) as string,
+    externalLinks: (user.externalLinks || undefined) as Record<string, string> | undefined,
+    createdAt: user.createdAt as Date,
+    updatedAt: user.updatedAt as Date,
     deletedAt: undefined,
   };
 }
@@ -52,9 +52,9 @@ export async function loginAction(formData: FormData): Promise<AuthResponse> {
       emailOrUsername,
       password,
     });
-    
+
     // Assume emailOrUsername is an email for better-auth
-    const email = emailOrUsername;
+    const email = validatedData.emailOrUsername;
     
     // Process login
     const result = await signIn(email, password);
@@ -113,9 +113,14 @@ export async function signupAction(formData: FormData): Promise<AuthResponse> {
       confirmPassword,
       agreeToTerms,
     });
-    
-    // Process signup
-    const result = await signUp(username, email, password, fullName);
+
+    // Process signup with validated data
+    const result = await signUp(
+      validatedData.username,
+      validatedData.email,
+      validatedData.password,
+      validatedData.fullName
+    );
     
     // Transform result to match AuthResponse type
     return {

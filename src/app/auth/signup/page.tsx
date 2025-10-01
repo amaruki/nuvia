@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { animate } from "animejs";
@@ -13,6 +13,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signupAction } from "@/lib/actions/auth.actions";
+import { getOAuthAuthorizationUrlAction } from "@/lib/actions/oauth.actions";
 
 const signupSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -48,6 +49,7 @@ export default function SignupPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -69,6 +71,7 @@ export default function SignupPage() {
           formData.append('fullName', fullName);
           formData.append('password', password);
           formData.append('confirmPassword', confirmPassword);
+          formData.append('agreeToTerms', data.agreeToTerms ? 'true' : 'false');
     
           const result = await signupAction(formData);
     
@@ -102,10 +105,25 @@ export default function SignupPage() {
     return !!validationErrors[field]?.length;
   };
 
-  const handleGoogleSignup = () => {
-    // Here you would implement Google OAuth signup
-    console.log("Google signup clicked");
-  };
+  const handleGoogleSignUp = async () => {
+      try {
+        const result = await getOAuthAuthorizationUrlAction("google");
+        
+        if (result.success) {
+          // Redirect to Google OAuth authorization URL
+          if (result.data?.authorizationUrl) {
+            window.location.href = result.data.authorizationUrl;
+          } else {
+            setError("Invalid authorization URL received");
+          }
+        } else {
+          setError(result.message || "Failed to initialize Google signup");
+        }
+      } catch (err) {
+        setError("An unexpected error occurred with Google signup. Please try again.");
+        console.error(err);
+      }
+    };
 
   useEffect(() => {
     // Animate signup card entrance
@@ -284,9 +302,16 @@ export default function SignupPage() {
             </div>
 
             <div className="flex items-start space-x-2 pt-2">
-              <Checkbox
-                id="agreeToTerms"
-                {...register("agreeToTerms")}
+              <Controller
+                name="agreeToTerms"
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    id="agreeToTerms"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
               />
               <Label
                 htmlFor="agreeToTerms"
@@ -331,8 +356,8 @@ export default function SignupPage() {
           <Button
             type="button"
             variant="outline"
-            className="w-full flex items-center text-gray-800 justify-center gap-2"
-            onClick={handleGoogleSignup}
+            className="w-full flex items-center text-gray-800 justify-center gap-2 cursor-pointer"
+            onClick={handleGoogleSignUp}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path

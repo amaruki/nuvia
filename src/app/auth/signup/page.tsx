@@ -13,7 +13,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signupAction } from "@/lib/actions/auth.actions";
-import { getOAuthAuthorizationUrlAction } from "@/lib/actions/oauth.actions";
+import { signInWithOAuthAction } from "@/lib/actions/oauth-better-auth.actions";
 
 const signupSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -106,22 +106,33 @@ export default function SignupPage() {
   };
 
   const handleGoogleSignUp = async () => {
+      setError(null);
+      setIsLoading(true);
+
       try {
-        const result = await getOAuthAuthorizationUrlAction("google");
-        
+        console.log("Starting Google OAuth signup with better-auth...");
+        const result = await signInWithOAuthAction("google", "/dashboard");
+
+        console.log("Google OAuth signup result:", result);
+
         if (result.success) {
-          // Redirect to Google OAuth authorization URL
-          if (result.data?.authorizationUrl) {
-            window.location.href = result.data.authorizationUrl;
+          // Redirect to OAuth URL provided by better-auth
+          if (result.data?.url) {
+            console.log("Redirecting to Google OAuth:", result.data.url);
+            window.location.href = result.data.url;
           } else {
+            console.error("No redirect URL in OAuth response");
             setError("Invalid authorization URL received");
           }
         } else {
+          console.error("OAuth action failed:", result.message);
           setError(result.message || "Failed to initialize Google signup");
         }
       } catch (err) {
+        console.error("Error during Google OAuth signup:", err);
         setError("An unexpected error occurred with Google signup. Please try again.");
-        console.error(err);
+      } finally {
+        setIsLoading(false);
       }
     };
 

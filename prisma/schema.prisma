@@ -96,31 +96,33 @@ model PasswordResetToken {
 // NextAuth.js models
 
 model Account {
-  id                            String  @id @default(uuid())
-  userId                        String
-  providerId                    String
-  accountId                     String
-  refreshToken                  String? @db.Text
-  accessToken                   String? @db.Text
-  accessTokenExpiresAt          DateTime?
-  scope                         String?
-  idToken                       String? @db.Text
-  
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                   String    @id @default(uuid())
+  userId               String
+  providerId           String
+  accountId            String
+  refreshToken         String?   @db.Text
+  accessToken          String?   @db.Text
+  accessTokenExpiresAt DateTime?
+  scope                String?
+  idToken              String?   @db.Text
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  refreshTokenExpiresAt DateTime?
+  password              String?
 
   @@unique([providerId, accountId])
   @@map("accounts")
 }
 
 model Session {
-  id           String   @id @default(uuid())
-  token        String   @unique
-  userId       String
-  expiresAt    DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -151,18 +153,19 @@ model Verification {
 }
 
 // Authentication log model for security monitoring
+
 model AuthLog {
-  id         String   @id @default(uuid())
-  userId     String?
-  eventType  String
-  severity   String
-  message    String
-  ipAddress  String?
-  userAgent  String?
-  deviceId   String?
-  location   String?
-  metadata   Json?
-  timestamp  DateTime @default(now())
+  id        String   @id @default(uuid())
+  userId    String?
+  eventType String
+  severity  String
+  message   String
+  ipAddress String?
+  userAgent String?
+  deviceId  String?
+  location  String?
+  metadata  Json?
+  timestamp DateTime @default(now())
 
   @@map("auth_logs")
 }

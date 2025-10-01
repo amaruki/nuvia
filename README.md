@@ -74,13 +74,61 @@ cp .env.example .env.local
 
 Configure the following variables:
 ```env
-DATABASE_URL="postgresql://user:password@localhost:5432/community_platform"
-NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
-REDIS_URL="redis://localhost:6379" # optional
+# Application Configuration
+APP_URL=http://localhost:3000
+NODE_ENV=development
+
+# Authentication Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
+JWT_EXPIRES_IN=7d
+BETTER_AUTH_SECRET=your-super-secret-auth-key-here
+
+# Database Configuration
+DATABASE_URL="postgresql://username:password@localhost:5432/nuvia?schema=public"
+
+# Google OAuth Configuration
+GOOGLE_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-oauth-client-secret
+
+# Email Configuration
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@example.com
+EMAIL_PASS=your-email-password
+EMAIL_FROM=noreply@yourapp.com
+
+# Optional: Redis Configuration
+REDIS_URL=redis://localhost:6379
 ```
 
-4. Set up the database:
+4. Generate secure secrets:
+```bash
+# Generate JWT secret
+openssl rand -base64 32
+
+# Generate Better Auth secret
+openssl rand -base64 32
+```
+
+5. Google OAuth Setup:
+
+    a. Go to Google Cloud Console: https://console.cloud.google.com/
+
+    b. Create a new project or select existing one
+
+    c. Go to "APIs & Services" > "Credentials"
+
+    d. Click "Create Credentials" > "OAuth client ID"
+
+    e. Application type: "Web application"
+
+    f. Add authorized redirect URIs:
+   - http://localhost:3000/api/auth/callback/google
+   - https://yourdomain.com/api/auth/callback/google
+
+    g. Copy the Client ID and Client Secret to your .env.local file
+
+6. Set up the database:
 ```bash
 # Generate Prisma client
 bunx prisma generate
@@ -92,7 +140,7 @@ bunx prisma migrate dev
 bunx prisma db seed
 ```
 
-5. Start the development server:
+7. Start the development server:
 ```bash
 bun run dev
 ```
@@ -157,16 +205,6 @@ The platform can also be deployed to Railway or DigitalOcean App Platform with s
 1. Ensure all tests pass
 2. Follow the established code patterns and architecture
 3. Update documentation as needed
-
-## Security
-
-This platform implements security best practices including:
-- Input validation at all layers
-- JWT-based authentication
-- Rate limiting
-- CORS configuration
-- SQL injection prevention
-- XSS protection
 
 ## License
 

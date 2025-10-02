@@ -54,6 +54,20 @@ export const auth = betterAuth({
       scopes: ["openid", "profile", "email"],
     },
   },
+  // Ensure account creation is enabled for OAuth providers
+  account: {
+    accountLinking: {
+      enabled: true,
+      // Allow users to link multiple OAuth accounts to the same email
+      trustedProviders: ["google", "github", "linkedin"],
+    },
+  },
+  // Configure OAuth account creation
+  oauth: {
+    enabled: true,
+    // Automatically create accounts for OAuth users
+    createAccountOnSignIn: true,
+  },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
@@ -112,14 +126,33 @@ export const auth = betterAuth({
       "https://localhost:3000",
     ],
     generateState: true,
-    // Add hooks for debugging OAuth state
+    // Add hooks for debugging OAuth state and handling account creation
     hooks: {
       onError: async (event: any) => {
         console.error("Better Auth Error:", {
           event: event.name,
           error: event.error,
         });
-      }
+      },
+      // Hook to handle OAuth account creation
+      onOAuthAccountCreation: async (event: any) => {
+        console.log("OAuth Account Creation:", {
+          provider: event.provider,
+          email: event.email,
+          accountId: event.accountId,
+        });
+        
+        // The account will be automatically created by better-auth
+        // This hook is just for logging and potential additional processing
+      },
+      // Hook to handle OAuth sign-in
+      onOAuthSignIn: async (event: any) => {
+        console.log("OAuth Sign In:", {
+          provider: event.provider,
+          email: event.email,
+          userId: event.userId,
+        });
+      },
     }
   },
    logger: {

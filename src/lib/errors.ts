@@ -143,6 +143,11 @@ export function createErrorResponse(error: Error) {
     errors = {
       external: [error.message],
     };
+  } else if (error instanceof OAuthConflictError) {
+    statusCode = 409;
+    errors = {
+      oauth: [error.message],
+    };
   }
   
   return {
@@ -231,4 +236,23 @@ export function logError(error: Error, context: Record<string, any> = {}): void 
     context,
     timestamp: new Date().toISOString(),
   });
+}
+
+export class OAuthConflictError extends Error {
+  public email: string;
+  public existingMethod: string;
+  public attemptedMethod: string;
+  
+  constructor(
+    email: string,
+    existingMethod: string,
+    attemptedMethod: string,
+    message?: string
+  ) {
+    super(message || `Email ${email} is already registered with ${existingMethod}. Cannot use ${attemptedMethod}.`);
+    this.name = "OAuthConflictError";
+    this.email = email;
+    this.existingMethod = existingMethod;
+    this.attemptedMethod = attemptedMethod;
+  }
 }

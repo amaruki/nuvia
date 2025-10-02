@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { WidgetContainer } from "../ui/WidgetContainer"
-import { Card, CardContent } from "../ui/Card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "../ui/Badge"
+import { WidgetContainer } from "../../ui/WidgetContainer"
+import { Card, CardContent } from "../../ui/Card"
+import { Button } from "@/components/ui/Button"
+import { Badge } from "../../ui/Badge"
 import { MessageSquare, Users, Heart, Share2, Calendar, TrendingUp, ExternalLink } from "lucide-react"
 import { CommunityActivity } from "@/types/dashboard.types"
 

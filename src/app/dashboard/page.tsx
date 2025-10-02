@@ -60,15 +60,15 @@ export default function DashboardPage() {
         {/* Personal Recommendations Widget */}
         <PersonalRecommendationsWidget />
         
+        <MemberStatisticsWidget />
+        <EventActivityWidget />
+        <RecentContentWidget />
+        <ModerationWidget />
+        <FinanceWidget />
+        <AnalyticsWidget />
         {/* Admin Widgets - only shown if user is admin */}
         {userRole === "admin" && (
           <>
-            <MemberStatisticsWidget />
-            <EventActivityWidget />
-            <RecentContentWidget />
-            <ModerationWidget />
-            <FinanceWidget />
-            <AnalyticsWidget />
           </>
         )}
         

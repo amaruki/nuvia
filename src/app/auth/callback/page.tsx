@@ -31,8 +31,8 @@ export default function OAuthCallbackPage() {
                 router.push("/dashboard");
               }, 2000);
             },
-            onError: (error) => {
-              console.error("OAuth callback session retrieval failed:", error?.message || error);
+            onError: (ctx) => {
+              console.error("OAuth callback session retrieval failed:", ctx.error?.message || ctx.error);
               setStatus("error");
               setMessage("Authentication failed. Please try again.");
 

@@ -80,6 +80,10 @@ export interface Article {
   publishedAt: Date;
   category: string;
   coverImage?: string;
+  readTime?: number;
+  isBookmarked?: boolean;
+  commentCount?: number;
+  viewCount?: number;
 }
 
 export interface Certificate {

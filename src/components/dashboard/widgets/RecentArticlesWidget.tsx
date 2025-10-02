@@ -22,7 +22,7 @@ const mockArticles: Article[] = [
     title: "Getting Started with React Hooks",
     excerpt: "Learn the fundamentals of React Hooks and how to use them effectively in your applications.",
     author: "Jane Smith",
-    publishDate: new Date("2023-10-01T10:30:00"),
+    publishedAt: new Date("2023-10-01T10:30:00"),
     category: "Development",
     readTime: 5,
     isBookmarked: false,
@@ -34,7 +34,7 @@ const mockArticles: Article[] = [
     title: "The Future of Web Development",
     excerpt: "Exploring emerging trends and technologies that will shape the future of web development.",
     author: "John Doe",
-    publishDate: new Date("2023-09-28T14:15:00"),
+    publishedAt: new Date("2023-09-28T14:15:00"),
     category: "Technology",
     readTime: 8,
     isBookmarked: true,
@@ -46,7 +46,7 @@ const mockArticles: Article[] = [
     title: "Building Accessible Web Applications",
     excerpt: "Best practices and techniques for creating web applications that are accessible to all users.",
     author: "Alex Johnson",
-    publishDate: new Date("2023-09-25T09:45:00"),
+    publishedAt: new Date("2023-09-25T09:45:00"),
     category: "Accessibility",
     readTime: 7,
     isBookmarked: false,
@@ -58,7 +58,7 @@ const mockArticles: Article[] = [
     title: "Introduction to TypeScript",
     excerpt: "A comprehensive guide to getting started with TypeScript and its benefits for JavaScript developers.",
     author: "Sarah Williams",
-    publishDate: new Date("2023-09-22T16:20:00"),
+    publishedAt: new Date("2023-09-22T16:20:00"),
     category: "Development",
     readTime: 10,
     isBookmarked: true,
@@ -178,7 +178,7 @@ export function RecentArticlesWidget({
                         
                         <div className="flex items-center space-x-1">
                           <Calendar className="h-3 w-3" />
-                          <span>{formatDate(article.publishDate)}</span>
+                          <span>{formatDate(article.publishedAt)}</span>
                         </div>
                         
                         <div className="flex items-center space-x-1">

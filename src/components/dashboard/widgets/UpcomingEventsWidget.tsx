@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import { WidgetContainer } from "../ui/WidgetContainer"
 import { EmptyState } from "../ui/EmptyState"

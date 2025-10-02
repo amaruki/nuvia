@@ -10,7 +10,7 @@ const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
   maxRequests: number; // Maximum number of requests allowed in the window
-  keyGenerator?: (request: NextRequest) => string; // Custom key generator
+  keyGenerator?: (request: NextRequest) => string | Promise<string>; // Custom key generator
   skipSuccessfulRequests?: boolean; // Don't count successful requests
   skipFailedRequests?: boolean; // Don't count failed requests
 }
@@ -60,9 +60,9 @@ export const RATE_LIMITS = {
 export function createRateLimiter(config: RateLimitConfig) {
   return async function rateLimit(request: NextRequest): Promise<RateLimitInfo> {
     // Generate key for rate limiting
-    const key = config.keyGenerator 
-      ? config.keyGenerator(request)
-      : getDefaultKey(request);
+    const key = config.keyGenerator
+      ? await config.keyGenerator(request)
+      : await getDefaultKey(request);
     
     const now = Date.now();
     const windowStart = now - config.windowMs;
@@ -106,15 +106,26 @@ export function createRateLimiter(config: RateLimitConfig) {
  * @param request - The request object
  * @returns string - The rate limit key
  */
-function getDefaultKey(request: NextRequest): string {
+async function getDefaultKey(request: NextRequest): Promise<string> {
   const ip = getClientIP(request);
   const url = new URL(request.url);
   const path = url.pathname;
   
-  // For login and forgot password, include email in key if available
-  // Note: In a real implementation, you would need to parse the request body differently
-  // as we can't easily access the request body here without cloning it
-  // This is a simplified version that doesn't include email in the key
+  // For login and signup, include email/username in key if available
+  if (path.includes('/login') || path.includes('/signup')) {
+    try {
+      // Clone the request to read the body
+      const clonedRequest = request.clone();
+      const body = await clonedRequest.json();
+      
+      // Use email or username as part of the key
+      const identifier = body.email || body.emailOrUsername || body.username || ip;
+      return `${ip}:${path}:${identifier}`;
+    } catch (error) {
+      // If we can't parse the body, fall back to IP-based key
+      return `${ip}:${path}`;
+    }
+  }
   
   return `${ip}:${path}`;
 }
@@ -160,7 +171,7 @@ function checkIfShouldSkip(request: NextRequest, config: RateLimitConfig): boole
  * @returns Function that generates a rate limit key
  */
 export function createKeyGenerator(route: string) {
-  return (request: NextRequest): string => {
+  return async (request: NextRequest): Promise<string> => {
     const ip = getClientIP(request);
     return `${ip}:${route}`;
   };

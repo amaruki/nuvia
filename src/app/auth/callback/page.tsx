@@ -12,8 +12,38 @@ export default function OAuthCallbackPage() {
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
+      // Check for OAuth conflict error in URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const error = urlParams.get('error');
+      const errorDescription = urlParams.get('error_description');
+      const provider = urlParams.get('provider');
+
+      // If there's an OAuth conflict error, show it immediately
+      if (error === 'oauth_conflict') {
+        setStatus("error");
+        setMessage(errorDescription || "This email is already registered with a different authentication method.");
+        
+        // Redirect to login page after showing error
+        setTimeout(() => {
+          router.push(`/auth/login?error=oauth_conflict&provider=${provider || ''}`);
+        }, 5000);
+        return;
+      }
+
+      // Handle other OAuth errors
+      if (error && error !== 'oauth_conflict') {
+        setStatus("error");
+        setMessage(errorDescription || "Authentication failed. Please try again.");
+        
+        // Redirect to login page after showing error
+        setTimeout(() => {
+          router.push(`/auth/login?error=${error}&provider=${provider || ''}`);
+        }, 3000);
+        return;
+      }
+
       try {
-        const { data: session, error } = await authClient.getSession({
+        const { data: session, error: sessionError } = await authClient.getSession({
           fetchOptions: {
             onSuccess: (sessionData) => {
               setStatus("success");
@@ -44,8 +74,8 @@ export default function OAuthCallbackPage() {
           },
         });
 
-        if (error) {
-          throw error;
+        if (sessionError) {
+          throw sessionError;
         }
       } catch (error) {
         console.error("OAuth callback error:", error instanceof Error ? error.message : String(error));

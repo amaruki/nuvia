@@ -113,9 +113,18 @@ function LoginForm() {
     // Check for OAuth callback parameters
     const error = searchParams.get('error');
     const errorDescription = searchParams.get('error_description');
+    const provider = searchParams.get('provider');
 
     if (error) {
-      setError(errorDescription || error);
+      let errorMessage = errorDescription || error;
+      
+      // Handle specific OAuth conflict error
+      if (error === 'oauth_conflict') {
+        errorMessage = errorDescription ||
+          `This email is already registered with a different authentication method. Please sign in using the same method you used to register.`;
+      }
+      
+      setError(errorMessage);
       // Clean up URL parameters
       window.history.replaceState({}, document.title, window.location.pathname);
     }

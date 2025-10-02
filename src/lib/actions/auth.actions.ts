@@ -76,12 +76,40 @@ export async function loginAction(formData: FormData): Promise<AuthResponse> {
   } catch (error) {
     console.error('Login action error:', error);
     
-    // Return a generic error response
+    // Handle specific authentication errors
+    if (error && typeof error === 'object' && 'status' in error) {
+      const authError = error as { status: string; body?: any; message?: string };
+      
+      if (authError.status === 'UNAUTHORIZED') {
+        return {
+          success: false,
+          message: 'Invalid email or password',
+          errors: {
+            authentication: ['The email or password you entered is incorrect'],
+          },
+          meta: {
+            timestamp: new Date(),
+            version: 'v1',
+          },
+        };
+      }
+    }
+    
+    // Handle other error types
+    let errorMessage = 'An unexpected error occurred during login';
+    let errorDetails: string[] = ['Please try again later'];
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      errorDetails = [error.message];
+    }
+    
+    // Return a specific error response
     return {
       success: false,
-      message: 'An unexpected error occurred during login',
+      message: errorMessage,
       errors: {
-        server: ['Please try again later'],
+        server: errorDetails,
       },
       meta: {
         timestamp: new Date(),
@@ -139,12 +167,40 @@ export async function signupAction(formData: FormData): Promise<AuthResponse> {
   } catch (error) {
     console.error('Signup action error:', error);
     
-    // Return a generic error response
+    // Handle specific authentication errors
+    if (error && typeof error === 'object' && 'status' in error) {
+      const authError = error as { status: string; body?: any; message?: string };
+      
+      if (authError.status === 'UNAUTHORIZED' || authError.status === 'CONFLICT') {
+        return {
+          success: false,
+          message: 'Email already registered',
+          errors: {
+            authentication: ['This email is already registered. Please use a different email or try logging in.'],
+          },
+          meta: {
+            timestamp: new Date(),
+            version: 'v1',
+          },
+        };
+      }
+    }
+    
+    // Handle other error types
+    let errorMessage = 'An unexpected error occurred during signup';
+    let errorDetails: string[] = ['Please try again later'];
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      errorDetails = [error.message];
+    }
+    
+    // Return a specific error response
     return {
       success: false,
-      message: 'An unexpected error occurred during signup',
+      message: errorMessage,
       errors: {
-        server: ['Please try again later'],
+        server: errorDetails,
       },
       meta: {
         timestamp: new Date(),

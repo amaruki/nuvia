@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { Event, EventRegistration } from "@/types/event.types";
 import { getEventById, getUserEventRegistrations, registerForEvent } from "@/lib/services/event.service";
-import { EventLayout } from "@/components/events/EventLayout";
+import { EventLayout } from "@/components/events/event-layout";
 
 export default function EventRegistrationPage() {
   const params = useParams();

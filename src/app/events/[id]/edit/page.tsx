@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { ArrowLeft, Save, X, Plus } from "lucide-react";
 import { EventType, EventStatus, Event } from "@/types/event.types";
-import { EventLayout } from "@/components/events/EventLayout";
+import { EventLayout } from "@/components/events/event-layout";
 import { getEventById } from "@/lib/services/event.service";
 
 const eventTypeOptions = [

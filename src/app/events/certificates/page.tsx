@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Award, Download, ExternalLink } from "lucide-react";
 import { EventCertificate, Event } from "@/types/event.types";
 import { getUserEventRegistrations, getEventCertificate } from "@/lib/services/event.service";
-import { EventListLayout } from "@/components/events/EventListLayout";
+import { EventListLayout } from "@/components/events/event-list-layout";
 
 export default function EventCertificatesPage() {
   const [certificates, setCertificates] = React.useState<EventCertificate[]>([]);

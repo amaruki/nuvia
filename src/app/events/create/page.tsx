@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Save, X, Plus } from "lucide-react";
 import { EventType, EventStatus } from "@/types/event.types";
-import { EventLayout } from "@/components/events/EventLayout";
+import { EventLayout } from "@/components/events/event-layout";
 
 const eventTypeOptions = [
   { value: EventType.WORKSHOP, label: "Workshop" },

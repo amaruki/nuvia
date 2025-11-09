@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Event, EventRegistration, EventStatistics } from "@/types/event.types";
 import { getEventDashboardData, getEventStatistics } from "@/lib/services/event.service";
-import { EventListLayout } from "@/components/events/EventListLayout";
+import { EventListLayout } from "@/components/events/event-list-layout";
 
 export default function EventDashboardPage() {
   const [dashboardData, setDashboardData] = React.useState<{

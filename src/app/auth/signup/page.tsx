@@ -15,37 +15,50 @@ import { useRouter } from "next/navigation";
 import { signupAction } from "@/lib/actions/auth.actions";
 import { signInWithOAuthAction } from "@/lib/actions/oauth-better-auth.actions";
 
-const signupSchema = z.object({
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number")
-    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
-  confirmPassword: z.string().min(1, "Please confirm your password"),
-  agreeToTerms: z.boolean().refine(val => val === true, "You must agree to the terms and conditions"),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const signupSchema = z
+  .object({
+    fullName: z.string().min(2, "Full name must be at least 2 characters"),
+    email: z.string().email("Please enter a valid email address"),
+    username: z.string().min(3, "Username must be at least 3 characters"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(
+        /[^A-Za-z0-9]/,
+        "Password must contain at least one special character"
+      ),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+    agreeToTerms: z
+      .boolean()
+      .refine(
+        (val) => val === true,
+        "You must agree to the terms and conditions"
+      ),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-    const [email, setEmail] = useState('');
-    const [username, setUsername] = useState('');
-    const [fullName, setFullName] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
-    const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
-    const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string[]>
+  >({});
+  const router = useRouter();
 
-    
   const {
     register,
     handleSubmit,
@@ -63,38 +76,40 @@ export default function SignupPage() {
     setError(null);
     setSuccess(null);
     setValidationErrors({});
-    
+
     try {
-          const formData = new FormData();
-          formData.append('email', email);
-          formData.append('username', username);
-          formData.append('fullName', fullName);
-          formData.append('password', password);
-          formData.append('confirmPassword', confirmPassword);
-          formData.append('agreeToTerms', data.agreeToTerms ? 'true' : 'false');
-    
-          const result = await signupAction(formData);
-    
-          if (result.success) {
-            setSuccess('Account created successfully! Please check your email to verify your account.');
-            // In a real implementation, you would store the user session/token here
-            setTimeout(() => {
-              router.push('/dashboard');
-            }, 3000);
-          } else {
-            setError(result.message || 'Signup failed');
-            
-            // Set validation errors if they exist
-            if (result.errors) {
-              setValidationErrors(result.errors);
-            }
-          }
-        } catch (err) {
-          setError('An unexpected error occurred. Please try again.');
-          console.error(err);
-        } finally {
-          setIsLoading(false);
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("username", username);
+      formData.append("fullName", fullName);
+      formData.append("password", password);
+      formData.append("confirmPassword", confirmPassword);
+      formData.append("agreeToTerms", data.agreeToTerms ? "true" : "false");
+
+      const result = await signupAction(formData);
+
+      if (result.success) {
+        setSuccess(
+          "Account created successfully! Please check your email to verify your account."
+        );
+        // In a real implementation, you would store the user session/token here
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 3000);
+      } else {
+        setError(result.message || "Signup failed");
+
+        // Set validation errors if they exist
+        if (result.errors) {
+          setValidationErrors(result.errors);
         }
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getErrorMessage = (field: string) => {
@@ -106,35 +121,37 @@ export default function SignupPage() {
   };
 
   const handleGoogleSignUp = async () => {
-      setError(null);
-      setIsLoading(true);
+    setError(null);
+    setIsLoading(true);
 
-      try {
-        console.log("Starting Google OAuth signup with better-auth...");
-        const result = await signInWithOAuthAction("google", "/dashboard");
+    try {
+      console.log("Starting Google OAuth signup with better-auth...");
+      const result = await signInWithOAuthAction("google", "/dashboard");
 
-        console.log("Google OAuth signup result:", result);
+      console.log("Google OAuth signup result:", result);
 
-        if (result.success) {
-          // Redirect to OAuth URL provided by better-auth
-          if (result.data?.url) {
-            console.log("Redirecting to Google OAuth:", result.data.url);
-            window.location.href = result.data.url;
-          } else {
-            console.error("No redirect URL in OAuth response");
-            setError("Invalid authorization URL received");
-          }
+      if (result.success) {
+        // Redirect to OAuth URL provided by better-auth
+        if (result.data?.url) {
+          console.log("Redirecting to Google OAuth:", result.data.url);
+          window.location.href = result.data.url;
         } else {
-          console.error("OAuth action failed:", result.message);
-          setError(result.message || "Failed to initialize Google signup");
+          console.error("No redirect URL in OAuth response");
+          setError("Invalid authorization URL received");
         }
-      } catch (err) {
-        console.error("Error during Google OAuth signup:", err);
-        setError("An unexpected error occurred with Google signup. Please try again.");
-      } finally {
-        setIsLoading(false);
+      } else {
+        console.error("OAuth action failed:", result.message);
+        setError(result.message || "Failed to initialize Google signup");
       }
-    };
+    } catch (err) {
+      console.error("Error during Google OAuth signup:", err);
+      setError(
+        "An unexpected error occurred with Google signup. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Animate signup card entrance
@@ -149,11 +166,11 @@ export default function SignupPage() {
   return (
     <>
       {/* Signup card - responsive width and padding */}
-      <div className="signup-card relative z-10 w-full max-w-md sm:max-w-lg bg-card rounded-2xl shadow-xl overflow-hidden opacity-0">
-        <div className="p-6 sm:p-8 md:p-10">
+      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
+        <div className="w-full max-w-md">
           {/* Logo and title */}
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-foreground">
               <Image
                 src="/logo.png"
                 alt="Nuvia Logo"
@@ -162,245 +179,255 @@ export default function SignupPage() {
                 className="rounded-md"
               />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">Create Account</h1>
-            <p className="text-foreground/70 mt-2">Join us today</p>
+            <h1 className="text-2xl font-semibold text-foreground">
+              Create your account
+            </h1>
+            <p className="text-sm mt-1 text-muted-foreground">
+              Join us today
+            </p>
           </div>
 
           {error && (
-        <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-destructive" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
+            <div className="mb-6 p-3 rounded-lg border bg-destructive/10 border-destructive/30">
+              <p className="text-sm text-destructive">{error}</p>
             </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-destructive">Error</h3>
-              <div className="mt-2 text-sm text-destructive">
-                <p>{error}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {success && (
-        <div className="bg-chart-2/10 border border-success/30 rounded-md p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
+          {success && (
+            <div className="mb-6 p-3 rounded-lg border bg-primary/10 border-primary/30">
+              <p className="text-sm text-primary">{success}</p>
             </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-success">Success</h3>
-              <div className="mt-2 text-sm text-success">
-                <p>{success}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+          )}
 
           {/* Signup form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-foreground/70">
-                Full Name
-              </Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Enter your full name"
-                className="w-full"
-                value={fullName}
-                {...register("fullName", {
-                  onChange: (e) => setFullName(e.target.value)
-                })}
-              />
-              {errors.fullName && (
-                <p className="text-destructive text-sm mt-1">
-                  {errors.fullName.message}
-                </p>
-              )}
-              {hasError('fullName') && (
-                <p className="mt-1 text-sm text-destructive">{getErrorMessage('fullName')}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground/70">
-                Email Address
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email address"
-                className="w-full"
-                value={email}
-                {...register("email", {
-                  onChange: (e) => setEmail(e.target.value)
-                })}
-              />
-              {errors.email && (
-                <p className="text-destructive text-sm mt-1">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-foreground/70">
-                Username
-              </Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Choose a username"
-                className="w-full"
-                value={username}
-                {...register("username", {
-                  onChange: (e) => setUsername(e.target.value),
-                })}
-              />
-              {errors.username && (
-                <p className="text-destructive text-sm mt-1">
-                  {errors.username.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground/70">
-                Password
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Create a password"
-                className="w-full"
-                value={password}
-                {...register("password", {
-                  onChange: (e) => setPassword(e.target.value),
-                })}
-              />
-              {errors.password && (
-                <p className="text-destructive text-sm mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-foreground/70">
-                Confirm Password
-              </Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm your password"
-                className="w-full"
-                value={confirmPassword}
-                {...register("confirmPassword", {
-                  onChange: (e) => setConfirmPassword(e.target.value),
-                })}
-              />
-              {errors.confirmPassword && (
-                <p className="text-destructive text-sm mt-1">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-
-            <div className="flex items-start space-x-2 pt-2">
-              <Controller
-                name="agreeToTerms"
-                control={control}
-                render={({ field }) => (
-                  <Checkbox
-                    id="agreeToTerms"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                )}
-              />
-              <Label
-                htmlFor="agreeToTerms"
-                className="text-foreground/70 text-sm"
+          <div className="signup-card rounded-2xl border p-8 shadow-sm bg-card border-border">
+            {/* Social signup */}
+            <div className="space-y-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGoogleSignUp}
+                disabled={isLoading}
+                className="w-full h-10 justify-center gap-3"
               >
-                I agree to the{" "}
-                <Link href="/terms" className="text-primary hover:text-primary/80">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link href="/privacy" className="text-primary hover:text-primary/80">
-                  Privacy Policy
-                </Link>
-              </Label>
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  />
+                </svg>
+                <span>Google</span>
+              </Button>
             </div>
-            {errors.agreeToTerms && (
-              <p className="text-destructive text-sm mt-1">
-                {errors.agreeToTerms.message}
-              </p>
-            )}
 
-            <Button
-              type="submit"
-              className="w-full bg-primary hover:bg-primary/90 mt-4"
-              disabled={isLoading}
-            >
-              {isLoading ? "Creating Account..." : "Create Account"}
-            </Button>
-          </form>
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-card px-4 text-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
 
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-card text-foreground/50">Or continue with</span>
-            </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 my-6">
+              <div className="space-y-3">
+                <Label
+                  htmlFor="fullName"
+                  className="text-sm font-medium"
+                >
+                  Full Name
+                </Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={fullName}
+                  {...register("fullName", {
+                    onChange: (e) => setFullName(e.target.value),
+                  })}
+                  className="h-10"
+                />
+                {errors.fullName && (
+                  <p className="text-sm text-destructive">
+                    {errors.fullName.message}
+                  </p>
+                )}
+                {hasError("fullName") && (
+                  <p className="text-sm text-destructive">
+                    {getErrorMessage("fullName")}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <Label
+                  htmlFor="email"
+                  className="text-sm font-medium"
+                >
+                  Email Address
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  {...register("email", {
+                    onChange: (e) => setEmail(e.target.value),
+                  })}
+                  className="h-10"
+                />
+                {errors.email && (
+                  <p className="text-sm text-destructive">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <Label
+                  htmlFor="username"
+                  className="text-sm font-medium"
+                >
+                  Username
+                </Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="Choose a username"
+                  value={username}
+                  {...register("username", {
+                    onChange: (e) => setUsername(e.target.value),
+                  })}
+                  className="h-10"
+                />
+                {errors.username && (
+                  <p className="text-sm text-destructive">
+                    {errors.username.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <Label
+                  htmlFor="password"
+                  className="text-sm font-medium"
+                >
+                  Password
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Create a password"
+                  value={password}
+                  {...register("password", {
+                    onChange: (e) => setPassword(e.target.value),
+                  })}
+                  className="h-10"
+                />
+                {errors.password && (
+                  <p className="text-sm text-destructive">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <Label
+                  htmlFor="confirmPassword"
+                  className="text-sm font-medium"
+                >
+                  Confirm Password
+                </Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  {...register("confirmPassword", {
+                    onChange: (e) => setConfirmPassword(e.target.value),
+                  })}
+                  className="h-10"
+                />
+                {errors.confirmPassword && (
+                  <p className="text-sm text-destructive">
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <Controller
+                  name="agreeToTerms"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      id="agreeToTerms"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  )}
+                />
+                <Label
+                  htmlFor="agreeToTerms"
+                  className="text-sm font-normal leading-relaxed"
+                >
+                  I agree to the{" "}
+                  <Link
+                    href="/terms"
+                    className="text-primary hover:underline"
+                  >
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/privacy"
+                    className="text-primary hover:underline"
+                  >
+                    Privacy Policy
+                  </Link>
+                </Label>
+              </div>
+              {errors.agreeToTerms && (
+                <p className="text-sm text-destructive">
+                  {errors.agreeToTerms.message}
+                </p>
+              )}
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-10"
+              >
+                {isLoading ? "Creating Account..." : "Create Account"}
+              </Button>
+            </form>
+
+            {/* Sign in link */}
+            <p className="text-center text-sm text-muted-foreground mt-6">
+              Already have an account?{" "}
+              <Link
+                href="/auth/login"
+                className="font-medium hover:underline text-primary"
+              >
+                Sign in
+              </Link>
+            </p>
           </div>
-
-          {/* Social signup */}
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full flex items-center text-foreground/80 justify-center gap-2 cursor-pointer"
-            onClick={handleGoogleSignUp}
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path
-                fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
-            Sign up with Google
-          </Button>
-
-          {/* Login link */}
-          <p className="text-center text-foreground/60 mt-6">
-            Already have an account?{" "}
-            <Link
-              href="/auth/login"
-              className="text-primary hover:text-primary/80 font-medium"
-            >
-              Sign in
-            </Link>
-          </p>
         </div>
       </div>
     </>

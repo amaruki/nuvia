@@ -34,6 +34,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
+import { NotificationsWidget } from "@/components/dashboard/widgets/notifications-widget";
+import { Notification } from "@/types/dashboard.types";
 
 interface BreadcrumbItem {
   label: string;
@@ -53,6 +55,11 @@ interface DashboardHeaderProps {
   className?: string;
   notificationCount?: number;
   showSearch?: boolean;
+  notifications?: Notification[];
+  onMarkAsRead?: (id: string) => void;
+  onMarkAllAsRead?: () => void;
+  onDismiss?: (id: string) => void;
+  onViewAllNotifications?: () => void;
 }
 
 export function DashboardHeader({
@@ -64,6 +71,11 @@ export function DashboardHeader({
   className,
   notificationCount = 0,
   showSearch = true,
+  notifications,
+  onMarkAsRead,
+  onMarkAllAsRead,
+  onDismiss,
+  onViewAllNotifications,
 }: DashboardHeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
 
@@ -195,14 +207,14 @@ export function DashboardHeader({
                 <span className="sr-only">Notifications</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
-              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <div className="flex flex-col gap-2 p-2">
-                <div className="text-sm text-muted-foreground text-center py-4">
-                  No new notifications
-                </div>
-              </div>
+            <DropdownMenuContent align="end" className="w-96 p-0">
+                <NotificationsWidget
+                  notifications={notifications}
+                  onMarkAsRead={onMarkAsRead}
+                  onMarkAllAsRead={onMarkAllAsRead}
+                  onDismiss={onDismiss}
+                  onViewAll={onViewAllNotifications}
+                />
             </DropdownMenuContent>
           </DropdownMenu>
 

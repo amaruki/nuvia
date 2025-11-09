@@ -1,11 +1,8 @@
 "use client";
 
 import * as React from "react"
-import { WidgetContainer } from "../../ui/widget-container"
-import { Card, CardContent } from "../../ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "../../ui/badge"
-import { Bell, Check, CheckCheck, ExternalLink, X } from "lucide-react"
+import { Bell, Check, ExternalLink, X } from "lucide-react"
 import { Notification } from "@/types/dashboard.types"
 
 interface NotificationsWidgetProps {
@@ -57,18 +54,7 @@ const mockNotifications: Notification[] = [
 ]
 
 const getNotificationIcon = (type: string) => {
-  switch (type) {
-    case "announcement":
-      return <Bell className="h-4 w-4" style={{ color: 'var(--primary)' }} />
-    case "comment-reply":
-      return <div className="h-4 w-4 rounded-full" style={{ backgroundColor: 'var(--chart-2)' }}></div>
-    case "mention":
-      return <div className="h-4 w-4 rounded-full bg-chart-4"></div>
-    case "event-reminder":
-      return <div className="h-4 w-4 rounded-full" style={{ backgroundColor: 'var(--destructive)' }}></div>
-    default:
-      return <Bell className="h-4 w-4" style={{ color: 'var(--muted-foreground)' }} />
-  }
+  return <Bell className="h-4 w-4 text-muted-foreground" />
 }
 
 const formatDate = (date: Date) => {
@@ -95,132 +81,123 @@ export function NotificationsWidget({
   onViewAll,
 }: NotificationsWidgetProps) {
   const unreadCount = notifications.filter(n => !n.read).length
-  
+
   return (
-    <WidgetContainer
-      type="notifications"
-      title="Notifications"
-      description={`You have ${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}`}
-      size="medium"
-    >
-      <Card className="border-0 shadow-none">
-        <CardContent className="p-0">
-          <div className="space-y-4">
-            {/* Header with actions */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Bell className="h-5 w-5" style={{ color: 'var(--muted-foreground)' }} />
-                <span className="text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
-                  {unreadCount} unread
-                </span>
-              </div>
-              <div className="flex space-x-2">
-                {unreadCount > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onMarkAllAsRead}
-                    className="text-xs"
-                  >
-                    <CheckCheck className="h-3 w-3 mr-1" />
-                    Mark all read
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onViewAll}
-                  className="text-xs"
-                >
-                  View all
-                </Button>
-              </div>
-            </div>
-            
-            {/* Notifications list */}
-            <div className="space-y-3 max-h-80 overflow-y-auto">
-              {notifications.length === 0 ? (
-                <div className="text-center py-8" style={{ color: 'var(--muted-foreground)' }}>
-                  <Bell className="h-8 w-8 mx-auto mb-2" style={{ color: 'var(--muted-foreground)', opacity: '0.4' }} />
-                  <p>No notifications</p>
-                </div>
-              ) : (
-                notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`p-3 rounded-lg border ${
-                      notification.read
-                        ? "bg-card border-border"
-                        : "bg-info/10 border-info/30"
-                    }`}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div className="mt-0.5">
-                        {getNotificationIcon(notification.type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <h4 className={`text-sm font-medium truncate ${
-                            notification.read ? "" : ""
-                          }`} style={{ color: 'var(--foreground)' }}>
-                            {notification.title}
-                            {!notification.read && (
-                              <Badge className="ml-2 text-xs" style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }}>
-                                New
-                              </Badge>
-                            )}
-                          </h4>
-                          <div className="flex space-x-1 ml-2">
-                            {!notification.read && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onMarkAsRead?.(notification.id)}
-                                className="h-6 w-6 p-0"
-                              >
-                                <Check className="h-3 w-3" />
-                              </Button>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => onDismiss?.(notification.id)}
-                              className="h-6 w-6 p-0"
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
+    <div className="w-full">
+      {/* Simple header */}
+      {unreadCount > 0 && (
+        <div className="flex items-center justify-between px-4 py-3 border-b">
+          <span className="text-sm font-medium text-muted-foreground">
+            {unreadCount} unread
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onMarkAllAsRead}
+            className="text-xs text-muted-foreground hover:text-foreground h-7 px-2"
+          >
+            Mark all read
+          </Button>
+        </div>
+      )}
+  
+      {/* Notifications list */}
+      <div className="max-h-96 overflow-y-auto">
+        {notifications.length === 0 ? (
+          <div className="text-center py-8">
+            <Bell className="h-8 w-8 mx-auto mb-2 text-muted-foreground/40" />
+            <p className="text-sm text-muted-foreground">No notifications</p>
+          </div>
+        ) : (
+          <div className="divide-y">
+            {notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className={`px-4 py-3 hover:bg-muted/50 transition-colors ${
+                  !notification.read ? "bg-blue-50/30 dark:bg-blue-950/20" : ""
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 text-muted-foreground">
+                    {getNotificationIcon(notification.type)}
+                  </div>
+
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <h4 className={`text-sm font-medium text-foreground leading-tight ${
+                        !notification.read ? "font-semibold" : ""
+                      }`}>
+                        {notification.title}
+                      </h4>
+
+                      {!notification.read && (
+                        <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onMarkAsRead?.(notification.id)}
+                            className="h-6 w-6 p-0 hover:bg-muted"
+                          >
+                            <Check className="h-3 w-3" />
+                            <span className="sr-only">Mark as read</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onDismiss?.(notification.id)}
+                            className="h-6 w-6 p-0 hover:bg-muted"
+                          >
+                            <X className="h-3 w-3" />
+                            <span className="sr-only">Dismiss</span>
+                          </Button>
                         </div>
-                        <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>
-                          {notification.message}
-                        </p>
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-xs" style={{ color: 'var(--muted-foreground)', opacity: '0.4' }}>
-                            {formatDate(notification.createdAt)}
-                          </span>
-                          {notification.actionUrl && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-xs h-6 p-0" style={{ color: 'var(--primary)' }}
-                              asChild
-                            >
-                              <a href={notification.actionUrl}>
-                                <ExternalLink className="h-3 w-3 mr-1" />
-                                View
-                              </a>
-                            </Button>
-                          )}
-                        </div>
-                      </div>
+                      )}
+                    </div>
+
+                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                      {notification.message}
+                    </p>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground/60">
+                        {formatDate(notification.createdAt)}
+                      </span>
+
+                      {notification.actionUrl && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-primary hover:text-primary/80 h-6 p-0"
+                          asChild
+                        >
+                          <a href={notification.actionUrl} className="flex items-center gap-1">
+                            View
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </Button>
+                      )}
                     </div>
                   </div>
-                ))
-              )}
-            </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </CardContent>
-      </Card>
-    </WidgetContainer>
+        )}
+      </div>
+
+      {/* Footer */}
+      {notifications.length > 0 && (
+        <div className="border-t p-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onViewAll}
+            className="w-full text-xs text-muted-foreground hover:text-foreground"
+          >
+            View all notifications
+          </Button>
+        </div>
+      )}
+    </div>
   )
 }

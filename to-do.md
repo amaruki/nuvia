@@ -7,9 +7,9 @@
   - Username & display name
   - Avatar upload
   - Short bio
-- [ ] Account management
-  - Email, username, password management
-  - OAuth login (google)
+- [x] Account management
+  - ~~Email, username, password management~~
+  - ~~OAuth login (google)~~
 - [ ] Minimal privacy settings (public vs. private profile)
 
 ### Membership System
@@ -20,7 +20,7 @@
 
 ### Registration & Renewal Process
 - [ ] Registration form
-  - Full name, email, username, password
+  - ~~Full name, email, username, password~~
   - Membership tier selection (free vs. premium)
 - [ ] Email verification for onboarding
 - [ ] Simple manual renewal process

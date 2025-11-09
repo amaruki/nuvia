@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { DarkModeToggle } from "@/components/ui/dark-mode-toggle";
 import {
   Sidebar,
   SidebarContent,
@@ -19,7 +19,6 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarTrigger,
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
@@ -32,8 +31,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import {
   Collapsible,
   CollapsibleContent,
@@ -63,14 +60,13 @@ import {
   Cog,
   UserCircle,
   BellRing,
-  Palette,
-  Search,
   Plus,
   ChevronsUpDown,
   BadgeCheck,
   LogOut,
 } from "lucide-react";
 import { UserRole } from "@/types/dashboard.types";
+import { useState } from "react";
 
 interface DashboardSidebarProps {
   readonly user?: {
@@ -103,12 +99,12 @@ export function DashboardSidebar({
   role = "member",
   className,
 }: DashboardSidebarProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const { state, isMobile } = useSidebar();
-
+  const [active, setActive] = useState(false);
+  
   const isCollapsed = state === "collapsed";
-
+ 
   // Navigation configuration
   const navigationConfig: readonly NavigationItem[] = [
     // Main Navigation
@@ -351,10 +347,7 @@ export function DashboardSidebar({
     {} as Record<string, NavigationItem[]>
   );
 
-  const handleNavigation = (path: string) => {
-    router.push(path);
-  };
-
+  
   const isPathActive = (path: string): boolean => {
     return pathname === path || pathname.startsWith(path + "/");
   };
@@ -377,8 +370,8 @@ export function DashboardSidebar({
         <Collapsible key={item.id} asChild defaultOpen={isActive}>
           <SidebarMenuItem>
             <CollapsibleTrigger asChild>
-              <SidebarMenuButton 
-                tooltip={item.title} 
+              <SidebarMenuButton
+                tooltip={item.title}
                 isActive={isActive}
                 className="group/item relative"
               >
@@ -423,14 +416,7 @@ export function DashboardSidebar({
                   return (
                     <SidebarMenuSubItem key={subItem.id}>
                       <SidebarMenuSubButton asChild isActive={isSubActive}>
-                        <a
-                          href={subItem.path}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleNavigation(subItem.path);
-                          }}
-                          className="relative"
-                        >
+                        <Link href={subItem.path} className="relative">
                           <span>{subItem.title}</span>
                           {subItem.badge && (
                             <Badge
@@ -440,7 +426,7 @@ export function DashboardSidebar({
                               {subItem.badge}
                             </Badge>
                           )}
-                        </a>
+                        </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   );
@@ -457,43 +443,45 @@ export function DashboardSidebar({
         <SidebarMenuButton
           tooltip={item.title}
           isActive={isActive}
-          onClick={() => handleNavigation(item.path)}
+          asChild
           className="group/item relative"
         >
-          <div className="relative flex items-center justify-center">
-            {item.icon}
+          <Link href={item.path} prefetch={active ? null : false} onMouseEnter={() => setActive(true)} className="block w-full">
+            <div className="relative flex items-center justify-center">
+              {item.icon}
+              {item.badge && (
+                <Badge
+                  variant="secondary"
+                  className={cn(
+                    "absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] font-bold",
+                    "flex items-center justify-center",
+                    "bg-primary text-primary-foreground border-0",
+                    "shadow-sm",
+                    "opacity-0 scale-0 transition-all duration-200",
+                    "group-data-[collapsible=icon]:opacity-100 group-data-[collapsible=icon]:scale-100"
+                  )}
+                >
+                  {item.badge}
+                </Badge>
+              )}
+            </div>
+            <span className="group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 transition-all duration-200">
+              {item.title}
+            </span>
             {item.badge && (
               <Badge
                 variant="secondary"
                 className={cn(
-                  "absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] font-bold",
-                  "flex items-center justify-center",
-                  "bg-primary text-primary-foreground border-0",
-                  "shadow-sm",
-                  "opacity-0 scale-0 transition-all duration-200",
-                  "group-data-[collapsible=icon]:opacity-100 group-data-[collapsible=icon]:scale-100"
+                  "ml-auto h-5 min-w-5 px-1.5 text-xs font-semibold",
+                  "bg-primary/10 text-primary border-primary/20",
+                  "group-data-[collapsible=icon]:hidden",
+                  "transition-all duration-200"
                 )}
               >
                 {item.badge}
               </Badge>
             )}
-          </div>
-          <span className="group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 transition-all duration-200">
-            {item.title}
-          </span>
-          {item.badge && (
-            <Badge
-              variant="secondary"
-              className={cn(
-                "ml-auto h-5 min-w-5 px-1.5 text-xs font-semibold",
-                "bg-primary/10 text-primary border-primary/20",
-                "group-data-[collapsible=icon]:hidden",
-                "transition-all duration-200"
-              )}
-            >
-              {item.badge}
-            </Badge>
-          )}
+          </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
     );

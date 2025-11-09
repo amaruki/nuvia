@@ -94,11 +94,11 @@ export default function ForgotPasswordPage() {
   return (
     <>
       {/* Forgot password card - responsive width and padding */}
-      <div className="forgot-password-card relative z-10 w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden opacity-0">
-        <div className="p-6 sm:p-8 md:p-10">
+      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
+        <div className="w-full max-w-md">
           {/* Logo and title */}
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-foreground">
               <Image
                 src="/logo.png"
                 alt="Nuvia Logo"
@@ -107,10 +107,10 @@ export default function ForgotPasswordPage() {
                 className="rounded-md"
               />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Forgot Password
+            <h1 className="text-2xl font-semibold text-foreground">
+              Reset your password
             </h1>
-            <p className="text-foreground/70 mt-2">
+            <p className="text-sm mt-1 text-muted-foreground">
               {success
                 ? "Check your email for reset instructions"
                 : "Enter your email to reset your password"}
@@ -118,159 +118,100 @@ export default function ForgotPasswordPage() {
           </div>
 
           {error && (
-            <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-destructive"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">Error</h3>
-                  <div className="mt-2 text-sm text-red-700">
-                    <p>{error}</p>
-                  </div>
-                </div>
-              </div>
+            <div className="mb-6 p-3 rounded-lg border bg-destructive/10 border-destructive/30">
+              <p className="text-sm text-destructive">{error}</p>
             </div>
           )}
 
           {success && (
-            <div className="bg-green-50 border border-green-200 rounded-md p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-green-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-green-800">
-                    Success
-                  </h3>
-                  <div className="mt-2 text-sm text-green-700">
-                    <p>{success}</p>
-                  </div>
-                </div>
-              </div>
+            <div className="mb-6 p-3 rounded-lg border bg-primary/10 border-primary/30">
+              <p className="text-sm text-primary">{success}</p>
             </div>
           )}
 
-          {!success ? (
-            <>
-              {/* Forgot password form */}
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground/70">
-                    Email Address
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email address"
-                    className={`appearance-none block w-full px-3 py-2 border ${
-                      hasError("email") ? "border-red-300" : "border-gray-300"
-                    } placeholder-gray-500 text-foreground/90 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                    value={email}
-                    {...register("email", {
-                      onChange: (e) => setEmail(e.target.value),
-                    })}
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.email.message}
-                    </p>
-                  )}
-                  {hasError("email") && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {getErrorMessage("email")}
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Sending Email..." : "Reset Password"}
-                </Button>
-              </form>
-
-              {/* Divider */}
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-foreground/50">
-                    Or return to
-                  </span>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Success message */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                <div className="flex items-center">
-                  <svg
-                    className="w-5 h-5 text-green-500 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
+          {/* Forgot password form */}
+          <div className="forgot-password-card rounded-2xl border p-8 shadow-sm bg-card border-border">
+            {!success ? (
+              <>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                  <div className="space-y-3">
+                    <Label
+                      htmlFor="email"
+                      className="text-sm font-medium"
+                    >
+                      Email Address
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Enter your email address"
+                      className={`h-10 ${hasError("email") ? "border-destructive" : ""}`}
+                      value={email}
+                      {...register("email", {
+                        onChange: (e) => setEmail(e.target.value),
+                      })}
                     />
-                  </svg>
-                  <p className="text-green-700">
-                    We&apos;ve sent password reset instructions to your email
-                    address.
-                  </p>
-                </div>
-              </div>
+                    {errors.email && (
+                      <p className="text-sm text-destructive">
+                        {errors.email.message}
+                      </p>
+                    )}
+                    {hasError("email") && (
+                      <p className="text-sm text-destructive">
+                        {getErrorMessage("email")}
+                      </p>
+                    )}
+                  </div>
 
-              {/* Divider */}
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-foreground/50">
-                    Need more help?
-                  </span>
-                </div>
-              </div>
-            </>
-          )}
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full h-10"
+                  >
+                    {isLoading ? "Sending Email..." : "Reset Password"}
+                  </Button>
+                </form>
 
-          {/* Back to login link */}
-          <div className="text-center">
-            <Link
-              href="/auth/login"
-              className="text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Back to Login
-            </Link>
+                {/* Divider */}
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-border"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="bg-card px-4 text-foreground">
+                      Or return to
+                    </span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Success message area - already handled above */}
+
+                {/* Divider */}
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-border"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="bg-card px-4 text-foreground">
+                      Need more help?
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Back to login link */}
+            <p className="text-center text-sm text-muted-foreground">
+              Remember your password?{" "}
+              <Link
+                href="/auth/login"
+                className="font-medium hover:underline text-primary"
+              >
+                Sign in
+              </Link>
+            </p>
           </div>
         </div>
       </div>

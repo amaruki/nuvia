@@ -5,8 +5,7 @@ import { cn } from "@/lib/utils";
 import { DashboardHeader } from "@/components/dashboard/layout/dashboard-header";
 import { DashboardFooter } from "@/components/dashboard/layout/dashboard-footer";
 import { DashboardSidebar } from "@/components/dashboard/layout/dashboard-sidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { useSidebar } from "@/lib/hooks/use-sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { UserRole } from "@/types/dashboard.types";
 
 /**
@@ -50,100 +49,17 @@ function DashboardLayout({
   className,
   headerProps,
 }: DashboardLayoutProps) {
-  const {
-    isCollapsed,
-    isMobile,
-    toggleSidebar,
-    expandSidebar,
-    collapseSidebar,
-  } = useSidebar({
-    defaultCollapsed: false,
-    storageKey: "nuvia-sidebar-state",
-  });
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-
-  // Handle mobile menu toggle
-  const handleMobileMenuToggle = React.useCallback(() => {
-    setIsMobileMenuOpen((prev) => !prev);
-  }, []);
-
-  // Close mobile menu when resizing to desktop
-  React.useEffect(() => {
-    if (!isMobile && isMobileMenuOpen) {
-      setIsMobileMenuOpen(false);
-    }
-  }, [isMobile, isMobileMenuOpen]);
-
-  // Close mobile menu when navigating to a new page
-  React.useEffect(() => {
-    const handleRouteChange = () => {
-      if (isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    // Listen for route changes
-    window.addEventListener("popstate", handleRouteChange);
-
-    return () => {
-      window.removeEventListener("popstate", handleRouteChange);
-    };
-  }, [isMobileMenuOpen]);
-
-  // Listen for custom event to close mobile menu
-  React.useEffect(() => {
-    const handleCloseMobileMenu = () => {
-      setIsMobileMenuOpen(false);
-    };
-
-    window.addEventListener("close-mobile-menu", handleCloseMobileMenu);
-
-    return () => {
-      window.removeEventListener("close-mobile-menu", handleCloseMobileMenu);
-    };
-  }, []);
-
   return (
     <SidebarProvider>
-      <div className={cn("min-h-screen bg-background flex", className)}>
-        {/* Desktop Sidebar */}
-        <DashboardSidebar
-          user={user}
-          role={role}
-          className={cn("hidden md:flex", isMobile && "hidden")}
-        />
-
-        {/* Mobile Sidebar Overlay */}
-        <>
-          <div
-            className={cn(
-              "fixed inset-0 z-50 bg-black/50 md:hidden transition-opacity",
-              isMobileMenuOpen
-                ? "opacity-100 pointer-events-auto"
-                : "opacity-0 pointer-events-none",
-            )}
-            onClick={handleMobileMenuToggle}
-          />
-          <div
-            className={cn(
-              "fixed inset-y-0 left-0 z-50 w-64 bg-card md:hidden transition-transform",
-              isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
-            )}
-            data-mobile-menu="true"
-          >
-            <DashboardSidebar user={user} role={role} />
-          </div>
-        </>
-
+      <DashboardSidebar user={user} role={role} />
+      <SidebarInset className={cn("flex-1", className)}>
         {/* Main content */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex flex-col h-full">
           <DashboardHeader
             title={headerProps?.title}
             description={headerProps?.description}
             user={user}
             actions={headerProps?.actions}
-            onMenuClick={handleMobileMenuToggle}
-            showMenuButton={isMobile}
           />
 
           <main className="flex-1">
@@ -154,7 +70,7 @@ function DashboardLayout({
 
           <DashboardFooter />
         </div>
-      </div>
+      </SidebarInset>
     </SidebarProvider>
   );
 }

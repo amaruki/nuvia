@@ -1,113 +1,236 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { DarkModeToggle } from "@/components/ui/dark-mode-toggle";
-import { Bell, Search, Settings, User, Menu } from "lucide-react"
-import Image from "next/image"
+import { Badge } from "@/components/ui/badge";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import {
+  Bell,
+  Search,
+  Settings,
+  User,
+  ChevronsUpDown,
+  LogOut,
+  BadgeCheck,
+  CreditCard,
+  Command,
+} from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
 
 interface DashboardHeaderProps {
-  title?: string
-  description?: string
+  title?: string;
+  description?: string;
+  breadcrumbs?: BreadcrumbItem[];
   user?: {
-    name: string
-    email: string
-    avatar?: string
-  }
-  actions?: React.ReactNode
-  className?: string
-  onMenuClick?: () => void
-  showMenuButton?: boolean
+    name: string;
+    email: string;
+    avatar?: string;
+  };
+  actions?: React.ReactNode;
+  className?: string;
+  notificationCount?: number;
+  showSearch?: boolean;
 }
 
 export function DashboardHeader({
-  title = "Dashboard",
+  title,
   description,
+  breadcrumbs,
   user,
   actions,
   className,
-  onMenuClick,
-  showMenuButton = false,
+  notificationCount = 0,
+  showSearch = true,
 }: DashboardHeaderProps) {
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+
+  const getInitials = (name: string): string => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
-    <header className={cn("bg-card border-b", className)}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Left side */}
-          <div className="flex items-center">
-            {/* Mobile menu button */}
-            {showMenuButton && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onMenuClick}
-                className="mr-2 md:hidden"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            )}
-            <div>
-              <h1 className="text-2xl font-bold text-foreground/90">{title}</h1>
+    <header
+      className={cn(
+        "sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-200",
+        className
+      )}
+    >
+      <div className="flex w-full items-center gap-2 px-4">
+        {/* Sidebar Trigger */}
+        <SidebarTrigger className="-ml-1" />
+        <Separator orientation="vertical" className="mr-2 h-4" />
+
+        {/* Breadcrumbs or Title */}
+        <div className="flex flex-1 items-center gap-2 overflow-hidden">
+          {breadcrumbs && breadcrumbs.length > 0 ? (
+            <Breadcrumb>
+              <BreadcrumbList>
+                {breadcrumbs.map((item, index) => (
+                  <React.Fragment key={index}>
+                    <BreadcrumbItem className="hidden md:block">
+                      {index === breadcrumbs.length - 1 ? (
+                        <BreadcrumbPage className="font-semibold">
+                          {item.label}
+                        </BreadcrumbPage>
+                      ) : (
+                        <BreadcrumbLink
+                          href={item.href || "#"}
+                          className="text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {item.label}
+                        </BreadcrumbLink>
+                      )}
+                    </BreadcrumbItem>
+                    {index < breadcrumbs.length - 1 && (
+                      <BreadcrumbSeparator className="hidden md:block" />
+                    )}
+                  </React.Fragment>
+                ))}
+              </BreadcrumbList>
+            </Breadcrumb>
+          ) : title ? (
+            <div className="flex flex-col">
+              <h1 className="text-lg font-semibold text-foreground truncate">
+                {title}
+              </h1>
               {description && (
-                <p className="text-sm text-foreground/50">{description}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {description}
+                </p>
               )}
             </div>
-          </div>
+          ) : null}
+        </div>
 
-          {/* Right side */}
-          <div className="flex items-center space-x-4">
-            {/* Search button */}
-            <Button variant="ghost" size="sm">
-              <Search className="h-5 w-5" />
-            </Button>
-
-            {/* Notifications */}
-            <Button variant="ghost" size="sm" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
-                3
-              </span>
-            </Button>
-
-            {/* Settings */}
-            <Button variant="ghost" size="sm">
-              <Settings className="h-5 w-5" />
-            </Button>
-
-            {/* Dark mode toggle */}
-            <DarkModeToggle />
-
-            {/* User menu */}
-            {user ? (
-              <div className="flex items-center space-x-3">
-                <div className="text-right hidden sm:block">
-                  <p className="text-sm font-medium text-foreground/90">{user.name}</p>
-                  <p className="text-xs text-foreground/50">{user.email}</p>
-                </div>
-                {user.avatar ? (
-                  <Image
-                    src={user.avatar}
-                    alt={user.name}
-                    width={32}
-                    height={32}
-                    className="h-8 w-8 rounded-full"
+        {/* Right side actions */}
+        <div className="flex items-center gap-2 ml-auto">
+          {/* Search */}
+          {showSearch && (
+            <div className="relative hidden md:flex items-center">
+              {isSearchOpen ? (
+                <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2 duration-200">
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    className="h-9 w-64 pr-8"
+                    autoFocus
+                    onBlur={() => setIsSearchOpen(false)}
                   />
-                ) : (
-                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Button variant="ghost" size="sm">
-                <User className="h-5 w-5" />
-              </Button>
-            )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 h-9 w-9"
+                    onClick={() => setIsSearchOpen(false)}
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => setIsSearchOpen(true)}
+                >
+                  <Search className="h-4 w-4" />
+                  <span className="sr-only">Search</span>
+                </Button>
+              )}
+            </div>
+          )}
 
-            {/* Additional actions */}
-            {actions}
-          </div>
+          {/* Command Menu - Mobile Search */}
+          {showSearch && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 md:hidden"
+            >
+              <Command className="h-4 w-4" />
+              <span className="sr-only">Open command menu</span>
+            </Button>
+          )}
+
+          {/* Notifications */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9 relative">
+                <Bell className="h-4 w-4" />
+                {notificationCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-1 -right-1 h-5 min-w-5 px-1 text-[10px] font-semibold flex items-center justify-center rounded-full"
+                  >
+                    {notificationCount > 9 ? "9+" : notificationCount}
+                  </Badge>
+                )}
+                <span className="sr-only">Notifications</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="flex flex-col gap-2 p-2">
+                <div className="text-sm text-muted-foreground text-center py-4">
+                  No new notifications
+                </div>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Settings */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Settings className="h-4 w-4" />
+                <span className="sr-only">Settings</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Quick Settings</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                Preferences
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <BadgeCheck className="mr-2 h-4 w-4" />
+                Profile Settings
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {/* Additional actions */}
+          {actions}
         </div>
       </div>
     </header>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-import LoadingSkeleton from "@/components/ui/loading-skeleton";
+import { DashboardContentSkeleton } from "@/components/dashboard/loading/dashboard-content-skeleton";
 
 export default function Loading() {
-  // You can add any UI inside Loading, including a Skeleton.
-  return <LoadingSkeleton />
+  // Show dashboard-specific loading skeleton that matches the layout structure
+  return <DashboardContentSkeleton />;
 }

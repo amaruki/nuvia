@@ -6,7 +6,7 @@ import { EventList, EventFilter } from "@/components/events";
 import { Button } from "@/components/ui/button";
 import { Plus, Filter, Calendar, SortAsc, SortDesc } from "lucide-react";
 
-import { EventListLayout } from "@/components/events/EventListLayout";
+import { EventListLayout } from "@/components/events/event-list-layout";
 import { useEvents, useEventFilters } from "@/lib/hooks/use-events";
 import { formatDate } from "@/lib/utils/date-utils";
 

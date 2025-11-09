@@ -104,17 +104,17 @@ export default function OAuthCallbackPage() {
     switch (status) {
       case "loading":
         return (
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         );
       case "success":
         return (
-          <svg className="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-12 h-12 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
           </svg>
         );
       case "error":
         return (
-          <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-12 h-12 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         );
@@ -124,17 +124,17 @@ export default function OAuthCallbackPage() {
   const getStatusColor = () => {
     switch (status) {
       case "loading":
-        return "text-blue-600";
+        return "text-primary";
       case "success":
-        return "text-green-600";
+        return "text-success";
       case "error":
-        return "text-red-600";
+        return "text-destructive";
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="callback-card bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center opacity-0">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-indigo-100 px-4">
+      <div className="callback-card bg-card rounded-2xl shadow-xl p-8 max-w-md w-full text-center opacity-0">
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img
@@ -158,19 +158,19 @@ export default function OAuthCallbackPage() {
           {status === "error" && "Authentication Failed"}
         </h1>
 
-        <p className="text-gray-600 mb-6">
+        <p className="text-foreground/60 mb-6">
           {message}
         </p>
 
         {/* Progress Bar for Loading State */}
         {status === "loading" && (
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
-            <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: "60%" }}></div>
+          <div className="w-full bg-muted rounded-full h-2 mb-6">
+            <div className="bg-primary h-2 rounded-full animate-pulse" style={{ width: "60%" }}></div>
           </div>
         )}
 
         {/* Additional Info */}
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-foreground/50">
           {status === "loading" && "Please wait while we complete your authentication..."}
           {status === "success" && "You will be redirected to your dashboard shortly."}
           {status === "error" && "You will be redirected to the login page."}

@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { animate } from "animejs";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -107,10 +107,10 @@ export default function ForgotPasswordPage() {
                 className="rounded-md"
               />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-foreground">
               Forgot Password
             </h1>
-            <p className="text-gray-600 mt-2">
+            <p className="text-foreground/70 mt-2">
               {success
                 ? "Check your email for reset instructions"
                 : "Enter your email to reset your password"}
@@ -118,11 +118,11 @@ export default function ForgotPasswordPage() {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg
-                    className="h-5 w-5 text-red-400"
+                    className="h-5 w-5 text-destructive"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -178,7 +178,7 @@ export default function ForgotPasswordPage() {
               {/* Forgot password form */}
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-700">
+                  <Label htmlFor="email" className="text-foreground/70">
                     Email Address
                   </Label>
                   <Input
@@ -187,7 +187,7 @@ export default function ForgotPasswordPage() {
                     placeholder="Enter your email address"
                     className={`appearance-none block w-full px-3 py-2 border ${
                       hasError("email") ? "border-red-300" : "border-gray-300"
-                    } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                    } placeholder-gray-500 text-foreground/90 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     value={email}
                     {...register("email", {
                       onChange: (e) => setEmail(e.target.value),
@@ -220,7 +220,7 @@ export default function ForgotPasswordPage() {
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">
+                  <span className="px-2 bg-white text-foreground/50">
                     Or return to
                   </span>
                 </div>
@@ -255,7 +255,7 @@ export default function ForgotPasswordPage() {
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">
+                  <span className="px-2 bg-white text-foreground/50">
                     Need more help?
                   </span>
                 </div>

@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { animate } from "animejs";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { resetPasswordAction } from "@/lib/actions/auth.actions";
@@ -107,11 +107,11 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <div className="max-w-md w-full space-y-8">
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg
-                className="h-5 w-5 text-red-400"
+                className="h-5 w-5 text-destructive"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
@@ -124,10 +124,10 @@ function ResetPasswordForm() {
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
+              <h3 className="text-sm font-medium text-destructive">
                 Invalid Request
               </h3>
-              <div className="mt-2 text-sm text-red-700">
+              <div className="mt-2 text-sm text-destructive">
                 <p>
                   The password reset link is invalid or has expired. Please
                   request a new password reset.
@@ -136,7 +136,7 @@ function ResetPasswordForm() {
               <div className="mt-4">
                 <Link
                   href="/auth/forgot-password"
-                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 >
                   Request New Reset Link
                 </Link>
@@ -153,7 +153,7 @@ function ResetPasswordForm() {
       <div className="p-6 sm:p-8 md:p-10">
         {/* Logo and title */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-foreground">
             Reset Your Password
           </h1>
         </div>
@@ -219,7 +219,7 @@ function ResetPasswordForm() {
             {/* Reset password form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-700">
+                <Label htmlFor="password" className="text-foreground/70">
                   New Password
                 </Label>
                 <Input
@@ -229,7 +229,7 @@ function ResetPasswordForm() {
                   required
                   className={`appearance-none block w-full px-3 py-2 border ${
                       hasError("password") ? "border-red-300" : "border-gray-300"
-                  } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                  } placeholder-gray-500 text-foreground/90 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                   value={password}
                   {...register("password", {
                       onChange: (e) => setPassword(e.target.value),
@@ -248,7 +248,7 @@ function ResetPasswordForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-gray-700">
+                <Label htmlFor="confirmPassword" className="text-foreground/70">
                   Confirm New Password
                 </Label>
                 <Input
@@ -258,7 +258,7 @@ function ResetPasswordForm() {
                   required
                   className={`appearance-none block w-full px-3 py-2 border ${
                       hasError("confirmPassword") ? "border-red-300" : "border-gray-300"
-                  } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                  } placeholder-gray-500 text-foreground/90 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                   value={confirmPassword}
                   {...register("confirmPassword", {
                       onChange: (e) => setConfirmPassword(e.target.value),
@@ -291,7 +291,7 @@ function ResetPasswordForm() {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
+                <span className="px-2 bg-white text-foreground/50">
                   Or return to
                 </span>
               </div>

@@ -5,10 +5,10 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { animate } from "animejs";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
-import { Checkbox } from "@/components/ui/Checkbox";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -149,7 +149,7 @@ export default function SignupPage() {
   return (
     <>
       {/* Signup card - responsive width and padding */}
-      <div className="signup-card relative z-10 w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden opacity-0">
+      <div className="signup-card relative z-10 w-full max-w-md sm:max-w-lg bg-card rounded-2xl shadow-xl overflow-hidden opacity-0">
         <div className="p-6 sm:p-8 md:p-10">
           {/* Logo and title */}
           <div className="text-center mb-8">
@@ -162,21 +162,21 @@ export default function SignupPage() {
                 className="rounded-md"
               />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
-            <p className="text-gray-600 mt-2">Join us today</p>
+            <h1 className="text-3xl font-bold text-foreground">Create Account</h1>
+            <p className="text-foreground/70 mt-2">Join us today</p>
           </div>
 
           {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5 text-destructive" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
+              <h3 className="text-sm font-medium text-destructive">Error</h3>
+              <div className="mt-2 text-sm text-destructive">
                 <p>{error}</p>
               </div>
             </div>
@@ -185,16 +185,16 @@ export default function SignupPage() {
       )}
 
       {success && (
-        <div className="bg-green-50 border border-green-200 rounded-md p-4">
+        <div className="bg-chart-2/10 border border-success/30 rounded-md p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5 text-success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-green-800">Success</h3>
-              <div className="mt-2 text-sm text-green-700">
+              <h3 className="text-sm font-medium text-success">Success</h3>
+              <div className="mt-2 text-sm text-success">
                 <p>{success}</p>
               </div>
             </div>
@@ -205,7 +205,7 @@ export default function SignupPage() {
           {/* Signup form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-gray-700">
+              <Label htmlFor="fullName" className="text-foreground/70">
                 Full Name
               </Label>
               <Input
@@ -219,17 +219,17 @@ export default function SignupPage() {
                 })}
               />
               {errors.fullName && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-destructive text-sm mt-1">
                   {errors.fullName.message}
                 </p>
               )}
               {hasError('fullName') && (
-                <p className="mt-1 text-sm text-red-600">{getErrorMessage('fullName')}</p>
+                <p className="mt-1 text-sm text-destructive">{getErrorMessage('fullName')}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-700">
+              <Label htmlFor="email" className="text-foreground/70">
                 Email Address
               </Label>
               <Input
@@ -243,14 +243,14 @@ export default function SignupPage() {
                 })}
               />
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-destructive text-sm mt-1">
                   {errors.email.message}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-gray-700">
+              <Label htmlFor="username" className="text-foreground/70">
                 Username
               </Label>
               <Input
@@ -264,14 +264,14 @@ export default function SignupPage() {
                 })}
               />
               {errors.username && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-destructive text-sm mt-1">
                   {errors.username.message}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700">
+              <Label htmlFor="password" className="text-foreground/70">
                 Password
               </Label>
               <Input
@@ -285,14 +285,14 @@ export default function SignupPage() {
                 })}
               />
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-destructive text-sm mt-1">
                   {errors.password.message}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-gray-700">
+              <Label htmlFor="confirmPassword" className="text-foreground/70">
                 Confirm Password
               </Label>
               <Input
@@ -306,7 +306,7 @@ export default function SignupPage() {
                 })}
               />
               {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-destructive text-sm mt-1">
                   {errors.confirmPassword.message}
                 </p>
               )}
@@ -326,27 +326,27 @@ export default function SignupPage() {
               />
               <Label
                 htmlFor="agreeToTerms"
-                className="text-gray-700 text-sm"
+                className="text-foreground/70 text-sm"
               >
                 I agree to the{" "}
-                <Link href="/terms" className="text-blue-600 hover:text-blue-800">
+                <Link href="/terms" className="text-primary hover:text-primary/80">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy" className="text-blue-600 hover:text-blue-800">
+                <Link href="/privacy" className="text-primary hover:text-primary/80">
                   Privacy Policy
                 </Link>
               </Label>
             </div>
             {errors.agreeToTerms && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="text-destructive text-sm mt-1">
                 {errors.agreeToTerms.message}
               </p>
             )}
 
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
+              className="w-full bg-primary hover:bg-primary/90 mt-4"
               disabled={isLoading}
             >
               {isLoading ? "Creating Account..." : "Create Account"}
@@ -356,10 +356,10 @@ export default function SignupPage() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-border"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              <span className="px-2 bg-card text-foreground/50">Or continue with</span>
             </div>
           </div>
 
@@ -367,7 +367,7 @@ export default function SignupPage() {
           <Button
             type="button"
             variant="outline"
-            className="w-full flex items-center text-gray-800 justify-center gap-2 cursor-pointer"
+            className="w-full flex items-center text-foreground/80 justify-center gap-2 cursor-pointer"
             onClick={handleGoogleSignUp}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -392,11 +392,11 @@ export default function SignupPage() {
           </Button>
 
           {/* Login link */}
-          <p className="text-center text-gray-600 mt-6">
+          <p className="text-center text-foreground/60 mt-6">
             Already have an account?{" "}
             <Link
               href="/auth/login"
-              className="text-blue-600 hover:text-blue-800 font-medium"
+              className="text-primary hover:text-primary/80 font-medium"
             >
               Sign in
             </Link>

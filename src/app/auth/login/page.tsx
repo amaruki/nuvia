@@ -6,10 +6,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { animate } from "animejs";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
-import { Checkbox } from "@/components/ui/Checkbox";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import Image from "next/image";
 import { loginAction } from "@/lib/actions/auth.actions";
@@ -141,7 +141,7 @@ function LoginForm() {
   return (
     <>
       {/* Login card - responsive width and padding */}
-      <div className="login-card relative z-10 w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden opacity-0">
+      <div className="login-card relative z-10 w-full max-w-md sm:max-w-lg rounded-2xl shadow-xl overflow-hidden opacity-0" style={{ backgroundColor: 'var(--background)' }}>
         <div className="p-6 sm:p-8 md:p-10">
           {/* Logo and title */}
           <div className="text-center mb-8">
@@ -154,16 +154,17 @@ function LoginForm() {
                 className="rounded-md"
               />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="text-gray-600 mt-2">Sign in to your account</p>
+            <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>Welcome Back</h1>
+            <p className="mt-2" style={{ color: 'var(--muted-foreground)' }}>Sign in to your account</p>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="rounded-md p-4" style={{ backgroundColor: 'var(--destructive)', color: 'var(--destructive-foreground)', opacity: '0.1' }}>
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg
-                    className="h-5 w-5 text-red-400"
+                    className="h-5 w-5"
+                    style={{ color: 'var(--destructive)' }}
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -176,8 +177,8 @@ function LoginForm() {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">Error</h3>
-                  <div className="mt-2 text-sm text-red-700">
+                  <h3 className="text-sm font-medium" style={{ color: 'var(--destructive)' }}>Error</h3>
+                  <div className="mt-2 text-sm" style={{ color: 'var(--destructive)' }}>
                     <p>{error}</p>
                   </div>
                 </div>
@@ -186,11 +187,12 @@ function LoginForm() {
           )}
 
           {success && (
-            <div className="bg-green-50 border border-green-200 rounded-md p-4">
+            <div className="rounded-md p-4" style={{ backgroundColor: 'var(--chart-2)', color: 'var(--chart-2-foreground)', opacity: '0.1' }}>
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg
-                    className="h-5 w-5 text-green-400"
+                    className="h-5 w-5"
+                    style={{ color: 'var(--chart-2)' }}
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -203,10 +205,10 @@ function LoginForm() {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-green-800">
+                  <h3 className="text-sm font-medium" style={{ color: 'var(--chart-2)' }}>
                     Success
                   </h3>
-                  <div className="mt-2 text-sm text-green-700">
+                  <div className="mt-2 text-sm" style={{ color: 'var(--chart-2)' }}>
                     <p>{success}</p>
                   </div>
                 </div>
@@ -217,7 +219,7 @@ function LoginForm() {
           {/* Login form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="emailOrUsername" className="text-gray-700">
+              <Label htmlFor="emailOrUsername" style={{ color: 'var(--muted-foreground)' }}>
                 Email or Username
               </Label>
               <Input
@@ -231,7 +233,7 @@ function LoginForm() {
                 })}
               />
               {errors.emailOrUsername && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-destructive text-sm mt-1">
                   {errors.emailOrUsername.message}
                 </p>
               )}
@@ -239,12 +241,12 @@ function LoginForm() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-gray-700">
+                <Label htmlFor="password" style={{ color: 'var(--muted-foreground)' }}>
                   Password
                 </Label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-sm text-blue-600 hover:text-blue-800"
+                  className="text-sm" style={{ color: 'var(--primary)' }}
                 >
                   Forgot password?
                 </Link>
@@ -260,7 +262,7 @@ function LoginForm() {
                 })}
               />
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-destructive text-sm mt-1">
                   {errors.password.message}
                 </p>
               )}
@@ -268,14 +270,14 @@ function LoginForm() {
 
             <div className="flex items-center space-x-2">
               <Checkbox id="rememberMe" {...register("rememberMe")} />
-              <Label htmlFor="rememberMe" className="text-gray-700 text-sm">
+              <Label htmlFor="rememberMe" className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
                 Remember me
               </Label>
             </div>
 
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
@@ -285,10 +287,10 @@ function LoginForm() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t" style={{ borderColor: 'var(--border)' }}></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
+              <span className="px-2" style={{ backgroundColor: 'var(--background)', color: 'var(--muted-foreground)' }}>
                 Or continue with
               </span>
             </div>
@@ -300,7 +302,7 @@ function LoginForm() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center text-gray-800 justify-center gap-2 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 cursor-pointer" style={{ color: 'var(--muted-foreground)' }}
               onClick={handleGoogleLogin}
               disabled={isLoading || isOAuthLoading}
             >
@@ -329,7 +331,7 @@ function LoginForm() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center text-gray-800 justify-center gap-2 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 cursor-pointer" style={{ color: 'var(--muted-foreground)' }}
               onClick={handleGithubLogin}
               disabled={isLoading || isOAuthLoading}
             >
@@ -343,7 +345,7 @@ function LoginForm() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center text-gray-800 justify-center gap-2 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 cursor-pointer" style={{ color: 'var(--muted-foreground)' }}
               onClick={handleLinkedinLogin}
               disabled={isLoading || isOAuthLoading}
             >
@@ -355,11 +357,11 @@ function LoginForm() {
           </div>
 
           {/* Sign up link */}
-          <p className="text-center text-gray-600 mt-6">
+          <p className="text-center text-foreground/60 mt-6">
             Don&apos;t have an account?{" "}
             <Link
               href="/auth/signup"
-              className="text-blue-600 hover:text-blue-800 font-medium"
+              className="text-primary hover:text-primary/80 font-medium"
             >
               Sign up
             </Link>

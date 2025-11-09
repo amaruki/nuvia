@@ -3,7 +3,163 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { prisma } from "./prisma";
 import { validatePasswordStrength } from "./utils/password";
-import { SOCIAL_PROVIDERS, FEATURES, APP_URL } from "./config";
+import { SOCIAL_PROVIDERS, FEATURES, APP_URL, EMAIL_CONFIG } from "./config";
+import { renderEmailTemplate } from "./email-utils";
+import PasswordResetEmail from "@/components/email-template/password-reset";
+import EmailVerificationEmail from "@/components/email-template/email-verification";
+import WelcomeEmail from "@/components/email-template/welcome";
+import React from 'react';
+
+// Email service integration
+let emailService: 'resend' | 'nodemailer' | 'none' = 'none';
+let resendClient: any = null;
+let nodemailerTransporter: any = null;
+
+// Initialize email service based on configuration
+if (process.env.RESEND_API_KEY) {
+  emailService = 'resend';
+  import('resend').then(({ Resend }) => {
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+  }).catch(() => {
+    console.warn('Failed to initialize Resend email service');
+  });
+} else if (EMAIL_CONFIG.HOST && EMAIL_CONFIG.USER && EMAIL_CONFIG.PASS) {
+  emailService = 'nodemailer';
+  import('nodemailer').then(({ createTransport }) => {
+    nodemailerTransporter = createTransport({
+      host: EMAIL_CONFIG.HOST,
+      port: EMAIL_CONFIG.PORT,
+      secure: EMAIL_CONFIG.PORT === 465,
+      auth: {
+        user: EMAIL_CONFIG.USER,
+        pass: EMAIL_CONFIG.PASS,
+      },
+    });
+  }).catch(() => {
+    console.warn('Failed to initialize Nodemailer email service');
+  });
+} else {
+  console.warn('No email service configured. Email functionality will be disabled.');
+}
+
+/**
+ * Send an email using the configured email service
+ */
+interface SendEmailOptions {
+  to: string | string[];
+  subject: string;
+  text?: string;
+  html?: string;
+  from?: string;
+  replyTo?: string;
+}
+
+export async function sendEmail(options: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Skip email sending in development/test environment if no service is configured
+    if (emailService === 'none' && process.env.NODE_ENV !== 'production') {
+      console.log('📧 Email would be sent (development mode):', {
+        to: options.to,
+        subject: options.subject,
+        text: options.text?.substring(0, 100) + '...',
+      });
+      return { success: true };
+    }
+
+    const from = options.from || EMAIL_CONFIG.FROM;
+
+    if (emailService === 'resend' && resendClient) {
+      // Use Resend for email delivery
+      const { data, error } = await resendClient.emails.send({
+        from,
+        to: Array.isArray(options.to) ? options.to : [options.to],
+        subject: options.subject,
+        text: options.text,
+        html: options.html,
+        replyTo: options.replyTo,
+      });
+
+      if (error) {
+        throw new Error(`Resend error: ${error.message}`);
+      }
+
+      console.log('✅ Email sent via Resend:', data);
+      return { success: true };
+
+    } else if (emailService === 'nodemailer' && nodemailerTransporter) {
+      // Use Nodemailer for email delivery
+      const mailOptions = {
+        from,
+        to: options.to,
+        subject: options.subject,
+        text: options.text,
+        html: options.html,
+        replyTo: options.replyTo,
+      };
+
+      const result = await nodemailerTransporter.sendMail(mailOptions);
+      console.log('✅ Email sent via Nodemailer:', result.messageId);
+      return { success: true };
+
+    } else {
+      throw new Error('No email service is properly configured');
+    }
+
+  } catch (error) {
+    console.error('❌ Failed to send email:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown email error'
+    };
+  }
+}
+
+/**
+ * Email template functions that use React Email components
+ */
+export const emailTemplates = {
+  /**
+   * Password reset email template
+   */
+  passwordReset: async (resetUrl: string, userName?: string) => {
+    const component = React.createElement(PasswordResetEmail, { resetUrl, userName });
+    const { html, text } = await renderEmailTemplate(component);
+
+    return {
+      subject: 'Reset your password',
+      html,
+      text,
+    };
+  },
+
+  /**
+   * Email verification template
+   */
+  emailVerification: async (verificationUrl: string, userName?: string) => {
+    const component = React.createElement(EmailVerificationEmail, { verificationUrl, userName });
+    const { html, text } = await renderEmailTemplate(component);
+
+    return {
+      subject: 'Verify your email address',
+      html,
+      text,
+    };
+  },
+
+  /**
+   * Welcome email template
+   */
+  welcome: async (userName?: string) => {
+    const component = React.createElement(WelcomeEmail, { userName, dashboardUrl: `${APP_URL}/dashboard` });
+    const { html, text } = await renderEmailTemplate(component);
+
+    return {
+      subject: 'Welcome to our platform!',
+      html,
+      text,
+    };
+  },
+};
 
 // Validate Better Auth secret is properly configured
 const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
@@ -28,6 +184,20 @@ export const auth = betterAuth({
         throw new Error(validation.errors.join(", "));
       }
       return true;
+    },
+    sendResetPassword: async ({ user, url }) => {
+      const template = await emailTemplates.passwordReset(url, user.name || user.email);
+      const result = await sendEmail({
+        to: user.email,
+        subject: template.subject,
+        text: template.text,
+        html: template.html,
+      });
+
+      if (!result.success) {
+        console.error('Failed to send password reset email:', result.error);
+        throw new Error('Failed to send password reset email');
+      }
     },
   },
   socialProviders: {

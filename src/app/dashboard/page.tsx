@@ -18,17 +18,8 @@ import { GlobalSearchWidget } from "@/components/dashboard/widgets/global-search
 import { QuickNavigationWidget } from "@/components/dashboard/widgets/quick-navigation-widget";
 import { CommunityHighlightsWidget } from "@/components/dashboard/widgets/community-highlights-widget";
 import { UserRole } from "@/types/dashboard.types";
-import { AsyncContent } from "@/components/ui/async-content";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
-
-/**
- * Mock user data - in a real app, this would come from authentication
- */
-const mockUser = {
-  name: "John Doe",
-  email: "john.doe@example.com",
-  avatar: "", // URL to avatar image
-};
+import { useDashboardStats } from "@/contexts/dashboard-context";
+import { useRealtimeUpdates } from "@/hooks/use-realtime-updates";
 
 /**
  * Mock user role - in a real app, this would come from authentication
@@ -42,37 +33,61 @@ const userRole: UserRole = "member"; // Change to "admin" to see admin widgets
  * @returns JSX.Element
  */
 export default function DashboardPage() {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const { updateMemberStats, updateEventStats } = useDashboardStats();
 
-  // Simulate loading data
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+  // Mock data fetching functions - replace with actual API calls
+  const fetchMemberStats = React.useCallback(async () => {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return {
+      totalMembers: 1245,
+      activeMembers: 892,
+      newMembers: 23,
+    };
   }, []);
 
-  const handleRetry = () => {
-    setIsLoading(true);
-    setError(null);
-    // Simulate retry
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  };
+  const fetchEventStats = React.useCallback(async () => {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 800));
+    return {
+      upcomingEvents: 8,
+      totalEvents: 156,
+      thisWeekEvents: 3,
+    };
+  }, []);
+
+  // Real-time updates for member stats (every 30 seconds)
+  const memberStatsUpdate = useRealtimeUpdates(fetchMemberStats, {
+    enabled: true,
+    interval: 30000,
+    pauseWhenHidden: true,
+  });
+
+  // Real-time updates for event stats (every 45 seconds)
+  const eventStatsUpdate = useRealtimeUpdates(fetchEventStats, {
+    enabled: true,
+    interval: 45000,
+    pauseWhenHidden: true,
+  });
+
+  // Update global state when data is fetched
+  React.useEffect(() => {
+    if (memberStatsUpdate.data) {
+      updateMemberStats(memberStatsUpdate.data);
+    }
+  }, [memberStatsUpdate.data, updateMemberStats]);
+
+  React.useEffect(() => {
+    if (eventStatsUpdate.data) {
+      updateEventStats(eventStatsUpdate.data);
+    }
+  }, [eventStatsUpdate.data, updateEventStats]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {/* User Profile Section */}
       <div className="xl:col-span-1">
         <UserProfileWidget />
-      </div>
-
-      {/* Notifications Section */}
-      <div className="xl:col-span-1">
-        <NotificationsWidget />
       </div>
 
       {/* Events Section */}

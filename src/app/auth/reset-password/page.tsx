@@ -106,219 +106,187 @@ function ResetPasswordForm() {
   // If no token is provided, show an error
   if (!token) {
     return (
-      <div className="max-w-md w-full space-y-8">
-        <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-destructive"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-destructive">
+      <>
+        <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
+          <div className="w-full max-w-md">
+            {/* Logo and title */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-foreground">
+                <svg className="w-6 h-6 text-background" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h1 className="text-2xl font-semibold text-foreground">
                 Invalid Request
-              </h3>
-              <div className="mt-2 text-sm text-destructive">
-                <p>
-                  The password reset link is invalid or has expired. Please
-                  request a new password reset.
-                </p>
-              </div>
-              <div className="mt-4">
-                <Link
-                  href="/auth/forgot-password"
-                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              </h1>
+              <p className="text-sm mt-1 text-muted-foreground">
+                The password reset link is invalid or has expired.
+              </p>
+            </div>
+
+            {/* Error message */}
+            <div className="mb-6 p-3 rounded-lg border bg-destructive/10 border-destructive/30">
+              <p className="text-sm text-destructive">
+                Please request a new password reset link to continue.
+              </p>
+            </div>
+
+            {/* Reset password form */}
+            <div className="rounded-2xl border p-8 shadow-sm bg-card border-border space-y-4">
+              <div className="text-center">
+                <Button
+                  asChild
+                  className="w-full h-10"
                 >
-                  Request New Reset Link
-                </Link>
+                  <Link href="/auth/forgot-password">
+                    Request New Reset Link
+                  </Link>
+                </Button>
               </div>
+
+              {/* Back to login link */}
+              <p className="text-center text-sm text-muted-foreground">
+                Remember your password?{" "}
+                <Link
+                  href="/auth/login"
+                  className="font-medium hover:underline text-primary"
+                >
+                  Sign in
+                </Link>
+              </p>
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="reset-password-card relative z-10 w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden opacity-0">
-      <div className="p-6 sm:p-8 md:p-10">
-        {/* Logo and title */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground">
-            Reset Your Password
-          </h1>
-        </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg
-                  className="h-5 w-5 text-red-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Error</h3>
-                <div className="mt-2 text-sm text-red-700">
-                  <p>{error}</p>
-                </div>
-              </div>
+    <>
+      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
+        <div className="w-full max-w-md">
+          {/* Logo and title */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-foreground">
+              <svg className="w-6 h-6 text-background" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+              </svg>
             </div>
+            <h1 className="text-2xl font-semibold text-foreground">
+              Reset Your Password
+            </h1>
+            <p className="text-sm mt-1 text-muted-foreground">
+              Enter your new password below
+            </p>
           </div>
-        )}
 
-        {success && (
-          <div className="bg-green-50 border border-green-200 rounded-md p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg
-                  className="h-5 w-5 text-green-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-green-800">
-                  Success
-                </h3>
-                <div className="mt-2 text-sm text-green-700">
-                  <p>{success}</p>
-                </div>
-              </div>
+          {error && (
+            <div className="mb-6 p-3 rounded-lg border bg-destructive/10 border-destructive/30">
+              <p className="text-sm text-destructive">{error}</p>
             </div>
-          </div>
-        )}
+          )}
 
-        {!success ? (
-          <>
-            {/* Reset password form */}
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground/70">
-                  New Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                  className={`appearance-none block w-full px-3 py-2 border ${
-                      hasError("password") ? "border-red-300" : "border-gray-300"
-                  } placeholder-gray-500 text-foreground/90 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                  value={password}
-                  {...register("password", {
-                      onChange: (e) => setPassword(e.target.value),
-                  })}
-                />
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.password.message}
-                  </p>
-                )}
-                {hasError("password") && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {getErrorMessage("password")}
-                  </p>
-                )}
-              </div>
+          {success && (
+            <div className="mb-6 p-3 rounded-lg border bg-primary/10 border-primary/30">
+              <p className="text-sm text-primary">{success}</p>
+            </div>
+          )}
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-foreground/70">
-                  Confirm New Password
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                  className={`appearance-none block w-full px-3 py-2 border ${
-                      hasError("confirmPassword") ? "border-red-300" : "border-gray-300"
-                  } placeholder-gray-500 text-foreground/90 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                  value={confirmPassword}
-                  {...register("confirmPassword", {
-                      onChange: (e) => setConfirmPassword(e.target.value),
-                  })}
-                />
-                {errors.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.confirmPassword.message}
-                  </p>
-                )}
-                {hasError("confirmPassword") && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {getErrorMessage("confirmPassword")}
-                  </p>
-                )}
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700"
-                disabled={isLoading}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div className="space-y-3">
+              <Label
+                htmlFor="password"
+                className="text-sm font-medium"
               >
-                {isLoading ? "Resetting Password" : "Reset Password"}
-              </Button>
-            </form>
-
-            {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-foreground/50">
-                  Or return to
-                </span>
-              </div>
+                New Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                className={`h-10 ${hasError("password") ? "border-destructive" : ""}`}
+                value={password}
+                {...register("password", {
+                  onChange: (e) => setPassword(e.target.value),
+                })}
+              />
+              {errors.password && (
+                <p className="text-sm text-destructive">
+                  {errors.password.message}
+                </p>
+              )}
+              {hasError("password") && (
+                <p className="text-sm text-destructive">
+                  {getErrorMessage("password")}
+                </p>
+              )}
             </div>
-          </>
-        ) : (
-          <>
-            {/* Success message */}
-            <div className="text-center">
-              <p className="text-green-700 mb-4">
-                Your password has been reset successfully. Redirecting to login...
-              </p>
-            </div>
-          </>
-        )}
 
-        {/* Back to login link */}
-        <div className="text-center">
-          <Link
-            href="/auth/login"
-            className="text-blue-600 hover:text-blue-800 font-medium"
-          >
-            Back to Login
-          </Link>
+            <div className="space-y-3">
+              <Label
+                htmlFor="confirmPassword"
+                className="text-sm font-medium"
+              >
+                Confirm New Password
+              </Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                required
+                className={`h-10 ${hasError("confirmPassword") ? "border-destructive" : ""}`}
+                value={confirmPassword}
+                {...register("confirmPassword", {
+                  onChange: (e) => setConfirmPassword(e.target.value),
+                })}
+              />
+              {errors.confirmPassword && (
+                <p className="text-sm text-destructive">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+              {hasError("confirmPassword") && (
+                <p className="text-sm text-destructive">
+                  {getErrorMessage("confirmPassword")}
+                </p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-10"
+            >
+              {isLoading ? "Resetting Password" : "Reset Password"}
+            </Button>
+          </form>
+
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-card px-4 text-foreground">
+                Or return to
+              </span>
+            </div>
+          </div>
+
+          {/* Back to login link */}
+          <p className="text-center text-sm text-muted-foreground">
+            Remember your password?{" "}
+            <Link
+              href="/auth/login"
+              className="font-medium hover:underline text-primary"
+            >
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

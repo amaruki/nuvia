@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { animate } from "animejs";
 import { authClient } from "@/lib/client";
+import Image from "next/image";
 
 export default function OAuthCallbackPage() {
   const router = useRouter();
@@ -108,7 +109,7 @@ export default function OAuthCallbackPage() {
         );
       case "success":
         return (
-          <svg className="w-12 h-12 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
           </svg>
         );
@@ -121,59 +122,50 @@ export default function OAuthCallbackPage() {
     }
   };
 
-  const getStatusColor = () => {
-    switch (status) {
-      case "loading":
-        return "text-primary";
-      case "success":
-        return "text-success";
-      case "error":
-        return "text-destructive";
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-indigo-100 px-4">
-      <div className="callback-card bg-card rounded-2xl shadow-xl p-8 max-w-md w-full text-center opacity-0">
-        {/* Logo */}
-        <div className="flex justify-center mb-6">
-          <img
-            src="/logo.png"
-            alt="Nuvia Logo"
-            width={60}
-            height={60}
-            className="rounded-md"
-          />
-        </div>
-
-        {/* Status Icon */}
-        <div className="flex justify-center mb-6">
-          {getStatusIcon()}
-        </div>
-
-        {/* Status Message */}
-        <h1 className={`text-xl font-semibold mb-2 ${getStatusColor()}`}>
-          {status === "loading" && "Authentication in Progress"}
-          {status === "success" && "Authentication Successful"}
-          {status === "error" && "Authentication Failed"}
-        </h1>
-
-        <p className="text-foreground/60 mb-6">
-          {message}
-        </p>
-
-        {/* Progress Bar for Loading State */}
-        {status === "loading" && (
-          <div className="w-full bg-muted rounded-full h-2 mb-6">
-            <div className="bg-primary h-2 rounded-full animate-pulse" style={{ width: "60%" }}></div>
+    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
+      <div className="w-full max-w-md">
+        {/* Logo and title */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-foreground">
+            <Image
+              src="/logo.png"
+              alt="Nuvia Logo"
+              width={60}
+              height={60}
+              className="rounded-md"
+            />
           </div>
-        )}
+          <h1 className="text-2xl font-semibold text-foreground">
+            {status === "loading" && "Authentication in Progress"}
+            {status === "success" && "Authentication Successful"}
+            {status === "error" && "Authentication Failed"}
+          </h1>
+          <p className="text-sm mt-1 text-muted-foreground">
+            {message}
+          </p>
+        </div>
 
-        {/* Additional Info */}
-        <div className="text-sm text-foreground/50">
-          {status === "loading" && "Please wait while we complete your authentication..."}
-          {status === "success" && "You will be redirected to your dashboard shortly."}
-          {status === "error" && "You will be redirected to the login page."}
+        {/* Status card */}
+        <div className="callback-card rounded-2xl border p-8 shadow-sm bg-card border-border">
+          {/* Status Icon */}
+          <div className="flex justify-center mb-6">
+            {getStatusIcon()}
+          </div>
+
+          {/* Progress Bar for Loading State */}
+          {status === "loading" && (
+            <div className="w-full bg-muted rounded-full h-2 mb-6">
+              <div className="bg-primary h-2 rounded-full animate-pulse" style={{ width: "60%" }}></div>
+            </div>
+          )}
+
+          {/* Additional Info */}
+          <div className="text-sm text-muted-foreground text-center">
+            {status === "loading" && "Please wait while we complete your authentication..."}
+            {status === "success" && "You will be redirected to your dashboard shortly."}
+            {status === "error" && "You will be redirected to the login page."}
+          </div>
         </div>
       </div>
     </div>

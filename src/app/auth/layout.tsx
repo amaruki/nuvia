@@ -31,7 +31,7 @@ export default function ForgotPasswordLayout({
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-chart-1/10 to-chart-2/100 p-4 sm:p-6 md:p-8 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
       <div
         className="absolute inset-0 z-0 pointer-events-none"
         style={{

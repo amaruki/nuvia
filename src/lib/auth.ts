@@ -10,6 +10,20 @@ import EmailVerificationEmail from "@/components/email-template/email-verificati
 import WelcomeEmail from "@/components/email-template/welcome";
 import React from 'react';
 
+// Environment checks
+const isProduction = process.env.NODE_ENV === 'production';
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+
+// Validate Better Auth secret
+const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
+if (!BETTER_AUTH_SECRET || BETTER_AUTH_SECRET === "your-secret-key-here") {
+  console.warn("WARNING: BETTER_AUTH_SECRET is not properly configured.");
+  if (isProduction) {
+    throw new Error("BETTER_AUTH_SECRET must be set in production environment");
+  }
+}
+
 // Email service integration
 let emailService: 'resend' | 'nodemailer' | 'none' = 'none';
 let resendClient: any = null;
@@ -42,9 +56,6 @@ if (process.env.RESEND_API_KEY) {
   console.warn('No email service configured. Email functionality will be disabled.');
 }
 
-/**
- * Send an email using the configured email service
- */
 interface SendEmailOptions {
   to: string | string[];
   subject: string;
@@ -56,8 +67,7 @@ interface SendEmailOptions {
 
 export async function sendEmail(options: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
   try {
-    // Skip email sending in development/test environment if no service is configured
-    if (emailService === 'none' && process.env.NODE_ENV !== 'production') {
+    if (emailService === 'none' && !isProduction) {
       console.log('📧 Email would be sent (development mode):', {
         to: options.to,
         subject: options.subject,
@@ -69,7 +79,6 @@ export async function sendEmail(options: SendEmailOptions): Promise<{ success: b
     const from = options.from || EMAIL_CONFIG.FROM;
 
     if (emailService === 'resend' && resendClient) {
-      // Use Resend for email delivery
       const { data, error } = await resendClient.emails.send({
         from,
         to: Array.isArray(options.to) ? options.to : [options.to],
@@ -87,7 +96,6 @@ export async function sendEmail(options: SendEmailOptions): Promise<{ success: b
       return { success: true };
 
     } else if (emailService === 'nodemailer' && nodemailerTransporter) {
-      // Use Nodemailer for email delivery
       const mailOptions = {
         from,
         to: options.to,
@@ -114,17 +122,10 @@ export async function sendEmail(options: SendEmailOptions): Promise<{ success: b
   }
 }
 
-/**
- * Email template functions that use React Email components
- */
 export const emailTemplates = {
-  /**
-   * Password reset email template
-   */
   passwordReset: async (resetUrl: string, userName?: string) => {
     const component = React.createElement(PasswordResetEmail, { resetUrl, userName });
     const { html, text } = await renderEmailTemplate(component);
-
     return {
       subject: 'Reset your password',
       html,
@@ -132,13 +133,9 @@ export const emailTemplates = {
     };
   },
 
-  /**
-   * Email verification template
-   */
   emailVerification: async (verificationUrl: string, userName?: string) => {
     const component = React.createElement(EmailVerificationEmail, { verificationUrl, userName });
     const { html, text } = await renderEmailTemplate(component);
-
     return {
       subject: 'Verify your email address',
       html,
@@ -146,13 +143,9 @@ export const emailTemplates = {
     };
   },
 
-  /**
-   * Welcome email template
-   */
   welcome: async (userName?: string) => {
     const component = React.createElement(WelcomeEmail, { userName, dashboardUrl: `${APP_URL}/dashboard` });
     const { html, text } = await renderEmailTemplate(component);
-
     return {
       subject: 'Welcome to our platform!',
       html,
@@ -161,23 +154,60 @@ export const emailTemplates = {
   },
 };
 
-// Validate Better Auth secret is properly configured
-const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
-if (!BETTER_AUTH_SECRET || BETTER_AUTH_SECRET === "your-secret-key-here") {
-  console.warn("WARNING: BETTER_AUTH_SECRET is not properly configured. Please set a secure secret in your environment variables.");
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("BETTER_AUTH_SECRET must be set in production environment");
-  }
-}
-
 export const auth = betterAuth({
+  // CRITICAL: Set base URL explicitly
   baseURL: APP_URL,
+  basePath: "/api/auth",
+
+  // Secret configuration
+  secret: BETTER_AUTH_SECRET || "fallback-secret-for-development",
+
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          // Handle username generation for OAuth users
+          if (user.username && typeof user.username === 'string') {
+            let username = user.username.toLowerCase().replace(/[^a-z0-9_]/g, '');
+            let counter = 1;
+            let uniqueUsername = username;
+
+            // Check if username exists and generate unique one if needed
+            while (await prisma.user.findUnique({
+              where: { username: uniqueUsername },
+              select: { id: true }
+            })) {
+              uniqueUsername = `${username}${counter}`;
+              counter++;
+
+              // Prevent infinite loop
+              if (counter > 9999) {
+                uniqueUsername = `${username}_${Date.now()}`;
+                break;
+              }
+            }
+
+            return {
+              data: {
+                ...user,
+                username: uniqueUsername,
+              },
+            };
+          }
+
+          return { data: user };
+        },
+      },
+    },
+  },
+  
   emailAndPassword: {
     enabled: true,
-    // Add password validation using our utility
+    autoSignIn: true,
     passwordValidation: (password: string) => {
       const validation = validatePasswordStrength(password);
       if (!validation.isValid) {
@@ -199,53 +229,56 @@ export const auth = betterAuth({
         throw new Error('Failed to send password reset email');
       }
     },
+    onPasswordReset: async ({ user }: { user: { email: string } }) => {
+      console.log(`Password for user ${user.email} has been reset.`);
+    },
+    resetPasswordTokenExpiresIn: 3600,
   },
+  
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       enabled: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
+      // FIXED: Use consistent redirect URI
       redirectUri: `${APP_URL}/api/auth/callback/google`,
-      prompt: "select_account consent",
+      accessType: "offline",
+      prompt: "consent",
       scopes: ["openid", "profile", "email"],
-    },
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID || "",
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
-      enabled: !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
-      redirectUri: `${APP_URL}/api/auth/callback/github`,
-      scopes: ["user:email", "read:user"],
-    },
-    linkedin: {
-      clientId: process.env.LINKEDIN_CLIENT_ID || "",
-      clientSecret: process.env.LINKEDIN_CLIENT_SECRET || "",
-      enabled: !!(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET),
-      redirectUri: `${APP_URL}/api/auth/callback/linkedin`,
-      scopes: ["openid", "profile", "email"],
+      // REMOVED: Let Better Auth handle state management automatically
+      mapProfileToUser: (profile) => {
+        // Generate username from email if not provided by OAuth provider
+        const baseUsername = profile.email?.split('@')[0] || 'user';
+        const cleanUsername = baseUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+        return {
+          name: profile.given_name || profile.name,
+          email: profile.email,
+          image: profile.picture,
+          username: cleanUsername,
+        };
+      }
     },
   },
-  // Ensure account creation is enabled for OAuth providers
+  
   account: {
     accountLinking: {
       enabled: true,
-      // Allow users to link multiple OAuth accounts to the same email
-      trustedProviders: ["google", "github", "linkedin"],
+      trustedProviders: ["google"],
     },
   },
-  // Configure OAuth account creation
-  oauth: {
-    enabled: true,
-    // Automatically create accounts for OAuth users
-    createAccountOnSignIn: true,
-  },
+  
+  // FIXED: Session cookie configuration based on environment
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
-    cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60,
+    cookieOptions: {
+      secure: isProduction, // true in production, false in development
+      sameSite: isProduction ? "none" : "lax", // "none" requires secure=true
+      httpOnly: true,
+      path: "/",
     },
   },
+  
   user: {
     additionalFields: {
       username: {
@@ -271,71 +304,101 @@ export const auth = betterAuth({
       },
     },
   },
+  
   rateLimit: {
     enabled: true,
-    window: 60, // 60 seconds
-    max: 100, // 100 requests per window
+    window: 60,
+    max: 100,
   },
+  
+  verification: {
+    disableCleanup: false,
+    expiresIn: 300, // 5 minutes
+  },
+  
   plugins: [nextCookies()],
-  // Add secret for Better Auth
-  secret: BETTER_AUTH_SECRET || "fallback-secret-for-development",
-  // Add advanced configuration for cookies and state management
+  
+  // FIXED: Advanced configuration with environment-aware settings
   advanced: {
-    useSecureCookies: process.env.NODE_ENV === "production",
+    useSecureCookies: isProduction,
     cookieOptions: {
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction,
       httpOnly: true,
       path: "/",
     },
     cookiePrefix: "nuvia-auth",
-    trustedOrigins: [
-      APP_URL,
-      new URL(APP_URL).origin,
-      "http://localhost:3000",
-      "https://localhost:3000",
-    ],
+    // FIXED: Only include current origin in trusted origins
+    trustedOrigins: isProduction 
+      ? [APP_URL]
+      : [
+          APP_URL,
+          "http://localhost:3000",
+          "http://localhost:3001",
+        ],
     generateState: true,
-    // Add hooks for debugging OAuth state and handling account creation
+    stateOptions: {
+      maxAge: 600, // 10 minutes
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
+      httpOnly: true,
+      secure: isProduction,
+    },
     hooks: {
       onError: async (event: any) => {
         console.error("Better Auth Error:", {
           event: event.name,
-          error: event.error,
+          error: event.error?.message || event.error,
+          context: event.context,
+          stack: isDevelopment ? event.error?.stack : undefined,
         });
       },
-      // Hook to handle OAuth account creation
+      beforeOAuthStart: async (event: any) => {
+        if (isDevelopment) {
+          console.log("Starting OAuth Flow:", {
+            provider: event.provider,
+            state: event.state,
+            timestamp: new Date().toISOString(),
+          });
+        }
+      },
       onOAuthAccountCreation: async (event: any) => {
         console.log("OAuth Account Creation:", {
           provider: event.provider,
           email: event.email,
-          accountId: event.accountId,
+          timestamp: new Date().toISOString(),
         });
-        
-        // The account will be automatically created by better-auth
-        // This hook is just for logging and potential additional processing
       },
-      // Hook to handle OAuth sign-in
       onOAuthSignIn: async (event: any) => {
         console.log("OAuth Sign In:", {
           provider: event.provider,
           email: event.email,
-          userId: event.userId,
+          timestamp: new Date().toISOString(),
         });
+      },
+      beforeOAuthCallback: async (event: any) => {
+        if (isDevelopment) {
+          console.log("Before OAuth Callback:", {
+            provider: event.provider,
+            state: event.state,
+            query: event.query,
+            timestamp: new Date().toISOString(),
+          });
+        }
       },
     }
   },
-   logger: {
-    level: process.env.NODE_ENV === "development" ? "debug" : "warn",
-    disabled: process.env.NODE_ENV === "production",
+  
+  logger: {
+    level: isDevelopment ? "debug" : "warn",
+    disabled: isProduction,
   },
+  
   onError: (error: any) => {
     console.error("Better Auth Error:", error?.message || error);
   },
 });
 
-// Export password utilities for use in auth actions
 export const passwordUtils = {
   validatePasswordStrength,
 };
-

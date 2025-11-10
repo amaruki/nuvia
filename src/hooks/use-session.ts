@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession as useBetterAuthSession } from "@/lib/auth-client";
 
 interface User {
   id: string;
@@ -21,36 +22,41 @@ interface SessionData {
 }
 
 export function useSession(): SessionData {
-  const [sessionData, setSessionData] = useState<SessionData>({
-    user: null,
-    isPending: true,
-    error: null,
-  });
+  const { data: session, isPending, error } = useBetterAuthSession();
+  
+  // Transform better-auth session to our User format
+  const [userData, setUserData] = useState<User | null>(null);
+  const [sessionError, setSessionError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Mock session data for now
-    // In a real implementation, this would fetch from the auth API
-    const mockUser: User = {
-      id: "1",
-      username: "testuser",
-      email: "test@example.com",
-      displayName: "Test User",
-      image: undefined,
-      bio: "This is a test bio",
-      role: "USER",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    // Simulate loading
-    setTimeout(() => {
-      setSessionData({
-        user: mockUser,
-        isPending: false,
-        error: null,
+    if (session?.user) {
+      setUserData({
+        id: session.user.id,
+        username: (session.user as any).username || session.user.name || "",
+        email: session.user.email,
+        displayName: session.user.name,
+        image: session.user.image || undefined, // Convert null to undefined
+        bio: (session.user as any).bio || undefined, // Cast to any for custom fields
+        role: (session.user as any).role || "USER", // Cast to any for custom fields
+        createdAt: new Date(session.user.createdAt),
+        updatedAt: new Date(session.user.updatedAt),
       });
-    }, 500);
-  }, []);
+      setSessionError(null);
+    } else if (!isPending && !session) {
+      setUserData(null);
+      setSessionError(null);
+    }
+  }, [session, isPending]);
 
-  return sessionData;
+  useEffect(() => {
+    if (error) {
+      setSessionError(error.message || "Session error");
+    }
+  }, [error]);
+
+  return {
+    user: userData,
+    isPending,
+    error: sessionError,
+  };
 }

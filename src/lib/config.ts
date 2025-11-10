@@ -138,7 +138,7 @@ export function validateEnvironment(): void {
   }
   
   // Warn if using default JWT secret in production
-  if (NODE_ENV === 'production' && JWT_SECRET === 'your-secret-key-change-in-production') {
+  if (NODE_ENV === 'production' && process.env.JWT_SECRET === 'your-secret-key-change-in-production') {
     console.warn('WARNING: Using default JWT secret in production. Please set a secure JWT_SECRET environment variable.');
   }
 }

@@ -110,7 +110,8 @@ export function ProfilePhotoUpload({ user }: ProfilePhotoUploadProps) {
 
       if (result.success) {
         setSuccess(true);
-        setPreview(result.data?.image || null);
+        // Use the photoUrl we created earlier instead of trying to get it from result.data
+        setPreview(photoUrl);
 
         setTimeout(() => setSuccess(false), 3000);
       } else {

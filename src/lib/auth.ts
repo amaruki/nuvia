@@ -1,3 +1,10 @@
+/**
+ * Consolidated Better Auth configuration
+ *
+ * This module provides the main Better Auth setup with clean, modular configuration
+ * that leverages our consolidated auth utilities to eliminate redundancy.
+ */
+
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
@@ -9,119 +16,165 @@ import PasswordResetEmail from "@/components/email-template/password-reset";
 import EmailVerificationEmail from "@/components/email-template/email-verification";
 import WelcomeEmail from "@/components/email-template/welcome";
 import React from 'react';
+import { AuthError, AuthErrorType } from './auth/common';
 
-// Environment checks
+// TODO: Move email service logic to a separate module
+// TODO: Add support for multiple OAuth providers (GitHub, LinkedIn)
+// TODO: Add support for multi-factor authentication
+
+// Environment configuration
 const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
 
+// Validate required environment variables
+const validateEnvironment = () => {
+  const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
 
-// Validate Better Auth secret
-const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
-if (!BETTER_AUTH_SECRET || BETTER_AUTH_SECRET === "your-secret-key-here") {
-  console.warn("WARNING: BETTER_AUTH_SECRET is not properly configured.");
-  if (isProduction) {
-    throw new Error("BETTER_AUTH_SECRET must be set in production environment");
-  }
-}
+  if (!BETTER_AUTH_SECRET || BETTER_AUTH_SECRET === "your-secret-key-here") {
+    const message = "BETTER_AUTH_SECRET is not properly configured";
 
-// Email service integration
-let emailService: 'resend' | 'nodemailer' | 'none' = 'none';
-let resendClient: any = null;
-let nodemailerTransporter: any = null;
-
-// Initialize email service based on configuration
-if (process.env.RESEND_API_KEY) {
-  emailService = 'resend';
-  import('resend').then(({ Resend }) => {
-    resendClient = new Resend(process.env.RESEND_API_KEY);
-  }).catch(() => {
-    console.warn('Failed to initialize Resend email service');
-  });
-} else if (EMAIL_CONFIG.HOST && EMAIL_CONFIG.USER && EMAIL_CONFIG.PASS) {
-  emailService = 'nodemailer';
-  import('nodemailer').then(({ createTransport }) => {
-    nodemailerTransporter = createTransport({
-      host: EMAIL_CONFIG.HOST,
-      port: EMAIL_CONFIG.PORT,
-      secure: EMAIL_CONFIG.PORT === 465,
-      auth: {
-        user: EMAIL_CONFIG.USER,
-        pass: EMAIL_CONFIG.PASS,
-      },
-    });
-  }).catch(() => {
-    console.warn('Failed to initialize Nodemailer email service');
-  });
-} else {
-  console.warn('No email service configured. Email functionality will be disabled.');
-}
-
-interface SendEmailOptions {
-  to: string | string[];
-  subject: string;
-  text?: string;
-  html?: string;
-  from?: string;
-  replyTo?: string;
-}
-
-export async function sendEmail(options: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
-  try {
-    if (emailService === 'none' && !isProduction) {
-      console.log('📧 Email would be sent (development mode):', {
-        to: options.to,
-        subject: options.subject,
-        text: options.text?.substring(0, 100) + '...',
-      });
-      return { success: true };
+    if (isProduction) {
+      throw new AuthError(AuthErrorType.INTERNAL, message);
     }
 
-    const from = options.from || EMAIL_CONFIG.FROM;
+    console.warn(`WARNING: ${message}`);
+  }
 
-    if (emailService === 'resend' && resendClient) {
-      const { data, error } = await resendClient.emails.send({
-        from,
-        to: Array.isArray(options.to) ? options.to : [options.to],
-        subject: options.subject,
-        text: options.text,
-        html: options.html,
-        replyTo: options.replyTo,
-      });
+  if (!APP_URL) {
+    throw new AuthError(AuthErrorType.INTERNAL, "APP_URL environment variable is required");
+  }
+};
 
-      if (error) {
-        throw new Error(`Resend error: ${error.message}`);
+validateEnvironment();
+
+/**
+ * Email service types
+ */
+type EmailServiceType = 'resend' | 'nodemailer' | 'none';
+
+/**
+ * Email service configuration class
+ */
+class EmailService {
+  private service: EmailServiceType = 'none';
+  private resendClient: any = null;
+  private nodemailerTransporter: any = null;
+
+  constructor() {
+    this.initialize();
+  }
+
+  private async initialize() {
+    // Initialize Resend if available
+    if (process.env.RESEND_API_KEY) {
+      this.service = 'resend';
+      try {
+        const { Resend } = await import('resend');
+        this.resendClient = new Resend(process.env.RESEND_API_KEY);
+        console.log('✅ Resend email service initialized');
+      } catch (error) {
+        console.warn('❌ Failed to initialize Resend:', error);
+        this.service = 'none';
+      }
+    }
+    // Initialize Nodemailer if available
+    else if (EMAIL_CONFIG.HOST && EMAIL_CONFIG.USER && EMAIL_CONFIG.PASS) {
+      this.service = 'nodemailer';
+      try {
+        const { createTransport } = await import('nodemailer');
+        this.nodemailerTransporter = createTransport({
+          host: EMAIL_CONFIG.HOST,
+          port: EMAIL_CONFIG.PORT,
+          secure: EMAIL_CONFIG.PORT === 465,
+          auth: {
+            user: EMAIL_CONFIG.USER,
+            pass: EMAIL_CONFIG.PASS,
+          },
+        });
+        console.log('✅ Nodemailer email service initialized');
+      } catch (error) {
+        console.warn('❌ Failed to initialize Nodemailer:', error);
+        this.service = 'none';
+      }
+    }
+    // No email service configured
+    else {
+      console.warn('⚠️ No email service configured. Email functionality will be disabled.');
+    }
+  }
+
+  /**
+   * Send an email using the configured service
+   */
+  async sendEmail(options: {
+    to: string | string[];
+    subject: string;
+    text?: string;
+    html?: string;
+    from?: string;
+    replyTo?: string;
+  }): Promise<{ success: boolean; error?: string }> {
+    try {
+      // Development mode fallback
+      if (this.service === 'none' && !isProduction) {
+        console.log('📧 Email would be sent (development mode):', {
+          to: options.to,
+          subject: options.subject,
+          textPreview: options.text?.substring(0, 100) + '...',
+        });
+        return { success: true };
       }
 
-      console.log('✅ Email sent via Resend:', data);
-      return { success: true };
+      const from = options.from || EMAIL_CONFIG.FROM;
 
-    } else if (emailService === 'nodemailer' && nodemailerTransporter) {
-      const mailOptions = {
-        from,
-        to: options.to,
-        subject: options.subject,
-        text: options.text,
-        html: options.html,
-        replyTo: options.replyTo,
-      };
+      if (this.service === 'resend' && this.resendClient) {
+        const { data, error } = await this.resendClient.emails.send({
+          from,
+          to: Array.isArray(options.to) ? options.to : [options.to],
+          subject: options.subject,
+          text: options.text,
+          html: options.html,
+          replyTo: options.replyTo,
+        });
 
-      const result = await nodemailerTransporter.sendMail(mailOptions);
-      console.log('✅ Email sent via Nodemailer:', result.messageId);
-      return { success: true };
+        if (error) {
+          throw new Error(`Resend error: ${error.message}`);
+        }
 
-    } else {
+        console.log('✅ Email sent via Resend:', data);
+        return { success: true };
+      }
+
+      if (this.service === 'nodemailer' && this.nodemailerTransporter) {
+        const mailOptions = {
+          from,
+          to: options.to,
+          subject: options.subject,
+          text: options.text,
+          html: options.html,
+          replyTo: options.replyTo,
+        };
+
+        const result = await this.nodemailerTransporter.sendMail(mailOptions);
+        console.log('✅ Email sent via Nodemailer:', result.messageId);
+        return { success: true };
+      }
+
       throw new Error('No email service is properly configured');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown email error';
+      console.error('❌ Failed to send email:', errorMessage);
+      return { success: false, error: errorMessage };
     }
-
-  } catch (error) {
-    console.error('❌ Failed to send email:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown email error'
-    };
   }
 }
 
+// Initialize email service
+const emailService = new EmailService();
+
+/**
+ * Email templates factory
+ */
 export const emailTemplates = {
   passwordReset: async (resetUrl: string, userName?: string) => {
     const component = React.createElement(PasswordResetEmail, { resetUrl, userName });
@@ -144,7 +197,10 @@ export const emailTemplates = {
   },
 
   welcome: async (userName?: string) => {
-    const component = React.createElement(WelcomeEmail, { userName, dashboardUrl: `${APP_URL}/dashboard` });
+    const component = React.createElement(WelcomeEmail, {
+      userName,
+      dashboardUrl: `${APP_URL}/dashboard`
+    });
     const { html, text } = await renderEmailTemplate(component);
     return {
       subject: 'Welcome to our platform!',
@@ -154,43 +210,69 @@ export const emailTemplates = {
   },
 };
 
+/**
+ * Username generator for OAuth users
+ */
+async function generateUniqueUsername(baseUsername: string): Promise<string> {
+  let username = baseUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+  let counter = 1;
+  let uniqueUsername = username;
+
+  // Check if username exists and generate unique one if needed
+  while (await prisma.user.findUnique({
+    where: { username: uniqueUsername },
+    select: { id: true }
+  })) {
+    uniqueUsername = `${username}${counter}`;
+    counter++;
+
+    // Prevent infinite loop
+    if (counter > 9999) {
+      uniqueUsername = `${username}_${Date.now()}`;
+      break;
+    }
+  }
+
+  return uniqueUsername;
+}
+
+/**
+ * OAuth profile mapping helper
+ */
+function mapOAuthProfileToUser(profile: any) {
+  const baseUsername = profile.email?.split('@')[0] || 'user';
+  const cleanUsername = baseUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+
+  return {
+    name: profile.given_name || profile.name,
+    email: profile.email,
+    image: profile.picture,
+    username: cleanUsername,
+  };
+}
+
+/**
+ * Main Better Auth configuration
+ */
 export const auth = betterAuth({
-  // CRITICAL: Set base URL explicitly
+  // Core configuration
   baseURL: APP_URL,
   basePath: "/api/auth",
+  secret: process.env.BETTER_AUTH_SECRET || "fallback-secret-for-development",
 
-  // Secret configuration
-  secret: BETTER_AUTH_SECRET || "fallback-secret-for-development",
-
+  // Database configuration
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
 
+  // Database hooks for user management
   databaseHooks: {
     user: {
       create: {
         before: async (user) => {
           // Handle username generation for OAuth users
           if (user.username && typeof user.username === 'string') {
-            let username = user.username.toLowerCase().replace(/[^a-z0-9_]/g, '');
-            let counter = 1;
-            let uniqueUsername = username;
-
-            // Check if username exists and generate unique one if needed
-            while (await prisma.user.findUnique({
-              where: { username: uniqueUsername },
-              select: { id: true }
-            })) {
-              uniqueUsername = `${username}${counter}`;
-              counter++;
-
-              // Prevent infinite loop
-              if (counter > 9999) {
-                uniqueUsername = `${username}_${Date.now()}`;
-                break;
-              }
-            }
-
+            const uniqueUsername = await generateUniqueUsername(user.username);
             return {
               data: {
                 ...user,
@@ -204,7 +286,8 @@ export const auth = betterAuth({
       },
     },
   },
-  
+
+  // Email and password authentication
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
@@ -217,7 +300,7 @@ export const auth = betterAuth({
     },
     sendResetPassword: async ({ user, url }) => {
       const template = await emailTemplates.passwordReset(url, user.name || user.email);
-      const result = await sendEmail({
+      const result = await emailService.sendEmail({
         to: user.email,
         subject: template.subject,
         text: template.text,
@@ -232,53 +315,46 @@ export const auth = betterAuth({
     onPasswordReset: async ({ user }: { user: { email: string } }) => {
       console.log(`Password for user ${user.email} has been reset.`);
     },
-    resetPasswordTokenExpiresIn: 3600,
+    resetPasswordTokenExpiresIn: 3600, // 1 hour
   },
-  
+
+  // Social providers configuration
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       enabled: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-      // FIXED: Use consistent redirect URI
       redirectUri: `${APP_URL}/api/auth/callback/google`,
       accessType: "offline",
       prompt: "consent",
       scopes: ["openid", "profile", "email"],
-      // REMOVED: Let Better Auth handle state management automatically
-      mapProfileToUser: (profile) => {
-        // Generate username from email if not provided by OAuth provider
-        const baseUsername = profile.email?.split('@')[0] || 'user';
-        const cleanUsername = baseUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
-        return {
-          name: profile.given_name || profile.name,
-          email: profile.email,
-          image: profile.picture,
-          username: cleanUsername,
-        };
-      }
+      mapProfileToUser: mapOAuthProfileToUser,
     },
+    // TODO: Add GitHub provider
+    // TODO: Add LinkedIn provider
   },
-  
+
+  // Account linking configuration
   account: {
     accountLinking: {
       enabled: true,
       trustedProviders: ["google"],
     },
   },
-  
-  // FIXED: Session cookie configuration based on environment
+
+  // Session configuration
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
     cookieOptions: {
-      secure: isProduction, // true in production, false in development
-      sameSite: isProduction ? "none" : "lax", // "none" requires secure=true
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
       httpOnly: true,
       path: "/",
     },
   },
-  
+
+  // User fields configuration
   user: {
     additionalFields: {
       username: {
@@ -304,21 +380,24 @@ export const auth = betterAuth({
       },
     },
   },
-  
+
+  // Rate limiting configuration
   rateLimit: {
     enabled: true,
-    window: 60,
-    max: 100,
+    window: 60, // 1 minute
+    max: 100,   // 100 requests per minute
   },
-  
+
+  // Email verification configuration
   verification: {
     disableCleanup: false,
     expiresIn: 300, // 5 minutes
   },
-  
+
+  // Next.js cookies plugin
   plugins: [nextCookies()],
-  
-  // FIXED: Advanced configuration with environment-aware settings
+
+  // Advanced configuration with environment-aware settings
   advanced: {
     useSecureCookies: isProduction,
     cookieOptions: {
@@ -328,8 +407,7 @@ export const auth = betterAuth({
       path: "/",
     },
     cookiePrefix: "nuvia-auth",
-    // FIXED: Only include current origin in trusted origins
-    trustedOrigins: isProduction 
+    trustedOrigins: isProduction
       ? [APP_URL]
       : [
           APP_URL,
@@ -388,17 +466,24 @@ export const auth = betterAuth({
       },
     }
   },
-  
+
+  // Logger configuration
   logger: {
     level: isDevelopment ? "debug" : "warn",
     disabled: isProduction,
   },
-  
+
+  // Global error handler
   onError: (error: any) => {
     console.error("Better Auth Error:", error?.message || error);
   },
 });
 
+/**
+ * Export commonly used utilities
+ */
 export const passwordUtils = {
   validatePasswordStrength,
 };
+
+export { emailService };

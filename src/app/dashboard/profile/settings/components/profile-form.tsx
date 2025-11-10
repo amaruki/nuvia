@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle, AlertCircle, Save } from "lucide-react";
 
-import { updateProfile } from "@/lib/utils/auth-client-utils";
+import { updateProfile } from "@/lib/client";
 
 // Simple form validation schema
 const profileFormSchema = z.object({

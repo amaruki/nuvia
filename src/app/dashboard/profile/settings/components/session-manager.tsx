@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "@/lib/auth-client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +13,7 @@ import {
   Clock, Shield, Eye
 } from "lucide-react";
 
-import { listSessions, revokeSession } from "@/lib/utils/auth-client-utils";
+import { getUserSessionsAction, revokeSessionAction, revokeAllOtherSessionsAction } from "@/lib/actions/auth.actions";
 
 interface SessionManagerProps {
   user: any;
@@ -33,7 +32,6 @@ interface SessionData {
 }
 
 export function SessionManager({ user }: SessionManagerProps) {
-  const { data: currentSession } = useSession();
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,69 +39,44 @@ export function SessionManager({ user }: SessionManagerProps) {
   const [error, setError] = useState<string | null>(null);
   const [isRevoking, setIsRevoking] = useState(false);
 
-  // Mock session data for now
-  const mockSessions: SessionData[] = [
-    {
-      id: "current-session",
-      userId: user.id,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      ipAddress: "192.168.1.1",
-      userAgent: navigator.userAgent,
-      createdAt: new Date(),
-      lastAccessedAt: new Date(),
-      token: "current-token",
-      isCurrent: true
-    }
-  ];
-
   // Load sessions on component mount
   const loadSessions = async () => {
     try {
-      const result = await listSessions();
+      const result = await getUserSessionsAction();
 
       if (result.success && result.data) {
-        // Check if result.data is an array (direct sessions) or an object with sessions property
-        const sessionsArray = Array.isArray(result.data) ? result.data : result.data.sessions;
-        
-        if (sessionsArray && sessionsArray.length > 0) {
-          // Transform Better Auth session data to our format
-          const transformedSessions = sessionsArray.map((session: any) => {
-            // Handle different session structures
-            const sessionData = session.session || session;
-            const userData = session.user;
-            
-            // Get the session ID - it could be in different places
-            const sessionId = sessionData.id || sessionData.token || session.id;
-            
-            // Get the current session ID for comparison
-            const currentSessionId = currentSession?.session?.id || currentSession?.session?.token;
-            
-            return {
-              id: sessionId,
-              userId: userData?.id || sessionData.userId || session.userId,
-              expiresAt: new Date(sessionData.expiresAt),
-              ipAddress: sessionData.ipAddress,
-              userAgent: sessionData.userAgent,
-              createdAt: new Date(sessionData.createdAt),
-              lastAccessedAt: new Date(sessionData.lastAccessedAt || sessionData.createdAt),
-              token: sessionData.token || sessionId,
-              isCurrent: sessionId === currentSessionId
-            };
-          });
+        // Transform Better Auth session data to our format
+        const sessionsArray = Array.isArray(result.data) ? result.data : [];
+        const transformedSessions = sessionsArray.map((session: any) => {
+          // Handle different session structures
+          const sessionData = session.session || session;
+          const userData = session.user;
 
-          setSessions(transformedSessions);
-        } else {
-          // Fallback to mock data if no sessions found
-          setSessions(mockSessions);
-        }
+          // Get the session ID - it could be in different places
+          const sessionId = sessionData.id || sessionData.token || session.id;
+
+          return {
+            id: sessionId,
+            userId: userData?.id || sessionData.userId || session.userId,
+            expiresAt: new Date(sessionData.expiresAt),
+            ipAddress: sessionData.ipAddress,
+            userAgent: sessionData.userAgent,
+            createdAt: new Date(sessionData.createdAt),
+            lastAccessedAt: new Date(sessionData.lastAccessedAt || sessionData.createdAt),
+            token: sessionData.token || sessionId,
+            isCurrent: sessionData.isCurrent || false
+          };
+        });
+
+        setSessions(transformedSessions);
       } else {
-        // Fallback to mock data if API fails
-        setSessions(mockSessions);
+        // Set empty array if no sessions found
+        setSessions([]);
       }
     } catch (err) {
       console.error("Failed to load sessions:", err);
       setError("Failed to load active sessions");
-      setSessions(mockSessions);
+      setSessions([]);
     } finally {
       setIsLoading(false);
     }
@@ -120,14 +93,7 @@ export function SessionManager({ user }: SessionManagerProps) {
     setError(null);
 
     try {
-      // Find the session to get the token
-      const session = sessions.find(s => s.id === sessionId);
-      if (!session) {
-        setError("Session not found");
-        return;
-      }
-
-      const result = await revokeSession(session.token);
+      const result = await revokeSessionAction(sessionId);
 
       if (result.success) {
         setIsSuccess(true);
@@ -146,11 +112,18 @@ export function SessionManager({ user }: SessionManagerProps) {
 
   const handleRevokeAllOtherSessions = async () => {
     if (confirm("Are you sure you want to revoke all other sessions? This will sign you out from all other devices.")) {
-      const otherSessions = sessions.filter(s => !s.isCurrent);
-      
-      // Revoke each session one by one
-      for (const session of otherSessions) {
-        await handleRevokeSession(session.id);
+      try {
+        const result = await revokeAllOtherSessionsAction();
+        if (result.success) {
+          setIsSuccess(true);
+          // Keep only the current session
+          setSessions(sessions.filter(s => s.isCurrent));
+          setTimeout(() => setIsSuccess(false), 3000);
+        } else {
+          setError(result.message || "Failed to revoke other sessions");
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to revoke other sessions");
       }
     }
   };

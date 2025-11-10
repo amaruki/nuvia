@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { Camera, Upload, X, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
-import { updateProfile } from "@/lib/utils/auth-client-utils";
+import { updateProfile } from "@/lib/client";
 
 interface ProfilePhotoUploadProps {
   user: any;

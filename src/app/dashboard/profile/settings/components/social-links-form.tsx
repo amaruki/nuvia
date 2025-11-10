@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@/hooks/use-session";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ExternalLink as ExternalLinkType } from "@/types/auth.types";
 
@@ -23,7 +23,7 @@ import {
   Facebook, Loader2, Save
 } from "lucide-react";
 
-import { updateProfile } from "@/lib/utils/auth-client-utils";
+import { updateProfileAction } from "@/lib/actions/auth.actions";
 
 // Social link validation schema
 const socialLinkSchema = z.object({
@@ -135,15 +135,17 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
   const socialLinksMutation = useMutation({
     mutationFn: async (updatedLinks: SocialLink[]) => {
       // Convert links array to the format expected by the API
-      const externalLinks: ExternalLinkType[] = updatedLinks.map(link => ({
+      const externalLinks = JSON.stringify(updatedLinks.map(link => ({
         platform: link.platform,
         url: link.url,
         username: link.label
-      }));
+      })));
 
-      const result = await updateProfile({
-        externalLinks: externalLinks
-      });
+      // Create FormData for server action
+      const formData = new FormData();
+      formData.append('externalLinks', externalLinks);
+
+      const result = await updateProfileAction(formData);
 
       if (!result.success) {
         throw new Error(result.message || "Failed to update social links");

@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { Key, CheckCircle, AlertCircle, Eye, EyeOff, Loader2, Shield, Check } from "lucide-react";
 
-import { changePassword } from "@/lib/utils/auth-client-utils";
+import { changePassword } from "@/lib/client";
 
 // Simple password validation schema
 const passwordFormSchema = z.object({

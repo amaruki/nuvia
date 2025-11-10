@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession as useBetterAuthSession } from "@/lib/auth-client";
+import { authClient } from "@/lib/client";
 
 interface User {
   id: string;
   username: string;
   email: string;
-  displayName?: string;
-  image?: string;
-  bio?: string;
-  role?: string;
+  displayName?: string | null;
+  image?: string | null;
+  bio?: string | null;
+  role?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,31 +22,31 @@ interface SessionData {
 }
 
 export function useSession(): SessionData {
-  const { data: session, isPending, error } = useBetterAuthSession();
-  
-  // Transform better-auth session to our User format
+  const { data: authUser, isPending, error } = authClient.useSession();
+
+  // Transform better-auth user to our User format
   const [userData, setUserData] = useState<User | null>(null);
   const [sessionError, setSessionError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (session?.user) {
+    if (authUser) {
       setUserData({
-        id: session.user.id,
-        username: (session.user as any).username || session.user.name || "",
-        email: session.user.email,
-        displayName: session.user.name,
-        image: session.user.image || undefined, // Convert null to undefined
-        bio: (session.user as any).bio || undefined, // Cast to any for custom fields
-        role: (session.user as any).role || "USER", // Cast to any for custom fields
-        createdAt: new Date(session.user.createdAt),
-        updatedAt: new Date(session.user.updatedAt),
+        id: authUser.user.id,
+        username: (authUser.user as any).username || authUser.user.name || "",
+        email: authUser.user.email,
+        displayName: authUser.user.name || (authUser.user as any).displayName || undefined,
+        image: authUser.user.image || undefined, // Convert null to undefined
+        bio: (authUser.user as any).bio || undefined, // Cast to any for custom fields
+        role: (authUser.user as any).role || "USER", // Cast to any for custom fields
+        createdAt: new Date(authUser.user.createdAt),
+        updatedAt: new Date(authUser.user.updatedAt),
       });
       setSessionError(null);
-    } else if (!isPending && !session) {
+    } else if (!isPending && !authUser) {
       setUserData(null);
       setSessionError(null);
     }
-  }, [session, isPending]);
+  }, [authUser, isPending]);
 
   useEffect(() => {
     if (error) {

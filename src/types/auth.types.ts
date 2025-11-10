@@ -4,10 +4,11 @@ export type SafeUser = {
   username: string;
   email: string;
   emailVerified: boolean;
-  displayName?: string;
-  profilePhoto?: string;
-  bio?: string;
-  externalLinks?: Record<string, string>;
+  displayName?: string | null;
+  profilePhoto?: string | null; // Better Auth can return null for optional image fields
+  bio?: string | null;
+  externalLinks?: any; // JSON field from Better Auth
+  role?: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;

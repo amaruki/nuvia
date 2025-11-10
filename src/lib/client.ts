@@ -1,8 +1,22 @@
+/**
+ * Better Auth React Client Configuration
+ *
+ * This module provides the React client setup for Better Auth, enabling
+ * client-side session management and authentication hooks.
+ */
+
 import { createAuthClient } from "better-auth/react";
 
+// Create the Better Auth React client
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  baseURL: process.env.NEXT_PUBLIC_APP_URL ||
+          (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'),
+  basePath: "/api/auth",
 });
+
+export const { useSession } = authClient;
+export const updateProfile = authClient.updateUser;
+export const changePassword = authClient.changePassword;
 
 /**
  * OAuth utility functions for client-side usage

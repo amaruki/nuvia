@@ -1,74 +1,83 @@
-import { NextResponse } from 'next/server';
+/**
+ * Consolidated Next.js middleware
+ *
+ * This middleware uses our refactored auth and rate limiting modules to provide
+ * consistent security and rate limiting across the application.
+ */
+
 import type { NextRequest } from 'next/server';
-import { rateLimiters, getRateLimitHeaders, createRateLimitResponse } from '@/lib/utils/rate-limiter';
+import { NextResponse } from 'next/server';
+import { createAuthMiddleware } from '@/lib/auth/middleware';
+
+// Force Node.js runtime to allow Prisma database access
+export const runtime = 'nodejs';
+import { RATE_LIMIT_CONFIGS } from '@/lib/auth/rate-limiting';
+import { AuthResponseFactory } from '@/lib/auth/common';
+
+// TODO: Add support for API key authentication for external services
+// TODO: Add support for request logging and analytics
+// TODO: Add support for CORS configuration
 
 /**
- * Middleware for rate limiting and other global security measures
+ * Create middleware with authentication and rate limiting
+ */
+const authMiddleware = createAuthMiddleware({
+  rateLimit: 'API',
+  skipPaths: ['/api/auth/callback'], // Skip auth for OAuth callbacks
+});
+
+/**
+ * Main middleware function
  */
 export async function middleware(request: NextRequest) {
-  // Apply global rate limiting to all authentication endpoints
-  if (request.nextUrl.pathname.startsWith('/api/v1/auth/')) {
-    const rateLimitResult = await rateLimiters.global(request);
-    
-    if (rateLimitResult.isLimited) {
-      const headers = getRateLimitHeaders(rateLimitResult);
-      
-      return new NextResponse(
-        JSON.stringify({
-          success: false,
-          message: 'Too many requests. Please try again later.',
-          errors: {
-            rateLimit: ['Rate limit exceeded. Please try again later.'],
-          },
-          meta: {
-            timestamp: new Date(),
-            version: 'v1',
-          },
-        }),
-        {
-          status: 429,
-          headers: {
-            'Content-Type': 'application/json',
-            ...headers,
-          },
-        }
-      );
+  try {
+    // Apply authentication middleware to API routes
+    if (request.nextUrl.pathname.startsWith('/api/')) {
+      // Skip auth middleware for OAuth callbacks and public endpoints
+      if (isPublicEndpoint(request.nextUrl.pathname)) {
+        return NextResponse.next();
+      }
+
+      const result = await authMiddleware(request);
+      if (result) {
+        return result; // Return error response if auth/rate limit fails
+      }
     }
-    
-    // Add rate limit headers to all responses
-    const response = NextResponse.next();
-    const headers = getRateLimitHeaders(rateLimitResult);
-    
-    // Add headers to response
-    Object.entries(headers).forEach(([key, value]) => {
-      response.headers.set(key, value);
-    });
-    
-    // Preserve cookies from the original request
-    const requestCookies = request.headers.get('cookie');
-    if (requestCookies) {
-      response.headers.set('cookie', requestCookies);
-    }
-    
-    return response;
-  }
-  
-  // Handle OAuth callback routes - ensure cookies are preserved
-  if (request.nextUrl.pathname.startsWith('/api/auth/callback/')) {
+
+    // Continue to the route handler
     return NextResponse.next();
+  } catch (error) {
+    console.error('Middleware error:', error);
+    return AuthResponseFactory.internalError('Internal server error');
   }
-  
-  // For non-authentication endpoints, just continue
-  return NextResponse.next();
 }
 
+/**
+ * Check if the endpoint is public and doesn't require authentication
+ */
+function isPublicEndpoint(pathname: string): boolean {
+  const publicEndpoints = [
+    '/api/auth/callback', // OAuth callbacks
+    '/api/v1/auth/login',   // Login endpoints
+    '/api/v1/auth/register', // Registration endpoints
+    '/api/v1/auth/reset-password', // Password reset
+    '/api/v1/auth/verify-email', // Email verification
+    // TODO: Add other public endpoints as needed
+  ];
+
+  return publicEndpoints.some(endpoint => pathname.startsWith(endpoint));
+}
+
+/**
+ * Middleware configuration
+ */
 export const config = {
   matcher: [
     // Apply to all API routes
     '/api/:path*',
     // Apply to authentication pages
     '/auth/:path*',
-    // Apply to OAuth callback routes
-    '/api/auth/callback/:path*',
+    // Exclude static files and images
+    '/((?!_next/static|_next/image|favicon.ico|public).*)',
   ],
 };

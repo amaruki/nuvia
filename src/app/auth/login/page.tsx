@@ -32,8 +32,6 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const { user, isPending } = useSession();
 
-  const [emailOrUsername, setEmailOrUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -105,8 +103,8 @@ function LoginForm() {
 
     try {
       const formData = new FormData();
-      formData.append("emailOrUsername", emailOrUsername);
-      formData.append("password", password);
+      formData.append("emailOrUsername", data.emailOrUsername);
+      formData.append("password", data.password);
 
       const result = await loginAction(formData);
 
@@ -184,10 +182,7 @@ function LoginForm() {
               id="emailOrUsername"
               type="text"
               placeholder="Enter your email"
-              value={emailOrUsername}
-              {...register("emailOrUsername", {
-                onChange: (e) => setEmailOrUsername(e.target.value),
-              })}
+              {...register("emailOrUsername")}
               className="h-10"
             />
             {errors.emailOrUsername && (
@@ -213,10 +208,7 @@ function LoginForm() {
               id="password"
               type="password"
               placeholder="Enter your password"
-              value={password}
-              {...register("password", {
-                onChange: (e) => setPassword(e.target.value),
-              })}
+              {...register("password")}
               className="h-10"
             />
             {errors.password && (

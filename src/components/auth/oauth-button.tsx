@@ -35,7 +35,7 @@ export function OAuthButton({ provider, isLoading, onClick, disabled }: OAuthBut
       case "linkedin":
         return "LinkedIn";
       default:
-        return provider.charAt(0).toUpperCase() + provider.slice(1);
+        return provider;
     }
   };
 

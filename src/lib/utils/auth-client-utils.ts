@@ -18,9 +18,6 @@ export async function updateProfile(data: UpdateProfileRequest) {
     const result = await authClient.updateUser({
       image: data.image,
       name: data.displayName,
-      bio: data.bio,
-      username: data.username,
-      externalLinks: data.externalLinks
     });
 
     if (result.error) {
@@ -28,7 +25,7 @@ export async function updateProfile(data: UpdateProfileRequest) {
         success: false,
         data: null,
         message: result.error.message || "Failed to update profile",
-        errors: result.error.errors || []
+        errors: []
       };
     }
 
@@ -42,7 +39,7 @@ export async function updateProfile(data: UpdateProfileRequest) {
       success: false,
       data: null,
       message: error.message || "Failed to update profile",
-      errors: error.errors || []
+      errors: []
     };
   }
 }
@@ -80,7 +77,7 @@ export async function changePassword(data: {
         success: false,
         data: null,
         message: result.error.message || "Failed to change password",
-        errors: result.error.errors || []
+        errors: []
       };
     }
 
@@ -94,7 +91,7 @@ export async function changePassword(data: {
       success: false,
       data: null,
       message: error.message || "Failed to change password",
-      errors: error.errors || []
+      errors: []
     };
   }
 }

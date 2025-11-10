@@ -51,36 +51,9 @@ type SignupFormData = z.infer<typeof signupSchema>;
 function SignupPage() {
   const { user, isPending } = useSession();
 
-  // Redirect authenticated users to dashboard
-  useEffect(() => {
-    if (!isPending && user) {
-      window.location.href = "/dashboard";
-    }
-  }, [user, isPending]);
-
-  // Show loading state while checking authentication
-  if (isPending) {
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Checking authentication...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string[]>
-  >({});
 
   const {
     register,
@@ -105,6 +78,13 @@ function SignupPage() {
     },
   });
 
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!isPending && user) {
+      window.location.href = "/dashboard";
+    }
+  }, [user, isPending]);
+
   // Animate signup card entrance
   useEffect(() => {
     animate(".signup-card", {
@@ -115,20 +95,31 @@ function SignupPage() {
     });
   }, []);
 
+  // Show loading state while checking authentication
+  if (isPending) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
     setError(null);
     setSuccess(null);
-    setValidationErrors({});
     clearOAuthError();
 
     try {
       const formData = new FormData();
-      formData.append("email", email);
-      formData.append("username", username);
-      formData.append("fullName", fullName);
-      formData.append("password", password);
-      formData.append("confirmPassword", confirmPassword);
+      formData.append("email", data.email);
+      formData.append("username", data.username);
+      formData.append("fullName", data.fullName);
+      formData.append("password", data.password);
+      formData.append("confirmPassword", data.confirmPassword);
       formData.append("agreeToTerms", data.agreeToTerms ? "true" : "false");
 
       const result = await signupAction(formData);
@@ -142,11 +133,6 @@ function SignupPage() {
         }, 3000);
       } else {
         setError(result.message || "Signup failed");
-
-        // Set validation errors if they exist
-        if (result.errors) {
-          setValidationErrors(result.errors);
-        }
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
@@ -154,14 +140,6 @@ function SignupPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const getErrorMessage = (field: string) => {
-    return validationErrors[field]?.[0];
-  };
-
-  const hasError = (field: string) => {
-    return !!validationErrors[field]?.length;
   };
 
   const handleErrorClear = () => {
@@ -222,20 +200,12 @@ function SignupPage() {
               id="fullName"
               type="text"
               placeholder="Enter your full name"
-              value={fullName}
-              {...register("fullName", {
-                onChange: (e) => setFullName(e.target.value),
-              })}
+              {...register("fullName")}
               className="h-10"
             />
             {errors.fullName && (
               <p className="text-sm text-destructive">
                 {errors.fullName.message}
-              </p>
-            )}
-            {hasError("fullName") && (
-              <p className="text-sm text-destructive">
-                {getErrorMessage("fullName")}
               </p>
             )}
           </div>
@@ -251,10 +221,7 @@ function SignupPage() {
               id="email"
               type="email"
               placeholder="Enter your email address"
-              value={email}
-              {...register("email", {
-                onChange: (e) => setEmail(e.target.value),
-              })}
+              {...register("email")}
               className="h-10"
             />
             {errors.email && (
@@ -275,10 +242,7 @@ function SignupPage() {
               id="username"
               type="text"
               placeholder="Choose a username"
-              value={username}
-              {...register("username", {
-                onChange: (e) => setUsername(e.target.value),
-              })}
+              {...register("username")}
               className="h-10"
             />
             {errors.username && (
@@ -299,10 +263,7 @@ function SignupPage() {
               id="password"
               type="password"
               placeholder="Create a password"
-              value={password}
-              {...register("password", {
-                onChange: (e) => setPassword(e.target.value),
-              })}
+              {...register("password")}
               className="h-10"
             />
             {errors.password && (
@@ -323,10 +284,7 @@ function SignupPage() {
               id="confirmPassword"
               type="password"
               placeholder="Confirm your password"
-              value={confirmPassword}
-              {...register("confirmPassword", {
-                onChange: (e) => setConfirmPassword(e.target.value),
-              })}
+              {...register("confirmPassword")}
               className="h-10"
             />
             {errors.confirmPassword && (

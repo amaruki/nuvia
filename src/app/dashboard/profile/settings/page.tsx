@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "@/hooks/use-session";
-import { z } from "zod";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,7 +52,7 @@ type TabId = typeof profileTabs[number]["id"];
 
 export default function ProfileSettingsPage() {
   const params = useParams();
-  const { data: session, status } = useSession();
+  const { user, isPending: status } = useSession();
   const [activeTab, setActiveTab] = useState<TabId>("profile");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -69,7 +68,7 @@ export default function ProfileSettingsPage() {
   }, [params.tab]);
 
   // Show loading state while checking authentication
-  if (status === "loading" || isLoading) {
+  if (status || isLoading) {
     return (
       <div className="space-y-6">
         <div>
@@ -92,7 +91,7 @@ export default function ProfileSettingsPage() {
   }
 
   // Show error if user is not authenticated
-  if (status === "unauthenticated" || !session?.user) {
+  if (!status && !user) {
     return (
       <div className="space-y-6">
         <div>
@@ -111,8 +110,6 @@ export default function ProfileSettingsPage() {
     );
   }
 
-  const user = session.user;
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -129,20 +126,20 @@ export default function ProfileSettingsPage() {
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
               <Avatar className="h-12 w-12">
-                <AvatarImage src={user.image || undefined} alt={user.name || ""} />
+                <AvatarImage src={user!.image || undefined} alt={user!.displayName || ""} />
                 <AvatarFallback>
-                  {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U"}
+                  {user!.displayName?.charAt(0)?.toUpperCase() || user!.email?.charAt(0)?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
-                  {user.displayName || user.name || "User"}
+                  {user!.displayName || user!.username || "User"}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {user.email}
+                  {user!.email}
                 </p>
                 <Badge variant="secondary" className="mt-1 text-xs">
-                  {user.role === "ADMIN" ? "Administrator" : "Member"}
+                  {user!.role === "ADMIN" ? "Administrator" : "Member"}
                 </Badge>
               </div>
             </div>
@@ -188,7 +185,7 @@ export default function ProfileSettingsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ProfileForm user={user} />
+                <ProfileForm user={user!} />
               </CardContent>
             </Card>
 
@@ -203,7 +200,7 @@ export default function ProfileSettingsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ProfilePhotoUpload user={user} />
+                <ProfilePhotoUpload user={user!} />
               </CardContent>
             </Card>
           </div>
@@ -230,7 +227,7 @@ export default function ProfileSettingsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <SecurityForm user={user} />
+                <SecurityForm user={user!} />
               </CardContent>
             </Card>
 
@@ -296,7 +293,7 @@ export default function ProfileSettingsPage() {
             </p>
           </div>
 
-          <SocialLinksForm user={user} />
+          <SocialLinksForm user={user!} />
         </TabsContent>
 
         {/* Active Sessions Tab */}
@@ -308,7 +305,7 @@ export default function ProfileSettingsPage() {
             </p>
           </div>
 
-          <SessionManager user={user} />
+          <SessionManager user={user!} />
         </TabsContent>
       </Tabs>
     </div>

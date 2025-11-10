@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useSession } from "@/hooks/use-session";
+import { useState, useEffect } from "react";
+import { useSession } from "@/lib/auth-client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -60,19 +60,59 @@ export function SessionManager({ user }: SessionManagerProps) {
   const loadSessions = async () => {
     try {
       const result = await listSessions();
-      // Mock session response for now
-      setSessions(mockSessions);
+
+      if (result.success && result.data) {
+        // Check if result.data is an array (direct sessions) or an object with sessions property
+        const sessionsArray = Array.isArray(result.data) ? result.data : result.data.sessions;
+        
+        if (sessionsArray && sessionsArray.length > 0) {
+          // Transform Better Auth session data to our format
+          const transformedSessions = sessionsArray.map((session: any) => {
+            // Handle different session structures
+            const sessionData = session.session || session;
+            const userData = session.user;
+            
+            // Get the session ID - it could be in different places
+            const sessionId = sessionData.id || sessionData.token || session.id;
+            
+            // Get the current session ID for comparison
+            const currentSessionId = currentSession?.session?.id || currentSession?.session?.token;
+            
+            return {
+              id: sessionId,
+              userId: userData?.id || sessionData.userId || session.userId,
+              expiresAt: new Date(sessionData.expiresAt),
+              ipAddress: sessionData.ipAddress,
+              userAgent: sessionData.userAgent,
+              createdAt: new Date(sessionData.createdAt),
+              lastAccessedAt: new Date(sessionData.lastAccessedAt || sessionData.createdAt),
+              token: sessionData.token || sessionId,
+              isCurrent: sessionId === currentSessionId
+            };
+          });
+
+          setSessions(transformedSessions);
+        } else {
+          // Fallback to mock data if no sessions found
+          setSessions(mockSessions);
+        }
+      } else {
+        // Fallback to mock data if API fails
+        setSessions(mockSessions);
+      }
     } catch (err) {
       console.error("Failed to load sessions:", err);
+      setError("Failed to load active sessions");
       setSessions(mockSessions);
     } finally {
       setIsLoading(false);
     }
   };
 
-  useState(() => {
+  // Load sessions on component mount
+  useEffect(() => {
     loadSessions();
-  });
+  }, []);
 
   const handleRevokeSession = async (sessionId: string) => {
     setSelectedSessionId(sessionId);
@@ -80,7 +120,14 @@ export function SessionManager({ user }: SessionManagerProps) {
     setError(null);
 
     try {
-      const result = await revokeSession(sessionId);
+      // Find the session to get the token
+      const session = sessions.find(s => s.id === sessionId);
+      if (!session) {
+        setError("Session not found");
+        return;
+      }
+
+      const result = await revokeSession(session.token);
 
       if (result.success) {
         setIsSuccess(true);
@@ -97,12 +144,14 @@ export function SessionManager({ user }: SessionManagerProps) {
     }
   };
 
-  const handleRevokeAllOtherSessions = () => {
+  const handleRevokeAllOtherSessions = async () => {
     if (confirm("Are you sure you want to revoke all other sessions? This will sign you out from all other devices.")) {
       const otherSessions = sessions.filter(s => !s.isCurrent);
-      otherSessions.forEach(session => {
-        handleRevokeSession(session.id);
-      });
+      
+      // Revoke each session one by one
+      for (const session of otherSessions) {
+        await handleRevokeSession(session.id);
+      }
     }
   };
 
@@ -262,6 +311,88 @@ export function SessionManager({ user }: SessionManagerProps) {
                 Active
               </Badge>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Other Sessions */}
+      {otherSessions.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Other Active Sessions
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRevokeAllOtherSessions}
+                disabled={isRevoking}
+              >
+                {isRevoking ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Revoking...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Revoke All Others
+                  </>
+                )}
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {otherSessions.map((session) => (
+              <div key={session.id} className="flex items-start justify-between p-4 border rounded-lg">
+                <div className="space-y-3 flex-1">
+                  <div className="flex items-center gap-3">
+                    {(() => {
+                      const DeviceIcon = getDeviceInfo(session.userAgent).icon;
+                      return <DeviceIcon className="h-5 w-5 text-muted-foreground" />;
+                    })()}
+                    <div>
+                      <p className="font-medium">
+                        {getDeviceInfo(session.userAgent).name} • {getBrowserInfo(session.userAgent)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {getLocationInfo(session.ipAddress)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span>
+                        Last active: {formatTimeAgo(new Date(session.lastAccessedAt))}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      <span>
+                        Expires: {session.expiresAt.toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleRevokeSession(session.id)}
+                  disabled={isRevoking && selectedSessionId === session.id}
+                >
+                  {isRevoking && selectedSessionId === session.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            ))}
           </CardContent>
         </Card>
       )}

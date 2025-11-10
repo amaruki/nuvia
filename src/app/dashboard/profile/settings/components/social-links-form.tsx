@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useSession } from "@/hooks/use-session";
+import { useSession } from "@/lib/auth-client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { ExternalLink as ExternalLinkType } from "@/types/auth.types";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -101,7 +103,7 @@ interface SocialLink {
 }
 
 export function SocialLinksForm({ user }: SocialLinksFormProps) {
-  const { update: updateSession } = useSession();
+  const { data: session, refetch } = useSession();
   const queryClient = useQueryClient();
   const [isSuccess, setIsSuccess] = useState(false);
   const [isAddingLink, setIsAddingLink] = useState(false);
@@ -132,16 +134,15 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
 
   const socialLinksMutation = useMutation({
     mutationFn: async (updatedLinks: SocialLink[]) => {
-      // Convert links array back to the format expected by the database
-      const linksObject: Record<string, any> = {};
-      updatedLinks.forEach(link => {
-        linksObject[link.platform] = link.label
-          ? { url: link.url, label: link.label }
-          : link.url;
-      });
+      // Convert links array to the format expected by the API
+      const externalLinks: ExternalLinkType[] = updatedLinks.map(link => ({
+        platform: link.platform,
+        url: link.url,
+        username: link.label
+      }));
 
       const result = await updateProfile({
-        externalLinks: linksObject
+        externalLinks: externalLinks
       });
 
       if (!result.success) {
@@ -153,13 +154,8 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
     onSuccess: async (result) => {
       setIsSuccess(true);
 
-      // Update session data
-      await updateSession({
-        user: {
-          ...user,
-          externalLinks: result.data.externalLinks
-        }
-      });
+      // Refresh session data
+      await refetch();
 
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ["profile"] });

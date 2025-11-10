@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -67,6 +67,7 @@ import {
 } from "lucide-react";
 import { UserRole } from "@/types/dashboard.types";
 import { useState } from "react";
+import { logoutAction } from "@/lib/actions/auth.actions";
 
 interface DashboardSidebarProps {
   readonly user?: {
@@ -100,8 +101,10 @@ export function DashboardSidebar({
   className,
 }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { state, isMobile } = useSidebar();
   const [active, setActive] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   const isCollapsed = state === "collapsed";
  
@@ -361,6 +364,27 @@ export function DashboardSidebar({
       .slice(0, 2);
   };
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      const result = await logoutAction();
+      if (result.success) {
+        // Redirect to login page after successful logout
+        router.push("/auth/login");
+        // Force a refresh to clear any client-side state
+        router.refresh();
+      } else {
+        console.error("Logout failed:", result.message);
+        alert(result.message || "Failed to logout");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert("An error occurred during logout");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   const renderNavigationItem = (item: NavigationItem) => {
     const isActive = isPathActive(item.path);
     const hasSubItems = item.subItems && item.subItems.length > 0;
@@ -597,9 +621,9 @@ export function DashboardSidebar({
                   Notifications
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut}>
                   <LogOut className="mr-2 size-4" />
-                  Log out
+                  {isLoggingOut ? "Logging out..." : "Log out"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

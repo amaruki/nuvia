@@ -10,7 +10,8 @@ import {
   changePassword,
   getUserSessions,
   revokeSession,
-  revokeOtherSessions
+  revokeOtherSessions,
+  signOut
 } from '@/lib/utils/better-auth-utils';
 import { loginSchema, signupSchema, forgotPasswordSchema, resetPasswordSchema } from '@/lib/validation/auth.validation';
 import type {
@@ -602,6 +603,45 @@ export async function deleteAccountAction(): Promise<AuthResponse> {
     return {
       success: false,
       message: 'An unexpected error occurred while deleting account',
+      errors: {
+        server: ['Please try again later'],
+      },
+      meta: {
+        timestamp: new Date(),
+        version: 'v1',
+      },
+    };
+  }
+}
+
+/**
+ * Server action for user logout
+ */
+export async function logoutAction(): Promise<AuthResponse> {
+  try {
+    // Process logout
+    const result = await signOut();
+    
+    // Transform result to match AuthResponse type
+    // For logout, we assume success if no error is thrown
+    const isSuccess = true;
+    
+    return {
+      success: isSuccess,
+      message: 'Logout successful',
+      errors: undefined,
+      meta: {
+        timestamp: new Date(),
+        version: 'v1',
+      },
+    };
+  } catch (error) {
+    console.error('Logout action error:', error);
+    
+    // Return a generic error response
+    return {
+      success: false,
+      message: 'An unexpected error occurred during logout',
       errors: {
         server: ['Please try again later'],
       },

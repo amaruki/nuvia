@@ -14,21 +14,27 @@ import type { UpdateProfileRequest } from "@/types/auth.types";
  */
 export async function updateProfile(data: UpdateProfileRequest) {
   try {
-    // For now, we'll create a simple mock response since the Better Auth client setup needs more configuration
-    // In a real implementation, this would call the actual API endpoints
+    // Use Better Auth's updateUser method
+    const result = await authClient.updateUser({
+      image: data.image,
+      name: data.displayName,
+      bio: data.bio,
+      username: data.username,
+      externalLinks: data.externalLinks
+    });
 
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    if (result.error) {
+      return {
+        success: false,
+        data: null,
+        message: result.error.message || "Failed to update profile",
+        errors: result.error.errors || []
+      };
+    }
 
     return {
       success: true,
-      data: {
-        image: data.image,
-        displayName: data.displayName,
-        bio: data.bio,
-        username: data.username,
-        externalLinks: data.externalLinks
-      },
+      data: result.data,
       message: "Profile updated successfully"
     };
   } catch (error: any) {
@@ -52,13 +58,35 @@ export async function changePassword(data: {
   confirmPassword: string;
 }) {
   try {
-    // Mock implementation for now
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Validate passwords match
+    if (data.newPassword !== data.confirmPassword) {
+      return {
+        success: false,
+        data: null,
+        message: "New passwords do not match",
+        errors: [{ field: "confirmPassword", message: "Passwords do not match" }]
+      };
+    }
+
+    // Use Better Auth's changePassword method
+    const result = await authClient.changePassword({
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+      revokeOtherSessions: true
+    });
+
+    if (result.error) {
+      return {
+        success: false,
+        data: null,
+        message: result.error.message || "Failed to change password",
+        errors: result.error.errors || []
+      };
+    }
 
     return {
       success: true,
-      data: null,
+      data: result.data,
       message: "Password changed successfully"
     };
   } catch (error: any) {

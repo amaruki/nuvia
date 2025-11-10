@@ -54,6 +54,30 @@ export async function POST(request: NextRequest) {
     // Process login
     const result = await signIn(emailOrUsername, password);
     
+    // Debug: Log the result to see if cookies are included
+    console.log('Login result:', JSON.stringify(result, null, 2));
+    
+    // Check if the result has a response object with cookies
+    if (result && typeof result === 'object' && 'response' in result) {
+      // If it's a Next.js Response object, we need to handle it differently
+      const response = result.response as Response;
+      console.log('Response headers from better-auth:', response.headers);
+      
+      // Create a new response that includes the cookies from the better-auth response
+      const responseHeaders: Record<string, string> = {};
+      response.headers.forEach((value, key) => {
+        responseHeaders[key] = value;
+      });
+      
+      // Merge with our rate limit headers
+      const mergedHeaders = { ...responseHeaders, ...headers };
+      
+      return new NextResponse(JSON.stringify(result), {
+        status: response.status,
+        headers: mergedHeaders,
+      });
+    }
+    
     return NextResponse.json(result, { headers: headers });
   } catch (error) {
     console.error('Login error:', error);

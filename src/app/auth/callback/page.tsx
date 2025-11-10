@@ -44,39 +44,95 @@ export default function OAuthCallbackPage() {
       }
 
       try {
-        const { data: session, error: sessionError } = await authClient.getSession({
-          fetchOptions: {
-            onSuccess: (sessionData) => {
-              setStatus("success");
-              setMessage("Authentication successful! Redirecting to dashboard...");
-
-              // Animate success state
-              animate(".callback-card", {
-                scale: [1, 1.05, 1],
-                duration: 500,
-                easing: "easeInOutQuad",
-              });
-
-              // Redirect to dashboard after a short delay
-              setTimeout(() => {
-                router.push("/dashboard");
-              }, 2000);
-            },
-            onError: (ctx) => {
-              console.error("OAuth callback session retrieval failed:", ctx.error?.message || ctx.error);
-              setStatus("error");
-              setMessage("Authentication failed. Please try again.");
-
-              // Redirect to login page after showing error
-              setTimeout(() => {
-                router.push("/auth/login?error=oauth_failed");
-              }, 3000);
-            },
-          },
-        });
+        // First, let's try to get the session using the better-auth client
+        const { data: session, error: sessionError } = await authClient.getSession();
 
         if (sessionError) {
           throw sessionError;
+        }
+
+        if (session?.user) {
+          setStatus("success");
+          setMessage("Authentication successful! Redirecting to dashboard...");
+
+          // Animate success state
+          animate(".callback-card", {
+            scale: [1, 1.05, 1],
+            duration: 500,
+            easing: "easeInOutQuad",
+          });
+
+          // Redirect to dashboard after a short delay
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 2000);
+        } else {
+          // If no session, check if we have OAuth callback parameters
+          const urlParams = new URLSearchParams(window.location.search);
+          const code = urlParams.get('code');
+          const state = urlParams.get('state');
+          const provider = urlParams.get('provider');
+          const error = urlParams.get('error');
+
+          // If there's an error in the URL parameters, show it
+          if (error) {
+            setStatus("error");
+            setMessage(urlParams.get('error_description') || "Authentication failed. Please try again.");
+
+            // Redirect to login page after showing error
+            setTimeout(() => {
+              router.push(`/auth/login?error=${error}&provider=${provider || ''}`);
+            }, 3000);
+            return;
+          }
+
+          if (code && state && provider) {
+            // If we have OAuth parameters, try to complete the OAuth flow
+            try {
+              const { data: oauthSession, error: oauthError } = await authClient.signIn.social({
+                provider: provider as any,
+                callbackURL: "/dashboard",
+              });
+
+              if (oauthError) {
+                throw oauthError;
+              }
+
+              if (oauthSession) {
+                setStatus("success");
+                setMessage("Authentication successful! Redirecting to dashboard...");
+
+                // Animate success state
+                animate(".callback-card", {
+                  scale: [1, 1.05, 1],
+                  duration: 500,
+                  easing: "easeInOutQuad",
+                });
+
+                // Redirect to dashboard after a short delay
+                setTimeout(() => {
+                  router.push("/dashboard");
+                }, 2000);
+              }
+            } catch (oauthError) {
+              console.error("OAuth completion error:", oauthError);
+              setStatus("error");
+              setMessage("Failed to complete authentication. Please try again.");
+
+              // Redirect to login page after showing error
+              setTimeout(() => {
+                router.push("/auth/login?error=oauth_completion_failed");
+              }, 3000);
+            }
+          } else {
+            setStatus("error");
+            setMessage("No authentication session found. Please try again.");
+
+            // Redirect to login page after showing error
+            setTimeout(() => {
+              router.push("/auth/login?error=no_session");
+            }, 3000);
+          }
         }
       } catch (error) {
         console.error("OAuth callback error:", error instanceof Error ? error.message : String(error));

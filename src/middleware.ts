@@ -44,7 +44,18 @@ export async function middleware(request: NextRequest) {
       response.headers.set(key, value);
     });
     
+    // Preserve cookies from the original request
+    const requestCookies = request.headers.get('cookie');
+    if (requestCookies) {
+      response.headers.set('cookie', requestCookies);
+    }
+    
     return response;
+  }
+  
+  // Handle OAuth callback routes - ensure cookies are preserved
+  if (request.nextUrl.pathname.startsWith('/api/auth/callback/')) {
+    return NextResponse.next();
   }
   
   // For non-authentication endpoints, just continue
@@ -57,5 +68,7 @@ export const config = {
     '/api/:path*',
     // Apply to authentication pages
     '/auth/:path*',
+    // Apply to OAuth callback routes
+    '/api/auth/callback/:path*',
   ],
 };

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { forgotPassword } from '@/lib/utils/better-auth-utils';
+import { auth } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,10 +7,21 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email } = body;
     
-    // Process forgot password
-    const result = await forgotPassword(email);
-    
-    return NextResponse.json(result);
+    // Process forgot password using Better Auth API
+    await auth.api.forgetPassword({
+      body: {
+        email: email,
+        redirectTo: '/auth/reset-password'
+      }
+    });
+
+    // Always return success for security (don't reveal if email exists)
+    const response = {
+      success: true,
+      message: 'Password reset email sent if account exists'
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     // Return a generic error response
     return NextResponse.json(

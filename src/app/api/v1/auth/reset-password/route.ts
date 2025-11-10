@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { resetPassword } from '@/lib/utils/better-auth-utils';
+import { auth } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,10 +7,21 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { token, newPassword } = body;
     
-    // Process reset password
-    const result = await resetPassword(token, newPassword);
-    
-    return NextResponse.json(result);
+    // Process reset password using Better Auth API
+    await auth.api.resetPassword({
+      body: {
+        token: token,
+        newPassword: newPassword
+      }
+    });
+
+    // Create a standardized response
+    const response = {
+      success: true,
+      message: 'Password reset successful'
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     // Return a generic error response
     return NextResponse.json(

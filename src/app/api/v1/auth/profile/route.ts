@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUser, updateProfile } from '@/lib/utils/better-auth-utils';
+import { auth } from '@/lib/auth';
+import { AuthUtils } from '@/lib/auth/utils';
 
 // GET /api/v1/auth/profile - Get user profile
 export async function GET(request: NextRequest) {
   try {
     // Get user profile
-    const user = await getUser();
+    const user = await AuthUtils.getCurrentUser(request);
     
     if (!user) {
       return NextResponse.json(
@@ -61,8 +62,11 @@ export async function PUT(request: NextRequest) {
     // Parse request body
     const body = await request.json();
     
-    // Update user profile
-    const updatedUser = await updateProfile(body);
+    // Update user profile using Better Auth API
+    const updatedUser = await auth.api.updateUser({
+      body: body,
+      headers: request.headers
+    });
     
     return NextResponse.json({
       success: true,

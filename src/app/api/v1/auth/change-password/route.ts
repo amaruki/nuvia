@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { changePassword } from '@/lib/utils/better-auth-utils';
+import { auth } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,10 +7,23 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { currentPassword, newPassword } = body;
     
-    // Process change password
-    const result = await changePassword(currentPassword, newPassword);
-    
-    return NextResponse.json(result);
+    // Process change password using Better Auth API
+    await auth.api.changePassword({
+      body: {
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+        revokeOtherSessions: true
+      },
+      headers: request.headers
+    });
+
+    // Create a standardized response
+    const response = {
+      success: true,
+      message: 'Password changed successfully'
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     // Return a generic error response
     return NextResponse.json(

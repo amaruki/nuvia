@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserSessions, revokeSession } from '@/lib/utils/better-auth-utils';
+import { auth } from '@/lib/auth';
 
 // GET /api/v1/auth/active-devices - Get user's active devices
 export async function GET(request: NextRequest) {
   try {
-    // Get active devices
-    const sessions = await getUserSessions();
+    // Get active devices using Better Auth API
+    const sessions = await auth.api.listSessions({
+      headers: request.headers
+    });
     
     return NextResponse.json({
       success: true,
@@ -62,10 +64,21 @@ export async function DELETE(request: NextRequest) {
       );
     }
     
-    // Deactivate device
-    const result = await revokeSession(token);
-    
-    return NextResponse.json(result);
+    // Deactivate device using Better Auth API
+    await auth.api.revokeSession({
+      body: {
+        token: token
+      },
+      headers: request.headers
+    });
+
+    // Create a standardized response
+    const response = {
+      success: true,
+      message: 'Device deactivated successfully'
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     // Return a generic error response
     return NextResponse.json(

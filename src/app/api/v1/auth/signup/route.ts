@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { signUp } from '@/lib/utils/better-auth-utils';
+import { auth } from '@/lib/auth';
 import { rateLimiters, createRateLimitResponse } from '@/lib/utils/rate-limiter';
 import { signupSchema } from '@/lib/validation/auth.validation';
 import { fromZodError } from 'zod-validation-error';
@@ -49,11 +49,32 @@ export async function POST(request: NextRequest) {
     }
     
     const { username, email, password, fullName } = validationResult.data;
-    
-    // Process signup
-    const result = await signUp(username, email, password, fullName);
-    
-    return NextResponse.json(result, { headers: headers });
+
+    // Process signup using Better Auth API
+    const result = await auth.api.signUpEmail({
+      body: {
+        email: email,
+        password: password,
+        name: fullName || username,
+        username: username
+      }
+    });
+
+    // Create a standardized response
+    const response = {
+      success: true,
+      message: 'Signup successful',
+      data: {
+        user: {
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          username: result.user.username
+        }
+      }
+    };
+
+    return NextResponse.json(response, { headers: headers });
   } catch (error) {
     console.error('Signup error:', error);
     

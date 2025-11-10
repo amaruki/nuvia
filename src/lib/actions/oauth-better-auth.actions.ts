@@ -1,7 +1,7 @@
 'use server';
 
-import { signInWithOAuth } from '@/lib/utils/better-auth-utils';
-import { createSuccessResponse, createErrorResponse } from '@/lib/utils/response-utils';
+import { auth } from '@/lib/auth';
+import { AuthResponseFactory } from '@/lib/auth/common';
 import { BusinessLogicError } from '@/lib/errors';
 
 /**
@@ -23,29 +23,32 @@ export async function signInWithOAuthAction(
   callbackURL?: string
 ) {
   try {
-    const result = await signInWithOAuth(provider, callbackURL);
-
-    // better-auth OAuth response structure
-    let redirectUrl: string | undefined;
-
-    // Check if result has a direct URL property
-    if ('url' in result && result.url) {
-      redirectUrl = result.url as string;
-    }
-    // Check if result has a data property with URL (for backward compatibility)
-    else if ('data' in result && result.data && typeof result.data === 'object' && 'url' in result.data) {
-      redirectUrl = (result.data as { url: string }).url;
-    }
-    // Check if result has a redirect property that contains the URL
-    else if ('redirect' in result && typeof result.redirect === 'string') {
-      redirectUrl = result.redirect;
+    // Validate provider
+    if (!checkProviderConfig(provider)) {
+      throw new BusinessLogicError(
+        `OAuth provider ${provider} is not configured`,
+        'OAUTH_PROVIDER_NOT_CONFIGURED'
+      );
     }
 
-    if (redirectUrl) {
-      return createSuccessResponse({
-        url: redirectUrl,
-        provider,
-      });
+    // Use Better Auth API for OAuth sign in
+    const result = await auth.api.signInSocial({
+      body: {
+        provider: provider as any,
+        callbackURL: callbackURL || '/dashboard'
+      }
+    });
+
+    // Better Auth returns URL for redirect
+    if (result.url) {
+      return {
+        success: true,
+        data: {
+          url: result.url,
+          provider,
+        },
+        message: 'OAuth sign-in initiated successfully'
+      };
     }
 
     throw new BusinessLogicError(
@@ -55,17 +58,11 @@ export async function signInWithOAuthAction(
   } catch (error) {
     console.error("OAuth sign-in error:", error instanceof Error ? error.message : String(error));
 
-    if (error instanceof BusinessLogicError) {
-      return createErrorResponse(
-        error.message,
-        error.code || 'OAUTH_SIGNIN_FAILED'
-      );
-    }
-
-    return createErrorResponse(
-      'Failed to initiate OAuth sign-in',
-      'OAUTH_SIGNIN_FAILED'
-    );
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to initiate OAuth sign-in',
+      errors: { server: [error instanceof Error ? error.message : 'OAuth sign-in failed'] }
+    };
   }
 }
 
@@ -80,15 +77,20 @@ export async function getOAuthProviderConfigAction(provider: string) {
     // Check if provider is configured by checking environment variables
     const isConfigured = checkProviderConfig(provider);
 
-    return createSuccessResponse({
-      provider,
-      configured: isConfigured,
-    });
-  } catch {
-    return createErrorResponse(
-      'Failed to check OAuth provider configuration',
-      'OAUTH_CONFIG_CHECK_FAILED'
-    );
+    return {
+      success: true,
+      data: {
+        provider,
+        configured: isConfigured,
+      },
+      message: 'OAuth provider configuration retrieved successfully'
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to check OAuth provider configuration',
+      errors: { server: ['OAUTH_CONFIG_CHECK_FAILED'] }
+    };
   }
 }
 
@@ -104,14 +106,19 @@ export async function getAvailableOAuthProvidersAction() {
       checkProviderConfig(provider)
     );
 
-    return createSuccessResponse({
-      providers: availableProviders,
-    });
-  } catch {
-    return createErrorResponse(
-      'Failed to get available OAuth providers',
-      'OAUTH_PROVIDERS_RETRIEVAL_FAILED'
-    );
+    return {
+      success: true,
+      data: {
+        providers: availableProviders,
+      },
+      message: 'Available OAuth providers retrieved successfully'
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to get available OAuth providers',
+      errors: { server: ['OAUTH_PROVIDERS_RETRIEVAL_FAILED'] }
+    };
   }
 }
 
@@ -126,16 +133,21 @@ export async function getOAuthProviderConfigurationAction(provider: string) {
     const isConfigured = checkProviderConfig(provider);
     const redirectUri = `${process.env.APP_URL}/api/auth/callback/${provider}`;
 
-    return createSuccessResponse({
-      provider,
-      configured: isConfigured,
-      redirectUri,
-    });
-  } catch {
-    return createErrorResponse(
-      'Failed to get OAuth provider configuration',
-      'OAUTH_CONFIG_RETRIEVAL_FAILED'
-    );
+    return {
+      success: true,
+      data: {
+        provider,
+        configured: isConfigured,
+        redirectUri,
+      },
+      message: 'OAuth provider configuration retrieved successfully'
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to get OAuth provider configuration',
+      errors: { server: ['OAUTH_CONFIG_RETRIEVAL_FAILED'] }
+    };
   }
 }
 

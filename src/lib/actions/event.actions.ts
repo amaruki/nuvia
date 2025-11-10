@@ -6,7 +6,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { getUser } from '@/lib/utils/better-auth-utils';
+import { AuthUtils } from '@/lib/auth/utils';
 import {
   CreateEventRequest,
   UpdateEventRequest,
@@ -37,7 +37,7 @@ export async function createEventAction(eventData: CreateEventRequest) {
     const validatedData = createEventSchema.parse(eventData);
     
     // Check if user is authenticated
-    const user = await getUser();
+    const user = await AuthUtils.getCurrentUser();
     if (!user) {
       throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
     }
@@ -77,7 +77,7 @@ export async function updateEventAction(eventId: string, eventData: UpdateEventR
     const validatedData = updateEventSchema.parse(eventData);
     
     // Check if user is authenticated
-    const user = await getUser();
+    const user = await AuthUtils.getCurrentUser();
     if (!user) {
       throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
     }
@@ -116,7 +116,7 @@ export async function updateEventAction(eventId: string, eventData: UpdateEventR
 export async function deleteEventAction(eventId: string) {
   try {
     // Check if user is authenticated
-    const user = await getUser();
+    const user = await AuthUtils.getCurrentUser();
     if (!user) {
       throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
     }
@@ -149,7 +149,7 @@ export async function registerForEventAction(registrationData: RegisterForEventR
     const validatedData = eventRegistrationSchema.parse(registrationData);
     
     // Check if user is authenticated
-    const user = await getUser();
+    const user = await AuthUtils.getCurrentUser();
     if (!user) {
       throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
     }
@@ -187,7 +187,7 @@ export async function registerForEventAction(registrationData: RegisterForEventR
 export async function cancelEventRegistrationAction(eventId: string) {
   try {
     // Check if user is authenticated
-    const user = await getUser();
+    const user = await AuthUtils.getCurrentUser();
     if (!user) {
       throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
     }
@@ -220,7 +220,7 @@ export async function checkInToEventAction(checkInData: CheckInToEventRequest) {
     const validatedData = eventCheckInSchema.parse(checkInData);
     
     // Check if user is authenticated
-    const user = await getUser();
+    const user = await AuthUtils.getCurrentUser();
     if (!user) {
       throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
     }

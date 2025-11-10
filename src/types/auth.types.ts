@@ -101,7 +101,9 @@ export type ResetPasswordRequest = {
 export type UpdateProfileRequest = {
   displayName?: string;
   bio?: string;
+  username?: string;
   externalLinks?: ExternalLink[];
+  image?: string;
 };
 
 // Change password request type

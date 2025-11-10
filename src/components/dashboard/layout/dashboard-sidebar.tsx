@@ -586,9 +586,11 @@ export function DashboardSidebar({
                   <CreditCard className="mr-2 size-4" />
                   Billing
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 size-4" />
-                  Settings
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/profile/settings">
+                    <Settings className="mr-2 size-4" />
+                    Settings
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Bell className="mr-2 size-4" />

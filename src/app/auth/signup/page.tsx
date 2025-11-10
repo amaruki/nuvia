@@ -5,6 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { animate } from "animejs";
+import { useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,6 +47,28 @@ const signupSchema = z
 type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
+  const router = useRouter();
+  const { user, isPending } = useSession();
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!isPending && user) {
+      router.push("/dashboard");
+    }
+  }, [user, isPending, router]);
+
+  // Show loading state while checking authentication
+  if (isPending) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
@@ -57,7 +80,6 @@ export default function SignupPage() {
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string[]>
   >({});
-  const router = useRouter();
 
   const {
     register,
@@ -70,6 +92,16 @@ export default function SignupPage() {
       agreeToTerms: false,
     },
   });
+
+  // Animate signup card entrance
+  useEffect(() => {
+    animate(".signup-card", {
+      translateY: [50, 0],
+      opacity: [0, 1],
+      duration: 1000,
+      easing: "easeOutExpo",
+    });
+  }, []);
 
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
@@ -152,16 +184,6 @@ export default function SignupPage() {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    // Animate signup card entrance
-    animate(".signup-card", {
-      translateY: [50, 0],
-      opacity: [0, 1],
-      duration: 1000,
-      easing: "easeOutExpo",
-    });
-  }, []);
 
   return (
     <>

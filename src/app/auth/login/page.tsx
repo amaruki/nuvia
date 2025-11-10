@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { animate } from "animejs";
+import { useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,14 +25,16 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { user, isPending } = useSession();
+
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   const {
     register,
@@ -43,6 +46,56 @@ function LoginForm() {
       rememberMe: false,
     },
   });
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!isPending && user) {
+      router.push("/dashboard");
+    }
+  }, [user, isPending, router]);
+
+  // Check for OAuth callback parameters and handle animations
+  useEffect(() => {
+    // Check for OAuth callback parameters
+    const error = searchParams.get("error");
+    const errorDescription = searchParams.get("error_description");
+    const provider = searchParams.get("provider");
+
+    if (error) {
+      let errorMessage = errorDescription || error;
+
+      // Handle specific OAuth conflict error
+      if (error === "oauth_conflict") {
+        errorMessage =
+          errorDescription ||
+          `This email is already registered with a different authentication method. Please sign in using the same method you used to register.`;
+      }
+
+      setError(errorMessage);
+      // Clean up URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // Animate login card entrance
+    animate(".login-card", {
+      translateY: [50, 0],
+      opacity: [0, 1],
+      duration: 1000,
+      easing: "easeOutExpo",
+    });
+  }, [searchParams]);
+
+  // Show loading state while checking authentication
+  if (isPending) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -108,36 +161,6 @@ function LoginForm() {
   };
 
   const handleGoogleLogin = () => handleOAuthLogin("google");
-
-  useEffect(() => {
-    // Check for OAuth callback parameters
-    const error = searchParams.get("error");
-    const errorDescription = searchParams.get("error_description");
-    const provider = searchParams.get("provider");
-
-    if (error) {
-      let errorMessage = errorDescription || error;
-
-      // Handle specific OAuth conflict error
-      if (error === "oauth_conflict") {
-        errorMessage =
-          errorDescription ||
-          `This email is already registered with a different authentication method. Please sign in using the same method you used to register.`;
-      }
-
-      setError(errorMessage);
-      // Clean up URL parameters
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    // Animate login card entrance
-    animate(".login-card", {
-      translateY: [50, 0],
-      opacity: [0, 1],
-      duration: 1000,
-      easing: "easeOutExpo",
-    });
-  }, [searchParams]);
 
   return (
     <>

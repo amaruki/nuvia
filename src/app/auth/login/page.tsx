@@ -8,7 +8,7 @@ import { z } from "zod";
 import { animate } from "animejs";
 import { useSession } from "@/hooks/use-session";
 import { useOAuthLogin } from "@/hooks/use-oauth-login";
-import { extractOAuthError, cleanOAuthUrlParams, formatOAuthErrorMessage } from "@/lib/utils/oauth-utils";
+import { extractOAuthError, cleanOAuthUrlParams } from "@/lib/utils/oauth-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,7 @@ import { OAuthButton } from "@/components/auth/oauth-button";
 import { FormMessage } from "@/components/auth/form-message";
 import { FormDivider } from "@/components/auth/form-divider";
 import { loginAction } from "@/lib/actions/auth.actions";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   emailOrUsername: z.string().min(1, "Email or username is required"),
@@ -33,8 +34,6 @@ function LoginForm() {
   const { user, isPending } = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   const {
     register,
@@ -50,11 +49,9 @@ function LoginForm() {
   const {
     signInWithGoogle,
     isLoading: isOAuthLoading,
-    error: oauthError,
-    clearError: clearOAuthError,
   } = useOAuthLogin({
     onError: (error) => {
-      setError(formatOAuthErrorMessage(error));
+      toast.error(error.message || "OAuth sign-in failed");
     },
   });
 
@@ -70,7 +67,7 @@ function LoginForm() {
     // Check for OAuth callback errors
     const oauthError = extractOAuthError(searchParams);
     if (oauthError) {
-      setError(formatOAuthErrorMessage(oauthError));
+      toast.error(oauthError.message || "OAuth sign-in failed");
       cleanOAuthUrlParams();
     }
 
@@ -97,9 +94,6 @@ function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    setError(null);
-    setSuccess(null);
-    clearOAuthError();
 
     try {
       const formData = new FormData();
@@ -109,24 +103,19 @@ function LoginForm() {
       const result = await loginAction(formData);
 
       if (result.success) {
-        setSuccess("Login successful! Redirecting...");
+        toast.success("Login successful! Redirecting...");
         setTimeout(() => {
           router.push("/dashboard");
         }, 1500);
       } else {
-        setError(result.message || "Login failed");
+        toast.error(result.message || "Login failed");
       }
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
+      toast.error("An unexpected error occurred. Please try again.");
       console.error(err);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleErrorClear = () => {
-    setError(null);
-    clearOAuthError();
   };
 
   return (
@@ -140,22 +129,6 @@ function LoginForm() {
       }}
     >
       <div className="login-card">
-        {/* OAuth Error */}
-        {(error || oauthError) && (
-          <FormMessage
-            type="error"
-            message={error || formatOAuthErrorMessage(oauthError!)}
-          />
-        )}
-
-        {/* Success Message */}
-        {success && (
-          <FormMessage
-            type="success"
-            message={success}
-          />
-        )}
-
         {/* Social Login */}
         <div className="space-y-3">
           <OAuthButton
@@ -232,7 +205,6 @@ function LoginForm() {
             type="submit"
             disabled={isLoading}
             className="w-full h-10"
-            onClick={handleErrorClear}
           >
             {isLoading ? "Signing in..." : "Sign in"}
           </Button>

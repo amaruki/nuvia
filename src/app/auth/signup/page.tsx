@@ -7,21 +7,20 @@ import { z } from "zod";
 import { animate } from "animejs";
 import { useSession } from "@/hooks/use-session";
 import { useOAuthLogin } from "@/hooks/use-oauth-login";
-import { formatOAuthErrorMessage } from "@/lib/utils/oauth-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AuthLayoutWrapper } from "@/components/auth/auth-layout";
 import { OAuthButton } from "@/components/auth/oauth-button";
-import { FormMessage } from "@/components/auth/form-message";
 import { FormDivider } from "@/components/auth/form-divider";
 import { signupAction } from "@/lib/actions/auth.actions";
+import { toast } from "sonner";
 
 const signupSchema = z
   .object({
     fullName: z.string().min(2, "Full name must be at least 2 characters"),
-    email: z.string().email("Please enter a valid email address"),
+    email: z.email("Please enter a valid email address"),
     username: z.string().min(3, "Username must be at least 3 characters"),
     password: z
       .string()
@@ -52,8 +51,6 @@ function SignupPage() {
   const { user, isPending } = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   const {
     register,
@@ -70,11 +67,9 @@ function SignupPage() {
   const {
     signInWithGoogle,
     isLoading: isOAuthLoading,
-    error: oauthError,
-    clearError: clearOAuthError,
   } = useOAuthLogin({
     onError: (error) => {
-      setError(formatOAuthErrorMessage(error));
+      toast.error(error.message || "OAuth sign-in failed");
     },
   });
 
@@ -109,9 +104,6 @@ function SignupPage() {
 
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
-    setError(null);
-    setSuccess(null);
-    clearOAuthError();
 
     try {
       const formData = new FormData();
@@ -125,28 +117,24 @@ function SignupPage() {
       const result = await signupAction(formData);
 
       if (result.success) {
-        setSuccess(
-          "Account created successfully! Please check your email to verify your account."
+        toast.success(
+          "Account created successfully! Please check your email to verify your account, then sign in."
         );
         setTimeout(() => {
-          window.location.href = "/dashboard";
+          window.location.href = "/auth/login";
         }, 3000);
       } else {
-        setError(result.message || "Signup failed");
+        toast.error(result.message || "Signup failed");
       }
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
+      toast.error("An unexpected error occurred. Please try again.");
       console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleErrorClear = () => {
-    setError(null);
-    clearOAuthError();
-  };
-
+  
   return (
     <AuthLayoutWrapper
       title="Create your account"
@@ -158,22 +146,6 @@ function SignupPage() {
       }}
     >
       <div className="signup-card">
-        {/* OAuth Error */}
-        {(error || oauthError) && (
-          <FormMessage
-            type="error"
-            message={error || formatOAuthErrorMessage(oauthError!)}
-          />
-        )}
-
-        {/* Success Message */}
-        {success && (
-          <FormMessage
-            type="success"
-            message={success}
-          />
-        )}
-
         {/* Social Signup */}
         <div className="space-y-3">
           <OAuthButton
@@ -336,7 +308,6 @@ function SignupPage() {
             type="submit"
             disabled={isLoading}
             className="w-full h-10"
-            onClick={handleErrorClear}
           >
             {isLoading ? "Creating Account..." : "Create Account"}
           </Button>

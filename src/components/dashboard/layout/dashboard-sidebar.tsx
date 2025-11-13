@@ -603,18 +603,18 @@ export function DashboardSidebar({
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <BadgeCheck className="mr-2 size-4" />
-                  Account
+                  <Link href="/dashboard/profile/settings">
+                    <BadgeCheck className="mr-2 size-4" />
+                    Account
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <CreditCard className="mr-2 size-4" />
                   Billing
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard/profile/settings">
                     <Settings className="mr-2 size-4" />
                     Settings
-                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Bell className="mr-2 size-4" />

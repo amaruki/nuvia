@@ -68,6 +68,7 @@ import {
 import { UserRole } from "@/types/dashboard.types";
 import { useState } from "react";
 import { logoutAction } from "@/lib/actions/auth.actions";
+import { useSession } from "@/hooks/use-session";
 
 interface DashboardSidebarProps {
   readonly user?: {
@@ -91,17 +92,10 @@ interface NavigationItem {
   readonly isActive?: boolean;
 }
 
-export function DashboardSidebar({
-  user = {
-    name: "User",
-    email: "user@example.com",
-    avatar: "",
-  },
-  role = "member",
-  className,
-}: DashboardSidebarProps) {
+export function DashboardSidebar({ className}: DashboardSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { user, isPending: status } = useSession();
   const { state, isMobile } = useSidebar();
   const [active, setActive] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -334,7 +328,7 @@ export function DashboardSidebar({
 
   // Filter navigation items based on user role
   const filteredNavigationItems = navigationConfig.filter((item) => {
-    return !item.roles || item.roles.includes(role);
+    return !item.roles || item.roles.includes(user?.role as UserRole);
   });
 
   // Group items by category
@@ -567,14 +561,14 @@ export function DashboardSidebar({
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground group-data-[collapsible=icon]:px-2"
                 >
                   <Avatar className="size-8 rounded-lg group-data-[collapsible=icon]:size-8">
-                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarImage src={user?.image || ""} alt={user?.displayName || ""} />
                     <AvatarFallback className="rounded-lg">
-                      {getInitials(user.name)}
+                      {getInitials(user?.displayName || "")}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 transition-all duration-200 overflow-hidden">
-                    <span className="truncate font-semibold">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+                    <span className="truncate font-semibold">{user?.displayName}</span>
+                    <span className="truncate text-xs">{user?.email}</span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
                 </SidebarMenuButton>
@@ -588,16 +582,16 @@ export function DashboardSidebar({
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="size-8 rounded-lg">
-                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarImage src={user?.image || ""} alt={user?.displayName || ""} />
                       <AvatarFallback className="rounded-lg">
-                        {getInitials(user.name)}
+                        {getInitials(user?.displayName || "")}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-semibold">
-                        {user.name}
+                        {user?.displayName}
                       </span>
-                      <span className="truncate text-xs">{user.email}</span>
+                      <span className="truncate text-xs">{user?.email ||""}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>

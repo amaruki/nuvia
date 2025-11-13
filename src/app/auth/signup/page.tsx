@@ -76,27 +76,44 @@ function SignupPage() {
   // Redirect authenticated users to dashboard
   useEffect(() => {
     if (!isPending && user) {
+      // Clear any potential errors before redirecting
+      // Import cleanOAuthUrlParams if needed or use simple URL cleanup
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        const params = url.searchParams;
+        params.delete('error');
+        params.delete('error_description');
+        params.delete('code');
+        params.delete('state');
+        const newUrl = `${url.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
+        window.history.replaceState({}, '', newUrl);
+      }
       window.location.href = "/dashboard";
+      return; // Prevent any further rendering
     }
   }, [user, isPending]);
 
-  // Animate signup card entrance
+  // Animate signup card entrance only if user is not authenticated
   useEffect(() => {
-    animate(".signup-card", {
-      translateY: [50, 0],
-      opacity: [0, 1],
-      duration: 1000,
-      easing: "easeOutExpo",
-    });
-  }, []);
+    if (!user && !isPending) {
+      animate(".signup-card", {
+        translateY: [50, 0],
+        opacity: [0, 1],
+        duration: 1000,
+        easing: "easeOutExpo",
+      });
+    }
+  }, [user, isPending]);
 
-  // Show loading state while checking authentication
-  if (isPending) {
+  // Show loading state only while checking authentication (not for authenticated users)
+  if (isPending || user) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Checking authentication...</p>
+          <p className="text-muted-foreground">
+            {isPending ? "Checking authentication..." : "Redirecting..."}
+          </p>
         </div>
       </div>
     );

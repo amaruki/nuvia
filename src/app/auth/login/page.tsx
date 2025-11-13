@@ -8,7 +8,10 @@ import { z } from "zod";
 import { animate } from "animejs";
 import { useSession } from "@/hooks/use-session";
 import { useOAuthLogin } from "@/hooks/use-oauth-login";
-import { extractOAuthError, cleanOAuthUrlParams } from "@/lib/utils/oauth-utils";
+import {
+  extractOAuthError,
+  cleanOAuthUrlParams,
+} from "@/lib/utils/oauth-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,10 +49,7 @@ function LoginForm() {
     },
   });
 
-  const {
-    signInWithGoogle,
-    isLoading: isOAuthLoading,
-  } = useOAuthLogin({
+  const { signInWithGoogle, isLoading: isOAuthLoading } = useOAuthLogin({
     onError: (error) => {
       toast.error(error.message || "OAuth sign-in failed");
     },
@@ -59,35 +59,44 @@ function LoginForm() {
   useEffect(() => {
     if (!isPending && user) {
       const redirectTo = searchParams.get("redirectTo") || "/dashboard";
+      // Clear any OAuth errors before redirecting
+      cleanOAuthUrlParams();
       router.push(redirectTo);
+      return; // Prevent any further rendering
     }
   }, [user, isPending, router, searchParams]);
 
   // Handle OAuth callback errors and animations
   useEffect(() => {
-    // Check for OAuth callback errors
-    const oauthError = extractOAuthError(searchParams);
-    if (oauthError) {
-      toast.error(oauthError.message || "OAuth sign-in failed");
-      cleanOAuthUrlParams();
+    // Only check for OAuth errors if user is NOT authenticated
+    if (!user && !isPending) {
+      const oauthError = extractOAuthError(searchParams);
+      if (oauthError) {
+        toast.error(oauthError.message || "OAuth sign-in failed");
+        cleanOAuthUrlParams();
+      }
     }
 
-    // Animate login card entrance
-    animate(".login-card", {
-      translateY: [50, 0],
-      opacity: [0, 1],
-      duration: 1000,
-      easing: "easeOutExpo",
-    });
-  }, [searchParams]);
+    // Animate login card entrance only if user is not authenticated
+    if (!user && !isPending) {
+      animate(".login-card", {
+        translateY: [50, 0],
+        opacity: [0, 1],
+        duration: 1000,
+        easing: "easeOutExpo",
+      });
+    }
+  }, [searchParams, user, isPending]);
 
-  // Show loading state while checking authentication
-  if (isPending) {
+  // Show loading state while checking authentication OR redirecting
+  if (isPending || user) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Checking authentication...</p>
+          <p className="text-muted-foreground">
+            {isPending ? "Checking authentication..." : "Redirecting..."}
+          </p>
         </div>
       </div>
     );
@@ -147,10 +156,7 @@ function LoginForm() {
         {/* Login Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 my-6">
           <div className="space-y-3">
-            <Label
-              htmlFor="emailOrUsername"
-              className="text-sm font-medium"
-            >
+            <Label htmlFor="emailOrUsername" className="text-sm font-medium">
               Email or Username
             </Label>
             <Input
@@ -203,11 +209,7 @@ function LoginForm() {
             </Label>
           </div>
 
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="w-full h-10"
-          >
+          <Button type="submit" disabled={isLoading} className="w-full h-10">
             {isLoading ? "Signing in..." : "Sign in"}
           </Button>
         </form>

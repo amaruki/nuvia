@@ -15,30 +15,55 @@ const CACHE_PREFIX = 'nuvia:session:';
 // Redis client instance (singleton)
 let redisClient: Redis | null = null;
 
+// Redis connection state
+let redisInitialized = false;
+let redisAvailable = false;
+
+// Session cache configuration
+const ENABLE_REDIS_CACHE = process.env.ENABLE_REDIS_CACHE === 'true' && process.env.REDIS_URL;
+
 /**
  * Initialize Redis connection
  */
 function getRedisClient(): Redis | null {
-  if (!redisClient && process.env.REDIS_URL) {
+  // Return null immediately if Redis caching is disabled
+  if (!ENABLE_REDIS_CACHE) {
+    return null;
+  }
+
+  if (!redisClient && !redisInitialized) {
+    redisInitialized = true; // Prevent multiple initialization attempts
+
     try {
-      redisClient = new Redis(process.env.REDIS_URL, {
+      redisClient = new Redis(process.env.REDIS_URL!, {
         maxRetriesPerRequest: 3,
         lazyConnect: true,
+        enableOfflineQueue: false, 
       });
 
       redisClient.on('error', (err) => {
-        console.warn('Redis connection error:', err.message);
+        if (redisAvailable) {
+          console.warn('Redis connection lost:', err.message);
+          redisAvailable = false;
+        }
       });
 
       redisClient.on('connect', () => {
         console.log('✅ Redis connected for session caching');
+        redisAvailable = true;
       });
+
+      redisClient.on('close', () => {
+        redisAvailable = false;
+      });
+
     } catch (error) {
-      console.warn('Failed to initialize Redis:', error);
+      console.warn('Redis not available - session caching disabled:', error instanceof Error ? error.message : 'Unknown error');
+      redisAvailable = false;
     }
   }
 
-  return redisClient;
+  return redisClient && redisAvailable ? redisClient : null;
 }
 
 /**
@@ -87,7 +112,11 @@ export async function cacheSession(sessionToken: string, sessionData: any): Prom
       JSON.stringify(cacheData)
     );
   } catch (error) {
-    console.warn('Failed to cache session:', error);
+    // Silent fail - session caching is optional
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('Redis cache failed (session caching disabled):', error instanceof Error ? error.message : error);
+    }
   }
 }
 
@@ -162,22 +191,37 @@ export async function invalidateUserSessionCaches(userId: string): Promise<void>
 }
 
 /**
+ * Get cache status information
+ */
+export function getCacheStatus() {
+  return {
+    enabled: ENABLE_REDIS_CACHE,
+    redis: {
+      configured: !!process.env.REDIS_URL,
+      available: redisAvailable,
+    }
+  };
+}
+
+/**
  * Enhanced session validation with caching
  */
 export async function validateSessionWithCache(sessionToken: string) {
-  // First, check cache
-  const cachedSession = await getCachedSession(sessionToken);
-  if (cachedSession) {
-    return {
-      session: {
-        id: cachedSession.sessionId,
-        userId: cachedSession.userId,
-        expiresAt: cachedSession.expiresAt,
-        token: sessionToken,
-      },
-      user: cachedSession.user,
-      fromCache: true,
-    };
+  // First, check cache if enabled
+  if (ENABLE_REDIS_CACHE) {
+    const cachedSession = await getCachedSession(sessionToken);
+    if (cachedSession) {
+      return {
+        session: {
+          id: cachedSession.sessionId,
+          userId: cachedSession.userId,
+          expiresAt: cachedSession.expiresAt,
+          token: sessionToken,
+        },
+        user: cachedSession.user,
+        fromCache: true,
+      };
+    }
   }
 
   // Cache miss - fetch from database
@@ -226,11 +270,13 @@ export async function validateSessionWithCache(sessionToken: string) {
       emailVerified: session.user.emailVerified,
     };
 
-    // Cache the successful validation
-    await cacheSession(sessionToken, {
-      ...session,
-      user: transformedUser,
-    });
+    // Cache the successful validation only if Redis is enabled
+    if (ENABLE_REDIS_CACHE) {
+      await cacheSession(sessionToken, {
+        ...session,
+        user: transformedUser,
+      });
+    }
 
     return {
       session: {

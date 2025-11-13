@@ -73,6 +73,26 @@ export function useSession(): SessionData {
         isValid: true,
       };
 
+      // Cache session data on server-side via API call (only if Redis is enabled)
+      // Note: This is async but we don't await it to avoid blocking the UI
+      if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_ENABLE_REDIS_CACHE === 'true') {
+        fetch('/api/auth/cache-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token: authUser.session?.token || '',
+            sessionData: {
+              id: authUser.user.id,
+              userId: authUser.user.id,
+              expiresAt: new Date(authUser.session?.expiresAt || Date.now() + 7 * 24 * 60 * 60 * 1000),
+              user: transformedUser,
+            },
+          }),
+        }).catch(error => {
+          console.warn('Failed to cache session:', error);
+        });
+      }
+
       // Update local state
       setUserData(transformedUser);
       setSessionError(null);
@@ -109,8 +129,20 @@ export function useSession(): SessionData {
  * Utility function to manually invalidate session cache
  * Useful after logout or session changes
  */
-export function invalidateSessionCache(): void {
+export function invalidateSessionCache(sessionToken?: string): void {
+  // Clear client-side cache
   globalSessionCache = null;
+
+  // Clear server-side cache if token is provided (only if Redis is enabled)
+  if (sessionToken && typeof window !== 'undefined' && process.env.NEXT_PUBLIC_ENABLE_REDIS_CACHE === 'true') {
+    fetch('/api/auth/invalidate-session-cache', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: sessionToken }),
+    }).catch(error => {
+      console.warn('Failed to invalidate server session cache:', error);
+    });
+  }
 }
 
 /**

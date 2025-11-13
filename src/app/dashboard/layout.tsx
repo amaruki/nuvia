@@ -1,11 +1,13 @@
 "use client";
 
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { DashboardHeader } from "@/components/dashboard/layout/dashboard-header";
 import { DashboardFooter } from "@/components/dashboard/layout/dashboard-footer";
 import { DashboardSidebar } from "@/components/dashboard/layout/dashboard-sidebar";
 import { DashboardProvider, useHeader } from "@/contexts/dashboard-context";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { UserRole } from "@/types/dashboard.types";
 
@@ -41,6 +43,40 @@ interface DashboardLayoutProps {
  */
 function DashboardHeaderWrapper({ user }: { user?: DashboardLayoutProps["user"] }) {
   const { title, description, actions } = useHeader();
+  const [isHeaderLoaded, setIsHeaderLoaded] = useState(false);
+
+  // Track if header has been set by a page
+  useEffect(() => {
+    if (title || description) {
+      setIsHeaderLoaded(true);
+    } else {
+      // Small delay to show skeleton on fast loads for better UX
+      const timer = setTimeout(() => {
+        setIsHeaderLoaded(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [title, description]);
+
+  // Show skeleton while header is loading
+  if (!isHeaderLoaded) {
+    return (
+      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <Skeleton className="h-8 w-20" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <DashboardHeader

@@ -4,7 +4,7 @@ import type { ExternalLink } from '@/types/auth.types';
 // External link validation schema
 const externalLinkSchema: z.ZodType<ExternalLink> = z.object({
   platform: z.string().min(1, 'Platform is required').max(50, 'Platform must be less than 50 characters'),
-  url: z.string().url('Please enter a valid URL'),
+  url: z.url('Please enter a valid URL'),
   username: z.string().optional(),
 });
 
@@ -18,7 +18,7 @@ export const loginSchema = z.object({
 // Signup validation schema
 export const signupSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters').max(100, 'Full name must be less than 100 characters'),
-  email: z.string().email('Please enter a valid email address'),
+  email: z.email('Please enter a valid email address'),
   username: z.string()
     .min(3, 'Username must be at least 3 characters')
     .max(30, 'Username must be less than 30 characters')
@@ -40,7 +40,7 @@ export const signupSchema = z.object({
 
 // Forgot password validation schema
 export const forgotPasswordSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: z.email('Please enter a valid email address'),
 });
 
 // Reset password validation schema
@@ -107,9 +107,9 @@ export const loginActivityInfoSchema = z.object({
 export const oAuthProfileSchema = z.object({
   provider: z.enum(['google', 'github', 'linkedin']),
   providerAccountId: z.string().min(1, 'Provider account ID is required'),
-  email: z.string().email('Please enter a valid email address'),
+  email: z.email('Please enter a valid email address'),
   name: z.string().optional(),
-  image: z.string().url('Please enter a valid image URL').optional(),
+  image: z.url('Please enter a valid image URL').optional(),
   username: z.string().optional(),
 });
 

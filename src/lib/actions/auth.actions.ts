@@ -80,18 +80,25 @@ export async function loginAction(formData: FormData): Promise<AuthResponse> {
  */
 export async function signupAction(formData: FormData): Promise<AuthResponse> {
   try {
-    // Extract form data
-    const email = formData.get('email') as string;
-    const username = formData.get('username') as string;
-    const password = formData.get('password') as string;
-    const confirmPassword = formData.get('confirmPassword') as string;
+    // Extract form data - handle both regular and numbered field names
+    const email = (formData.get('email') || formData.get('1_email')) as string;
+    const username = (formData.get('username') || formData.get('1_username')) as string;
+    const fullName = (formData.get('fullName') || formData.get('1_fullName')) as string;
+    const password = (formData.get('password') || formData.get('1_password')) as string;
+    const confirmPassword = (formData.get('confirmPassword') || formData.get('1_confirmPassword')) as string;
+    const agreeToTermsValue = (formData.get('agreeToTerms') || formData.get('1_agreeToTerms')) as string;
+
+    // Convert agreeToTerms to boolean
+    const agreeToTerms = agreeToTermsValue === 'true' || agreeToTermsValue === true;
 
     // Validate input
     const validatedData = signupSchema.parse({
       email,
       username,
+      fullName,
       password,
-      confirmPassword
+      confirmPassword,
+      agreeToTerms
     });
 
     // Use Better Auth API for sign up
@@ -99,7 +106,7 @@ export async function signupAction(formData: FormData): Promise<AuthResponse> {
       body: {
         email: validatedData.email,
         password: validatedData.password,
-        name: validatedData.username,
+        name: validatedData.fullName,
         username: validatedData.username
       }
     });

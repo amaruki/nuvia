@@ -1,6 +1,11 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "@/hooks/use-session";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { UserProfileWidget } from "@/components/dashboard/widgets/user-profile-widget";
 import { NotificationsWidget } from "@/components/dashboard/widgets/notifications-widget";
 import { EnhancedUpcomingEventsWidget } from "@/components/dashboard/widgets/enhanced-upcoming-events-widget";
@@ -33,6 +38,8 @@ const userRole: UserRole = "member"; // Change to "admin" to see admin widgets
  * @returns JSX.Element
  */
 export default function DashboardPage() {
+  const router = useRouter();
+  const { user, isPending } = useSession();
   const { updateMemberStats, updateEventStats } = useDashboardStats();
 
   // Mock data fetching functions - replace with actual API calls
@@ -82,6 +89,50 @@ export default function DashboardPage() {
       updateEventStats(eventStatsUpdate.data);
     }
   }, [eventStatsUpdate.data, updateEventStats]);
+
+  // Show loading state while checking authentication
+  if (isPending) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {/* Loading skeletons for dashboard widgets */}
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} className="space-y-4">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Redirect to login if user is not authenticated
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+        <AlertCircle className="h-12 w-12 text-muted-foreground" />
+        <Alert variant="destructive" className="max-w-md">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            You must be logged in to access the dashboard.
+          </AlertDescription>
+        </Alert>
+        <div className="flex gap-4">
+          <button
+            onClick={() => router.push("/auth/login")}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          >
+            Sign In
+          </button>
+          <button
+            onClick={() => router.push("/auth/signup")}
+            className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90"
+          >
+            Sign Up
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

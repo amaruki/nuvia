@@ -602,7 +602,7 @@ export function DashboardSidebar({
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href="/dashboard/profile/settings">
                     <BadgeCheck className="mr-2 size-4" />
                     Account
@@ -612,7 +612,7 @@ export function DashboardSidebar({
                   <CreditCard className="mr-2 size-4" />
                   Billing
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem>
                     <Settings className="mr-2 size-4" />
                     Settings
                 </DropdownMenuItem>

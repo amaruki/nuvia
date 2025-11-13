@@ -16,10 +16,7 @@ export default function EventsPage() {
   
   
 
-  const handleCreateEvent = () => {
-    router.push("/events/create");
-  };
-
+  
   const handleRegister = (eventId: string) => {
     router.push(`/events/${eventId}/register`);
   };
@@ -30,31 +27,20 @@ export default function EventsPage() {
 
 
 
-  // Create event button to be placed next to the title
-  const createEventButton = (
-    <Button onClick={handleCreateEvent} className="h-9">
-      <Plus className="h-4 w-4 mr-2" />
-      Create Event
-    </Button>
-  );
-
+  
   return (
     <EventListLayout
       title="Events"
       description="Discover and join events that match your interests"
       icon={<Calendar className="h-8 w-8 text-primary" />}
-      
-      topRightActions={createEventButton}
     >
-
-
       <EventList
-        onCreateEvent={handleCreateEvent}
         onRegister={handleRegister}
         onViewDetails={handleViewDetails}
         showCreateButton={false}
-        showRegistrationStatus={true} 
-        events={[]}      />
+        showRegistrationStatus={true}
+        events={[]}
+      />
     </EventListLayout>
   );
 }

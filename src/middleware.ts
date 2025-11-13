@@ -31,6 +31,19 @@ const authMiddleware = createAuthMiddleware({
  */
 export async function middleware(request: NextRequest) {
   try {
+    // Protect dashboard routes - require authentication
+    if (request.nextUrl.pathname.startsWith('/dashboard')) {
+      const authResult = await authenticate(request);
+      if (!authResult.success) {
+        // Redirect to login page with return URL
+        const loginUrl = new URL('/auth/login', request.url);
+        loginUrl.searchParams.set('redirectTo', request.nextUrl.pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+      // Continue to dashboard page if authenticated
+      return NextResponse.next();
+    }
+
     // Apply authentication middleware to API routes
     if (request.nextUrl.pathname.startsWith('/api/')) {
       // Skip auth middleware for OAuth callbacks and public endpoints
@@ -49,6 +62,26 @@ export async function middleware(request: NextRequest) {
   } catch (error) {
     console.error('Middleware error:', error);
     return AuthResponseFactory.internalError('Internal server error');
+  }
+}
+
+/**
+ * Simple authentication check for middleware
+ */
+async function authenticate(request: NextRequest): Promise<{ success: boolean; user?: any }> {
+  try {
+    // Import auth utilities dynamically to avoid server-side issues
+    const { AuthUtils } = await import('@/lib/auth/utils');
+    const user = await AuthUtils.getCurrentUser(request);
+
+    if (!user) {
+      return { success: false };
+    }
+
+    return { success: true, user };
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { success: false };
   }
 }
 
@@ -75,6 +108,8 @@ export const config = {
   matcher: [
     // Apply to all API routes
     '/api/:path*',
+    // Apply to dashboard routes
+    '/dashboard/:path*',
     // Apply to authentication pages
     '/auth/:path*',
     // Exclude static files and images

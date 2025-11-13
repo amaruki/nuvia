@@ -55,12 +55,13 @@ function LoginForm() {
     },
   });
 
-  // Redirect authenticated users to dashboard
+  // Redirect authenticated users to dashboard or requested page
   useEffect(() => {
     if (!isPending && user) {
-      router.push("/dashboard");
+      const redirectTo = searchParams.get("redirectTo") || "/dashboard";
+      router.push(redirectTo);
     }
-  }, [user, isPending, router]);
+  }, [user, isPending, router, searchParams]);
 
   // Handle OAuth callback errors and animations
   useEffect(() => {
@@ -105,7 +106,8 @@ function LoginForm() {
       if (result.success) {
         toast.success("Login successful! Redirecting...");
         setTimeout(() => {
-          router.push("/dashboard");
+          const redirectTo = searchParams.get("redirectTo") || "/dashboard";
+          router.push(redirectTo);
         }, 1500);
       } else {
         toast.error(result.message || "Login failed");

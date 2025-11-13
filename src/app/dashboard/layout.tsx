@@ -104,7 +104,7 @@ function DashboardLayout({
   return (
     <SidebarProvider>
       <DashboardProvider>
-        <DashboardSidebar user={user} role={role} />
+        <DashboardSidebar />
         <SidebarInset className={cn("flex-1", className)}>
           {/* Main content */}
           <div className="flex flex-col h-full">

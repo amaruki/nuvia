@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "@/hooks/use-session";
+import { useHeader } from "@/contexts/dashboard-context";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,11 +54,19 @@ type TabId = typeof profileTabs[number]["id"];
 export default function ProfileSettingsPage() {
   const params = useParams();
   const { user, isPending: status } = useSession();
+  const { setHeader, clearHeader } = useHeader();
   const [activeTab, setActiveTab] = useState<TabId>("profile");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Set active tab from URL parameter if available
+  // Set header and active tab from URL parameter if available
   useEffect(() => {
+    // Set the header
+    setHeader({
+      title: "Profile Settings",
+      description: "Manage your account settings and preferences"
+    });
+
+    // Set active tab from URL parameter
     if (params.tab && typeof params.tab === "string") {
       const validTab = profileTabs.find(tab => tab.id === params.tab);
       if (validTab) {
@@ -65,7 +74,12 @@ export default function ProfileSettingsPage() {
       }
     }
     setIsLoading(false);
-  }, [params.tab]);
+
+    // Cleanup header on unmount
+    return () => {
+      clearHeader();
+    };
+  }, [params.tab, setHeader, clearHeader]);
 
   // Show loading state while checking authentication
   if (status || isLoading) {
@@ -94,13 +108,7 @@ export default function ProfileSettingsPage() {
   if (!status && !user) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Profile Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account settings and preferences
-          </p>
-        </div>
-        <Alert variant="destructive">
+                <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             You must be logged in to access profile settings.
@@ -112,43 +120,6 @@ export default function ProfileSettingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Profile Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account settings and preferences
-          </p>
-        </div>
-
-        {/* Quick Profile Summary */}
-        <Card className="w-64">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <Avatar className="h-12 w-12">
-                <AvatarImage src={user!.image || undefined} alt={user!.displayName || ""} />
-                <AvatarFallback>
-                  {user!.displayName?.charAt(0)?.toUpperCase() || user!.email?.charAt(0)?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">
-                  {user!.displayName || user!.username || "User"}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {user!.email}
-                </p>
-                <Badge variant="secondary" className="mt-1 text-xs">
-                  {user!.role === "ADMIN" ? "Administrator" : "Member"}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Separator />
-
       {/* Tabbed Interface */}
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabId)}>
         <TabsList className="grid w-full grid-cols-4">

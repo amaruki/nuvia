@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { DashboardHeader } from "@/components/dashboard/layout/dashboard-header";
 import { DashboardFooter } from "@/components/dashboard/layout/dashboard-footer";
 import { DashboardSidebar } from "@/components/dashboard/layout/dashboard-sidebar";
-import { DashboardProvider } from "@/contexts/dashboard-context";
+import { DashboardProvider, useHeader } from "@/contexts/dashboard-context";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { UserRole } from "@/types/dashboard.types";
 
@@ -37,6 +37,22 @@ interface DashboardLayoutProps {
 }
 
 /**
+ * Dashboard Header Wrapper - uses header context for dynamic headers
+ */
+function DashboardHeaderWrapper({ user }: { user?: DashboardLayoutProps["user"] }) {
+  const { title, description, actions } = useHeader();
+
+  return (
+    <DashboardHeader
+      title={title || "Dashboard"}
+      description={description}
+      user={user}
+      actions={actions}
+    />
+  );
+}
+
+/**
  * Dashboard layout component that provides a consistent structure for dashboard pages.
  * Includes sidebar, header, main content area, and footer with proper responsive design.
  *
@@ -48,8 +64,7 @@ function DashboardLayout({
   user,
   role = "member",
   className,
-  headerProps,
-}: DashboardLayoutProps) {
+}: Omit<DashboardLayoutProps, 'headerProps'>) {
   return (
     <SidebarProvider>
       <DashboardProvider>
@@ -57,12 +72,7 @@ function DashboardLayout({
         <SidebarInset className={cn("flex-1", className)}>
           {/* Main content */}
           <div className="flex flex-col h-full">
-            <DashboardHeader
-              title={headerProps?.title}
-              description={headerProps?.description}
-              user={user}
-              actions={headerProps?.actions}
-            />
+            <DashboardHeaderWrapper user={user} />
 
             <main className="flex-1">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

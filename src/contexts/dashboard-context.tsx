@@ -34,6 +34,13 @@ export interface DashboardState {
   sidebarCollapsed: boolean;
   theme: "light" | "dark" | "system";
 
+  // Header state
+  header: {
+    title?: string;
+    description?: string;
+    actions?: React.ReactNode;
+  };
+
   // Loading states
   isRefreshing: boolean;
   lastRefresh: Date | null;
@@ -48,6 +55,8 @@ type DashboardAction =
   | { type: "SET_EVENT_STATS"; payload: DashboardState["eventStats"] }
   | { type: "TOGGLE_SIDEBAR" }
   | { type: "SET_THEME"; payload: DashboardState["theme"] }
+  | { type: "SET_HEADER"; payload: DashboardState["header"] }
+  | { type: "CLEAR_HEADER" }
   | { type: "SET_REFRESHING"; payload: boolean }
   | { type: "SET_LAST_REFRESH"; payload: Date }
   | { type: "REFRESH_DATA" };
@@ -109,6 +118,18 @@ function dashboardReducer(state: DashboardState, action: DashboardAction): Dashb
         theme: action.payload,
       };
 
+    case "SET_HEADER":
+      return {
+        ...state,
+        header: action.payload,
+      };
+
+    case "CLEAR_HEADER":
+      return {
+        ...state,
+        header: {},
+      };
+
     case "SET_REFRESHING":
       return {
         ...state,
@@ -139,6 +160,7 @@ const initialState: DashboardState = {
   eventStats: null,
   sidebarCollapsed: false,
   theme: "system",
+  header: {},
   isRefreshing: false,
   lastRefresh: null,
 };
@@ -244,5 +266,27 @@ export function useDashboardStats() {
     updateEventStats,
     isRefreshing: state.isRefreshing,
     lastRefresh: state.lastRefresh,
+  };
+}
+
+export function useHeader() {
+  const { state, dispatch } = useDashboard();
+
+  const setHeader = React.useCallback((header: {
+    title?: string;
+    description?: string;
+    actions?: React.ReactNode;
+  }) => {
+    dispatch({ type: "SET_HEADER", payload: header });
+  }, [dispatch]);
+
+  const clearHeader = React.useCallback(() => {
+    dispatch({ type: "CLEAR_HEADER" });
+  }, [dispatch]);
+
+  return {
+    ...state.header,
+    setHeader,
+    clearHeader,
   };
 }

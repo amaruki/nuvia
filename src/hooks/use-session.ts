@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { authClient } from "@/lib/client";
 
 interface User {
@@ -21,42 +21,103 @@ interface SessionData {
   error: string | null;
 }
 
+// Client-side session cache to avoid re-rendering delays
+interface CachedSessionState {
+  user: User | null;
+  lastValidated: number;
+  isValid: boolean;
+}
+
+const SESSION_CACHE_TTL = 30 * 1000; // 30 seconds client-side cache
+let globalSessionCache: CachedSessionState | null = null;
+
 export function useSession(): SessionData {
   const { data: authUser, isPending, error } = authClient.useSession();
 
-  // Transform better-auth user to our User format
-  const [userData, setUserData] = useState<User | null>(null);
+  // Local state with caching
+  const [userData, setUserData] = useState<User | null>(() => {
+    // Initialize from global cache on first render
+    if (globalSessionCache &&
+        Date.now() - globalSessionCache.lastValidated < SESSION_CACHE_TTL &&
+        globalSessionCache.isValid) {
+      return globalSessionCache.user;
+    }
+    return null;
+  });
   const [sessionError, setSessionError] = useState<string | null>(null);
 
+  // Optimized user data transformation with memoization
+  const transformUserData = useCallback((authUser: any): User => {
+    return {
+      id: authUser.user.id,
+      username: (authUser.user as any).username || authUser.user.name || "",
+      email: authUser.user.email,
+      displayName: authUser.user.name || (authUser.user as any).displayName || undefined,
+      image: authUser.user.image || undefined,
+      bio: (authUser.user as any).bio || undefined,
+      role: (authUser.user as any).role || "USER",
+      createdAt: new Date(authUser.user.createdAt),
+      updatedAt: new Date(authUser.user.updatedAt),
+    };
+  }, []);
+
+  // Update global cache and local state
   useEffect(() => {
     if (authUser) {
-      setUserData({
-        id: authUser.user.id,
-        username: (authUser.user as any).username || authUser.user.name || "",
-        email: authUser.user.email,
-        displayName: authUser.user.name || (authUser.user as any).displayName || undefined,
-        image: authUser.user.image || undefined, // Convert null to undefined
-        bio: (authUser.user as any).bio || undefined, // Cast to any for custom fields
-        role: (authUser.user as any).role || "USER", // Cast to any for custom fields
-        createdAt: new Date(authUser.user.createdAt),
-        updatedAt: new Date(authUser.user.updatedAt),
-      });
+      const transformedUser = transformUserData(authUser);
+
+      // Update global cache
+      globalSessionCache = {
+        user: transformedUser,
+        lastValidated: Date.now(),
+        isValid: true,
+      };
+
+      // Update local state
+      setUserData(transformedUser);
       setSessionError(null);
     } else if (!isPending && !authUser) {
+      // Clear cache and state when user is logged out
+      globalSessionCache = {
+        user: null,
+        lastValidated: Date.now(),
+        isValid: false,
+      };
       setUserData(null);
       setSessionError(null);
     }
-  }, [authUser, isPending]);
+  }, [authUser, isPending, transformUserData]);
 
+  // Handle errors
   useEffect(() => {
     if (error) {
       setSessionError(error.message || "Session error");
+      // Invalidate cache on error
+      globalSessionCache = null;
     }
   }, [error]);
 
-  return {
+  // Memoize return value to prevent unnecessary re-renders
+  return useMemo(() => ({
     user: userData,
     isPending,
     error: sessionError,
-  };
+  }), [userData, isPending, sessionError]);
+}
+
+/**
+ * Utility function to manually invalidate session cache
+ * Useful after logout or session changes
+ */
+export function invalidateSessionCache(): void {
+  globalSessionCache = null;
+}
+
+/**
+ * Utility function to check if session is cached and valid
+ */
+export function isSessionCached(): boolean {
+  return globalSessionCache !== null &&
+         Date.now() - globalSessionCache.lastValidated < SESSION_CACHE_TTL &&
+         globalSessionCache.isValid;
 }

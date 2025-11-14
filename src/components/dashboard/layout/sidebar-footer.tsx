@@ -131,7 +131,7 @@ export function SidebarFooterComponent({ className }: SidebarFooterComponentProp
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <a href="/dashboard/profile/settings" className="flex items-center">
+                <a href="/dashboard/profile" className="flex items-center">
                   <BadgeCheck className="mr-2 size-4" />
                   Account
                 </a>

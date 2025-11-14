@@ -55,7 +55,7 @@ export function useSession(): SessionData {
       displayName: authUser.user.name || (authUser.user as any).displayName || undefined,
       image: authUser.user.image || undefined,
       bio: (authUser.user as any).bio || undefined,
-      role: (authUser.user as any).role || "USER",
+      role: (authUser.user as any).role || "admin",
       createdAt: new Date(authUser.user.createdAt),
       updatedAt: new Date(authUser.user.updatedAt),
     };

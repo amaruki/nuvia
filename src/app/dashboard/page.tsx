@@ -195,7 +195,7 @@ export default function DashboardPage() {
       <div className="xl:col-span-2">
         <QuickNavigationWidget />
       </div>
-      
+
     </div>
   );
 }

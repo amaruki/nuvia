@@ -1,6 +1,29 @@
 // Dashboard types for Nuvia community platform
 
-export type UserRole = 'member' | 'admin' | 'moderator';
+// Primary User Roles for Association Management System
+export type UserRole =
+  | 'superadmin'           // Global system control
+  | 'admin'                // Organization-wide management
+  | 'staff'                // Operational staff
+  | 'treasurer'            // Financial oversight
+  | 'chapter_president'    // Chapter leadership
+  | 'chapter_admin'        // Chapter administration
+  | 'committee_chair'      // Committee leadership
+  | 'organizer'            // Event organization
+  | 'member_corporate'     // Corporate member tier
+  | 'member_professional'  // Professional member tier
+  | 'member_student'       // Student member tier
+  | 'member'               // Basic member tier
+  | 'moderator'            // Content moderation
+  | 'user';                // Basic registered user
+
+// Committee-specific roles (context-dependent)
+export type CommitteeRole =
+  | 'chair'        // Committee leadership
+  | 'vice_chair'   // Deputy leadership
+  | 'member'       // Regular participation
+  | 'observer'     // Read-only access
+  | 'liaison';     // Cross-committee coordinator
 
 export type WidgetType = 
   | 'user-profile'

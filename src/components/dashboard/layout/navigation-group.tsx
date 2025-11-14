@@ -53,10 +53,8 @@ interface NavigationRendererProps {
 
 export function NavigationRenderer({ navigationGroups, isActive }: NavigationRendererProps) {
   const categories = [
-    { key: "main", title: "Navigation" },
-    { key: "personal", title: "Personal" },
-    { key: "admin", title: "Admin" },
-    { key: "system", title: "System" },
+    { key: "main", title: "Main Navigation" },
+    { key: "admin", title: "Administration" },
   ] as const;
 
   return (

@@ -220,6 +220,46 @@ export const navigationConfig: readonly NavigationItem[] = [
     roles: ["user", "member", "member_student", "member_professional", "member_corporate", "moderator", "organizer", "committee_chair", "chapter_admin", "chapter_president", "staff", "treasurer", "admin", "superadmin"],
   },
 
+  // User Management Section
+  {
+    id: "user-management",
+    title: "User Management",
+    icon: <UserCog className="h-4 w-4" />,
+    path: "/dashboard/users",
+    category: "admin",
+    roles: ["admin", "superadmin", "staff"],
+    subItems: [
+      {
+        id: "user-directory",
+        title: "User Directory",
+        icon: <Users className="h-4 w-4" />,
+        path: "/dashboard/users/directory",
+        roles: ["admin", "superadmin", "staff"],
+      },
+      {
+        id: "user-roles",
+        title: "User Roles & Permissions",
+        icon: <ShieldCheck className="h-4 w-4" />,
+        path: "/dashboard/users/roles",
+        roles: ["admin", "superadmin"],
+      },
+      {
+        id: "user-security",
+        title: "Security & Access",
+        icon: <Lock className="h-4 w-4" />,
+        path: "/dashboard/users/security",
+        roles: ["admin", "superadmin"],
+      },
+      {
+        id: "user-import-export",
+        title: "Import & Export",
+        icon: <Database className="h-4 w-4" />,
+        path: "/dashboard/users/import-export",
+        roles: ["admin", "superadmin"],
+      },
+    ] as const,
+  },
+
   // Membership Management Section
   {
     id: "memberships",

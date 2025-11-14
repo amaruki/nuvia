@@ -9,8 +9,6 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createAuthMiddleware } from '@/lib/auth/middleware';
 
-// Force Node.js runtime to allow Prisma database access
-export const runtime = 'nodejs';
 import { RATE_LIMIT_CONFIGS } from '@/lib/auth/rate-limiting';
 import { AuthResponseFactory } from '@/lib/auth/common';
 
@@ -29,7 +27,7 @@ const authMiddleware = createAuthMiddleware({
 /**
  * Main middleware function
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   try {
     // Protect dashboard routes - require authentication
     if (request.nextUrl.pathname.startsWith('/dashboard')) {

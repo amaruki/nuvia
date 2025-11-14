@@ -66,10 +66,11 @@ export interface UserProfile {
   id: string;
   username: string;
   email: string;
-  displayName?: string;
+  firstName?: string;
+  lastName?: string;
   profilePhoto?: string;
-  membershipTier: 'basic' | 'premium' | 'vip';
-  membershipStatus: 'active' | 'expired' | 'pending';
+  membershipTier: 'basic' | 'premium' | 'vip' | 'student' | 'corporate' | 'professional';
+  membershipStatus: 'active' | 'expired' | 'pending' | 'suspended' | 'cancelled';
   joinDate: Date;
 }
 

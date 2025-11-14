@@ -29,7 +29,7 @@ import { useRealtimeUpdates } from "@/hooks/use-realtime-updates";
 /**
  * Mock user role - in a real app, this would come from authentication
  */
-const userRole: UserRole = "member"; // Change to "admin" to see admin widgets
+const userRole: UserRole = "admin"; // Change to "admin" to see admin widgets
 
 /**
  * Dashboard page component that displays user-specific widgets and information.
@@ -45,7 +45,7 @@ export default function DashboardPage() {
   // Mock data fetching functions - replace with actual API calls
   const fetchMemberStats = React.useCallback(async () => {
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     return {
       totalMembers: 1245,
       activeMembers: 892,
@@ -55,7 +55,7 @@ export default function DashboardPage() {
 
   const fetchEventStats = React.useCallback(async () => {
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise((resolve) => setTimeout(resolve, 800));
     return {
       upcomingEvents: 8,
       totalEvents: 156,
@@ -136,10 +136,37 @@ export default function DashboardPage() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {/* User Profile Section */}
-      <div className="xl:col-span-1">
-        <UserProfileWidget />
-      </div>
+      {/* Admin-only Widgets */}
+      {userRole === "admin" && (
+        <>
+          <div className="xl:col-span-2">
+            <FinanceWidget />
+          </div>
+
+          <div className="xl:col-span-2">
+            <AnalyticsWidget />
+          </div>
+
+          {/* Statistics Section */}
+          <div className="xl:col-span-4">
+            <MemberStatisticsWidget />
+          </div>
+
+          <div className="xl:col-span-4">
+            <ModerationWidget />
+          </div>
+
+          {/* Community Section */}
+          <div className="xl:col-span-2">
+            <CommunityActivityWidget />
+          </div>
+
+          {/* Activity Section */}
+          <div className="xl:col-span-2">
+            <EventActivityWidget />
+          </div>
+        </>
+      )}
 
       {/* Events Section */}
       <div className="xl:col-span-2">
@@ -151,61 +178,24 @@ export default function DashboardPage() {
         <RecentArticlesWidget />
       </div>
 
-      {/* Certificates Section */}
-      <div className="xl:col-span-1">
-        <EnhancedCertificatesWidget />
-      </div>
-
-      {/* Community Section */}
-      <div className="xl:col-span-2">
-        <CommunityActivityWidget />
-      </div>
-
-      {/* Recommendations Section */}
-      <div className="xl:col-span-1">
-        <PersonalRecommendationsWidget />
-      </div>
-
-      {/* Statistics Section */}
-      <div className="xl:col-span-2">
-        <MemberStatisticsWidget />
-      </div>
-
-      {/* Activity Section */}
-      <div className="xl:col-span-1">
-        <EventActivityWidget />
-      </div>
-
       {/* Recent Content Section */}
       <div className="xl:col-span-2">
         <RecentContentWidget />
       </div>
 
-      {/* Admin-only Widgets */}
-      {userRole === "admin" && (
-        <>
-          <div className="xl:col-span-2">
-            <ModerationWidget />
-          </div>
-          <div className="xl:col-span-1">
-            <FinanceWidget />
-          </div>
-          <div className="xl:col-span-1">
-            <AnalyticsWidget />
-          </div>
-        </>
-      )}
-
-      {/* Utility Widgets */}
-      <div className="xl:col-span-1">
-        <GlobalSearchWidget />
-      </div>
-      <div className="xl:col-span-1">
-        <QuickNavigationWidget />
-      </div>
       <div className="xl:col-span-2">
         <CommunityHighlightsWidget />
       </div>
+
+      {/* Utility Widgets */}
+      <div className="xl:col-span-2">
+        <GlobalSearchWidget />
+      </div>
+      
+      <div className="xl:col-span-2">
+        <QuickNavigationWidget />
+      </div>
+      
     </div>
   );
 }

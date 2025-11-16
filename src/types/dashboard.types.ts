@@ -17,6 +17,126 @@ export type UserRole =
   | 'moderator'            // Content moderation
   | 'user';                // Basic registered user
 
+// Export role constants for re-use
+export const USER_ROLES = [
+  'superadmin', 'admin', 'staff', 'treasurer', 'chapter_president',
+  'chapter_admin', 'committee_chair', 'organizer', 'member_corporate',
+  'member_professional', 'member_student', 'member', 'moderator', 'user'
+] as const;
+
+// Utility function to check if role is predefined
+export function isPredefinedRole(role: string): role is UserRole {
+  return USER_ROLES.includes(role as UserRole);
+}
+
+// Role display information
+export const ROLE_DISPLAY_INFO: Record<UserRole, {
+  name: string;
+  description: string;
+  color: string;
+  icon: string;
+  category: 'administrative' | 'leadership' | 'staff' | 'membership' | 'basic';
+}> = {
+  superadmin: {
+    name: 'Super Administrator',
+    description: 'Complete system control and all permissions',
+    color: 'red',
+    icon: 'shield',
+    category: 'administrative'
+  },
+  admin: {
+    name: 'Administrator',
+    description: 'Organization-wide management access',
+    color: 'orange',
+    icon: 'settings',
+    category: 'administrative'
+  },
+  staff: {
+    name: 'Staff Member',
+    description: 'Operational staff with day-to-day management access',
+    color: 'blue',
+    icon: 'users',
+    category: 'staff'
+  },
+  treasurer: {
+    name: 'Treasurer',
+    description: 'Financial oversight and payment management',
+    color: 'green',
+    icon: 'dollar-sign',
+    category: 'leadership'
+  },
+  chapter_president: {
+    name: 'Chapter President',
+    description: 'Chapter leadership and management',
+    color: 'purple',
+    icon: 'crown',
+    category: 'leadership'
+  },
+  chapter_admin: {
+    name: 'Chapter Administrator',
+    description: 'Chapter-level administrative access',
+    color: 'purple',
+    icon: 'building',
+    category: 'leadership'
+  },
+  committee_chair: {
+    name: 'Committee Chair',
+    description: 'Committee leadership and coordination',
+    color: 'indigo',
+    icon: 'award',
+    category: 'leadership'
+  },
+  organizer: {
+    name: 'Event Organizer',
+    description: 'Event creation and management',
+    color: 'pink',
+    icon: 'calendar',
+    category: 'staff'
+  },
+  member_corporate: {
+    name: 'Corporate Member',
+    description: 'Corporate member with enhanced privileges',
+    color: 'slate',
+    icon: 'briefcase',
+    category: 'membership'
+  },
+  member_professional: {
+    name: 'Professional Member',
+    description: 'Professional member with standard privileges',
+    color: 'cyan',
+    icon: 'user-check',
+    category: 'membership'
+  },
+  member_student: {
+    name: 'Student Member',
+    description: 'Student member with educational privileges',
+    color: 'amber',
+    icon: 'graduation-cap',
+    category: 'membership'
+  },
+  member: {
+    name: 'Member',
+    description: 'Basic member privileges',
+    color: 'gray',
+    icon: 'user',
+    category: 'membership'
+  },
+  moderator: {
+    name: 'Moderator',
+    description: 'Content moderation and community management',
+    color: 'yellow',
+    icon: 'shield-check',
+    category: 'staff'
+  },
+  user: {
+    name: 'User',
+    description: 'Basic registered user access',
+    color: 'zinc',
+    icon: 'user',
+    category: 'basic'
+  }
+};
+
 // Committee-specific roles (context-dependent)
 export type CommitteeRole =
   | 'chair'        // Committee leadership

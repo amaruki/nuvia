@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react"
 import { UserDirectory } from "@/components/users/user-directory"
-import { UserFilter, UserSort, UserProfile, UserStats } from "@/types/user-management.types"
+import { UserFilter, UserSort, UserProfile, UserStats, UserStatus, AuthStatus } from "@/types/user-management.types"
+import { UserRole } from "@/types/dashboard.types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useSession } from "@/lib/client"
 
@@ -23,8 +24,8 @@ const mockUsers: UserProfile[] = [
     timezone: "America/Los_Angeles",
     language: "en",
     userRole: "admin",
-    status: "active",
-    authStatus: "verified",
+    status: UserStatus.ACTIVE,
+    authStatus: AuthStatus.VERIFIED,
     emailVerified: true,
     phoneVerified: true,
     lastLoginAt: new Date("2024-01-15T10:30:00Z"),
@@ -46,8 +47,8 @@ const mockUsers: UserProfile[] = [
     timezone: "America/New_York",
     language: "en",
     userRole: "member",
-    status: "active",
-    authStatus: "two_factor_enabled",
+    status: UserStatus.ACTIVE,
+    authStatus: AuthStatus.TWO_FACTOR_ENABLED,
     emailVerified: true,
     phoneVerified: false,
     lastLoginAt: new Date("2024-01-14T15:45:00Z"),
@@ -68,8 +69,8 @@ const mockUsers: UserProfile[] = [
     timezone: "America/Chicago",
     language: "en",
     userRole: "member",
-    status: "inactive",
-    authStatus: "verified",
+    status: UserStatus.INACTIVE,
+    authStatus: AuthStatus.VERIFIED,
     emailVerified: true,
     phoneVerified: true,
     lastLoginAt: new Date("2023-12-20T09:15:00Z"),
@@ -87,9 +88,20 @@ const mockStats: UserStats = {
   unverifiedUsers: 91,
   usersWithTwoFactor: 342,
   roleDistribution: {
-    admin: 5,
+    superadmin: 1,
+    admin: 4,
+    staff: 8,
+    treasurer: 2,
+    chapter_president: 6,
+    chapter_admin: 12,
+    committee_chair: 4,
+    organizer: 15,
+    member_corporate: 45,
+    member_professional: 180,
+    member_student: 320,
+    member: 680,
     moderator: 12,
-    member: 1230
+    user: 230
   },
   newUsersThisMonth: 47,
   usersLastLogin30Days: 756
@@ -153,13 +165,16 @@ export default function UserDirectoryPage() {
     // Apply sorting
     filtered.sort((a, b) => {
       const { field, direction } = sort
-      let aValue: any = a[field]
-      let bValue: any = b[field]
+      let aValue: any
+      let bValue: any
 
       // Handle name field specially
       if (field === "name") {
         aValue = `${a.firstName} ${a.lastName}`
         bValue = `${b.firstName} ${b.lastName}`
+      } else {
+        aValue = a[field as keyof UserProfile]
+        bValue = b[field as keyof UserProfile]
       }
 
       // Handle dates
@@ -225,7 +240,7 @@ export default function UserDirectoryPage() {
         onFilterChange={handleFilterChange}
         onSortChange={handleSortChange}
         onClearFilters={handleClearFilters}
-        currentUserRole={session?.user?.userRole as string}
+        currentUserRole="admin"
       />
     </div>
   )

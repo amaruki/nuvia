@@ -236,7 +236,6 @@ export async function validateSessionWithCache(sessionToken: string) {
             username: true,
             name: true,
             image: true,
-            displayName: true,
             profilePhoto: true,
             bio: true,
             externalLinks: true,

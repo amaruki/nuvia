@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
-import { MembershipFilter, MembershipSort, MembershipDirectoryResponse, MembershipProfile } from "@/types/membership.types"
+import { MembershipFilter, MembershipSort, MembershipDirectoryResponse, MembershipProfile, MembershipTier, MembershipStatus } from "@/types/membership.types"
 
 interface UseMembershipsOptions {
   initialFilters?: MembershipFilter
@@ -68,8 +68,8 @@ export function useMemberships({
             lastName,
             username: `${firstName.toLowerCase()}${lastName.toLowerCase()}${globalIndex + 1}`,
             joinDate: new Date(Date.now() - Math.random() * 730 * 24 * 60 * 60 * 1000), // Random date within last 2 years
-            membershipTier: tiers[globalIndex % tiers.length],
-            membershipStatus: statuses[Math.floor(globalIndex / 6) % statuses.length],
+            membershipTier: tiers[globalIndex % tiers.length] as MembershipTier,
+            membershipStatus: statuses[Math.floor(globalIndex / 6) % statuses.length] as MembershipStatus,
             membershipStartDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000),
             membershipEndDate: Math.random() > 0.3 ? new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000) : null,
             chapter: chapters[globalIndex % chapters.length],

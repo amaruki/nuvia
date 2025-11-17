@@ -108,14 +108,14 @@ export function ProfilePhotoUpload({ user }: ProfilePhotoUploadProps) {
         image: photoUrl
       });
 
-      if (result.success) {
+      if (result.data?.status) {
         setSuccess(true);
         // Use the photoUrl we created earlier instead of trying to get it from result.data
         setPreview(photoUrl);
 
         setTimeout(() => setSuccess(false), 3000);
       } else {
-        setError(result.message || "Failed to upload photo");
+        setError(result.error?.message || "Failed to upload photo");
       }
     } catch (error: any) {
       setError(error.message || "Failed to upload photo");
@@ -133,11 +133,11 @@ export function ProfilePhotoUpload({ user }: ProfilePhotoUploadProps) {
     try {
       const result = await updateProfile({ image: undefined });
 
-      if (result.success) {
+      if (result.data?.status) {
         setSuccess(true);
         setTimeout(() => setSuccess(false), 3000);
       } else {
-        setError(result.message || "Failed to remove photo");
+        setError(result.error?.message || "Failed to remove photo");
       }
     } catch (error: any) {
       setError(error.message || "Failed to remove photo");

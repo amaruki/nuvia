@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { loginSchema } from '@/lib/validation/auth.validation';
 import { fromZodError } from 'zod-validation-error';
-import { AuthResponseFactory } from '@/lib/auth/common';
+import { AuthResponseFactory, AuthErrorType } from '@/lib/auth/common';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
     if (!validationResult.success) {
       const validationError = fromZodError(validationResult.error);
-      return AuthResponseFactory.validationError(validationError.message);
+      return AuthResponseFactory.validationError(validationResult.error);
     }
 
     const { emailOrUsername, password } = validationResult.data;
@@ -39,6 +39,6 @@ export async function POST(request: NextRequest) {
     console.error('Login error:', error);
 
     // Return a generic error response
-    return AuthResponseFactory.serverError('An unexpected error occurred during login');
+    return AuthResponseFactory.internalError('An unexpected error occurred during login');
   }
 }

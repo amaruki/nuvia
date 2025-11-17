@@ -118,16 +118,16 @@ export function SecurityForm({ user }: SecurityFormProps) {
       const result = await changePassword({
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
-        confirmPassword: data.confirmPassword,
+        revokeOtherSessions: true,
       });
 
-      if (result.success) {
+      if (result.data?.user) {
         setIsSuccess(true);
         // Reset form
         handleSubmit(() => {})();
         setTimeout(() => setIsSuccess(false), 3000);
       } else {
-        setError(result.message || "Failed to change password");
+        setError(result.error?.message || "Failed to change password");
       }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");

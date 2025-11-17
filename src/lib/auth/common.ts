@@ -97,7 +97,7 @@ export class AuthResponseFactory {
    * Create a validation error response from ZodError
    */
   static validationError(error: ZodError): NextResponse<ApiResponse> {
-    const fields = error.errors.reduce((acc, err) => {
+    const fields = error.issues.reduce((acc, err) => {
       const field = err.path.join('.');
       if (!acc[field]) acc[field] = [];
       acc[field].push(err.message);
@@ -185,7 +185,7 @@ export function normalizeAuthError(error: unknown): AuthError {
   if (isAuthError(error)) return error;
 
   if (error instanceof ZodError) {
-    const fields = error.errors.reduce((acc, err) => {
+    const fields = error.issues.reduce((acc, err) => {
       const field = err.path.join('.');
       if (!acc[field]) acc[field] = [];
       acc[field].push(err.message);

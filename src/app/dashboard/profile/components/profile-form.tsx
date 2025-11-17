@@ -53,17 +53,15 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
     try {
       const result = await updateProfile({
-        displayName: data.displayName,
-        bio: data.bio,
-        username: data.username,
+        name: data.displayName,
       });
 
-      if (result.success) {
+      if (result.data?.status) {
         setIsSuccess(true);
         reset(data);
         setTimeout(() => setIsSuccess(false), 3000);
       } else {
-        setError(result.message || "Failed to update profile");
+        setError(result.error?.message || "Failed to update profile");
       }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");

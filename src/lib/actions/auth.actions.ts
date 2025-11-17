@@ -89,7 +89,7 @@ export async function signupAction(formData: FormData): Promise<AuthResponse> {
     const agreeToTermsValue = (formData.get('agreeToTerms') || formData.get('1_agreeToTerms')) as string;
 
     // Convert agreeToTerms to boolean
-    const agreeToTerms = agreeToTermsValue === 'true' || agreeToTermsValue === true;
+    const agreeToTerms = agreeToTermsValue === 'true';
 
     // Validate input
     const validatedData = signupSchema.parse({

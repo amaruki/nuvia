@@ -103,7 +103,7 @@ interface SocialLink {
 }
 
 export function SocialLinksForm({ user }: SocialLinksFormProps) {
-  const { data: session, refetch } = useSession();
+  const session = useSession();
   const queryClient = useQueryClient();
   const [isSuccess, setIsSuccess] = useState(false);
   const [isAddingLink, setIsAddingLink] = useState(false);
@@ -155,9 +155,6 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
     },
     onSuccess: async (result) => {
       setIsSuccess(true);
-
-      // Refresh session data
-      await refetch();
 
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ["profile"] });

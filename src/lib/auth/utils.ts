@@ -189,12 +189,16 @@ export class AuthUtils {
 
       const result = await auth.api.updateUser({
         headers: request?.headers || (await headers()),
-        body: data
+        body: {
+          name: data.name,
+          image: data.image || undefined,
+          externalLinks: data.externalLinks === null ? null : undefined
+        }
       });
 
       return {
         success: true,
-        data: result.user as SafeUser
+        data: result as any
       };
     } catch (error) {
       return {

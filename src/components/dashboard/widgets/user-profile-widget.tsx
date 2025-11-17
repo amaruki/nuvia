@@ -20,7 +20,8 @@ const mockUser: UserProfile = {
   id: "1",
   username: "johndoe",
   email: "john.doe@example.com",
-  displayName: "John Doe",
+  firstName: "John",
+  lastName: "Doe",
   profilePhoto: "", // URL to profile photo
   membershipTier: "premium",
   membershipStatus: "active",
@@ -81,7 +82,7 @@ export function UserProfileWidget({
               {user.profilePhoto ? (
                 <Image
                   src={user.profilePhoto}
-                  alt={user.displayName || user.username}
+                  alt={`${user.firstName} ${user.lastName}` || user.username}
                   width={80}
                   height={80}
                   className="h-20 w-20 rounded-full object-cover"
@@ -101,7 +102,7 @@ export function UserProfileWidget({
             {/* User Info */}
             <div className="text-center space-y-2">
               <h3 className="text-lg font-semibold" style={{ color: 'var(--foreground)' }}>
-                {user.displayName || user.username}
+                {user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username}
               </h3>
               <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>@{user.username}</p>
               <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>{user.email}</p>

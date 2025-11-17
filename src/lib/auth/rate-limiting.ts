@@ -89,35 +89,35 @@ export const RATE_LIMIT_CONFIGS = {
   AUTH: {
     windowMs: 15 * 60 * 1000, // 15 minutes
     maxRequests: 5,
-    keyGenerator: (req: NextRequest) => `auth:${req.ip || 'unknown'}`
+    keyGenerator: (req: NextRequest) => `auth:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`
   },
 
   // Password reset endpoints
   PASSWORD_RESET: {
     windowMs: 60 * 60 * 1000, // 1 hour
     maxRequests: 3,
-    keyGenerator: (req: NextRequest) => `password-reset:${req.ip || 'unknown'}`
+    keyGenerator: (req: NextRequest) => `password-reset:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`
   },
 
   // Registration endpoints
   REGISTRATION: {
     windowMs: 60 * 60 * 1000, // 1 hour
     maxRequests: 5,
-    keyGenerator: (req: NextRequest) => `registration:${req.ip || 'unknown'}`
+    keyGenerator: (req: NextRequest) => `registration:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`
   },
 
   // General API endpoints
   API: {
     windowMs: 15 * 60 * 1000, // 15 minutes
     maxRequests: 100,
-    keyGenerator: (req: NextRequest) => `api:${req.ip || 'unknown'}`
+    keyGenerator: (req: NextRequest) => `api:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`
   },
 
   // File upload endpoints
   FILE_UPLOAD: {
     windowMs: 60 * 60 * 1000, // 1 hour
     maxRequests: 10,
-    keyGenerator: (req: NextRequest) => `upload:${req.ip || 'unknown'}`
+    keyGenerator: (req: NextRequest) => `upload:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`
   }
 } as const;
 
@@ -194,7 +194,7 @@ export class RateLimiter {
    * Default key generator using IP address
    */
   private getDefaultKey(request: NextRequest): string {
-    return `rate-limit:${request.ip || 'unknown'}`;
+    return `rate-limit:${request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'}`;
   }
 }
 

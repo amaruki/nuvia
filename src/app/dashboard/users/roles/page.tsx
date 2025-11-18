@@ -198,7 +198,7 @@ export default function UserRoles() {
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <BarChart className="h-4 w-4" />
             Overview
@@ -206,10 +206,6 @@ export default function UserRoles() {
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             User Roles
-          </TabsTrigger>
-          <TabsTrigger value="permissions" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Permissions
           </TabsTrigger>
           <TabsTrigger value="matrix" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
@@ -311,23 +307,6 @@ export default function UserRoles() {
             onBulkRoleChange={handleBulkRoleChange}
             currentUserRole={currentUserRole}
           />
-        </TabsContent>
-
-        {/* Permissions Tab */}
-        <TabsContent value="permissions" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>System Permissions</CardTitle>
-              <CardDescription>
-                Overview of all available permissions in the system organized by category.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Use the Permission Matrix tab to view detailed role-permission mappings and manage custom role permissions.
-              </p>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* Permission Matrix Tab */}

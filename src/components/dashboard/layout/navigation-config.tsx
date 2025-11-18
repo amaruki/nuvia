@@ -250,13 +250,6 @@ export const navigationConfig: readonly NavigationItem[] = [
         path: "/dashboard/users/security",
         roles: ["admin", "superadmin"],
       },
-      {
-        id: "user-import-export",
-        title: "Import & Export",
-        icon: <Database className="h-4 w-4" />,
-        path: "/dashboard/users/import-export",
-        roles: ["admin", "superadmin"],
-      },
     ] as const,
   },
 

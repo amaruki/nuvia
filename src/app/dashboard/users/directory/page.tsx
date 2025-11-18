@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { UserDirectory } from "@/components/users/user-directory"
 import { UserFilter, UserSort, UserProfile, UserStats, UserStatus, AuthStatus } from "@/types/user-management.types"
 import { UserRole } from "@/types/dashboard.types"
+import { useHeader } from "@/contexts/dashboard-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useSession } from "@/lib/client"
 
@@ -110,9 +111,25 @@ const mockStats: UserStats = {
 export default function UserDirectoryPage() {
   const { data: session } = useSession()
   const [filters, setFilters] = useState<UserFilter>({})
+  const { setHeader, clearHeader } = useHeader();
   const [sort, setSort] = useState<UserSort>({ field: "createdAt", direction: "desc" })
   const [isLoading, setIsLoading] = useState(false)
 
+   // Set header and active tab from URL parameter if available
+    useEffect(() => {
+      // Set the header
+      setHeader({
+        title: "User Directory",
+        description: "Manage and monitor platform users"
+      });
+      setIsLoading(false);
+  
+      // Cleanup header on unmount
+      return () => {
+        clearHeader();
+      };
+    }, [setHeader, clearHeader]);
+    
   // Filter and sort users
   const filteredUsers = useMemo(() => {
     let filtered = [...mockUsers]
@@ -212,24 +229,6 @@ export default function UserDirectoryPage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <div className="flex items-center justify-center size-10 rounded-lg bg-primary/10 ring-1 ring-primary/20">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="m22 21-3-3 3-3"></path>
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">User Directory</h1>
-              <p className="text-sm text-muted-foreground">Manage and monitor platform users</p>
-            </div>
-          </CardTitle>
-        </CardHeader>
-      </Card>
-
       <UserDirectory
         users={filteredUsers}
         total={filteredUsers.length}

@@ -32,15 +32,32 @@ import { RoleStatistics, RoleStatisticsData } from '@/components/roles/role-stat
 // Import types and services
 import { Role, Permission } from '@/types/role.types';
 import { UserWithRoleInfo } from '@/lib/services/role.service';
+import { useHeader } from '@/contexts/dashboard-context';
 
 export default function UserRoles() {
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(false);
+  const { setHeader, clearHeader } = useHeader();
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<UserWithRoleInfo[]>([]);
   const [roleStats, setRoleStats] = useState<RoleStatisticsData | undefined>(undefined);
   const [currentUserRole, setCurrentUserRole] = useState<Role>('admin');
   const [selectedRole, setSelectedRole] = useState<Role>('user');
+
+  // Set header and active tab from URL parameter if available
+    useEffect(() => {
+      // Set the header
+      setHeader({
+        title: "Role Management",
+        description: "Manage user roles, permissions, and access control for your organization."
+      });
+      setLoading(false);
+  
+      // Cleanup header on unmount
+      return () => {
+        clearHeader();
+      };
+    }, [setHeader, clearHeader]);
 
   // Load data
   const loadData = async () => {

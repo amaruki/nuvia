@@ -115,21 +115,21 @@ export default function UserDirectoryPage() {
   const [sort, setSort] = useState<UserSort>({ field: "createdAt", direction: "desc" })
   const [isLoading, setIsLoading] = useState(false)
 
-   // Set header and active tab from URL parameter if available
-    useEffect(() => {
-      // Set the header
-      setHeader({
-        title: "User Directory",
-        description: "Manage and monitor platform users"
-      });
-      setIsLoading(false);
+  // Set header and active tab from URL parameter if available
+  useEffect(() => {
+    // Set the header
+    setHeader({
+      title: "User Directory",
+      description: "Manage and monitor platform users"
+    });
+    setIsLoading(false);
+
+    // Cleanup header on unmount
+    return () => {
+      clearHeader();
+    };
+  }, [setHeader, clearHeader]);
   
-      // Cleanup header on unmount
-      return () => {
-        clearHeader();
-      };
-    }, [setHeader, clearHeader]);
-    
   // Filter and sort users
   const filteredUsers = useMemo(() => {
     let filtered = [...mockUsers]

@@ -319,20 +319,6 @@ export const navigationConfig: readonly NavigationItem[] = [
         roles: ["user", "member", "member_student", "member_professional", "member_corporate", "moderator", "organizer", "committee_chair", "chapter_admin", "chapter_president", "staff", "treasurer", "admin", "superadmin"],
       },
       {
-        id: "create-event",
-        title: "Create Event",
-        icon: <Plus className="h-4 w-4" />,
-        path: "/dashboard/events/create",
-        roles: ["admin", "staff", "organizer", "committee_chair", "chapter_admin"],
-      },
-      {
-        id: "event-management",
-        title: "Manage Events",
-        icon: <Edit className="h-4 w-4" />,
-        path: "/dashboard/events/manage",
-        roles: ["admin", "staff", "organizer", "committee_chair", "chapter_admin"],
-      },
-      {
         id: "event-registrations",
         title: "Registrations",
         icon: <Users className="h-4 w-4" />,

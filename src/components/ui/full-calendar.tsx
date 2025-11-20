@@ -347,7 +347,7 @@ const CalendarWeekView = () => {
 };
 
 const CalendarMonthView = () => {
-  const { date, view, events, locale } = useCalendar();
+  const { date, view, events, locale, onDateClick } = useCalendar();
 
   const monthDates = useMemo(() => getDaysInMonth(date), [date]);
   const weekDays = useMemo(() => generateWeekdays(locale), [locale]);
@@ -385,7 +385,7 @@ const CalendarMonthView = () => {
               key={_date.toString()}
               onClick={() => {
                 if (isSameMonth(date, _date)) {
-                  useCalendar().onDateClick?.(_date);
+                  onDateClick?.(_date);
                 }
               }}
             >

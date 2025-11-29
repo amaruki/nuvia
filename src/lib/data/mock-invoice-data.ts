@@ -1,0 +1,277 @@
+import { Invoice, InvoicePayment, InvoiceStatistics, InvoiceItem } from "@/types/finance.types";
+
+// Mock invoice items data
+export const mockInvoiceItems: InvoiceItem[] = [
+  {
+    id: "item-1",
+    description: "Website Development Services",
+    quantity: 40,
+    unitPrice: 150,
+    total: 6000,
+    category: "Services",
+    serviceType: "Development"
+  },
+  {
+    id: "item-2",
+    description: "Website Hosting - Annual",
+    quantity: 1,
+    unitPrice: 1200,
+    total: 1200,
+    category: "Services",
+    serviceType: "Hosting"
+  },
+  {
+    id: "item-3",
+    description: "SEO Optimization Package",
+    quantity: 1,
+    unitPrice: 800,
+    total: 800,
+    category: "Marketing",
+    serviceType: "SEO"
+  }
+];
+
+// Mock invoices data
+export const mockInvoices: Invoice[] = [
+  {
+    id: "invoice-1",
+    invoiceNumber: "INV-2024-001",
+    clientId: "client-1",
+    clientName: "TechCorp Solutions",
+    clientEmail: "billing@techcorp.com",
+    clientAddress: "123 Business Ave, Suite 100, San Francisco, CA 94105",
+    items: [
+      {
+        id: "item-1",
+        description: "Website Development Services",
+        quantity: 40,
+        unitPrice: 150,
+        total: 6000,
+        category: "Services",
+        serviceType: "Development"
+      }
+    ],
+    subtotal: 6000,
+    taxAmount: 480,
+    totalAmount: 6480,
+    currency: "USD",
+    status: "paid",
+    issueDate: new Date("2024-11-01"),
+    dueDate: new Date("2024-11-30"),
+    paidDate: new Date("2024-11-25"),
+    paymentMethod: "Bank Transfer",
+    transactionId: "txn_inv_001",
+    notes: "Payment received on time",
+    createdAt: new Date("2024-11-01"),
+    updatedAt: new Date("2024-11-25"),
+  },
+  {
+    id: "invoice-2",
+    invoiceNumber: "INV-2024-002",
+    clientId: "client-2",
+    clientName: "Global Marketing Inc",
+    clientEmail: "accounts@globalmarketing.com",
+    clientAddress: "456 Market St, Floor 2, New York, NY 10013",
+    items: [
+      {
+        id: "item-2",
+        description: "Website Hosting - Annual",
+        quantity: 1,
+        unitPrice: 1200,
+        total: 1200,
+        category: "Services",
+        serviceType: "Hosting"
+      },
+      {
+        id: "item-3",
+        description: "SEO Optimization Package",
+        quantity: 1,
+        unitPrice: 800,
+        total: 800,
+        category: "Marketing",
+        serviceType: "SEO"
+      }
+    ],
+    subtotal: 2000,
+    taxAmount: 160,
+    totalAmount: 2160,
+    currency: "USD",
+    status: "sent",
+    issueDate: new Date("2024-11-15"),
+    dueDate: new Date("2024-12-15"),
+    notes: "Payment terms: Net 30",
+    createdAt: new Date("2024-11-15"),
+    updatedAt: new Date("2024-11-15"),
+  },
+  {
+    id: "invoice-3",
+    invoiceNumber: "INV-2024-003",
+    clientId: "client-3",
+    clientName: "Startup Ventures LLC",
+    clientEmail: "finance@startupventures.com",
+    items: [
+      {
+        id: "item-4",
+        description: "Mobile App Development",
+        quantity: 60,
+        unitPrice: 120,
+        total: 7200,
+        category: "Services",
+        serviceType: "Development"
+      }
+    ],
+    subtotal: 7200,
+    taxAmount: 576,
+    totalAmount: 7776,
+    currency: "USD",
+    status: "overdue",
+    issueDate: new Date("2024-10-01"),
+    dueDate: new Date("2024-11-01"),
+    notes: "Follow up required - payment overdue",
+    createdAt: new Date("2024-10-01"),
+    updatedAt: new Date("2024-11-15"),
+  },
+  {
+    id: "invoice-4",
+    invoiceNumber: "INV-2024-004",
+    clientId: "client-4",
+    clientName: "Digital Agency Pro",
+    clientEmail: "billing@digitalagency.com",
+    items: [
+      {
+        id: "item-5",
+        description: "Consulting Services",
+        quantity: 20,
+        unitPrice: 200,
+        total: 4000,
+        category: "Services",
+        serviceType: "Consulting"
+      }
+    ],
+    subtotal: 4000,
+    taxAmount: 320,
+    totalAmount: 4320,
+    currency: "USD",
+    status: "draft",
+    issueDate: new Date("2024-11-28"),
+    dueDate: new Date("2024-12-28"),
+    notes: "Draft invoice - pending review",
+    createdAt: new Date("2024-11-28"),
+    updatedAt: new Date("2024-11-28"),
+  },
+  {
+    id: "invoice-5",
+    invoiceNumber: "INV-2024-005",
+    clientId: "client-5",
+    clientName: "E-commerce Store Co",
+    clientEmail: "payments@ecommerce.com",
+    items: [
+      {
+        id: "item-6",
+        description: "Maintenance Contract - Quarterly",
+        quantity: 1,
+        unitPrice: 2500,
+        total: 2500,
+        category: "Services",
+        serviceType: "Maintenance"
+      }
+    ],
+    subtotal: 2500,
+    taxAmount: 200,
+    totalAmount: 2700,
+    currency: "USD",
+    status: "paid",
+    issueDate: new Date("2024-09-15"),
+    dueDate: new Date("2024-10-15"),
+    paidDate: new Date("2024-10-10"),
+    paymentMethod: "Credit Card",
+    transactionId: "txn_inv_005",
+    notes: "Early payment received",
+    createdAt: new Date("2024-09-15"),
+    updatedAt: new Date("2024-10-10"),
+  }
+];
+
+// Mock invoice payments data
+export const mockInvoicePayments: InvoicePayment[] = [
+  {
+    id: "payment-inv-1",
+    invoiceId: "invoice-1",
+    amount: 6480,
+    paymentDate: new Date("2024-11-25"),
+    paymentMethod: "Bank Transfer",
+    transactionId: "txn_inv_001",
+    status: "completed",
+    processedBy: "admin",
+    notes: "Full payment received",
+    createdAt: new Date("2024-11-25"),
+  },
+  {
+    id: "payment-inv-5",
+    invoiceId: "invoice-5",
+    amount: 2700,
+    paymentDate: new Date("2024-10-10"),
+    paymentMethod: "Credit Card",
+    transactionId: "txn_inv_005",
+    status: "completed",
+    processedBy: "system",
+    notes: "Early payment",
+    createdAt: new Date("2024-10-10"),
+  }
+];
+
+// Mock invoice statistics
+export const mockInvoiceStatistics: InvoiceStatistics = {
+  totalInvoices: 5,
+  totalAmount: 23436,
+  paidAmount: 13500,
+  pendingAmount: 2160,
+  overdueAmount: 7776,
+  collectionRate: 57.6,
+  overdueCount: 1,
+  upcomingInvoices: 2,
+  monthlyTrend: [
+    { month: "Aug", amount: 15000, collected: 12000 },
+    { month: "Sep", amount: 18000, collected: 16500 },
+    { month: "Oct", amount: 20000, collected: 18000 },
+    { month: "Nov", amount: 23436, collected: 13500 },
+    { month: "Dec", amount: 12000, collected: 0 },
+  ],
+  clientBreakdown: [
+    {
+      clientId: "client-1",
+      clientName: "TechCorp Solutions",
+      invoiceCount: 1,
+      totalAmount: 6480,
+      paidAmount: 6480,
+    },
+    {
+      clientId: "client-2",
+      clientName: "Global Marketing Inc",
+      invoiceCount: 1,
+      totalAmount: 2160,
+      paidAmount: 0,
+    },
+    {
+      clientId: "client-3",
+      clientName: "Startup Ventures LLC",
+      invoiceCount: 1,
+      totalAmount: 7776,
+      paidAmount: 0,
+    },
+    {
+      clientId: "client-4",
+      clientName: "Digital Agency Pro",
+      invoiceCount: 1,
+      totalAmount: 4320,
+      paidAmount: 0,
+    },
+    {
+      clientId: "client-5",
+      clientName: "E-commerce Store Co",
+      invoiceCount: 1,
+      totalAmount: 2700,
+      paidAmount: 2700,
+    },
+  ],
+};

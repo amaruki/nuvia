@@ -24,6 +24,7 @@ import {
   CalendarYearView,
 } from "@/components/ui/full-calendar";
 import { Badge } from "@/components/ui/badge";
+import { id } from "date-fns/locale";
 
 import {
   Calendar as CalIcon,
@@ -175,6 +176,7 @@ function CalendarView({ onDateClick }: { onDateClick: (date: Date) => void }) {
       defaultDate={new Date()} // Start in current month to show current events
       view="month"
       onDateClick={onDateClick}
+      locale={id}
     >
       <div className="h-[75vh] min-h-[600px] flex flex-col bg-card rounded-xl border shadow-sm overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b bg-muted/30">

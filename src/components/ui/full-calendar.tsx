@@ -302,7 +302,7 @@ const CalendarWeekView = () => {
             )}
           >
             <div className="text-xs uppercase tracking-wider text-muted-foreground">
-              {format(date, 'EEE', { locale })}
+              {format(date, 'EEEE', { locale })}
             </div>
             <span
               className={cn(
@@ -457,7 +457,7 @@ const CalendarYearView = () => {
                 key={day}
                 className="text-center text-[10px] font-semibold text-muted-foreground uppercase"
               >
-                {day}
+                {day.substring(0, 3)}
               </div>
             ))}
           </div>
@@ -685,7 +685,7 @@ const generateWeekdays = (locale: Locale) => {
   const daysOfWeek = [];
   for (let i = 0; i < 7; i++) {
     const date = addDays(startOfWeek(new Date(), { weekStartsOn: 0 }), i);
-    daysOfWeek.push(format(date, 'EEEEEE', { locale }));
+    daysOfWeek.push(format(date, 'EEEE', { locale }));
   }
   return daysOfWeek;
 };

@@ -10,6 +10,7 @@ import { DashboardProvider, useHeader } from "@/contexts/dashboard-context";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { UserRole } from "@/types/dashboard.types";
+import { AnnouncementBanner } from "@/components/content/announcement-banner";
 
 /**
  * Props for the DashboardLayout component
@@ -110,7 +111,7 @@ function DashboardLayout({
           <div className="flex flex-col h-full">
             <DashboardHeaderWrapper user={user} />
 
-            <main className="flex-1">
+            <main className="flex-1 pb-20">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {children}
               </div>
@@ -118,6 +119,9 @@ function DashboardLayout({
 
             <DashboardFooter />
           </div>
+          
+          {/* Announcement Banner - Fixed at bottom */}
+          <AnnouncementBanner />
         </SidebarInset>
       </DashboardProvider>
     </SidebarProvider>

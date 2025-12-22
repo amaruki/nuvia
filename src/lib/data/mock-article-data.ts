@@ -1,0 +1,756 @@
+import { 
+  Article, 
+  ArticleStatistics, 
+  ArticleAuthor, 
+  ArticleTag,
+  ArticleType,
+  ArticleCategory,
+  ArticleStatus,
+  ArticleDifficulty,
+  ArticleFormat,
+  ARTICLE_TYPES,
+  ARTICLE_CATEGORIES,
+  ARTICLE_STATUSES,
+  ARTICLE_DIFFICULTIES,
+  ARTICLE_FORMATS
+} from "@/types/article.types";
+
+// Mock authors
+const mockAuthors: ArticleAuthor[] = [
+  {
+    id: "author_1",
+    name: "Dr. Sarah Johnson",
+    email: "sarah.johnson@nuvia.org",
+    avatar: "/avatars/sarah.jpg",
+    bio: "Research scientist with expertise in AI and machine learning",
+    role: "Research Director",
+    chapter: "San Francisco Bay Area",
+    committee: "Technology Committee",
+    expertise: ["artificial intelligence", "machine learning", "data science"]
+  },
+  {
+    id: "author_2",
+    name: "Michael Chen",
+    email: "michael.chen@nuvia.org",
+    avatar: "/avatars/michael.jpg",
+    bio: "Business strategist and management consultant",
+    role: "Business Analyst",
+    chapter: "New York Metro",
+    committee: "Business Development",
+    expertise: ["business strategy", "management", "digital transformation"]
+  },
+  {
+    id: "author_3",
+    name: "Emily Rodriguez",
+    email: "emily.rodriguez@nuvia.org",
+    avatar: "/avatars/emily.jpg",
+    bio: "Education specialist and curriculum developer",
+    role: "Education Lead",
+    chapter: "Austin",
+    committee: "Education Committee",
+    expertise: ["education", "curriculum development", "online learning"]
+  },
+  {
+    id: "author_4",
+    name: "James Wilson",
+    email: "james.wilson@nuvia.org",
+    avatar: "/avatars/james.jpg",
+    bio: "Industry analyst and trends researcher",
+    role: "Industry Analyst",
+    chapter: "Chicago",
+    committee: "Research Committee",
+    expertise: ["industry analysis", "market research", "trend forecasting"]
+  },
+  {
+    id: "author_5",
+    name: "Lisa Thompson",
+    email: "lisa.thompson@nuvia.org",
+    avatar: "/avatars/lisa.jpg",
+    bio: "Chapter president and community organizer",
+    role: "Chapter President",
+    chapter: "Seattle",
+    expertise: ["community management", "leadership", "member engagement"]
+  }
+];
+
+// Mock tags
+const mockTags: ArticleTag[] = [
+  { id: "tag_1", name: "artificial-intelligence", color: "#3B82F6", count: 28 },
+  { id: "tag_2", name: "machine-learning", color: "#10B981", count: 24 },
+  { id: "tag_3", name: "business-strategy", color: "#F59E0B", count: 19 },
+  { id: "tag_4", name: "digital-transformation", color: "#8B5CF6", count: 16 },
+  { id: "tag_5", name: "best-practices", color: "#EF4444", count: 31 },
+  { id: "tag_6", name: "case-study", color: "#06B6D4", count: 14 },
+  { id: "tag_7", name: "research", color: "#84CC16", count: 22 },
+  { id: "tag_8", name: "education", color: "#F97316", count: 18 },
+  { id: "tag_9", name: "industry-trends", color: "#6366F1", count: 25 },
+  { id: "tag_10", name: "innovation", color: "#EC4899", count: 17 },
+  { id: "tag_11", name: "leadership", color: "#14B8A6", count: 21 },
+  { id: "tag_12", name: "career-development", color: "#F59E0B", count: 15 },
+  { id: "tag_13", name: "community", color: "#8B5CF6", count: 29 },
+  { id: "tag_14", name: "technology", color: "#3B82F6", count: 33 },
+  { id: "tag_15", name: "tutorial", color: "#10B981", count: 26 }
+];
+
+// Mock articles
+const mockArticles: Article[] = [
+  {
+    id: "article_1",
+    title: "Getting Started with React Hooks: A Comprehensive Tutorial",
+    slug: "getting-started-react-hooks-tutorial",
+    excerpt: "Learn everything you need to know about React Hooks with this comprehensive tutorial covering useState, useEffect, and custom hooks.",
+    content: "React Hooks revolutionized how we write React components. In this comprehensive tutorial, we'll explore the fundamentals of React Hooks, starting with the basic hooks like useState and useEffect, then moving on to more advanced concepts like custom hooks and performance optimization. You'll learn through practical examples and real-world scenarios...",
+    type: "tutorial",
+    category: "technology",
+    status: "published",
+    format: "tutorial",
+    difficulty: "beginner",
+    author: mockAuthors[0],
+    coAuthors: [mockAuthors[2]],
+    tags: [mockTags[0], mockTags[1], mockTags[14], mockTags[13]],
+    featuredImage: "/images/react-hooks-tutorial.jpg",
+    gallery: ["/images/react-1.jpg", "/images/react-2.jpg"],
+    publishedAt: new Date("2024-11-15T10:00:00Z"),
+    lastModified: new Date("2024-11-14T15:30:00Z"),
+    readTime: 15,
+    wordCount: 3000,
+    estimatedReadingSpeed: 200,
+    seo: {
+      title: "Getting Started with React Hooks: Complete Tutorial | Nuvia",
+      description: "Comprehensive React Hooks tutorial covering useState, useEffect, and custom hooks with practical examples.",
+      keywords: ["React", "React Hooks", "useState", "useEffect", "tutorial", "frontend"],
+      ogImage: "/images/react-hooks-og.jpg"
+    },
+    metrics: {
+      views: 2450,
+      reads: 1890,
+      shares: 89,
+      comments: 45,
+      likes: 167,
+      bookmarks: 123,
+      averageReadTime: 12.5,
+      completionRate: 77.2,
+      engagementScore: 85,
+      bounceRate: 22.8
+    },
+    visibility: "public",
+    version: 1,
+    language: "en",
+    commentsEnabled: true,
+    sharingEnabled: true,
+    downloadEnabled: true,
+    isFeatured: true,
+    isPinned: false,
+    priority: 8
+  },
+  {
+    id: "article_2",
+    title: "The Future of Remote Work: Business Strategy Insights",
+    slug: "future-remote-work-business-strategy",
+    excerpt: "Explore how remote work is transforming business strategies and what organizations need to do to adapt to this new reality.",
+    content: "Remote work has fundamentally transformed how businesses operate. This comprehensive analysis explores the latest trends in remote work, from technology infrastructure to cultural changes. We examine successful case studies, identify common challenges, and provide actionable strategies for organizations looking to optimize their remote work policies...",
+    type: "opinion",
+    category: "business",
+    status: "published",
+    format: "standard",
+    difficulty: "intermediate",
+    author: mockAuthors[1],
+    tags: [mockTags[3], mockTags[2], mockTags[9], mockTags[11]],
+    featuredImage: "/images/remote-work-future.jpg",
+    publishedAt: new Date("2024-11-10T14:30:00Z"),
+    lastModified: new Date("2024-11-09T11:20:00Z"),
+    readTime: 12,
+    wordCount: 2400,
+    estimatedReadingSpeed: 200,
+    seo: {
+      title: "Future of Remote Work: Business Strategy | Nuvia Insights",
+      description: "Business strategy insights on the future of remote work and organizational adaptation.",
+      keywords: ["remote work", "business strategy", "future of work", "organizational change"]
+    },
+    metrics: {
+      views: 1680,
+      reads: 1340,
+      shares: 67,
+      comments: 28,
+      likes: 134,
+      bookmarks: 89,
+      averageReadTime: 10.2,
+      completionRate: 79.8,
+      engagementScore: 78,
+      bounceRate: 20.2
+    },
+    visibility: "members_only",
+    version: 1,
+    language: "en",
+    commentsEnabled: true,
+    sharingEnabled: true,
+    downloadEnabled: true,
+    isFeatured: false,
+    isPinned: false,
+    priority: 5
+  },
+  {
+    id: "article_3",
+    title: "Building Effective Online Learning Communities: Best Practices Guide",
+    slug: "effective-online-learning-communities-guide",
+    excerpt: "A comprehensive guide to creating and managing thriving online learning communities that drive engagement and knowledge sharing.",
+    content: "Online learning communities are essential for modern education. This guide covers everything from platform selection and community design to engagement strategies and measurement. Learn how to create spaces where members actively participate, share knowledge, and support each other's learning journey...",
+    type: "guide",
+    category: "education",
+    status: "published",
+    format: "standard",
+    difficulty: "intermediate",
+    author: mockAuthors[2],
+    tags: [mockTags[8], mockTags[5], mockTags[13], mockTags[7]],
+    featuredImage: "/images/online-learning-communities.jpg",
+    publishedAt: new Date("2024-11-05T09:15:00Z"),
+    lastModified: new Date("2024-11-04T16:45:00Z"),
+    readTime: 18,
+    wordCount: 3600,
+    estimatedReadingSpeed: 200,
+    seo: {
+      title: "Building Online Learning Communities: Best Practices | Nuvia",
+      description: "Comprehensive guide to creating effective online learning communities with proven strategies.",
+      keywords: ["online learning", "community building", "education", "best practices"]
+    },
+    metrics: {
+      views: 1920,
+      reads: 1560,
+      shares: 78,
+      comments: 34,
+      likes: 145,
+      bookmarks: 112,
+      averageReadTime: 14.8,
+      completionRate: 81.3,
+      engagementScore: 82,
+      bounceRate: 18.7
+    },
+    visibility: "public",
+    version: 1,
+    language: "en",
+    commentsEnabled: true,
+    sharingEnabled: true,
+    downloadEnabled: true,
+    isFeatured: true,
+    isPinned: true,
+    priority: 7
+  },
+  {
+    id: "article_4",
+    title: "Industry Trends Report: AI Adoption in 2024",
+    slug: "ai-adoption-trends-2024-report",
+    excerpt: "Comprehensive analysis of artificial intelligence adoption trends across industries in 2024 with key insights and predictions.",
+    content: "Our annual AI adoption report provides deep insights into how organizations are implementing artificial intelligence across different sectors. This 2024 edition covers adoption rates, implementation challenges, ROI measurements, and future predictions based on survey data from over 500 organizations...",
+    type: "research_summary",
+    category: "research",
+    status: "published",
+    format: "standard",
+    difficulty: "advanced",
+    author: mockAuthors[3],
+    coAuthors: [mockAuthors[0]],
+    tags: [mockTags[0], mockTags[9], mockTags[7], mockTags[14]],
+    featuredImage: "/images/ai-adoption-2024.jpg",
+    attachments: [
+      {
+        id: "att_1",
+        name: "AI-Adoption-2024-Full-Report.pdf",
+        url: "/files/ai-adoption-2024.pdf",
+        size: 3456789,
+        type: "application/pdf"
+      }
+    ],
+    publishedAt: new Date("2024-11-01T08:00:00Z"),
+    lastModified: new Date("2024-10-31T17:30:00Z"),
+    readTime: 22,
+    wordCount: 4400,
+    estimatedReadingSpeed: 200,
+    seo: {
+      title: "AI Adoption Trends 2024: Industry Report | Nuvia Research",
+      description: "Comprehensive analysis of AI adoption trends across industries in 2024.",
+      keywords: ["AI adoption", "artificial intelligence", "industry trends", "2024 report"]
+    },
+    metrics: {
+      views: 2890,
+      reads: 2230,
+      shares: 112,
+      comments: 56,
+      likes: 198,
+      bookmarks: 167,
+      averageReadTime: 18.5,
+      completionRate: 77.2,
+      engagementScore: 88,
+      bounceRate: 22.8
+    },
+    visibility: "premium_only",
+    version: 1,
+    language: "en",
+    commentsEnabled: true,
+    sharingEnabled: true,
+    downloadEnabled: true,
+    isFeatured: true,
+    isPinned: false,
+    priority: 9
+  },
+  {
+    id: "article_5",
+    title: "Member Spotlight: From Junior Developer to Tech Lead",
+    slug: "member-spotlight-junior-to-tech-lead",
+    excerpt: "An inspiring interview with Sarah Chen about her journey from junior developer to technology team lead in just 5 years.",
+    content: "Sarah Chen's career journey is nothing short of inspiring. Starting as a junior developer with no formal computer science degree, she worked her way up to become a technology team lead at a major tech company. In this exclusive interview, Sarah shares her strategies for continuous learning, overcoming imposter syndrome, and leading technical teams effectively...",
+    type: "interview",
+    category: "member_stories",
+    status: "published",
+    format: "interview",
+    difficulty: "beginner",
+    author: mockAuthors[4],
+    tags: [mockTags[11], mockTags[12], mockTags[13], mockTags[5]],
+    featuredImage: "/images/sarah-chen-interview.jpg",
+    gallery: ["/images/sarah-1.jpg", "/images/sarah-2.jpg", "/images/sarah-3.jpg"],
+    publishedAt: new Date("2024-10-28T12:00:00Z"),
+    lastModified: new Date("2024-10-27T14:15:00Z"),
+    readTime: 10,
+    wordCount: 2000,
+    estimatedReadingSpeed: 200,
+    seo: {
+      title: "Member Spotlight: Junior Developer to Tech Lead | Nuvia",
+      description: "Interview with Sarah Chen about her career journey from junior developer to tech lead.",
+      keywords: ["career development", "tech lead", "interview", "member story"]
+    },
+    metrics: {
+      views: 1340,
+      reads: 1120,
+      shares: 45,
+      comments: 23,
+      likes: 89,
+      bookmarks: 67,
+      averageReadTime: 8.5,
+      completionRate: 83.6,
+      engagementScore: 76,
+      bounceRate: 16.4
+    },
+    visibility: "public",
+    version: 1,
+    language: "en",
+    commentsEnabled: true,
+    sharingEnabled: true,
+    downloadEnabled: false,
+    isFeatured: false,
+    isPinned: false,
+    priority: 4
+  },
+  {
+    id: "article_6",
+    title: "10 Best Practices for Remote Team Management",
+    slug: "best-practices-remote-team-management",
+    excerpt: "Essential strategies and best practices for effectively managing remote teams in today's distributed work environment.",
+    content: "Managing remote teams requires a different approach than traditional office management. This comprehensive guide covers 10 essential practices that successful remote team managers use to maintain productivity, engagement, and team cohesion. From communication strategies to performance measurement, learn proven techniques...",
+    type: "opinion",
+    category: "best_practices",
+    status: "review",
+    format: "listicle",
+    difficulty: "intermediate",
+    author: mockAuthors[1],
+    reviewer: mockAuthors[4],
+    tags: [mockTags[5], mockTags[3], mockTags[11], mockTags[2]],
+    featuredImage: "/images/remote-team-management.jpg",
+    lastModified: new Date("2024-11-16T10:30:00Z"),
+    readTime: 14,
+    wordCount: 2800,
+    estimatedReadingSpeed: 200,
+    seo: {
+      title: "10 Best Practices for Remote Team Management | Nuvia",
+      description: "Essential strategies for effectively managing remote teams in distributed environments.",
+      keywords: ["remote management", "team leadership", "best practices", "distributed teams"]
+    },
+    metrics: {
+      views: 0,
+      reads: 0,
+      shares: 0,
+      comments: 0,
+      likes: 0,
+      bookmarks: 0,
+      averageReadTime: 0,
+      completionRate: 0,
+      engagementScore: 0,
+      bounceRate: 0
+    },
+    visibility: "public",
+    version: 1,
+    language: "en",
+    commentsEnabled: false,
+    sharingEnabled: false,
+    downloadEnabled: false,
+    isFeatured: false,
+    isPinned: false,
+    priority: 6
+  },
+  {
+    id: "article_7",
+    title: "Seattle Chapter Launches Mentorship Program",
+    slug: "seattle-chapter-mentorship-program",
+    excerpt: "Exciting news from our Seattle chapter as they launch an innovative mentorship program connecting experienced members with newcomers.",
+    content: "The Seattle chapter is proud to announce the launch of our new mentorship program designed to foster connections between experienced members and those new to our community. The program includes monthly meetups, skill-sharing workshops, and one-on-one mentoring sessions. Learn how you can participate as either a mentor or mentee...",
+    type: "news",
+    category: "chapter_news",
+    status: "published",
+    format: "standard",
+    difficulty: "beginner",
+    author: mockAuthors[4],
+    tags: [mockTags[13], mockTags[8], mockTags[11]],
+    featuredImage: "/images/seattle-mentorship.jpg",
+    publishedAt: new Date("2024-11-12T16:00:00Z"),
+    lastModified: new Date("2024-11-11T13:45:00Z"),
+    readTime: 8,
+    wordCount: 1600,
+    estimatedReadingSpeed: 200,
+    seo: {
+      title: "Seattle Chapter Mentorship Program | Nuvia News",
+      description: "Seattle chapter launches innovative mentorship program for community members.",
+      keywords: ["Seattle chapter", "mentorship program", "community news", "member development"]
+    },
+    metrics: {
+      views: 789,
+      reads: 645,
+      shares: 23,
+      comments: 12,
+      likes: 56,
+      bookmarks: 34,
+      averageReadTime: 6.8,
+      completionRate: 81.8,
+      engagementScore: 72,
+      bounceRate: 18.2
+    },
+    visibility: "chapter_only",
+    allowedChapters: ["seattle"],
+    version: 1,
+    language: "en",
+    commentsEnabled: true,
+    sharingEnabled: true,
+    downloadEnabled: true,
+    isFeatured: false,
+    isPinned: false,
+    priority: 3
+  },
+  {
+    id: "article_8",
+    title: "Advanced Machine Learning Techniques for Community Analytics",
+    slug: "advanced-ml-community-analytics",
+    excerpt: "Deep dive into sophisticated machine learning approaches for analyzing community engagement and predicting member behavior.",
+    content: "This advanced technical article explores cutting-edge machine learning techniques specifically applied to community analytics. We cover neural networks for engagement prediction, natural language processing for sentiment analysis, and clustering algorithms for member segmentation. Includes code examples and implementation strategies...",
+    type: "tutorial",
+    category: "technology",
+    status: "scheduled",
+    format: "tutorial",
+    difficulty: "advanced",
+    author: mockAuthors[0],
+    tags: [mockTags[1], mockTags[0], mockTags[7], mockTags[14]],
+    featuredImage: "/images/ml-community-analytics.jpg",
+    scheduledFor: new Date("2024-12-01T09:00:00Z"),
+    lastModified: new Date("2024-11-15T11:20:00Z"),
+    readTime: 28,
+    wordCount: 5600,
+    estimatedReadingSpeed: 200,
+    seo: {
+      title: "Advanced ML for Community Analytics | Nuvia Technical",
+      description: "Sophisticated machine learning techniques for community engagement analysis and prediction.",
+      keywords: ["machine learning", "community analytics", "neural networks", "NLP"]
+    },
+    metrics: {
+      views: 0,
+      reads: 0,
+      shares: 0,
+      comments: 0,
+      likes: 0,
+      bookmarks: 0,
+      averageReadTime: 0,
+      completionRate: 0,
+      engagementScore: 0,
+      bounceRate: 0
+    },
+    visibility: "premium_only",
+    version: 1,
+    language: "en",
+    commentsEnabled: true,
+    sharingEnabled: true,
+    downloadEnabled: true,
+    isFeatured: false,
+    isPinned: false,
+    priority: 7
+  },
+  {
+    id: "article_9",
+    title: "Draft: Innovation Framework for Digital Communities",
+    slug: "innovation-framework-digital-communities",
+    excerpt: "A structured approach to fostering innovation within digital community organizations and measuring its impact on growth.",
+    content: "This is a draft article exploring innovation frameworks specifically designed for digital communities. The content is still being developed and will include case studies, implementation guides, and measurement strategies for fostering innovation in online community settings...",
+    type: "guide",
+    category: "business",
+    status: "draft",
+    format: "standard",
+    difficulty: "intermediate",
+    author: mockAuthors[1],
+    tags: [mockTags[10], mockTags[2], mockTags[13]],
+    lastModified: new Date("2024-11-16T09:45:00Z"),
+    readTime: 0,
+    wordCount: 1200,
+    estimatedReadingSpeed: 200,
+    seo: {
+      title: "Innovation Framework for Digital Communities | Nuvia Draft",
+      description: "Structured approach to fostering innovation in digital community organizations.",
+      keywords: ["innovation", "digital communities", "framework", "strategy"]
+    },
+    metrics: {
+      views: 0,
+      reads: 0,
+      shares: 0,
+      comments: 0,
+      likes: 0,
+      bookmarks: 0,
+      averageReadTime: 0,
+      completionRate: 0,
+      engagementScore: 0,
+      bounceRate: 0
+    },
+    visibility: "public",
+    version: 1,
+    language: "en",
+    commentsEnabled: false,
+    sharingEnabled: false,
+    downloadEnabled: false,
+    isFeatured: false,
+    isPinned: false,
+    priority: 2
+  },
+  {
+    id: "article_10",
+    title: "Archived: 2023 Community Engagement Annual Report",
+    slug: "2023-community-engagement-annual-report",
+    excerpt: "Complete annual report for 2023 including community engagement statistics, member participation metrics, and strategic achievements.",
+    content: "This archived report provides a comprehensive overview of our community's engagement performance in 2023. While some information may be outdated, it serves as an important historical record of our achievements, challenges, and growth patterns. The report includes detailed metrics on member participation, content engagement, event attendance, and community health indicators...",
+    type: "research_summary",
+    category: "announcements",
+    status: "archived",
+    format: "standard",
+    difficulty: "intermediate",
+    author: mockAuthors[3],
+    tags: [mockTags[9], mockTags[7], mockTags[13]],
+    featuredImage: "/images/2023-engagement-report.jpg",
+    publishedAt: new Date("2023-12-31T23:59:59Z"),
+    lastModified: new Date("2023-12-30T16:30:00Z"),
+    readTime: 25,
+    wordCount: 5000,
+    estimatedReadingSpeed: 200,
+    seo: {
+      title: "2023 Community Engagement Annual Report | Nuvia Archives",
+      description: "Complete annual report for 2023 with community engagement statistics and achievements.",
+      keywords: ["annual report", "2023", "community engagement", "archived"]
+    },
+    metrics: {
+      views: 1560,
+      reads: 1230,
+      shares: 67,
+      comments: 34,
+      likes: 123,
+      bookmarks: 89,
+      averageReadTime: 20.5,
+      completionRate: 78.8,
+      engagementScore: 81,
+      bounceRate: 21.2
+    },
+    visibility: "public",
+    version: 1,
+    language: "en",
+    commentsEnabled: false,
+    sharingEnabled: true,
+    downloadEnabled: true,
+    isFeatured: false,
+    isPinned: false,
+    priority: 1
+  }
+];
+
+// Mock statistics
+const mockStatistics: ArticleStatistics = {
+  totalArticles: mockArticles.length,
+  publishedArticles: mockArticles.filter(a => a.status === 'published').length,
+  draftArticles: mockArticles.filter(a => a.status === 'draft').length,
+  scheduledArticles: mockArticles.filter(a => a.status === 'scheduled').length,
+  archivedArticles: mockArticles.filter(a => a.status === 'archived').length,
+  
+  totalViews: mockArticles.reduce((sum, a) => sum + a.metrics.views, 0),
+  totalReads: mockArticles.reduce((sum, a) => sum + a.metrics.reads, 0),
+  totalShares: mockArticles.reduce((sum, a) => sum + a.metrics.shares, 0),
+  totalComments: mockArticles.reduce((sum, a) => sum + a.metrics.comments, 0),
+  totalLikes: mockArticles.reduce((sum, a) => sum + a.metrics.likes, 0),
+  totalBookmarks: mockArticles.reduce((sum, a) => sum + a.metrics.bookmarks, 0),
+  averageEngagementScore: Math.round(
+    mockArticles.reduce((sum, a) => sum + a.metrics.engagementScore, 0) / mockArticles.length
+  ),
+  averageReadTime: Math.round(
+    mockArticles.reduce((sum, a) => sum + a.metrics.averageReadTime, 0) / mockArticles.length
+  ),
+  averageCompletionRate: Math.round(
+    mockArticles.reduce((sum, a) => sum + a.metrics.completionRate, 0) / mockArticles.length
+  ),
+  
+  articlesByType: ARTICLE_TYPES.map(type => ({
+    type,
+    count: mockArticles.filter(a => a.type === type).length,
+    views: mockArticles.filter(a => a.type === type).reduce((sum, a) => sum + a.metrics.views, 0),
+    reads: mockArticles.filter(a => a.type === type).reduce((sum, a) => sum + a.metrics.reads, 0),
+    engagement: Math.round(
+      mockArticles.filter(a => a.type === type).reduce((sum, a) => sum + a.metrics.engagementScore, 0) / 
+      Math.max(1, mockArticles.filter(a => a.type === type).length)
+    )
+  })),
+  
+  articlesByCategory: ARTICLE_CATEGORIES.map(category => ({
+    category,
+    count: mockArticles.filter(a => a.category === category).length,
+    views: mockArticles.filter(a => a.category === category).reduce((sum, a) => sum + a.metrics.views, 0),
+    reads: mockArticles.filter(a => a.category === category).reduce((sum, a) => sum + a.metrics.reads, 0),
+    engagement: Math.round(
+      mockArticles.filter(a => a.category === category).reduce((sum, a) => sum + a.metrics.engagementScore, 0) / 
+      Math.max(1, mockArticles.filter(a => a.category === category).length)
+    )
+  })),
+  
+  articlesByDifficulty: ARTICLE_DIFFICULTIES.map(difficulty => ({
+    difficulty,
+    count: mockArticles.filter(a => a.difficulty === difficulty).length,
+    views: mockArticles.filter(a => a.difficulty === difficulty).reduce((sum, a) => sum + a.metrics.views, 0),
+    reads: mockArticles.filter(a => a.difficulty === difficulty).reduce((sum, a) => sum + a.metrics.reads, 0),
+    engagement: Math.round(
+      mockArticles.filter(a => a.difficulty === difficulty).reduce((sum, a) => sum + a.metrics.engagementScore, 0) / 
+      Math.max(1, mockArticles.filter(a => a.difficulty === difficulty).length)
+    )
+  })),
+  
+  articlesByStatus: ARTICLE_STATUSES.map(status => ({
+    status,
+    count: mockArticles.filter(a => a.status === status).length
+  })),
+  
+  topPerformingArticles: mockArticles
+    .filter(a => a.status === 'published')
+    .sort((a, b) => b.metrics.engagementScore - a.metrics.engagementScore)
+    .slice(0, 5)
+    .map(a => ({
+      articleId: a.id,
+      title: a.title,
+      author: a.author.name,
+      views: a.metrics.views,
+      reads: a.metrics.reads,
+      engagementScore: a.metrics.engagementScore,
+      completionRate: a.metrics.completionRate,
+      type: a.type,
+      category: a.category
+    })),
+  
+  recentActivity: [
+    {
+      id: "activity_1",
+      articleId: "article_6",
+      title: "10 Best Practices for Remote Team Management",
+      action: "updated",
+      author: "Michael Chen",
+      timestamp: new Date("2024-11-16T10:30:00Z")
+    },
+    {
+      id: "activity_2",
+      articleId: "article_9",
+      title: "Innovation Framework for Digital Communities",
+      action: "created",
+      author: "Michael Chen",
+      timestamp: new Date("2024-11-16T09:45:00Z")
+    },
+    {
+      id: "activity_3",
+      articleId: "article_8",
+      title: "Advanced Machine Learning Techniques for Community Analytics",
+      action: "created",
+      author: "Dr. Sarah Johnson",
+      timestamp: new Date("2024-11-15T11:20:00Z")
+    },
+    {
+      id: "activity_4",
+      articleId: "article_1",
+      title: "Getting Started with React Hooks: A Comprehensive Tutorial",
+      action: "published",
+      author: "Dr. Sarah Johnson",
+      timestamp: new Date("2024-11-15T10:00:00Z")
+    },
+    {
+      id: "activity_5",
+      articleId: "article_7",
+      title: "Seattle Chapter Launches Mentorship Program",
+      action: "published",
+      author: "Lisa Thompson",
+      timestamp: new Date("2024-11-12T16:00:00Z")
+    }
+  ],
+  
+  monthlyTrend: [
+    {
+      month: "November 2024",
+      articlesCreated: 4,
+      articlesPublished: 3,
+      totalViews: 6234,
+      totalReads: 4890,
+      totalEngagement: 398
+    },
+    {
+      month: "October 2024",
+      articlesCreated: 3,
+      articlesPublished: 2,
+      totalViews: 4567,
+      totalReads: 3678,
+      totalEngagement: 298
+    },
+    {
+      month: "September 2024",
+      articlesCreated: 2,
+      articlesPublished: 4,
+      totalViews: 5234,
+      totalReads: 4123,
+      totalEngagement: 387
+    },
+    {
+      month: "August 2024",
+      articlesCreated: 5,
+      articlesPublished: 3,
+      totalViews: 5890,
+      totalReads: 4678,
+      totalEngagement: 445
+    },
+    {
+      month: "July 2024",
+      articlesCreated: 3,
+      articlesPublished: 4,
+      totalViews: 5123,
+      totalReads: 4012,
+      totalEngagement: 398
+    },
+    {
+      month: "June 2024",
+      articlesCreated: 4,
+      articlesPublished: 2,
+      totalViews: 4789,
+      totalReads: 3789,
+      totalEngagement: 356
+    }
+  ],
+  
+  readingPatterns: {
+    peakReadingHours: [9, 10, 14, 19, 20, 21],
+    averageSessionDuration: 12.5,
+    mostReadCategories: ["technology", "education", "business"],
+    deviceBreakdown: {
+      desktop: 65,
+      mobile: 28,
+      tablet: 7
+    }
+  }
+};
+
+export { mockArticles, mockStatistics, mockAuthors, mockTags };

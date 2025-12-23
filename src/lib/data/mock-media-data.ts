@@ -1,0 +1,565 @@
+import { 
+  Media, 
+  MediaFolder, 
+  MediaVersion, 
+  MediaUsage, 
+  MediaPermission, 
+  MediaAnalytics,
+  MediaType, 
+  MediaStatus, 
+  MediaVisibility,
+  MediaTag,
+  MediaMetadata,
+  MediaDimensions
+} from '@/types/media.types';
+
+// Helper function to generate random dates
+const randomDate = (start: Date, end: Date): Date => {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+};
+
+// Helper function to generate random dimensions
+const randomDimensions = (): MediaDimensions => ({
+  width: Math.floor(Math.random() * 2000) + 500,
+  height: Math.floor(Math.random() * 1500) + 300,
+  aspectRatio: 0
+});
+
+// Generate mock media tags
+const mockTags: MediaTag[] = [
+  {
+    id: 'tag_1',
+    name: 'featured',
+    slug: 'featured',
+    color: '#3B82F6',
+    description: 'Featured content',
+    count: 15,
+    createdAt: new Date('2024-01-15'),
+    createdBy: 'admin'
+  },
+  {
+    id: 'tag_2',
+    name: 'banner',
+    slug: 'banner',
+    color: '#10B981',
+    description: 'Banner images',
+    count: 8,
+    createdAt: new Date('2024-01-20'),
+    createdBy: 'admin'
+  },
+  {
+    id: 'tag_3',
+    name: 'thumbnail',
+    slug: 'thumbnail',
+    color: '#F59E0B',
+    description: 'Thumbnail images',
+    count: 25,
+    createdAt: new Date('2024-01-25'),
+    createdBy: 'admin'
+  },
+  {
+    id: 'tag_4',
+    name: 'document',
+    slug: 'document',
+    color: '#EF4444',
+    description: 'Document files',
+    count: 12,
+    createdAt: new Date('2024-02-01'),
+    createdBy: 'admin'
+  },
+  {
+    id: 'tag_5',
+    name: 'video',
+    slug: 'video',
+    color: '#8B5CF6',
+    description: 'Video content',
+    count: 6,
+    createdAt: new Date('2024-02-05'),
+    createdBy: 'admin'
+  }
+];
+
+// Generate mock media data
+const mockMediaData: Media[] = [
+  {
+    id: 'media_1',
+    title: 'Community Meeting Photo',
+    slug: 'community-meeting-photo',
+    description: 'Annual community meeting group photo',
+    altText: 'Group of community members meeting in conference room',
+    caption: 'Annual community meeting 2024',
+    type: 'image',
+    status: 'ready',
+    visibility: 'public',
+    url: 'https://example.com/media/community-meeting.jpg',
+    thumbnailUrl: 'https://example.com/media/thumbnails/community-meeting-thumb.jpg',
+    previewUrl: 'https://example.com/media/previews/community-meeting-preview.jpg',
+    folderId: 'folder_1',
+    folderPath: '/images/events',
+    tags: [mockTags[0], mockTags[2]],
+    categories: ['events', 'community'],
+    metadata: {
+      originalName: 'community-meeting.jpg',
+      fileName: 'community-meeting.jpg',
+      fileExtension: 'jpg',
+      mimeType: 'image/jpeg',
+      size: 2048576,
+      sizeFormatted: '2.0 MB',
+      dimensions: randomDimensions(),
+      colorSpace: 'RGB',
+      hasTransparency: false,
+      dominantColor: '#3B82F6',
+      colorPalette: ['#3B82F6', '#10B981', '#F59E0B'],
+      checksum: 'abc123def456',
+      customFields: {}
+    },
+    currentVersion: 1,
+    versions: [],
+    usage: [],
+    permissions: [],
+    analytics: [],
+    storageType: 's3',
+    storagePath: '/media/images/community-meeting.jpg',
+    cdnUrl: 'https://cdn.example.com/media/images/community-meeting.jpg',
+    isOptimized: true,
+    compressionLevel: 'medium',
+    hasWebpVersion: true,
+    hasAvifVersion: false,
+    allowedRoles: [],
+    allowedChapters: [],
+    allowedCommittees: [],
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-01-15'),
+    createdBy: 'admin',
+    isFeatured: true,
+    priority: 5,
+    customFields: {}
+  },
+  {
+    id: 'media_2',
+    title: 'Welcome Video',
+    slug: 'welcome-video',
+    description: 'Welcome video for new members',
+    altText: 'Welcome video thumbnail',
+    caption: 'Welcome to our community!',
+    type: 'video',
+    status: 'ready',
+    visibility: 'public',
+    url: 'https://example.com/media/welcome-video.mp4',
+    thumbnailUrl: 'https://example.com/media/thumbnails/welcome-video-thumb.jpg',
+    previewUrl: 'https://example.com/media/previews/welcome-video-preview.jpg',
+    folderId: 'folder_2',
+    folderPath: '/videos',
+    tags: [mockTags[4]],
+    categories: ['videos', 'onboarding'],
+    metadata: {
+      originalName: 'welcome-video.mp4',
+      fileName: 'welcome-video.mp4',
+      fileExtension: 'mp4',
+      mimeType: 'video/mp4',
+      size: 52428800,
+      sizeFormatted: '50.0 MB',
+      dimensions: randomDimensions(),
+      duration: 180,
+      fps: 30,
+      bitrate: 2000,
+      checksum: 'def456ghi789',
+      customFields: {}
+    },
+    currentVersion: 1,
+    versions: [],
+    usage: [],
+    permissions: [],
+    analytics: [],
+    storageType: 's3',
+    storagePath: '/media/videos/welcome-video.mp4',
+    cdnUrl: 'https://cdn.example.com/media/videos/welcome-video.mp4',
+    isOptimized: true,
+    compressionLevel: 'high',
+    hasWebpVersion: false,
+    hasAvifVersion: false,
+    allowedRoles: [],
+    allowedChapters: [],
+    allowedCommittees: [],
+    createdAt: new Date('2024-01-20'),
+    updatedAt: new Date('2024-01-20'),
+    createdBy: 'admin',
+    isFeatured: true,
+    priority: 8,
+    customFields: {}
+  },
+  {
+    id: 'media_3',
+    title: 'Annual Report PDF',
+    slug: 'annual-report-pdf',
+    description: 'Annual community report for 2023',
+    altText: 'Annual report document',
+    caption: '2023 Annual Report',
+    type: 'pdf',
+    status: 'ready',
+    visibility: 'restricted',
+    url: 'https://example.com/media/annual-report-2023.pdf',
+    thumbnailUrl: 'https://example.com/media/thumbnails/annual-report-thumb.jpg',
+    previewUrl: 'https://example.com/media/previews/annual-report-preview.jpg',
+    folderId: 'folder_3',
+    folderPath: '/documents/reports',
+    tags: [mockTags[3]],
+    categories: ['documents', 'reports'],
+    metadata: {
+      originalName: 'annual-report-2023.pdf',
+      fileName: 'annual-report-2023.pdf',
+      fileExtension: 'pdf',
+      mimeType: 'application/pdf',
+      size: 10485760,
+      sizeFormatted: '10.0 MB',
+      pageCount: 45,
+      author: 'Community Admin',
+      subject: 'Annual Report 2023',
+      checksum: 'ghi789jkl012',
+      customFields: {}
+    },
+    currentVersion: 1,
+    versions: [],
+    usage: [],
+    permissions: [],
+    analytics: [],
+    storageType: 'local',
+    storagePath: '/uploads/documents/annual-report-2023.pdf',
+    isOptimized: false,
+    compressionLevel: 'none',
+    hasWebpVersion: false,
+    hasAvifVersion: false,
+    allowedRoles: ['member', 'admin'],
+    allowedChapters: [],
+    allowedCommittees: [],
+    createdAt: new Date('2024-02-01'),
+    updatedAt: new Date('2024-02-01'),
+    createdBy: 'admin',
+    isFeatured: false,
+    priority: 3,
+    customFields: {}
+  },
+  {
+    id: 'media_4',
+    title: 'Logo Vector',
+    slug: 'logo-vector',
+    description: 'Community logo in vector format',
+    altText: 'Community logo',
+    caption: 'Official community logo',
+    type: 'vector',
+    status: 'ready',
+    visibility: 'public',
+    url: 'https://example.com/media/logo.svg',
+    thumbnailUrl: 'https://example.com/media/thumbnails/logo-thumb.png',
+    previewUrl: 'https://example.com/media/previews/logo-preview.png',
+    folderId: 'folder_1',
+    folderPath: '/images/branding',
+    tags: [mockTags[0]],
+    categories: ['branding', 'logo'],
+    metadata: {
+      originalName: 'logo.svg',
+      fileName: 'logo.svg',
+      fileExtension: 'svg',
+      mimeType: 'image/svg+xml',
+      size: 524288,
+      sizeFormatted: '512.0 KB',
+      checksum: 'jkl012mno345',
+      customFields: {}
+    },
+    currentVersion: 1,
+    versions: [],
+    usage: [],
+    permissions: [],
+    analytics: [],
+    storageType: 's3',
+    storagePath: '/media/images/branding/logo.svg',
+    cdnUrl: 'https://cdn.example.com/media/images/branding/logo.svg',
+    isOptimized: true,
+    compressionLevel: 'none',
+    hasWebpVersion: true,
+    hasAvifVersion: true,
+    allowedRoles: [],
+    allowedChapters: [],
+    allowedCommittees: [],
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-01-10'),
+    createdBy: 'admin',
+    isFeatured: true,
+    priority: 10,
+    customFields: {}
+  },
+  {
+    id: 'media_5',
+    title: 'Podcast Episode 1',
+    slug: 'podcast-episode-1',
+    description: 'First episode of community podcast',
+    altText: 'Podcast audio player',
+    caption: 'Community Podcast - Episode 1',
+    type: 'audio',
+    status: 'ready',
+    visibility: 'public',
+    url: 'https://example.com/media/podcast-ep1.mp3',
+    thumbnailUrl: 'https://example.com/media/thumbnails/podcast-ep1-thumb.jpg',
+    previewUrl: 'https://example.com/media/previews/podcast-ep1-preview.jpg',
+    folderId: 'folder_2',
+    folderPath: '/audio/podcast',
+    tags: [mockTags[4]],
+    categories: ['audio', 'podcast'],
+    metadata: {
+      originalName: 'podcast-ep1.mp3',
+      fileName: 'podcast-ep1.mp3',
+      fileExtension: 'mp3',
+      mimeType: 'audio/mpeg',
+      size: 15728640,
+      sizeFormatted: '15.0 MB',
+      duration: 1800,
+      bitrate: 128,
+      checksum: 'mno345pqr678',
+      customFields: {}
+    },
+    currentVersion: 1,
+    versions: [],
+    usage: [],
+    permissions: [],
+    analytics: [],
+    storageType: 's3',
+    storagePath: '/media/audio/podcast/podcast-ep1.mp3',
+    cdnUrl: 'https://cdn.example.com/media/audio/podcast/podcast-ep1.mp3',
+    isOptimized: true,
+    compressionLevel: 'medium',
+    hasWebpVersion: false,
+    hasAvifVersion: false,
+    allowedRoles: [],
+    allowedChapters: [],
+    allowedCommittees: [],
+    createdAt: new Date('2024-02-15'),
+    updatedAt: new Date('2024-02-15'),
+    createdBy: 'admin',
+    isFeatured: false,
+    priority: 4,
+    customFields: {}
+  }
+];
+
+// Generate mock folders
+const mockFolders: MediaFolder[] = [
+  {
+    id: 'folder_1',
+    name: 'Images',
+    slug: 'images',
+    description: 'All image files',
+    parentId: undefined,
+    path: '/images',
+    level: 0,
+    order: 1,
+    color: '#3B82F6',
+    icon: 'image',
+    visibility: 'public',
+    allowedRoles: [],
+    allowedChapters: [],
+    allowedCommittees: [],
+    mediaCount: 15,
+    totalSize: 52428800,
+    lastModified: new Date('2024-02-15'),
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-02-15'),
+    createdBy: 'admin'
+  },
+  {
+    id: 'folder_2',
+    name: 'Videos',
+    slug: 'videos',
+    description: 'Video content and multimedia',
+    parentId: undefined,
+    path: '/videos',
+    level: 0,
+    order: 2,
+    color: '#8B5CF6',
+    icon: 'video',
+    visibility: 'public',
+    allowedRoles: [],
+    allowedChapters: [],
+    allowedCommittees: [],
+    mediaCount: 8,
+    totalSize: 1073741824,
+    lastModified: new Date('2024-02-10'),
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-02-10'),
+    createdBy: 'admin'
+  },
+  {
+    id: 'folder_3',
+    name: 'Documents',
+    slug: 'documents',
+    description: 'PDF and document files',
+    parentId: undefined,
+    path: '/documents',
+    level: 0,
+    order: 3,
+    color: '#EF4444',
+    icon: 'file-text',
+    visibility: 'restricted',
+    allowedRoles: ['member', 'admin'],
+    allowedChapters: [],
+    allowedCommittees: [],
+    mediaCount: 12,
+    totalSize: 524288000,
+    lastModified: new Date('2024-02-01'),
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-02-01'),
+    createdBy: 'admin'
+  }
+];
+
+// Generate mock versions
+const mockVersions: MediaVersion[] = [
+  {
+    id: 'version_1',
+    version: 1,
+    mediaId: 'media_1',
+    url: 'https://example.com/media/community-meeting-v1.jpg',
+    thumbnailUrl: 'https://example.com/media/thumbnails/community-meeting-v1-thumb.jpg',
+    metadata: mockMediaData[0].metadata,
+    createdAt: new Date('2024-01-15'),
+    createdBy: 'admin',
+    changelog: 'Initial upload',
+    isActive: true,
+    size: 2048576,
+    compressionLevel: 'medium'
+  },
+  {
+    id: 'version_2',
+    version: 2,
+    mediaId: 'media_1',
+    url: 'https://example.com/media/community-meeting-v2.jpg',
+    thumbnailUrl: 'https://example.com/media/thumbnails/community-meeting-v2-thumb.jpg',
+    metadata: {
+      ...mockMediaData[0].metadata,
+      size: 1843200,
+      sizeFormatted: '1.8 MB'
+    },
+    createdAt: new Date('2024-01-16'),
+    createdBy: 'admin',
+    changelog: 'Compressed image for faster loading',
+    isActive: false,
+    size: 1843200,
+    compressionLevel: 'high'
+  }
+];
+
+// Generate mock usage
+const mockUsage: MediaUsage[] = [
+  {
+    id: 'usage_1',
+    mediaId: 'media_1',
+    entityType: 'article',
+    entityId: 'article_1',
+    entityTitle: 'Community Meeting Highlights',
+    usageType: 'featured_image',
+    url: 'https://example.com/articles/community-meeting-highlights',
+    addedAt: new Date('2024-01-20'),
+    addedBy: 'admin'
+  },
+  {
+    id: 'usage_2',
+    mediaId: 'media_2',
+    entityType: 'event',
+    entityId: 'event_1',
+    entityTitle: 'New Member Orientation',
+    usageType: 'thumbnail',
+    url: 'https://example.com/events/new-member-orientation',
+    addedAt: new Date('2024-01-25'),
+    addedBy: 'admin'
+  }
+];
+
+// Generate mock permissions
+const mockPermissions: MediaPermission[] = [
+  {
+    id: 'permission_1',
+    mediaId: 'media_3',
+    entityType: 'role',
+    entityId: 'role_member',
+    entityName: 'Member',
+    permissions: ['view', 'download'],
+    grantedBy: 'admin',
+    grantedAt: new Date('2024-02-01'),
+    expiresAt: new Date('2025-02-01')
+  },
+  {
+    id: 'permission_2',
+    mediaId: 'media_3',
+    entityType: 'role',
+    entityId: 'role_admin',
+    entityName: 'Admin',
+    permissions: ['view', 'download', 'edit', 'delete', 'share'],
+    grantedBy: 'admin',
+    grantedAt: new Date('2024-02-01')
+  }
+];
+
+// Generate mock analytics
+const mockAnalytics: MediaAnalytics[] = [
+  {
+    id: 'analytics_1',
+    mediaId: 'media_1',
+    date: new Date('2024-02-01'),
+    views: 150,
+    uniqueViews: 120,
+    avgViewDuration: 45,
+    downloads: 25,
+    uniqueDownloads: 20,
+    usageCount: 5,
+    shares: 10,
+    loadTime: 1200,
+    errorRate: 0.5,
+    topCountries: [
+      { country: 'United States', views: 80, percentage: 53.3 },
+      { country: 'Canada', views: 30, percentage: 20.0 },
+      { country: 'United Kingdom', views: 25, percentage: 16.7 },
+      { country: 'Australia', views: 15, percentage: 10.0 }
+    ],
+    topReferrers: [
+      { source: 'Direct', views: 60, percentage: 40.0 },
+      { source: 'Google', views: 45, percentage: 30.0 },
+      { source: 'Social Media', views: 30, percentage: 20.0 },
+      { source: 'Email', views: 15, percentage: 10.0 }
+    ]
+  },
+  {
+    id: 'analytics_2',
+    mediaId: 'media_2',
+    date: new Date('2024-02-01'),
+    views: 200,
+    uniqueViews: 180,
+    avgViewDuration: 120,
+    downloads: 30,
+    uniqueDownloads: 25,
+    usageCount: 8,
+    shares: 15,
+    loadTime: 2500,
+    errorRate: 1.2,
+    topCountries: [
+      { country: 'United States', views: 100, percentage: 50.0 },
+      { country: 'Canada', views: 40, percentage: 20.0 },
+      { country: 'United Kingdom', views: 30, percentage: 15.0 },
+      { country: 'Germany', views: 30, percentage: 15.0 }
+    ],
+    topReferrers: [
+      { source: 'Direct', views: 80, percentage: 40.0 },
+      { source: 'YouTube', views: 60, percentage: 30.0 },
+      { source: 'Social Media', views: 40, percentage: 20.0 },
+      { source: 'Email', views: 20, percentage: 10.0 }
+    ]
+  }
+];
+
+export {
+  mockMediaData,
+  mockFolders,
+  mockVersions,
+  mockUsage,
+  mockPermissions,
+  mockAnalytics,
+  mockTags
+};

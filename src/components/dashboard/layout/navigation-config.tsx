@@ -375,7 +375,7 @@ export const navigationConfig: readonly NavigationItem[] = [
         id: "certificate-management",
         title: "Certificate Management",
         icon: <ShieldCheck className="h-4 w-4" />,
-        path: "/dashboard/learning/admin/certifications",
+        path: "/dashboard/learning/certificate-management",
         roles: ["admin", "staff"],
       },
       {

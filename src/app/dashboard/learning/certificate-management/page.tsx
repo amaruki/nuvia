@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { certificates } from "../../courses/_data/mock-data";
+import { certificates } from "../courses/_data/mock-data";
 import { toast } from "sonner";
 import { MoreHorizontal } from "lucide-react";
 

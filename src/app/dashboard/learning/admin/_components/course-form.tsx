@@ -350,7 +350,7 @@ function ModuleItem({ index, form, removeModule }: { index: number, form: any, r
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={(e) => {
                             e.stopPropagation();
                             removeModule(index);
@@ -360,7 +360,7 @@ function ModuleItem({ index, form, removeModule }: { index: number, form: any, r
                     </Button>
                 </div>
 
-                <div className="space-y-3 pl-4 border-l-2 border-muted ml-2">
+                <div className="space-y-3 pl-4 border-l-2 border-border ml-2">
                     {lessonFields.map((lesson, lessonIndex) => (
                         <div key={lesson.id} className="flex items-start gap-2 group">
                             <div className="mt-2.5">

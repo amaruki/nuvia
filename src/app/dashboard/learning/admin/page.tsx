@@ -65,8 +65,10 @@ export default function CourseManagementPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Courses</CardTitle>
+            <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center">
+              <FileText className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{courses.length}</div>
@@ -75,8 +77,10 @@ export default function CourseManagementPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Students</CardTitle>
+            <div className="h-8 w-8 rounded-full bg-green-50 flex items-center justify-center">
+              <Users className="h-4 w-4 text-green-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12,450</div>
@@ -85,8 +89,10 @@ export default function CourseManagementPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Revenue</CardTitle>
+            <div className="h-8 w-8 rounded-full bg-purple-50 flex items-center justify-center">
+              <BarChart3 className="h-4 w-4 text-purple-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">$45,231.89</div>
@@ -130,7 +136,7 @@ export default function CourseManagementPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">Published</Badge>
+                    <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">Published</Badge>
                   </TableCell>
                   <TableCell>{course.level}</TableCell>
                   <TableCell className="text-right">{course.students.toLocaleString()}</TableCell>
@@ -152,7 +158,7 @@ export default function CourseManagementPage() {
                           <Edit className="mr-2 h-4 w-4" /> Edit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" /> Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -162,7 +168,7 @@ export default function CourseManagementPage() {
               ))}
               {filteredCourses.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
+                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                     No results found.
                   </TableCell>
                 </TableRow>

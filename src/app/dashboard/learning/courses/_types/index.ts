@@ -31,6 +31,7 @@ export interface Instructor {
     role: string;
     bio: string;
     avatar: string;
+    signature?: string;
     coursesCount: number;
     studentsCount: number;
 }
@@ -62,4 +63,20 @@ export interface UserStat {
     icon: React.ElementType;
     change: string;
     trend: 'up' | 'down' | 'neutral';
+}
+
+export interface Certificate {
+    id: string;
+    courseId: number;
+    courseName: string;
+    issueDate: string;
+    expiryDate?: string;
+    grade?: string;
+    instructorName: string;
+    instructorSignature: string; // URL or string representation
+    verificationCode: string;
+    image: string; // Course image or badge
+    studentName: string;
+    studentEmail: string;
+    status: 'active' | 'revoked';
 }

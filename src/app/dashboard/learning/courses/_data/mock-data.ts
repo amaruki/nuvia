@@ -1,5 +1,5 @@
 import { BookOpen, Clock, Trophy, Zap } from "lucide-react";
-import { Course, UserStat } from "../_types";
+import { Course, UserStat, Certificate } from "../_types";
 
 export const courses: Course[] = [
     {
@@ -23,6 +23,7 @@ export const courses: Course[] = [
             role: "Senior Frontend Engineer",
             bio: "Sarah is a Core Team member of Vue.js and a Staff Writer at CSS-Tricks. She loves teaching and building tools for developers.",
             avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=60",
+            signature: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Signature_sample.svg/1200px-Signature_sample.svg.png",
             coursesCount: 12,
             studentsCount: 45000
         },
@@ -142,4 +143,33 @@ export const stats: UserStat[] = [
     { label: "Hours Learned", value: "24.5", icon: Clock, change: "+4.2 hrs", trend: "up" },
     { label: "Certificates Earned", value: "5", icon: Trophy, change: "Last earned 2d ago", trend: "neutral" },
     { label: "Current Streak", value: "7 Days", icon: Zap, change: "Best: 12 days", trend: "up" },
+];
+
+export const certificates: Certificate[] = [
+    {
+        id: "cert-001",
+        courseId: 1,
+        courseName: "Advanced React Patterns",
+        issueDate: "March 15, 2024",
+        instructorName: "Sarah Drasner",
+        instructorSignature: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Signature_sample.svg/1200px-Signature_sample.svg.png",
+        verificationCode: "REACT-ADV-2024-8892",
+        image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        studentName: "Alex Chen",
+        studentEmail: "alex.chen@example.com",
+        status: "active"
+    },
+    {
+        id: "cert-002",
+        courseId: 2,
+        courseName: "UI/UX Design Fundamentals",
+        issueDate: "February 28, 2024",
+        instructorName: "Gary Simon",
+        instructorSignature: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Signature_sample.svg/1200px-Signature_sample.svg.png",
+        verificationCode: "UIUX-BAS-2024-1123",
+        image: "https://images.unsplash.com/photo-1586717791821-3f44a5638d4f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+        studentName: "Alex Chen",
+        studentEmail: "alex.chen@example.com",
+        status: "active"
+    }
 ];

@@ -371,6 +371,20 @@ export const navigationConfig: readonly NavigationItem[] = [
         path: "/dashboard/learning/admin",
         roles: ["admin", "staff"],
       },
+      {
+        id: "certificate-management",
+        title: "Certificate Management",
+        icon: <ShieldCheck className="h-4 w-4" />,
+        path: "/dashboard/learning/admin/certifications",
+        roles: ["admin", "staff"],
+      },
+      {
+        id: "instructor-settings",
+        title: "Instructor Settings",
+        icon: <Cog className="h-4 w-4" />,
+        path: "/dashboard/learning/settings",
+        roles: ["admin", "staff", "organizer"],
+      },
     ] as const,
   },
 

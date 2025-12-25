@@ -1,3 +1,7 @@
-export default function ForumsReports() {
-  return <h1>ForumsReports page</h1>
+"use client";
+
+import { ReportList } from "@/app/dashboard/forums/_components/report-list";
+
+export default function ForumReportsPage() {
+  return <ReportList />;
 }

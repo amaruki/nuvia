@@ -1,3 +1,7 @@
-export default function ForumsCategories() {
-  return <h1>ForumsCategories page</h1>
+"use client";
+
+import { CategoryManager } from "@/app/dashboard/forums/_components/category-manager";
+
+export default function ForumCategoriesPage() {
+  return <CategoryManager />;
 }

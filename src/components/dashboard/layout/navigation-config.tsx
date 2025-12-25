@@ -45,6 +45,7 @@ import {
   UserPlus as UserPlusIcon,
   Image as ImageIcon,
   FileClock,
+  Palette,
 } from "lucide-react";
 import { UserRole } from "@/types/dashboard.types";
 
@@ -645,9 +646,36 @@ export const navigationConfig: readonly NavigationItem[] = [
       },
     ] as const,
   },
+
+  // Personal Settings Section
+  {
+    id: "personal-settings",
+    title: "Personal Settings",
+    icon: <Settings className="h-4 w-4" />,
+    path: "/dashboard/profile",
+    category: "personal",
+    roles: ["user", "member", "member_student", "member_professional", "member_corporate", "moderator", "organizer", "committee_chair", "chapter_admin", "chapter_president", "staff", "treasurer", "admin", "superadmin"],
+    subItems: [
+      {
+        id: "profile",
+        title: "Profile",
+        icon: <UserCog className="h-4 w-4" />,
+        path: "/dashboard/profile",
+        roles: ["user", "member", "member_student", "member_professional", "member_corporate", "moderator", "organizer", "committee_chair", "chapter_admin", "chapter_president", "staff", "treasurer", "admin", "superadmin"],
+      },
+      {
+        id: "preferences",
+        title: "Preferences",
+        icon: <Palette className="h-4 w-4" />,
+        path: "/dashboard/preferences",
+        roles: ["user", "member", "member_student", "member_professional", "member_corporate", "moderator", "organizer", "committee_chair", "chapter_admin", "chapter_president", "staff", "treasurer", "admin", "superadmin"],
+      },
+    ] as const,
+  },
 ] as const;
 
 export const navigationCategories = {
-  main: "Main Navigation",
-  admin: "Administration",
+main: "Main Navigation",
+personal: "Personal Settings",
+admin: "Administration",
 } as const;

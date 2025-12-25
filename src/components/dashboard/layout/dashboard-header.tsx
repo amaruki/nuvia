@@ -1,7 +1,8 @@
+"use client";
+
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { DarkModeToggle } from "@/components/ui/dark-mode-toggle";
 import { Badge } from "@/components/ui/badge";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -11,9 +12,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import {
   Bell,
   Search,
@@ -24,6 +32,14 @@ import {
   BadgeCheck,
   CreditCard,
   Command,
+  Sun,
+  Moon,
+  Monitor,
+  Palette,
+  Layout,
+  Shield,
+  Globe,
+  HelpCircle,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -78,6 +94,13 @@ export function DashboardHeader({
   onViewAllNotifications,
 }: DashboardHeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const { theme, setTheme } = useTheme();
+  const router = useRouter();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const getInitials = (name: string): string => {
     return name
@@ -218,24 +241,81 @@ export function DashboardHeader({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Settings */}
+          {/* Quick Settings */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-9 w-9">
                 <Settings className="h-4 w-4" />
-                <span className="sr-only">Settings</span>
+                <span className="sr-only">Quick Settings</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Quick Settings</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Quick Settings
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                Preferences
+              
+              {/* Theme Toggle */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Palette className="mr-2 h-4 w-4" />
+                  <span>Theme</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+                    <DropdownMenuRadioItem value="light">
+                      <Sun className="mr-2 h-4 w-4" />
+                      Light
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="dark">
+                      <Moon className="mr-2 h-4 w-4" />
+                      Dark
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="system">
+                      <Monitor className="mr-2 h-4 w-4" />
+                      System
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              <DropdownMenuSeparator />
+
+              {/* Quick Links */}
+              <DropdownMenuItem onClick={() => router.push("/dashboard/preferences")}>
+                <Layout className="mr-2 h-4 w-4" />
+                <div className="flex flex-col">
+                  <span>Preferences</span>
+                  <span className="text-xs text-muted-foreground">Appearance & settings</span>
+                </div>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BadgeCheck className="mr-2 h-4 w-4" />
-                Profile Settings
+
+              <DropdownMenuItem onClick={() => router.push("/dashboard/profile")}>
+                <User className="mr-2 h-4 w-4" />
+                <div className="flex flex-col">
+                  <span>Profile</span>
+                  <span className="text-xs text-muted-foreground">Account information</span>
+                </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => router.push("/dashboard/settings/general")}>
+                <Shield className="mr-2 h-4 w-4" />
+                <div className="flex flex-col">
+                  <span>Settings</span>
+                  <span className="text-xs text-muted-foreground">System configuration</span>
+                </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              {/* Help */}
+              <DropdownMenuItem disabled>
+                <HelpCircle className="mr-2 h-4 w-4" />
+                <div className="flex flex-col">
+                  <span>Help & Support</span>
+                  <span className="text-xs text-muted-foreground">Get assistance</span>
+                </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

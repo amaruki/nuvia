@@ -35,7 +35,27 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     }
 
     // For other paths, check if it starts with the path + "/"
-    return pathname.startsWith(path + "/");
+    // But ensure we don't match if there's a more specific path that also matches
+    if (pathname.startsWith(path + "/")) {
+      // Check if there's a more specific navigation item that also matches
+      // This prevents parent paths from being active when a child path is active
+      const hasMoreSpecificMatch = filteredNavigationItems.some(item => {
+        // Skip current path being checked
+        if (item.path === path) return false;
+        
+        // Only check items that are children of the current path
+        if (item.path.startsWith(path + "/")) {
+          // Check if this child path matches the current pathname exactly or as a prefix
+          return pathname === item.path || pathname.startsWith(item.path + "/");
+        }
+        return false;
+      });
+      
+      // Only mark as active if there's no more specific match
+      return !hasMoreSpecificMatch;
+    }
+
+    return false;
   };
 
   // Filter navigation items based on user role

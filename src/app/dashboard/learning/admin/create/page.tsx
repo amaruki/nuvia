@@ -1,16 +1,25 @@
 "use client";
 
+import { useEffect } from "react";
 import { CourseForm } from "../_components/course-form";
+import { useHeader } from "@/contexts/dashboard-context";
 
 export default function CreateCoursePage() {
+    const { setHeader, clearHeader } = useHeader();
+
+    useEffect(() => {
+        setHeader({
+            title: "Create Course",
+            description: "Add a new course to your catalog.",
+        });
+
+        return () => {
+            clearHeader();
+        };
+    }, [setHeader, clearHeader]);
+
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Create Course</h1>
-                <p className="text-muted-foreground">
-                    Add a new course to your catalog.
-                </p>
-            </div>
             <CourseForm />
         </div>
     );

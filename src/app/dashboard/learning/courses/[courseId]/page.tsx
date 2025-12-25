@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useHeader } from "@/contexts/dashboard-context";
 import {
     Clock,
     Users,
@@ -32,8 +33,22 @@ import { courses } from "../_data/mock-data";
 export default function CourseDetailPage() {
     const params = useParams();
     const router = useRouter();
+    const { setHeader, clearHeader } = useHeader();
     const courseId = Number(params.courseId);
     const course = courses.find(c => c.id === courseId);
+
+    useEffect(() => {
+        if (course) {
+            setHeader({
+                title: course.title,
+                description: course.description,
+            });
+        }
+
+        return () => {
+            clearHeader();
+        };
+    }, [course, setHeader, clearHeader]);
 
     if (!course) {
         return (
@@ -58,9 +73,6 @@ export default function CourseDetailPage() {
                                 <span className="text-xs text-muted-foreground ml-auto">Updated {course.updatedAt}</span>
                             )}
                         </div>
-
-                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{course.title}</h1>
-                        <p className="text-lg text-muted-foreground">{course.description}</p>
 
                         <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1.5">

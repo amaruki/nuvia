@@ -1,14 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Search, Award } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { CertificateCard } from "./_components/certificate-card";
 import { certificates } from "../courses/_data/mock-data";
+import { useHeader } from "@/contexts/dashboard-context";
 
 export default function CertificationsPage() {
   const [searchTerm, setSearchTerm] = React.useState("");
+  const { setHeader, clearHeader } = useHeader();
+
+  useEffect(() => {
+    setHeader({
+      title: "My Certifications",
+      description: "View and manage your earned certificates.",
+    });
+
+    return () => {
+      clearHeader();
+    };
+  }, [setHeader, clearHeader]);
 
   const filteredCertificates = certificates.filter(cert =>
     cert.courseName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -17,12 +30,6 @@ export default function CertificationsPage() {
   return (
     <div className="container mx-auto p-6 space-y-8 animate-fadeIn">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Certifications</h1>
-          <p className="text-muted-foreground mt-1">
-            View and manage your earned certificates.
-          </p>
-        </div>
         <div className="relative w-full md:w-72">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input

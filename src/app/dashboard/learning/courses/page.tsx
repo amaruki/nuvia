@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Trophy,
   Target,
@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useHeader } from "@/contexts/dashboard-context";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -28,6 +29,18 @@ export default function LearningPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const { setHeader, clearHeader } = useHeader();
+
+  useEffect(() => {
+    setHeader({
+      title: "Learning Center",
+      description: "Expand your skills with our curated courses and workshops.",
+    });
+
+    return () => {
+      clearHeader();
+    };
+  }, [setHeader, clearHeader]);
 
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -42,24 +55,16 @@ export default function LearningPage() {
 
   return (
     <div className="space-y-8 animate-fadeInUp">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Learning Center</h1>
-          <p className="text-muted-foreground mt-1">
-            Expand your skills with our curated courses and workshops.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" className="gap-2">
-            <Trophy className="h-4 w-4" />
-            My Certificates
-          </Button>
-          <Button className="gap-2">
-            <Target className="h-4 w-4" />
-            Learning Path
-          </Button>
-        </div>
+      {/* Header Actions */}
+      <div className="flex items-center justify-end gap-3">
+        <Button variant="outline" className="gap-2">
+          <Trophy className="h-4 w-4" />
+          My Certificates
+        </Button>
+        <Button className="gap-2">
+          <Target className="h-4 w-4" />
+          Learning Path
+        </Button>
       </div>
 
       {/* Stats Overview */}

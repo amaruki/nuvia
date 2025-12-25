@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +9,21 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Upload, X, Save } from "lucide-react";
+import { useHeader } from "@/contexts/dashboard-context";
 
 export default function InstructorSettingsPage() {
+    const { setHeader, clearHeader } = useHeader();
+
+    useEffect(() => {
+        setHeader({
+            title: "Instructor Settings",
+            description: "Manage your instructor profile and certificate settings.",
+        });
+
+        return () => {
+            clearHeader();
+        };
+    }, [setHeader, clearHeader]);
     const [signature, setSignature] = useState<string | null>(
         "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Signature_sample.svg/1200px-Signature_sample.svg.png"
     );
@@ -44,12 +57,6 @@ export default function InstructorSettingsPage() {
 
     return (
         <div className="container max-w-4xl mx-auto p-6 space-y-8 animate-fadeIn">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Instructor Settings</h1>
-                <p className="text-muted-foreground mt-1">
-                    Manage your instructor profile and certificate settings.
-                </p>
-            </div>
 
             <div className="grid gap-8 md:grid-cols-[1fr_250px]">
                 <div className="space-y-6">

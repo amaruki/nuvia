@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useHeader } from "@/contexts/dashboard-context";
 import {
   Plus,
   Search,
@@ -40,7 +41,19 @@ import { courses } from "../courses/_data/mock-data";
 
 export default function CourseManagementPage() {
   const router = useRouter();
+  const { setHeader, clearHeader } = useHeader();
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    setHeader({
+      title: "Course Management",
+      description: "Create, edit, and manage your courses and curriculum.",
+    });
+
+    return () => {
+      clearHeader();
+    };
+  }, [setHeader, clearHeader]);
 
   const filteredCourses = courses.filter(course =>
     course.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -49,12 +62,6 @@ export default function CourseManagementPage() {
   return (
     <div className="space-y-8 animate-fadeInUp">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Course Management</h1>
-          <p className="text-muted-foreground mt-1">
-            Create, edit, and manage your courses and curriculum.
-          </p>
-        </div>
         <Button onClick={() => router.push("/dashboard/learning/admin/create")}>
           <Plus className="h-4 w-4 mr-2" />
           Create New Course

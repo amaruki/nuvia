@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
+import { useHeader } from "@/contexts/dashboard-context";
 import { Download, Eye, Ban, Search, Filter, Award, ShieldCheck, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +30,18 @@ import { MoreHorizontal } from "lucide-react";
 
 export default function AdminCertificationsPage() {
     const [searchTerm, setSearchTerm] = React.useState("");
+    const { setHeader, clearHeader } = useHeader();
+
+    useEffect(() => {
+        setHeader({
+            title: "Certification Management",
+            description: "Monitor and manage issued certificates across platform.",
+        });
+
+        return () => {
+            clearHeader();
+        };
+    }, [setHeader, clearHeader]);
 
     const filteredCertificates = certificates.filter(cert =>
         cert.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -49,12 +62,6 @@ export default function AdminCertificationsPage() {
     return (
         <div className="p-6 space-y-6 animate-fadeIn">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Certification Management</h1>
-                    <p className="text-muted-foreground mt-1">
-                        Monitor and manage issued certificates across the platform.
-                    </p>
-                </div>
                 <div className="flex gap-2">
                     <Button variant="outline">
                         <Download className="mr-2 h-4 w-4" /> Export CSV

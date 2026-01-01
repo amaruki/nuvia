@@ -430,22 +430,6 @@ export const navigationConfig: readonly NavigationItem[] = [
     path: "/dashboard/jobs",
     category: "main",
     roles: ["user", "member", "member_student", "member_professional", "member_corporate", "admin", "staff"],
-    subItems: [
-      {
-        id: "job-postings",
-        title: "Job Postings",
-        icon: <Briefcase className="h-4 w-4" />,
-        path: "/dashboard/jobs/postings",
-        roles: ["user", "member", "member_student", "member_professional", "member_corporate", "admin", "staff"],
-      },
-      {
-        id: "job-management",
-        title: "Job Management",
-        icon: <Settings className="h-4 w-4" />,
-        path: "/dashboard/jobs/admin",
-        roles: ["admin", "staff"],
-      },
-    ] as const,
   },
 
   // Awards & Recognition Section
@@ -675,7 +659,7 @@ export const navigationConfig: readonly NavigationItem[] = [
 ] as const;
 
 export const navigationCategories = {
-main: "Main Navigation",
-personal: "Personal Settings",
-admin: "Administration",
+  main: "Main Navigation",
+  personal: "Personal Settings",
+  admin: "Administration",
 } as const;

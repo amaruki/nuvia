@@ -126,7 +126,7 @@ export default function JobApplicantsPage() {
                         {filteredApplicants.map((applicant) => (
                             <TableRow key={applicant.id}>
                                 <TableCell className="font-medium">
-                                    <div className="flex flex-col">
+                                    <div className="flex flex-col cursor-pointer hover:underline" onClick={() => router.push(`/dashboard/jobs/${jobId}/applicants/${applicant.id}`)}>
                                         <span className="text-base font-semibold">{applicant.name}</span>
                                         {applicant.coverLetter && (
                                             <span className="text-xs text-muted-foreground truncate max-w-[200px]" title={applicant.coverLetter}>
@@ -180,8 +180,8 @@ export default function JobApplicantsPage() {
                                             </DropdownMenuSub>
 
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem>
-                                                <FileText className="mr-2 h-4 w-4" /> View Resume
+                                            <DropdownMenuItem onClick={() => router.push(`/dashboard/jobs/${jobId}/applicants/${applicant.id}`)}>
+                                                <FileText className="mr-2 h-4 w-4" /> View Details
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
                                                 <Mail className="mr-2 h-4 w-4" /> Email Candidate

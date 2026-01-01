@@ -20,8 +20,8 @@ export const applicants: Applicant[] = [
         phone: "+1 (555) 123-4567",
         appliedDate: "2024-01-20",
         status: "New",
-        resumeUrl: "#",
-        coverLetter: "I am very interested in this role..."
+        resumeUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        coverLetter: "Dear Hiring Manager,\n\nI am writing to express my strong interest in the Senior Frontend Developer position at TechCorp Inc. With over 8 years of experience in building scalable web applications using React, Next.js, and TypeScript, I am confident in my ability to contribute effectively to your engineering team.\n\nIn my previous role at genericTech, I led a team of 5 developers to successfuly migrate our legacy monolith to a micro-frontend architecture, resulting in a 40% improvement in page load times and a significant boost in developer productivity. I am deeply passionate about web performance, accessibility, and creating intuitive user experiences.\n\nI have been following TechCorp's journey for years and have been impressed by your commitment to innovation, particularly in the cloud computing space. I would welcome the opportunity to discuss how my skills and experience align with your team's goals.\n\nThank you for considering my application. I look forward to the possibility of discussing this exciting opportunity with you.\n\nSincerely,\nJohn Doe"
     },
     {
         id: "102",

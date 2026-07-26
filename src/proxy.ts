@@ -9,7 +9,6 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { createAuthMiddleware } from "@/lib/auth/middleware";
 
-import { RATE_LIMIT_CONFIGS } from "@/lib/auth/rate-limiting";
 import { AuthResponseFactory } from "@/lib/auth/common";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 
@@ -21,7 +20,7 @@ import { isRoleAllowedForPath } from "@/lib/dashboard-access";
  * Create middleware with authentication and rate limiting
  */
 const authMiddleware = createAuthMiddleware({
-  rateLimit: "API",
+  rateLimit: "api",
   skipPaths: ["/api/auth/callback"], // Skip auth for OAuth callbacks
 });
 

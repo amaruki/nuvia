@@ -3,8 +3,12 @@ import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
 import { signupSchema } from "@/lib/validation/auth.validation";
 import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
+import { rateLimitOrProblem } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
+  const limited = await rateLimitOrProblem(request.headers, "signup");
+  if (limited) return limited;
+
   try {
     // Parse and validate request body
     const body = await request.json();

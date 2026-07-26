@@ -2,8 +2,12 @@ import { NextRequest } from "next/server";
 import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
 import { problem, problemResponse, problems, successResponse } from "@/lib/http";
+import { rateLimitOrProblem } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
+  const limited = await rateLimitOrProblem(request.headers, "changePassword");
+  if (limited) return limited;
+
   try {
     // Parse request body
     const body = await request.json();

@@ -10,14 +10,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthUtils } from "./utils";
 import { AuthResponseFactory } from "./common";
-import { RateLimiter, RATE_LIMIT_CONFIGS } from "./rate-limiting";
+import { RATE_LIMITS, rateLimitOrProblem } from "@/lib/rate-limit";
 
 /**
  * Middleware configuration options
  */
 export interface MiddlewareOptions {
   /** Rate limiting configuration */
-  rateLimit?: keyof typeof RATE_LIMIT_CONFIGS;
+  rateLimit?: keyof typeof RATE_LIMITS;
   /** Custom authentication logic */
   customAuth?: (request: NextRequest) => Promise<boolean>;
   /** Skip authentication for certain paths */
@@ -91,12 +91,8 @@ export function createAuthMiddleware(options: MiddlewareOptions = {}) {
 
     // Apply rate limiting if configured
     if (options.rateLimit) {
-      const rateLimiter = new RateLimiter(RATE_LIMIT_CONFIGS[options.rateLimit]);
-      const rateLimitResult = await rateLimiter.check(request);
-
-      if (rateLimitResult.isLimited) {
-        return rateLimiter.createLimitResponse(rateLimitResult);
-      }
+      const limited = await rateLimitOrProblem(request.headers, options.rateLimit);
+      if (limited) return limited;
     }
 
     // Authentication check

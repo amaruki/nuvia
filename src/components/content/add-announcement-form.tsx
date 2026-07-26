@@ -133,7 +133,7 @@ export function AddAnnouncementForm({
   });
   const [showPreview, setShowPreview] = useState(false);
 
-  const form = useForm<AnnouncementFormValues>({
+  const form = useForm<z.input<typeof announcementFormSchema>, any, AnnouncementFormValues>({
     resolver: zodResolver(announcementFormSchema),
     defaultValues: {
       title: "",

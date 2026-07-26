@@ -440,7 +440,10 @@ export function PublicationsFilters({
                     }
                     onSelect={(range) =>
                       onFiltersChange({
-                        dateRange: range ? { start: range.from, end: range.to } : undefined,
+                        dateRange:
+                          range?.from && range?.to
+                            ? { start: range.from, end: range.to }
+                            : undefined,
                       })
                     }
                   />

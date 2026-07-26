@@ -86,7 +86,8 @@ const courseFormSchema = z.object({
   modules: z.array(moduleSchema).optional(),
 });
 
-type CourseFormValues = z.infer<typeof courseFormSchema>;
+type CourseFormValues = z.output<typeof courseFormSchema>;
+type CourseFormInput = z.input<typeof courseFormSchema>;
 
 interface CourseFormProps {
   initialData?: Course | null;
@@ -107,7 +108,7 @@ export function CourseForm({ initialData }: CourseFormProps) {
     router.refresh();
   };
 
-  const form = useForm<CourseFormValues>({
+  const form = useForm<CourseFormInput, any, CourseFormValues>({
     resolver: zodResolver(courseFormSchema),
     defaultValues: initialData
       ? {
@@ -246,7 +247,14 @@ export function CourseForm({ initialData }: CourseFormProps) {
                     <FormItem>
                       <FormLabel>Price ($)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          placeholder="0.00"
+                          {...field}
+                          value={field.value as number}
+                        />
                       </FormControl>
                       <FormDescription>Set to 0 for free courses.</FormDescription>
                       <FormMessage />

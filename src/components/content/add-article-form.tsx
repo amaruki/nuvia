@@ -74,7 +74,7 @@ const formSchema = z.object({
   authorId: z.string().min(1, "Author is required"),
   coAuthorIds: z.array(z.string()).optional(),
   reviewerId: z.string().optional(),
-  tagIds: z.array(z.string()).optional(),
+  tagIds: z.array(z.string()).default([]),
   seriesId: z.string().optional(),
   visibility: z.enum(["public", "members_only", "premium_only", "chapter_only", "committee_only"]),
   commentsEnabled: z.boolean(),
@@ -92,7 +92,7 @@ const formSchema = z.object({
       .string()
       .min(1, "SEO description is required")
       .max(160, "SEO description must be less than 160 characters"),
-    keywords: z.array(z.string()).optional(),
+    keywords: z.array(z.string()).default([]),
     ogImage: z.string().optional(),
   }),
 });
@@ -119,7 +119,7 @@ export default function ArticlePageForm({
     (id) => mockArticles.find((a) => a.author.id === id)!.author,
   );
 
-  const form = useForm<ArticleFormData>({
+  const form = useForm<z.input<typeof formSchema>, any, ArticleFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",

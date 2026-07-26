@@ -225,7 +225,7 @@ export interface AnnouncementFormData {
   seriesId?: string;
   featuredImage?: string;
   gallery?: string[];
-  attachments?: File[];
+  attachments?: { id: string; name: string; url: string; size: number; type: string }[];
 
   // Publishing
   publishedAt?: Date;

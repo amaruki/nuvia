@@ -63,7 +63,7 @@ const formSchema = z.object({
   status: z.enum(PUBLICATION_STATUSES),
   authorId: z.string().min(1, "Author is required"),
   coAuthorIds: z.array(z.string()).optional(),
-  tagIds: z.array(z.string()).optional(),
+  tagIds: z.array(z.string()).default([]),
   difficulty: z.enum(["beginner", "intermediate", "advanced"]),
   visibility: z.enum(["public", "members_only", "premium_only", "chapter_only", "committee_only"]),
   commentsEnabled: z.boolean(),
@@ -81,10 +81,10 @@ const formSchema = z.object({
       .string()
       .min(1, "SEO description is required")
       .max(160, "SEO description must be less than 160 characters"),
-    keywords: z.array(z.string()).optional(),
+    keywords: z.array(z.string()).default([]),
     ogImage: z.string().optional(),
   }),
-}) as z.ZodType<PublicationFormData>;
+});
 
 interface PublicationPageFormProps {
   onSubmit: (data: PublicationFormData) => void;
@@ -103,7 +103,7 @@ export default function PublicationPageForm({
   const [gallery, setGallery] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<File[]>([]);
 
-  const form = useForm({
+  const form = useForm<z.input<typeof formSchema>, any, PublicationFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",

@@ -1,214 +1,205 @@
-# Community Platform
+# Nuvia
 
-A modern, scalable platform for managing open source communities, built with Next.js and designed for both hobby communities and professional associations.
+An open-source Association Management System (AMS) — member records, dues,
+events, chapters, and communications for a professional association or
+similar member organization.
+Built on Next.js, Drizzle, PostgreSQL, and Bun.
 
-## Overview
+**Status: pre-1.0, actively hardening.**
+See [`TODO.md`](TODO.md) for exactly what works today, what's mock data,
+and what's planned before a 1.0 release.
+Read that file before evaluating this project for production use — it's
+more accurate than a features list would be at this stage.
 
-This platform provides comprehensive community management features including user authentication, membership management, event organization, content management, and financial tracking. Built with a modular architecture that can evolve from a simple monolith to microservices as the community grows.
+## What actually works today
 
-## Technology Stack
+Five modules are wired to a real PostgreSQL database via Drizzle and
+gated by authentication: **members, events, content, forums, jobs**.
+Everything else in the dashboard (finance, awards, learning, chapters,
+committees, workspaces) is UI built against mock data, disabled by default
+in a fresh install — see
+[ADR-0008](docs/adr/0008-module-maturity-gate.md) for the promotion
+criteria that flip a module on.
 
-- **Frontend**: Next.js 15+ (App Router), React 18+, TypeScript, Tailwind CSS V4, Radix UI
-- **Backend**: Next.js API Routes, Server Actions, Node.js 20+
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: Betterauth
-- **Caching**: Redis
-<!-- - **Monitoring**: Sentry, Vercel Analytics -->
+## Technology stack
+
+- **Runtime & package manager**: [Bun](https://bun.sh)
+  ([ADR-0012](docs/adr/0012-bun-package-manager-and-runtime.md))
+- **Framework**: Next.js 16 (App Router), React 19, TypeScript
+- **Styling**: Tailwind CSS v4, shadcn/ui (Radix primitives)
+- **Database**: PostgreSQL via Drizzle ORM
+  ([ADR-0011](docs/adr/0011-prisma-to-drizzle.md))
+- **Authentication**: better-auth
+- **Caching / rate limiting**: Redis
+- **Lint / format**: oxlint / oxfmt
+  ([ADR-0013](docs/adr/0013-oxlint-oxfmt-toolchain.md))
 
 ## Architecture
 
-The platform follows a layered architecture design:
-
 ```
-Client Layer (Browser/Mobile)
-    ↓
-Controller Layer (Routes/API)
-    ↓
-Service Layer (Business Logic)
-    ↓
-Manager Layer (Data Access)
-    ↓
-Data Layer (PostgreSQL/Redis)
+route.ts / server action  →  service function  →  Drizzle (src/db/client.ts)
 ```
 
-## Core Modules
+Not the four-layer Controller/Service/Manager/Data design an earlier
+version of this README described — there has never been a `managers/`
+directory.
+Full detail, including the route-group security taxonomy and the module
+maturity system, is in
+[`docs/architecture/overview.md`](docs/architecture/overview.md).
 
-### MVP Features
-- **User Management**: Authentication, profiles, RBAC
-- **Membership Management**: Multi-tier memberships, payments
-- **Event Management**: Event creation, registration, certificates
-- **Content Management**: CMS for posts and announcements
-
-### Post-MVP Features
-- **Financial System**: Invoicing, donations, reports
-- **Directory**: Member and business listings
-- **Job Board**: Job postings and applications
-- **Forum**: Discussion threads and moderation
-- **Newsletter**: Email campaigns and analytics
-
-## Getting Started
+## Getting started
 
 ### Prerequisites
 
-- Node.js 18+
-- PostgreSQL database
-- Redis (optional, for caching)
+- [Bun](https://bun.sh) 1.3+
+- PostgreSQL
+- Redis (required in production; optional in development —
+  `src/lib/env.ts` enforces this)
 
 ### Installation
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd community-platform
-```
+1. Clone the repository and install dependencies:
 
-2. Install dependencies:
-```bash
-bun install
-```
+   ```bash
+   git clone https://github.com/amaruki/nuvia.git
+   cd nuvia
+   bun install
+   ```
 
-3. Set up environment variables:
-```bash
-cp .env.example .env.local
-```
+   `bun install` also installs the git hooks (`lefthook`) that run
+   `oxlint`/`oxfmt` on every commit — see
+   [ADR-0010](docs/adr/0010-ai-agent-commit-guard.md).
 
-Configure the following variables:
-```env
-# Application Configuration
-APP_URL=http://localhost:3000
-NODE_ENV=development
+2. Set up environment variables:
 
-# Authentication Configuration
-JWT_SECRET=your-super-secret-jwt-key-change-in-production
-JWT_EXPIRES_IN=7d
-BETTER_AUTH_SECRET=your-super-secret-auth-key-here
+   ```bash
+   cp .env.example .env.local
+   ```
 
-# Database Configuration
-DATABASE_URL="postgresql://username:password@localhost:5432/nuvia?schema=public"
+   Every variable is validated at boot by `src/lib/env.ts` — an invalid or
+   missing required value fails immediately with a readable error, rather
+   than falling back silently.
+   `DATABASE_URL` and `BETTER_AUTH_SECRET` are required; `REDIS_URL` is
+   required when `NODE_ENV=production`.
 
-# Google OAuth Configuration
-GOOGLE_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-google-oauth-client-secret
+3. Generate a secure `BETTER_AUTH_SECRET`:
 
-# Email Configuration
-EMAIL_HOST=smtp.example.com
-EMAIL_PORT=587
-EMAIL_USER=your-email@example.com
-EMAIL_PASS=your-email-password
-EMAIL_FROM=noreply@yourapp.com
+   ```bash
+   openssl rand -base64 32
+   ```
 
-# Optional: Redis Configuration
-REDIS_URL=redis://localhost:6379
-```
+4. Set up the database:
 
-4. Generate secure secrets:
-```bash
-# Generate JWT secret
-openssl rand -base64 32
+   ```bash
+   bun run db:generate   # generate a migration from the current schema
+   bun run db:push       # apply it (dev) — or db:migrate for a tracked migration
+   ```
 
-# Generate Better Auth secret
-openssl rand -base64 32
-```
+5. Seed an admin account — **requires an explicit password**, on purpose
+   (the previous seed script hardcoded a shared password across five
+   privileged accounts; see
+   [ADR-0009](docs/adr/0009-security-hardening-p0.md)):
 
-5. Google OAuth Setup:
+   ```bash
+   SEED_ADMIN_PASSWORD=$(openssl rand -base64 24) bun run db:seed
+   ```
 
-    a. Go to Google Cloud Console: https://console.cloud.google.com/
+6. Start the development server:
 
-    b. Create a new project or select existing one
+   ```bash
+   bun run dev
+   ```
 
-    c. Go to "APIs & Services" > "Credentials"
+   Open [http://localhost:3000](http://localhost:3000).
 
-    d. Click "Create Credentials" > "OAuth client ID"
+### Google OAuth (optional)
 
-    e. Application type: "Web application"
-
-    f. Add authorized redirect URIs:
-   - http://localhost:3000/api/auth/callback/google
-   - https://yourdomain.com/api/auth/callback/google
-
-    g. Copy the Client ID and Client Secret to your .env.local file
-
-    IMPORTANT: The redirect URI must exactly match `http://localhost:3000/api/auth/callback/google`
-    Make sure there are no trailing slashes or additional parameters in the Google Cloud Console.
-
-6. Set up the database:
-```bash
-# Generate Prisma client
-bunx prisma generate
-
-# Run migrations
-bunx prisma migrate dev
-
-# Seed the database (optional)
-bunx prisma db seed
-```
-
-7. Start the development server:
-```bash
-bun run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+1. [Google Cloud Console](https://console.cloud.google.com/) → APIs &
+   Services → Credentials → Create Credentials → OAuth client ID.
+2. Application type: Web application.
+3. Authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
+   in development, your production domain's equivalent in production.
+   No trailing slash, no extra parameters — a mismatch here is the most
+   common OAuth setup failure.
+4. Copy the Client ID and Secret into `.env.local`.
 
 ## Development
 
-### Available Scripts
+### Scripts
 
-- `bun run dev` - Start development server
-- `bun run build` - Build for production
-- `bun run start` - Start production server
-- `bun run lint` - Run ESLint
-- `bun run test` - Run tests
-- `bun run test:e2e` - Run end-to-end tests
+| Command                                                        | Does                                                                      |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `bun run dev`                                                  | Start the dev server                                                      |
+| `bun run build`                                                | Production build                                                          |
+| `bun run lint` / `lint:fix`                                    | oxlint                                                                    |
+| `bun run format` / `format:check`                              | oxfmt                                                                     |
+| `bun run typecheck`                                            | `tsc --noEmit`                                                            |
+| `bun test`                                                     | Run tests                                                                 |
+| `bun run guard:light`                                          | lint + format + typecheck (fast)                                          |
+| `bun run guard:heavy`                                          | `guard:light` + test + migration-drift check + build + `bun audit --prod` |
+| `bun run db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle                                                                   |
+| `bun run db:seed`                                              | Seed an admin account (`SEED_ADMIN_PASSWORD` required)                    |
 
-### Code Quality
+### Code quality
 
-This project uses:
-- **ESLint** for code linting
-- **Prettier** for code formatting
-- **TypeScript** with strict mode
-- **Jest** for unit testing
-- **Playwright** for E2E testing
+- **oxlint** + **oxfmt** — replaced ESLint + Prettier
+  ([ADR-0013](docs/adr/0013-oxlint-oxfmt-toolchain.md)); the previous
+  ESLint config had downgraded most rules to warnings, so nothing actually
+  blocked a build.
+- **TypeScript** strict mode.
+- **bun test** — coverage is being built up from zero; see
+  [`TODO.md`](TODO.md) M2 for the first ten tests being added and why.
+- **lefthook** — pre-commit (lint + format), commit-msg (Conventional
+  Commits, no `Co-Authored-By` trailers), pre-push (typecheck + test).
 
-### Project Structure
+### Project structure
 
 ```
 src/
-├── app/              # Next.js App Router pages & API routes
-├── lib/             # Core business logic
-│   ├── services/    # Business logic layer
-│   ├── managers/    # Data access layer
-│   └── utils/       # Utility functions
-├── components/      # React components
-├── types/          # TypeScript type definitions
-└── middleware.ts   # Next.js middleware
+├── app/                 # Next.js App Router — pages & API routes
+├── db/
+│   ├── schema/          # Drizzle table definitions
+│   └── client.ts        # Drizzle client (drizzle-orm/bun-sql)
+├── lib/
+│   ├── services/        # Business logic (route.ts → service → Drizzle)
+│   ├── validation/       # Zod schemas, one file per domain
+│   ├── auth/             # better-auth config, session handling
+│   └── env.ts             # Validated environment config — import this, not process.env
+├── components/            # React components
+├── types/                 # TypeScript type definitions
+└── proxy.ts                # Next.js 16's middleware.ts replacement (network-boundary auth)
 ```
 
 ## Documentation
 
-<!-- - [Technical Architecture](docs/technical/) -->
-- [API Patterns](docs/technical/api-patterns.md)
-- [Database Schema](docs/technical/database-schema.md)
-- [Security Guidelines](docs/technical/security-guidelines.md)
-
-## Deployment
-
-### Vercel (Recommended)
-
-1. Connect your GitHub repository to Vercel
-2. Configure environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
-
-### Alternative Deployment
-
-The platform can also be deployed to Railway or DigitalOcean App Platform with similar ease.
+- [`TODO.md`](TODO.md) — the real roadmap: what works, what's mock, what's
+  planned, in order.
+- [`docs/PRINCIPLES.md`](docs/PRINCIPLES.md) — the eight principles this
+  project holds itself to, and the two places they conflict.
+- [`docs/architecture/`](docs/architecture/) — layering, route-group
+  security taxonomy, data model conventions.
+- [`docs/api/conventions.md`](docs/api/conventions.md) — the RFC 9457 error
+  contract and route shape.
+- [`docs/security/`](docs/security/) — threat model, controls mapping,
+  privacy/GDPR posture.
+- [`docs/supply-chain.md`](docs/supply-chain.md) /
+  [`docs/release.md`](docs/release.md) — dependency policy, signing,
+  migration compatibility.
+- [`docs/adr/`](docs/adr/) — every contested decision, with the reasoning.
+- [`CODING_STANDARD.md`](CODING_STANDARD.md) — the rules day to day.
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to actually contribute.
 
 ## Contributing
 
-1. Ensure all tests pass
-2. Follow the established code patterns and architecture
-3. Update documentation as needed
+See [`CONTRIBUTING.md`](CONTRIBUTING.md).
+[`TODO.md`](TODO.md) tags several items **good first issue**.
+
+## Security
+
+See [`SECURITY.md`](SECURITY.md) for how to report a vulnerability, and
+[`docs/security/`](docs/security/) for the threat model and controls this
+project maintains against.
 
 ## License
 
-This project is licensed under the MIT License.
+[MIT](LICENSE).

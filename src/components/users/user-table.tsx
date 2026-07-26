@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent } from "@/components/ui/card"
+import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -13,15 +13,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { UserProfile, UserSort, UserStatus, AuthStatus } from "@/types/user-management.types"
+} from "@/components/ui/dropdown-menu";
+import { UserProfile, UserSort, UserStatus, AuthStatus } from "@/types/user-management.types";
 import {
   ArrowUpDown,
   ArrowUp,
@@ -37,57 +37,48 @@ import {
   User,
   ChevronRight,
   ExternalLink,
-  Linkedin
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+  Link2 as Linkedin, // lucide-react v1 dropped brand icons — see TODO.md
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface UserTableProps {
-  users: UserProfile[]
-  selectedUsers: string[]
-  onSelectUser: (userId: string, checked: boolean) => void
-  onSelectAll: (checked: boolean) => void
-  sort: UserSort
-  onSort: (sort: UserSort) => void
-  showSelection?: boolean
-  className?: string
+  users: UserProfile[];
+  selectedUsers: string[];
+  onSelectUser: (userId: string, checked: boolean) => void;
+  onSelectAll: (checked: boolean) => void;
+  sort: UserSort;
+  onSort: (sort: UserSort) => void;
+  showSelection?: boolean;
+  className?: string;
 }
 
 interface SortableHeaderProps {
-  children: React.ReactNode
-  field: UserSort["field"]
-  currentSort: UserSort
-  onSort: (sort: UserSort) => void
-  className?: string
+  children: React.ReactNode;
+  field: UserSort["field"];
+  currentSort: UserSort;
+  onSort: (sort: UserSort) => void;
+  className?: string;
 }
 
 function SortableHeader({ children, field, currentSort, onSort, className }: SortableHeaderProps) {
-  const isCurrentField = currentSort.field === field
-  const direction = isCurrentField ? currentSort.direction : "asc"
+  const isCurrentField = currentSort.field === field;
+  const direction = isCurrentField ? currentSort.direction : "asc";
 
   const handleSort = () => {
     onSort({
       field,
-      direction: isCurrentField && direction === "asc" ? "desc" : "asc"
-    })
-  }
+      direction: isCurrentField && direction === "asc" ? "desc" : "asc",
+    });
+  };
 
   return (
     <Button
       variant="ghost"
       size="sm"
-      className={cn(
-        "-ml-3 h-8 data-[state=open]:bg-accent",
-        className
-      )}
+      className={cn("-ml-3 h-8 data-[state=open]:bg-accent", className)}
       onClick={handleSort}
       aria-label={`Sort by ${field}`}
-      aria-sort={
-        isCurrentField
-          ? direction === "asc"
-            ? "ascending"
-            : "descending"
-          : "none"
-      }
+      aria-sort={isCurrentField ? (direction === "asc" ? "ascending" : "descending") : "none"}
     >
       <span>{children}</span>
       {isCurrentField ? (
@@ -100,76 +91,76 @@ function SortableHeader({ children, field, currentSort, onSort, className }: Sor
         <ArrowUpDown className="ml-2 size-4" />
       )}
     </Button>
-  )
+  );
 }
 
 function getStatusColor(status: UserStatus): string {
   switch (status) {
     case UserStatus.ACTIVE:
-      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 border-green-300 dark:border-green-700"
+      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 border-green-300 dark:border-green-700";
     case UserStatus.INACTIVE:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700";
     case UserStatus.SUSPENDED:
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100 border-orange-300 dark:border-orange-700"
+      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100 border-orange-300 dark:border-orange-700";
     case UserStatus.PENDING_VERIFICATION:
-      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100 border-yellow-300 dark:border-yellow-700"
+      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100 border-yellow-300 dark:border-yellow-700";
     case UserStatus.BANNED:
-      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 border-red-300 dark:border-red-700"
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 border-red-300 dark:border-red-700";
     default:
-      return "bg-secondary text-secondary-foreground border-border"
+      return "bg-secondary text-secondary-foreground border-border";
   }
 }
 
 function getAuthStatusColor(authStatus: AuthStatus): string {
   switch (authStatus) {
     case AuthStatus.VERIFIED:
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 border-blue-300 dark:border-blue-700"
+      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 border-blue-300 dark:border-blue-700";
     case AuthStatus.UNVERIFIED:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700";
     case AuthStatus.TWO_FACTOR_ENABLED:
-      return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100 border-purple-300 dark:border-purple-700"
+      return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100 border-purple-300 dark:border-purple-700";
     case AuthStatus.TWO_FACTOR_DISABLED:
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100 border-orange-300 dark:border-orange-700"
+      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100 border-orange-300 dark:border-orange-700";
     default:
-      return "bg-secondary text-secondary-foreground border-border"
+      return "bg-secondary text-secondary-foreground border-border";
   }
 }
 
 function getRoleColor(role: string): string {
   switch (role) {
     case "admin":
-      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 border-red-300 dark:border-red-700"
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 border-red-300 dark:border-red-700";
     case "moderator":
-      return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100 border-indigo-300 dark:border-indigo-700"
+      return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100 border-indigo-300 dark:border-indigo-700";
     case "member":
-      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 border-green-300 dark:border-green-700"
+      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 border-green-300 dark:border-green-700";
     default:
-      return "bg-secondary text-secondary-foreground border-border"
+      return "bg-secondary text-secondary-foreground border-border";
   }
 }
 
 function getInitials(firstName: string, lastName: string): string {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 }
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
-    day: "numeric"
-  }).format(date)
+    day: "numeric",
+  }).format(date);
 }
 
 function formatRelativeTime(date: Date): string {
-  const now = new Date()
-  const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
+  const now = new Date();
+  const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 
-  if (diffInDays === 0) return "Today"
-  if (diffInDays === 1) return "Yesterday"
-  if (diffInDays < 7) return `${diffInDays} days ago`
-  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`
-  if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} months ago`
-  return `${Math.floor(diffInDays / 365)} years ago`
+  if (diffInDays === 0) return "Today";
+  if (diffInDays === 1) return "Yesterday";
+  if (diffInDays < 7) return `${diffInDays} days ago`;
+  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+  if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} months ago`;
+  return `${Math.floor(diffInDays / 365)} years ago`;
 }
 
 export function UserTable({
@@ -180,35 +171,36 @@ export function UserTable({
   sort,
   onSort,
   showSelection = false,
-  className
+  className,
 }: UserTableProps) {
-  const [focusedRowIndex, setFocusedRowIndex] = useState<number | null>(null)
+  const [focusedRowIndex, setFocusedRowIndex] = useState<number | null>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     switch (e.key) {
       case "ArrowDown":
-        e.preventDefault()
-        setFocusedRowIndex(prev => prev === null ? 0 : Math.min(prev + 1, users.length - 1))
-        break
+        e.preventDefault();
+        setFocusedRowIndex((prev) => (prev === null ? 0 : Math.min(prev + 1, users.length - 1)));
+        break;
       case "ArrowUp":
-        e.preventDefault()
-        setFocusedRowIndex(prev => prev === null ? 0 : Math.max(prev - 1, 0))
-        break
+        e.preventDefault();
+        setFocusedRowIndex((prev) => (prev === null ? 0 : Math.max(prev - 1, 0)));
+        break;
       case "Enter":
-        e.preventDefault()
+        e.preventDefault();
         // Handle row action (view details)
-        break
+        break;
       case " ":
         if (showSelection) {
-          e.preventDefault()
-          onSelectUser(users[index].id, !selectedUsers.includes(users[index].id))
+          e.preventDefault();
+          onSelectUser(users[index].id, !selectedUsers.includes(users[index].id));
         }
-        break
+        break;
     }
-  }
+  };
 
-  const allSelected = showSelection && selectedUsers.length === users.length && users.length > 0
-  const someSelected = showSelection && selectedUsers.length > 0 && selectedUsers.length < users.length
+  const allSelected = showSelection && selectedUsers.length === users.length && users.length > 0;
+  const someSelected =
+    showSelection && selectedUsers.length > 0 && selectedUsers.length < users.length;
 
   return (
     <Card className={cn("overflow-hidden", className)}>
@@ -222,7 +214,7 @@ export function UserTable({
                     <Checkbox
                       checked={allSelected}
                       ref={(node: any) => {
-                        if (node) node.indeterminate = someSelected
+                        if (node) node.indeterminate = someSelected;
                       }}
                       onCheckedChange={(checked) => onSelectAll(checked as boolean)}
                       aria-label="Select all users"
@@ -267,8 +259,9 @@ export function UserTable({
                   key={user.id}
                   className={cn(
                     "border-b transition-colors hover:bg-muted/50 cursor-pointer",
-                    focusedRowIndex === index && "bg-muted/50 ring-2 ring-primary ring-inset ring-offset-0",
-                    selectedUsers.includes(user.id) && "bg-muted/30"
+                    focusedRowIndex === index &&
+                      "bg-muted/50 ring-2 ring-primary ring-inset ring-offset-0",
+                    selectedUsers.includes(user.id) && "bg-muted/30",
                   )}
                   tabIndex={0}
                   onKeyDown={(e) => handleKeyDown(e, index)}
@@ -288,10 +281,7 @@ export function UserTable({
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="size-10">
-                        <AvatarImage
-                          src={user.avatar}
-                          alt={`${user.firstName} ${user.lastName}`}
-                        />
+                        <AvatarImage src={user.avatar} alt={`${user.firstName} ${user.lastName}`} />
                         <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-primary font-semibold text-sm">
                           {getInitials(user.firstName || "", user.lastName || "")}
                         </AvatarFallback>
@@ -319,7 +309,7 @@ export function UserTable({
                     <Badge
                       className={cn(
                         "text-xs font-semibold px-2 py-0.5",
-                        getRoleColor(user.userRole)
+                        getRoleColor(user.userRole),
                       )}
                       variant="outline"
                     >
@@ -331,21 +321,23 @@ export function UserTable({
                       <Badge
                         className={cn(
                           "text-xs font-semibold px-2 py-0.5 w-full justify-center",
-                          getStatusColor(user.status)
+                          getStatusColor(user.status),
                         )}
                         variant="outline"
                       >
-                        {user.status.replace("_", " ").charAt(0).toUpperCase() + user.status.replace("_", " ").slice(1)}
+                        {user.status.replace("_", " ").charAt(0).toUpperCase() +
+                          user.status.replace("_", " ").slice(1)}
                       </Badge>
                       <Badge
                         className={cn(
                           "text-xs px-2 py-0.5 w-full justify-center",
-                          getAuthStatusColor(user.authStatus)
+                          getAuthStatusColor(user.authStatus),
                         )}
                         variant="outline"
                       >
-                        {user.authStatus === "two_factor_enabled" ? "2FA" :
-                         user.authStatus.charAt(0).toUpperCase() + user.authStatus.slice(1)}
+                        {user.authStatus === "two_factor_enabled"
+                          ? "2FA"
+                          : user.authStatus.charAt(0).toUpperCase() + user.authStatus.slice(1)}
                       </Badge>
                     </div>
                   </TableCell>
@@ -355,7 +347,10 @@ export function UserTable({
                         <Mail className="size-3 text-muted-foreground" />
                         <span className="truncate max-w-[120px]">{user.email}</span>
                         {user.emailVerified && (
-                          <div className="size-3 rounded-full bg-green-500" title="Email verified" />
+                          <div
+                            className="size-3 rounded-full bg-green-500"
+                            title="Email verified"
+                          />
                         )}
                       </div>
                       {user.phone && (
@@ -363,7 +358,10 @@ export function UserTable({
                           <Phone className="size-3 text-muted-foreground" />
                           <span className="truncate max-w-[120px]">{user.phone}</span>
                           {user.phoneVerified && (
-                            <div className="size-3 rounded-full bg-green-500" title="Phone verified" />
+                            <div
+                              className="size-3 rounded-full bg-green-500"
+                              title="Phone verified"
+                            />
                           )}
                         </div>
                       )}
@@ -448,5 +446,5 @@ export function UserTable({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

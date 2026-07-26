@@ -1,15 +1,16 @@
-'use server';
+"use server";
 
-import { AuthUtils } from '@/lib/auth/utils';
-import { AuthError, AuthErrorType } from '@/lib/auth/common';
-import { loginSchema, signupSchema, forgotPasswordSchema, resetPasswordSchema } from '@/lib/validation/auth.validation';
-import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
-import type {
-  AuthResponse,
-  PasswordResetResponse,
-  SafeUser
-} from '@/types/auth.types';
+import { AuthUtils } from "@/lib/auth/utils";
+import { AuthError, AuthErrorType } from "@/lib/auth/common";
+import {
+  loginSchema,
+  signupSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} from "@/lib/validation/auth.validation";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import type { AuthResponse, PasswordResetResponse, SafeUser } from "@/types/auth.types";
 
 // TODO: Implement proper Better Auth API calls once the correct API surface is identified
 // TODO: Add proper session management functions
@@ -21,7 +22,7 @@ import type {
 function transformUserToSafeUser(user: any): SafeUser {
   return {
     id: user.id,
-    username: user.username || user.name || '',
+    username: user.username || user.name || "",
     email: user.email,
     emailVerified: user.emailVerified,
     displayName: user.name,
@@ -40,8 +41,8 @@ function transformUserToSafeUser(user: any): SafeUser {
 export async function loginAction(formData: FormData): Promise<AuthResponse> {
   try {
     // Extract form data
-    const emailOrUsername = formData.get('emailOrUsername') as string;
-    const password = formData.get('password') as string;
+    const emailOrUsername = formData.get("emailOrUsername") as string;
+    const password = formData.get("password") as string;
 
     // Validate input
     const validatedData = loginSchema.parse({ emailOrUsername, password });
@@ -50,27 +51,27 @@ export async function loginAction(formData: FormData): Promise<AuthResponse> {
     const result = await auth.api.signInEmail({
       body: {
         email: validatedData.emailOrUsername,
-        password: validatedData.password
-      }
+        password: validatedData.password,
+      },
     });
 
     // Better Auth returns session/user object or throws errors
     return {
       success: true,
-      message: 'Login successful',
+      message: "Login successful",
       data: {
         user: transformUserToSafeUser(result.user),
         session: {
           accessToken: result.token,
           refreshToken: result.token, // Better Auth might use the same token
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
-        }
-      }
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        },
+      },
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Login failed'
+      message: error instanceof Error ? error.message : "Login failed",
     };
   }
 }
@@ -81,15 +82,17 @@ export async function loginAction(formData: FormData): Promise<AuthResponse> {
 export async function signupAction(formData: FormData): Promise<AuthResponse> {
   try {
     // Extract form data - handle both regular and numbered field names
-    const email = (formData.get('email') || formData.get('1_email')) as string;
-    const username = (formData.get('username') || formData.get('1_username')) as string;
-    const fullName = (formData.get('fullName') || formData.get('1_fullName')) as string;
-    const password = (formData.get('password') || formData.get('1_password')) as string;
-    const confirmPassword = (formData.get('confirmPassword') || formData.get('1_confirmPassword')) as string;
-    const agreeToTermsValue = (formData.get('agreeToTerms') || formData.get('1_agreeToTerms')) as string;
+    const email = (formData.get("email") || formData.get("1_email")) as string;
+    const username = (formData.get("username") || formData.get("1_username")) as string;
+    const fullName = (formData.get("fullName") || formData.get("1_fullName")) as string;
+    const password = (formData.get("password") || formData.get("1_password")) as string;
+    const confirmPassword = (formData.get("confirmPassword") ||
+      formData.get("1_confirmPassword")) as string;
+    const agreeToTermsValue = (formData.get("agreeToTerms") ||
+      formData.get("1_agreeToTerms")) as string;
 
     // Convert agreeToTerms to boolean
-    const agreeToTerms = agreeToTermsValue === 'true';
+    const agreeToTerms = agreeToTermsValue === "true";
 
     // Validate input
     const validatedData = signupSchema.parse({
@@ -98,7 +101,7 @@ export async function signupAction(formData: FormData): Promise<AuthResponse> {
       fullName,
       password,
       confirmPassword,
-      agreeToTerms
+      agreeToTerms,
     });
 
     // Use Better Auth API for sign up
@@ -107,22 +110,22 @@ export async function signupAction(formData: FormData): Promise<AuthResponse> {
         email: validatedData.email,
         password: validatedData.password,
         name: validatedData.fullName,
-        username: validatedData.username
-      }
+        username: validatedData.username,
+      },
     });
 
     // Better Auth returns either user object or throws errors
     return {
       success: true,
-      message: 'Signup successful',
+      message: "Signup successful",
       data: {
-        user: transformUserToSafeUser(result.user)
-      }
+        user: transformUserToSafeUser(result.user),
+      },
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Signup failed'
+      message: error instanceof Error ? error.message : "Signup failed",
     };
   }
 }
@@ -133,27 +136,28 @@ export async function signupAction(formData: FormData): Promise<AuthResponse> {
 export async function forgotPasswordAction(formData: FormData): Promise<PasswordResetResponse> {
   try {
     // Extract form data
-    const email = formData.get('email') as string;
+    const email = formData.get("email") as string;
 
     // Validate input
     const validatedData = forgotPasswordSchema.parse({ email });
 
     // Use Better Auth API for forgot password
-    await auth.api.forgetPassword({
+    // (renamed from forgetPassword -> requestPasswordReset in better-auth 1.5)
+    await auth.api.requestPasswordReset({
       body: {
         email: validatedData.email,
-        redirectTo: '/auth/reset-password'
-      }
+        redirectTo: "/auth/reset-password",
+      },
     });
 
     return {
       success: true,
-      message: 'Password reset email sent if account exists'
+      message: "Password reset email sent if account exists",
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Password reset failed'
+      message: error instanceof Error ? error.message : "Password reset failed",
     };
   }
 }
@@ -164,33 +168,33 @@ export async function forgotPasswordAction(formData: FormData): Promise<Password
 export async function resetPasswordAction(formData: FormData): Promise<PasswordResetResponse> {
   try {
     // Extract form data
-    const token = formData.get('token') as string;
-    const password = formData.get('password') as string;
-    const confirmPassword = formData.get('confirmPassword') as string;
+    const token = formData.get("token") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
 
     // Validate input
     const validatedData = resetPasswordSchema.parse({
       token,
       password,
-      confirmPassword
+      confirmPassword,
     });
 
     // Use Better Auth API for password reset
     await auth.api.resetPassword({
       body: {
         token: validatedData.token,
-        newPassword: validatedData.password
-      }
+        newPassword: validatedData.password,
+      },
     });
 
     return {
       success: true,
-      message: 'Password reset successful'
+      message: "Password reset successful",
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Password reset failed'
+      message: error instanceof Error ? error.message : "Password reset failed",
     };
   }
 }
@@ -198,25 +202,29 @@ export async function resetPasswordAction(formData: FormData): Promise<PasswordR
 /**
  * Server action to get current user
  */
-export async function getCurrentUserAction(): Promise<{ success: boolean; data?: SafeUser; error?: string }> {
+export async function getCurrentUserAction(): Promise<{
+  success: boolean;
+  data?: SafeUser;
+  error?: string;
+}> {
   try {
     const user = await AuthUtils.getCurrentUser();
 
     if (!user) {
       return {
         success: false,
-        error: 'User not authenticated'
+        error: "User not authenticated",
       };
     }
 
     return {
       success: true,
-      data: transformUserToSafeUser(user)
+      data: transformUserToSafeUser(user),
     };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to get current user'
+      error: error instanceof Error ? error.message : "Failed to get current user",
     };
   }
 }
@@ -227,10 +235,10 @@ export async function getCurrentUserAction(): Promise<{ success: boolean; data?:
 export async function updateProfileAction(formData: FormData): Promise<AuthResponse> {
   try {
     // Extract form data
-    const displayName = formData.get('displayName') as string;
-    const bio = formData.get('bio') as string;
-    const profilePhoto = formData.get('profilePhoto') as string;
-    const externalLinksStr = formData.get('externalLinks') as string;
+    const displayName = formData.get("displayName") as string;
+    const bio = formData.get("bio") as string;
+    const profilePhoto = formData.get("profilePhoto") as string;
+    const externalLinksStr = formData.get("externalLinks") as string;
 
     // Parse externalLinks if provided
     let externalLinks;
@@ -238,7 +246,7 @@ export async function updateProfileAction(formData: FormData): Promise<AuthRespo
       try {
         externalLinks = JSON.parse(externalLinksStr);
       } catch (parseError) {
-        console.warn('Failed to parse externalLinks:', parseError);
+        console.warn("Failed to parse externalLinks:", parseError);
         externalLinks = null;
       }
     }
@@ -250,7 +258,7 @@ export async function updateProfileAction(formData: FormData): Promise<AuthRespo
     const updateBody: any = {
       name: displayName || undefined,
       bio: bio || undefined,
-      image: profilePhoto || undefined
+      image: profilePhoto || undefined,
     };
 
     // Only include externalLinks if it was provided
@@ -261,20 +269,20 @@ export async function updateProfileAction(formData: FormData): Promise<AuthRespo
     // Use Better Auth API for profile update
     const updatedUser = await auth.api.updateUser({
       body: updateBody,
-      headers: requestHeaders
+      headers: requestHeaders,
     });
 
     return {
       success: true,
-      message: 'Profile updated successfully',
+      message: "Profile updated successfully",
       data: {
-        user: transformUserToSafeUser(updatedUser)
-      }
+        user: transformUserToSafeUser(updatedUser),
+      },
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Profile update failed'
+      message: error instanceof Error ? error.message : "Profile update failed",
     };
   }
 }
@@ -285,15 +293,15 @@ export async function updateProfileAction(formData: FormData): Promise<AuthRespo
 export async function changePasswordAction(formData: FormData): Promise<PasswordResetResponse> {
   try {
     // Extract form data
-    const currentPassword = formData.get('currentPassword') as string;
-    const newPassword = formData.get('newPassword') as string;
-    const confirmPassword = formData.get('confirmPassword') as string;
+    const currentPassword = formData.get("currentPassword") as string;
+    const newPassword = formData.get("newPassword") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
 
     // Validate passwords match
     if (newPassword !== confirmPassword) {
       return {
         success: false,
-        message: 'New passwords do not match'
+        message: "New passwords do not match",
       };
     }
 
@@ -305,19 +313,19 @@ export async function changePasswordAction(formData: FormData): Promise<Password
       body: {
         currentPassword: currentPassword,
         newPassword: newPassword,
-        revokeOtherSessions: true
+        revokeOtherSessions: true,
       },
-      headers: requestHeaders
+      headers: requestHeaders,
     });
 
     return {
       success: true,
-      message: 'Password changed successfully'
+      message: "Password changed successfully",
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Password change failed'
+      message: error instanceof Error ? error.message : "Password change failed",
     };
   }
 }
@@ -332,17 +340,17 @@ export async function getUserSessionsAction(): Promise<any> {
 
     // Use Better Auth API to list sessions
     const sessions = await auth.api.listSessions({
-      headers: requestHeaders
+      headers: requestHeaders,
     });
 
     return {
       success: true,
-      data: sessions
+      data: sessions,
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to get sessions'
+      message: error instanceof Error ? error.message : "Failed to get sessions",
     };
   }
 }
@@ -358,19 +366,19 @@ export async function revokeSessionAction(sessionId: string): Promise<PasswordRe
     // Use Better Auth API to revoke session
     await auth.api.revokeSession({
       body: {
-        token: sessionId
+        token: sessionId,
       },
-      headers: requestHeaders
+      headers: requestHeaders,
     });
 
     return {
       success: true,
-      message: 'Session revoked successfully'
+      message: "Session revoked successfully",
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to revoke session'
+      message: error instanceof Error ? error.message : "Failed to revoke session",
     };
   }
 }
@@ -385,17 +393,17 @@ export async function revokeOtherSessionsAction(): Promise<PasswordResetResponse
 
     // Use Better Auth API to revoke other sessions
     await auth.api.revokeOtherSessions({
-      headers: requestHeaders
+      headers: requestHeaders,
     });
 
     return {
       success: true,
-      message: 'Other sessions revoked successfully'
+      message: "Other sessions revoked successfully",
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to revoke other sessions'
+      message: error instanceof Error ? error.message : "Failed to revoke other sessions",
     };
   }
 }
@@ -410,17 +418,17 @@ export async function revokeAllOtherSessionsAction(): Promise<PasswordResetRespo
 
     // Use Better Auth API to revoke other sessions
     await auth.api.revokeOtherSessions({
-      headers: requestHeaders
+      headers: requestHeaders,
     });
 
     return {
       success: true,
-      message: 'All other sessions revoked successfully'
+      message: "All other sessions revoked successfully",
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to revoke other sessions'
+      message: error instanceof Error ? error.message : "Failed to revoke other sessions",
     };
   }
 }
@@ -435,17 +443,17 @@ export async function signOutAction(): Promise<PasswordResetResponse> {
 
     // Use Better Auth API for sign out
     await auth.api.signOut({
-      headers: requestHeaders
+      headers: requestHeaders,
     });
 
     return {
       success: true,
-      message: 'Signed out successfully'
+      message: "Signed out successfully",
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Sign out failed'
+      message: error instanceof Error ? error.message : "Sign out failed",
     };
   }
 }
@@ -455,16 +463,16 @@ export async function signOutAction(): Promise<PasswordResetResponse> {
  */
 export async function deleteAccountAction(): Promise<PasswordResetResponse> {
   try {
-    console.log('Account deletion attempt');
+    console.log("Account deletion attempt");
 
     return {
       success: true,
-      message: 'Account deletion functionality is being refactored. Please check back soon.'
+      message: "Account deletion functionality is being refactored. Please check back soon.",
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Account deletion failed'
+      message: error instanceof Error ? error.message : "Account deletion failed",
     };
   }
 }

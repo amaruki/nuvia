@@ -1,138 +1,141 @@
-"use client"
+"use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { MembershipProfile, MembershipTier, MembershipStatus } from "@/types/membership.types"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { MembershipProfile, MembershipTier, MembershipStatus } from "@/types/membership.types";
 import {
   MapPin,
   Mail,
   Phone,
   Calendar,
   ExternalLink,
-  Linkedin,
+  Link2 as Linkedin, // lucide-react v1 dropped brand icons — see TODO.md
   Building,
   Users,
   Award,
-  Clock
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+  Clock,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface MemberCardProps {
-  member: MembershipProfile
-  className?: string
+  member: MembershipProfile;
+  className?: string;
 }
 
 function getTierColor(tier: MembershipTier): string {
   switch (tier) {
     case MembershipTier.BASIC:
-      return "bg-secondary text-secondary-foreground border-border"
+      return "bg-secondary text-secondary-foreground border-border";
     case MembershipTier.STUDENT:
-      return "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 border-blue-300 dark:border-blue-700"
+      return "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 border-blue-300 dark:border-blue-700";
     case MembershipTier.PROFESSIONAL:
-      return "bg-indigo-100 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100 border-indigo-300 dark:border-indigo-700"
+      return "bg-indigo-100 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100 border-indigo-300 dark:border-indigo-700";
     case MembershipTier.CORPORATE:
-      return "bg-purple-100 dark:bg-purple-900 text-purple-900 dark:text-purple-100 border-purple-300 dark:border-purple-700"
+      return "bg-purple-100 dark:bg-purple-900 text-purple-900 dark:text-purple-100 border-purple-300 dark:border-purple-700";
     case MembershipTier.PREMIUM:
-      return "bg-amber-100 dark:bg-amber-900 text-amber-900 dark:text-amber-100 border-amber-300 dark:border-amber-700"
+      return "bg-amber-100 dark:bg-amber-900 text-amber-900 dark:text-amber-100 border-amber-300 dark:border-amber-700";
     case MembershipTier.VIP:
-      return "bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900 dark:to-yellow-900 text-amber-900 dark:text-amber-100 border-amber-400 dark:border-amber-600"
+      return "bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900 dark:to-yellow-900 text-amber-900 dark:text-amber-100 border-amber-400 dark:border-amber-600";
     default:
-      return "bg-secondary text-secondary-foreground border-border"
+      return "bg-secondary text-secondary-foreground border-border";
   }
 }
 
 function getStatusColor(status: MembershipStatus): string {
   switch (status) {
     case MembershipStatus.ACTIVE:
-      return "bg-green-100 dark:bg-green-900 text-green-900 dark:text-green-100 border-green-300 dark:border-green-700"
+      return "bg-green-100 dark:bg-green-900 text-green-900 dark:text-green-100 border-green-300 dark:border-green-700";
     case MembershipStatus.EXPIRED:
-      return "bg-destructive/10 text-destructive border-destructive/30"
+      return "bg-destructive/10 text-destructive border-destructive/30";
     case MembershipStatus.PENDING:
-      return "bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 border-yellow-300 dark:border-yellow-700"
+      return "bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 border-yellow-300 dark:border-yellow-700";
     case MembershipStatus.SUSPENDED:
-      return "bg-orange-100 dark:bg-orange-900 text-orange-900 dark:text-orange-100 border-orange-300 dark:border-orange-700"
+      return "bg-orange-100 dark:bg-orange-900 text-orange-900 dark:text-orange-100 border-orange-300 dark:border-orange-700";
     case MembershipStatus.CANCELLED:
-      return "bg-muted text-muted-foreground border-border"
+      return "bg-muted text-muted-foreground border-border";
     default:
-      return "bg-muted text-muted-foreground border-border"
+      return "bg-muted text-muted-foreground border-border";
   }
 }
 
 function getTierAccent(tier: MembershipTier): string {
   switch (tier) {
     case MembershipTier.BASIC:
-      return "border-l-muted"
+      return "border-l-muted";
     case MembershipTier.STUDENT:
-      return "border-l-blue-500"
+      return "border-l-blue-500";
     case MembershipTier.PROFESSIONAL:
-      return "border-l-indigo-500"
+      return "border-l-indigo-500";
     case MembershipTier.CORPORATE:
-      return "border-l-purple-500"
+      return "border-l-purple-500";
     case MembershipTier.PREMIUM:
-      return "border-l-amber-500"
+      return "border-l-amber-500";
     case MembershipTier.VIP:
-      return "border-l-amber-500"
+      return "border-l-amber-500";
     default:
-      return "border-l-muted"
+      return "border-l-muted";
   }
 }
 
 function formatDateString(date: Date | null): string {
-  if (!date) return "Lifetime"
+  if (!date) return "Lifetime";
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
-    day: "numeric"
-  }).format(date)
+    day: "numeric",
+  }).format(date);
 }
 
 function getInitials(firstName: string, lastName: string): string {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 }
 
 export function MemberCard({ member, className }: MemberCardProps) {
-  const isExpired = member.membershipStatus === MembershipStatus.EXPIRED
-  const hasSocialLinks = member.linkedin || member.website
+  const isExpired = member.membershipStatus === MembershipStatus.EXPIRED;
+  const hasSocialLinks = member.linkedin || member.website;
 
   return (
-    <Card className={cn(
-      "group relative overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4",
-      getTierAccent(member.membershipTier),
-      "hover:border-primary/20 hover:-translate-y-1",
-      isExpired && "opacity-70 grayscale-[0.3]",
-      className
-    )}>
+    <Card
+      className={cn(
+        "group relative overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4",
+        getTierAccent(member.membershipTier),
+        "hover:border-primary/20 hover:-translate-y-1",
+        isExpired && "opacity-70 grayscale-[0.3]",
+        className,
+      )}
+    >
       {/* Tier Indicator Dot */}
-      <div className={cn(
-        "absolute top-4 right-4 size-2.5 rounded-full",
-        member.membershipStatus === MembershipStatus.ACTIVE ? "bg-green-500 animate-pulse" : "bg-muted"
-      )} />
+      <div
+        className={cn(
+          "absolute top-4 right-4 size-2.5 rounded-full",
+          member.membershipStatus === MembershipStatus.ACTIVE
+            ? "bg-green-500 animate-pulse"
+            : "bg-muted",
+        )}
+      />
 
       <CardContent>
         {/* Header Section - Improved Visual Hierarchy */}
         <div className="flex items-start gap-4 mb-5">
           <Avatar className="size-16 ring-2 ring-background shadow-md">
-            <AvatarImage
-              src={member.avatar}
-              alt={`${member.firstName} ${member.lastName}`}
-            />
+            <AvatarImage src={member.avatar} alt={`${member.firstName} ${member.lastName}`} />
             <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-primary font-semibold text-lg">
               {getInitials(member.firstName || "", member.lastName || "")}
             </AvatarFallback>
           </Avatar>
-          
+
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-lg text-foreground mb-1 truncate group-hover:text-primary transition-colors">
               {member.firstName} {member.lastName}
             </h3>
-            
+
             {member.jobTitle && (
               <p className="text-sm font-medium text-muted-foreground truncate mb-1.5">
                 {member.jobTitle}
               </p>
             )}
-            
+
             {member.company && (
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Building className="size-3.5 flex-shrink-0" />
@@ -147,7 +150,7 @@ export function MemberCard({ member, className }: MemberCardProps) {
           <Badge
             className={cn(
               "text-xs font-semibold px-2.5 py-0.5 flex items-center gap-1.5",
-              getTierColor(member.membershipTier)
+              getTierColor(member.membershipTier),
             )}
             variant="outline"
           >
@@ -157,7 +160,7 @@ export function MemberCard({ member, className }: MemberCardProps) {
           <Badge
             className={cn(
               "text-xs font-semibold px-2.5 py-0.5 flex items-center gap-1.5",
-              getStatusColor(member.membershipStatus)
+              getStatusColor(member.membershipStatus),
             )}
             variant="outline"
           >
@@ -263,5 +266,5 @@ export function MemberCard({ member, className }: MemberCardProps) {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

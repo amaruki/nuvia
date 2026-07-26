@@ -17,10 +17,26 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 
+// lucide-react v1 dropped all brand/logo icons (Github, Linkedin, Twitter,
+// Instagram, Youtube, Facebook) — see TODO.md. These are generic stand-ins,
+// not brand marks; swap to a dedicated icon set (e.g. simple-icons) to
+// restore recognizable per-platform icons.
 import {
-  Link, Plus, X, CheckCircle, AlertCircle, ExternalLink,
-  Github, Linkedin, Twitter, Globe, Instagram, Youtube,
-  Facebook, Loader2, Save
+  Link,
+  Plus,
+  X,
+  CheckCircle,
+  AlertCircle,
+  ExternalLink,
+  Code as Github,
+  Link2 as Linkedin,
+  MessageCircle as Twitter,
+  Globe,
+  Image as Instagram,
+  Video as Youtube,
+  Users as Facebook,
+  Loader2,
+  Save,
 } from "lucide-react";
 
 import { updateProfileAction } from "@/lib/actions/auth.actions";
@@ -29,11 +45,11 @@ import { updateProfileAction } from "@/lib/actions/auth.actions";
 const socialLinkSchema = z.object({
   platform: z.string().min(1, "Platform is required"),
   url: z.string().url("Please enter a valid URL"),
-  label: z.string().optional()
+  label: z.string().optional(),
 });
 
 const socialLinksFormSchema = z.object({
-  links: z.array(socialLinkSchema).optional()
+  links: z.array(socialLinkSchema).optional(),
 });
 
 interface SocialLinksFormProps {
@@ -47,50 +63,50 @@ const socialPlatforms = {
     icon: Twitter,
     baseUrl: "https://twitter.com/",
     pattern: /^https?:\/\/(www\.)?twitter\.com\/.+/,
-    color: "text-[#1DA1F2]"
+    color: "text-[#1DA1F2]",
   },
   linkedin: {
     name: "LinkedIn",
     icon: Linkedin,
     baseUrl: "https://linkedin.com/in/",
     pattern: /^https?:\/\/(www\.)?linkedin\.com\/in\/.+/,
-    color: "text-[#0077B5]"
+    color: "text-[#0077B5]",
   },
   github: {
     name: "GitHub",
     icon: Github,
     baseUrl: "https://github.com/",
     pattern: /^https?:\/\/(www\.)?github\.com\/.+/,
-    color: "text-[#333333]"
+    color: "text-[#333333]",
   },
   instagram: {
     name: "Instagram",
     icon: Instagram,
     baseUrl: "https://instagram.com/",
     pattern: /^https?:\/\/(www\.)?instagram\.com\/.+/,
-    color: "text-[#E4405F]"
+    color: "text-[#E4405F]",
   },
   youtube: {
     name: "YouTube",
     icon: Youtube,
     baseUrl: "https://youtube.com/",
     pattern: /^https?:\/\/(www\.)?youtube\.com\/.+/,
-    color: "text-[#FF0000]"
+    color: "text-[#FF0000]",
   },
   facebook: {
     name: "Facebook",
     icon: Facebook,
     baseUrl: "https://facebook.com/",
     pattern: /^https?:\/\/(www\.)?facebook\.com\/.+/,
-    color: "text-[#1877F2]"
+    color: "text-[#1877F2]",
   },
   website: {
     name: "Website",
     icon: Globe,
     baseUrl: "https://",
     pattern: /^https?:\/\/.+/,
-    color: "text-blue-600"
-  }
+    color: "text-blue-600",
+  },
 } as const;
 
 type SocialPlatform = keyof typeof socialPlatforms;
@@ -113,37 +129,39 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
     ? Object.entries(user.externalLinks as Record<string, any>).map(([key, value]) => ({
         id: key,
         platform: key as SocialPlatform,
-        url: typeof value === 'string' ? value : value.url,
-        label: typeof value === 'string' ? undefined : value.label
+        url: typeof value === "string" ? value : value.url,
+        label: typeof value === "string" ? undefined : value.label,
       }))
     : [];
 
   const [links, setLinks] = useState<SocialLink[]>(existingLinks);
   const [newLink, setNewLink] = useState<Partial<SocialLink>>({
-    platform: 'github',
-    url: '',
-    label: ''
+    platform: "github",
+    url: "",
+    label: "",
   });
 
   const linksForm = useForm({
     resolver: zodResolver(socialLinksFormSchema),
     defaultValues: {
-      links: existingLinks
-    }
+      links: existingLinks,
+    },
   });
 
   const socialLinksMutation = useMutation({
     mutationFn: async (updatedLinks: SocialLink[]) => {
       // Convert links array to the format expected by the API
-      const externalLinks = JSON.stringify(updatedLinks.map(link => ({
-        platform: link.platform,
-        url: link.url,
-        username: link.label
-      })));
+      const externalLinks = JSON.stringify(
+        updatedLinks.map((link) => ({
+          platform: link.platform,
+          url: link.url,
+          username: link.label,
+        })),
+      );
 
       // Create FormData for server action
       const formData = new FormData();
-      formData.append('externalLinks', externalLinks);
+      formData.append("externalLinks", externalLinks);
 
       const result = await updateProfileAction(formData);
 
@@ -163,7 +181,7 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
     },
     onError: (error: any) => {
       console.error("Failed to update social links:", error);
-    }
+    },
   });
 
   const validateSocialUrl = (platform: SocialPlatform, url: string): boolean => {
@@ -176,9 +194,7 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
       return;
     }
 
-    const url = newLink.url.startsWith('http')
-      ? newLink.url
-      : `https://${newLink.url}`;
+    const url = newLink.url.startsWith("http") ? newLink.url : `https://${newLink.url}`;
 
     if (!validateSocialUrl(newLink.platform, url)) {
       // You could show an error message here
@@ -189,16 +205,16 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
       id: Date.now().toString(),
       platform: newLink.platform,
       url,
-      label: newLink.label
+      label: newLink.label,
     };
 
     setLinks([...links, linkToAdd]);
-    setNewLink({ platform: 'github', url: '', label: '' });
+    setNewLink({ platform: "github", url: "", label: "" });
     setIsAddingLink(false);
   };
 
   const removeLink = (id: string) => {
-    setLinks(links.filter(link => link.id !== id));
+    setLinks(links.filter((link) => link.id !== id));
   };
 
   const saveLinks = () => {
@@ -216,9 +232,7 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
       {isSuccess && (
         <Alert className="border-green-200 bg-green-50 text-green-800">
           <CheckCircle className="h-4 w-4" />
-          <AlertDescription>
-            Social links updated successfully!
-          </AlertDescription>
+          <AlertDescription>Social links updated successfully!</AlertDescription>
         </Alert>
       )}
 
@@ -233,11 +247,11 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             {Object.entries(socialPlatforms)
-              .filter(([key]) => ['twitter', 'github', 'linkedin'].includes(key))
+              .filter(([key]) => ["twitter", "github", "linkedin"].includes(key))
               .map(([key, platform]) => {
                 const Icon = platform.icon;
-                const isConnected = user.accounts?.some((account: any) =>
-                  account.provider.toLowerCase() === key
+                const isConnected = user.accounts?.some(
+                  (account: any) => account.provider.toLowerCase() === key,
                 );
 
                 return (
@@ -250,14 +264,14 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
                       <div>
                         <p className="font-medium">{platform.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {isConnected ? 'Connected' : 'Not connected'}
+                          {isConnected ? "Connected" : "Not connected"}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Switch checked={isConnected} disabled />
                       <Badge variant={isConnected ? "default" : "secondary"}>
-                        {isConnected ? 'Connected' : 'Connect'}
+                        {isConnected ? "Connected" : "Connect"}
                       </Badge>
                     </div>
                   </div>
@@ -286,11 +300,10 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
             <div className="space-y-3">
               <h4 className="text-sm font-medium">Your Links</h4>
               {links.map((link) => (
-                <div
-                  key={link.id}
-                  className="flex items-center gap-3 p-3 border rounded-lg"
-                >
-                  <div className={`flex items-center gap-2 ${socialPlatforms[link.platform].color}`}>
+                <div key={link.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                  <div
+                    className={`flex items-center gap-2 ${socialPlatforms[link.platform].color}`}
+                  >
                     {getPlatformIcon(link.platform)}
                     <span className="font-medium text-sm">
                       {socialPlatforms[link.platform].name}
@@ -306,9 +319,7 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
                       <ExternalLink className="h-3 w-3" />
                       {link.url}
                     </a>
-                    {link.label && (
-                      <p className="text-xs text-muted-foreground">{link.label}</p>
-                    )}
+                    {link.label && <p className="text-xs text-muted-foreground">{link.label}</p>}
                   </div>
                   <Button
                     variant="ghost"
@@ -334,10 +345,12 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
                   <select
                     id="platform"
                     value={newLink.platform}
-                    onChange={(e) => setNewLink({
-                      ...newLink,
-                      platform: e.target.value as SocialPlatform
-                    })}
+                    onChange={(e) =>
+                      setNewLink({
+                        ...newLink,
+                        platform: e.target.value as SocialPlatform,
+                      })
+                    }
                     className="w-full p-2 border rounded-md text-sm"
                   >
                     {Object.entries(socialPlatforms).map(([key, platform]) => (
@@ -353,11 +366,13 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
                   <Input
                     id="label"
                     placeholder="My Portfolio"
-                    value={newLink.label || ''}
-                    onChange={(e) => setNewLink({
-                      ...newLink,
-                      label: e.target.value
-                    })}
+                    value={newLink.label || ""}
+                    onChange={(e) =>
+                      setNewLink({
+                        ...newLink,
+                        label: e.target.value,
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -367,11 +382,13 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
                 <Input
                   id="url"
                   placeholder={socialPlatforms[newLink.platform as SocialPlatform]?.baseUrl}
-                  value={newLink.url || ''}
-                  onChange={(e) => setNewLink({
-                    ...newLink,
-                    url: e.target.value
-                  })}
+                  value={newLink.url || ""}
+                  onChange={(e) =>
+                    setNewLink({
+                      ...newLink,
+                      url: e.target.value,
+                    })
+                  }
                 />
               </div>
 
@@ -384,7 +401,7 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
                   variant="outline"
                   onClick={() => {
                     setIsAddingLink(false);
-                    setNewLink({ platform: 'github', url: '', label: '' });
+                    setNewLink({ platform: "github", url: "", label: "" });
                   }}
                   size="sm"
                 >
@@ -393,11 +410,7 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
               </div>
             </div>
           ) : (
-            <Button
-              variant="outline"
-              onClick={() => setIsAddingLink(true)}
-              className="w-full"
-            >
+            <Button variant="outline" onClick={() => setIsAddingLink(true)} className="w-full">
               <Plus className="h-4 w-4 mr-2" />
               Add Social Link
             </Button>

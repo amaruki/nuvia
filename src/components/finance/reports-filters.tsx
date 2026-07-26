@@ -9,7 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CalendarIcon, X, Filter } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -81,9 +87,7 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
 
   const handleTypeChange = (type: string, checked: boolean) => {
     const currentTypes = filters.type || [];
-    const newTypes = checked
-      ? [...currentTypes, type]
-      : currentTypes.filter(t => t !== type);
+    const newTypes = checked ? [...currentTypes, type] : currentTypes.filter((t) => t !== type);
     onFiltersChange({ type: newTypes });
   };
 
@@ -91,7 +95,7 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
     const currentStatuses = filters.status || [];
     const newStatuses = checked
       ? [...currentStatuses, status]
-      : currentStatuses.filter(s => s !== status);
+      : currentStatuses.filter((s) => s !== status);
     onFiltersChange({ status: newStatuses });
   };
 
@@ -99,7 +103,7 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
     const currentPeriods = filters.period || [];
     const newPeriods = checked
       ? [...currentPeriods, period]
-      : currentPeriods.filter(p => p !== period);
+      : currentPeriods.filter((p) => p !== period);
     onFiltersChange({ period: newPeriods });
   };
 
@@ -107,22 +111,20 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
     const currentGeneratedBy = filters.generatedBy || [];
     const newGeneratedBy = checked
       ? [...currentGeneratedBy, generatedBy]
-      : currentGeneratedBy.filter(g => g !== generatedBy);
+      : currentGeneratedBy.filter((g) => g !== generatedBy);
     onFiltersChange({ generatedBy: newGeneratedBy });
   };
 
   const handleTagChange = (tag: string, checked: boolean) => {
     const currentTags = filters.tags || [];
-    const newTags = checked
-      ? [...currentTags, tag]
-      : currentTags.filter(t => t !== tag);
+    const newTags = checked ? [...currentTags, tag] : currentTags.filter((t) => t !== tag);
     onFiltersChange({ tags: newTags });
   };
 
-  const handleDateRangeChange = (type: 'start' | 'end', date?: Date) => {
+  const handleDateRangeChange = (type: "start" | "end", date?: Date) => {
     const newDateRange = { ...dateRange, [type]: date };
     setDateRange(newDateRange);
-    
+
     if (newDateRange.start && newDateRange.end) {
       onFiltersChange({ dateRange: { start: newDateRange.start, end: newDateRange.end } });
     }
@@ -207,7 +209,9 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
                 <Checkbox
                   id={`status-${status.value}`}
                   checked={filters.status?.includes(status.value) || false}
-                  onCheckedChange={(checked) => handleStatusChange(status.value, checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    handleStatusChange(status.value, checked as boolean)
+                  }
                 />
                 <Label
                   htmlFor={`status-${status.value}`}
@@ -229,7 +233,9 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
                 <Checkbox
                   id={`period-${period.value}`}
                   checked={filters.period?.includes(period.value) || false}
-                  onCheckedChange={(checked) => handlePeriodChange(period.value, checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    handlePeriodChange(period.value, checked as boolean)
+                  }
                 />
                 <Label
                   htmlFor={`period-${period.value}`}
@@ -254,7 +260,7 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !dateRange.start && "text-muted-foreground"
+                      !dateRange.start && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -265,8 +271,8 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
                   <Calendar
                     mode="single"
                     selected={dateRange.start}
-                    onSelect={(date) => handleDateRangeChange('start', date)}
-                    initialFocus
+                    onSelect={(date) => handleDateRangeChange("start", date)}
+                    autoFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -279,7 +285,7 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !dateRange.end && "text-muted-foreground"
+                      !dateRange.end && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -290,8 +296,8 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
                   <Calendar
                     mode="single"
                     selected={dateRange.end}
-                    onSelect={(date) => handleDateRangeChange('end', date)}
-                    initialFocus
+                    onSelect={(date) => handleDateRangeChange("end", date)}
+                    autoFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -308,7 +314,9 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
                 <Checkbox
                   id={`generated-by-${option.value}`}
                   checked={filters.generatedBy?.includes(option.value) || false}
-                  onCheckedChange={(checked) => handleGeneratedByChange(option.value, checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    handleGeneratedByChange(option.value, checked as boolean)
+                  }
                 />
                 <Label
                   htmlFor={`generated-by-${option.value}`}

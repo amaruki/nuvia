@@ -28,12 +28,8 @@ interface DuesFiltersProps {
 }
 
 export function DuesFilters({ filters, onFiltersChange, onClearFilters }: DuesFiltersProps) {
-  const [dateRangeStart, setDateRangeStart] = useState<Date | undefined>(
-    filters.dateRange?.start
-  );
-  const [dateRangeEnd, setDateRangeEnd] = useState<Date | undefined>(
-    filters.dateRange?.end
-  );
+  const [dateRangeStart, setDateRangeStart] = useState<Date | undefined>(filters.dateRange?.start);
+  const [dateRangeEnd, setDateRangeEnd] = useState<Date | undefined>(filters.dateRange?.end);
 
   const handleStatusChange = (value: string) => {
     if (value === "all") {
@@ -120,10 +116,7 @@ export function DuesFilters({ filters, onFiltersChange, onClearFilters }: DuesFi
           {/* Status Filter */}
           <div className="space-y-2">
             <Label>Status</Label>
-            <Select
-              value={filters.status?.[0] || "all"}
-              onValueChange={handleStatusChange}
-            >
+            <Select value={filters.status?.[0] || "all"} onValueChange={handleStatusChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
@@ -141,10 +134,7 @@ export function DuesFilters({ filters, onFiltersChange, onClearFilters }: DuesFi
           {/* Tier Filter */}
           <div className="space-y-2">
             <Label>Membership Tier</Label>
-            <Select
-              value={filters.tier?.[0] || "all"}
-              onValueChange={handleTierChange}
-            >
+            <Select value={filters.tier?.[0] || "all"} onValueChange={handleTierChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Select tier" />
               </SelectTrigger>
@@ -171,7 +161,7 @@ export function DuesFilters({ filters, onFiltersChange, onClearFilters }: DuesFi
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !dateRangeStart && "text-muted-foreground"
+                    !dateRangeStart && "text-muted-foreground",
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -183,7 +173,7 @@ export function DuesFilters({ filters, onFiltersChange, onClearFilters }: DuesFi
                   mode="single"
                   selected={dateRangeStart}
                   onSelect={setDateRangeStart}
-                  initialFocus
+                  autoFocus
                 />
               </PopoverContent>
             </Popover>
@@ -194,7 +184,7 @@ export function DuesFilters({ filters, onFiltersChange, onClearFilters }: DuesFi
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !dateRangeEnd && "text-muted-foreground"
+                    !dateRangeEnd && "text-muted-foreground",
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -206,7 +196,7 @@ export function DuesFilters({ filters, onFiltersChange, onClearFilters }: DuesFi
                   mode="single"
                   selected={dateRangeEnd}
                   onSelect={setDateRangeEnd}
-                  initialFocus
+                  autoFocus
                 />
               </PopoverContent>
             </Popover>

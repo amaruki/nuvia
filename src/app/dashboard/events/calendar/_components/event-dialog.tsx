@@ -13,11 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -38,12 +34,7 @@ interface EventDialogProps {
   defaultDate?: Date;
 }
 
-export function EventDialog({
-  children,
-  open,
-  onOpenChange,
-  defaultDate,
-}: EventDialogProps) {
+export function EventDialog({ children, open, onOpenChange, defaultDate }: EventDialogProps) {
   const [date, setDate] = useState<Date | undefined>(defaultDate);
 
   useEffect(() => {
@@ -58,9 +49,7 @@ export function EventDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add New Event</DialogTitle>
-          <DialogDescription>
-            Create a new event for the community calendar.
-          </DialogDescription>
+          <DialogDescription>Create a new event for the community calendar.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
@@ -76,7 +65,7 @@ export function EventDialog({
                     variant={"outline"}
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !date && "text-muted-foreground"
+                      !date && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -84,12 +73,7 @@ export function EventDialog({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    initialFocus
-                  />
+                  <Calendar mode="single" selected={date} onSelect={setDate} autoFocus />
                 </PopoverContent>
               </Popover>
             </div>
@@ -126,10 +110,7 @@ export function EventDialog({
           </div>
           <div className="grid gap-2">
             <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Add details about the event..."
-            />
+            <Textarea id="description" placeholder="Add details about the event..." />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="category">Category</Label>

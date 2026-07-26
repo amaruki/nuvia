@@ -15,11 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DonationFilterOptions } from "@/types/finance.types";
 import { CalendarIcon, X, Filter } from "lucide-react";
 import { format } from "date-fns";
@@ -75,8 +71,8 @@ export function DonationsFilters({
     const currentStatuses = filters.status || [];
     const newStatuses = checked
       ? [...currentStatuses, status]
-      : currentStatuses.filter(s => s !== status);
-    
+      : currentStatuses.filter((s) => s !== status);
+
     onFiltersChange({ status: newStatuses.length > 0 ? newStatuses : undefined });
   };
 
@@ -84,8 +80,8 @@ export function DonationsFilters({
     const currentDonorTypes = filters.donorType || [];
     const newDonorTypes = checked
       ? [...currentDonorTypes, donorType]
-      : currentDonorTypes.filter(t => t !== donorType);
-    
+      : currentDonorTypes.filter((t) => t !== donorType);
+
     onFiltersChange({ donorType: newDonorTypes.length > 0 ? newDonorTypes : undefined });
   };
 
@@ -93,8 +89,8 @@ export function DonationsFilters({
     const currentDonationTypes = filters.donationType || [];
     const newDonationTypes = checked
       ? [...currentDonationTypes, donationType]
-      : currentDonationTypes.filter(t => t !== donationType);
-    
+      : currentDonationTypes.filter((t) => t !== donationType);
+
     onFiltersChange({ donationType: newDonationTypes.length > 0 ? newDonationTypes : undefined });
   };
 
@@ -102,8 +98,8 @@ export function DonationsFilters({
     const currentCampaigns = filters.campaign || [];
     const newCampaigns = checked
       ? [...currentCampaigns, campaign]
-      : currentCampaigns.filter(c => c !== campaign);
-    
+      : currentCampaigns.filter((c) => c !== campaign);
+
     onFiltersChange({ campaign: newCampaigns.length > 0 ? newCampaigns : undefined });
   };
 
@@ -120,9 +116,9 @@ export function DonationsFilters({
     const numValue = value ? parseFloat(value) : undefined;
     const currentRange = filters.amountRange || { min: 0, max: 10000 };
     const newRange = { ...currentRange, [type]: numValue };
-    
-    onFiltersChange({ 
-      amountRange: (newRange.min !== undefined || newRange.max !== undefined) ? newRange : undefined 
+
+    onFiltersChange({
+      amountRange: newRange.min !== undefined || newRange.max !== undefined ? newRange : undefined,
     });
   };
 
@@ -171,7 +167,9 @@ export function DonationsFilters({
                 <Checkbox
                   id={`status-${option.value}`}
                   checked={filters.status?.includes(option.value) || false}
-                  onCheckedChange={(checked) => handleStatusChange(option.value, checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    handleStatusChange(option.value, checked as boolean)
+                  }
                 />
                 <Label htmlFor={`status-${option.value}`} className="text-sm">
                   {option.label}
@@ -190,7 +188,9 @@ export function DonationsFilters({
                 <Checkbox
                   id={`donor-type-${option.value}`}
                   checked={filters.donorType?.includes(option.value) || false}
-                  onCheckedChange={(checked) => handleDonorTypeChange(option.value, checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    handleDonorTypeChange(option.value, checked as boolean)
+                  }
                 />
                 <Label htmlFor={`donor-type-${option.value}`} className="text-sm">
                   {option.label}
@@ -209,7 +209,9 @@ export function DonationsFilters({
                 <Checkbox
                   id={`donation-type-${option.value}`}
                   checked={filters.donationType?.includes(option.value) || false}
-                  onCheckedChange={(checked) => handleDonationTypeChange(option.value, checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    handleDonationTypeChange(option.value, checked as boolean)
+                  }
                 />
                 <Label htmlFor={`donation-type-${option.value}`} className="text-sm">
                   {option.label}
@@ -228,7 +230,9 @@ export function DonationsFilters({
                 <Checkbox
                   id={`campaign-${option.value}`}
                   checked={filters.campaign?.includes(option.value) || false}
-                  onCheckedChange={(checked) => handleCampaignChange(option.value, checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    handleCampaignChange(option.value, checked as boolean)
+                  }
                 />
                 <Label htmlFor={`campaign-${option.value}`} className="text-sm">
                   {option.label}
@@ -247,15 +251,14 @@ export function DonationsFilters({
                 variant="outline"
                 className={cn(
                   "w-full justify-start text-left font-normal",
-                  !dateRange.start && !dateRange.end && "text-muted-foreground"
+                  !dateRange.start && !dateRange.end && "text-muted-foreground",
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {dateRange.start ? (
                   dateRange.end ? (
                     <>
-                      {format(dateRange.start, "LLL dd, y")} -{" "}
-                      {format(dateRange.end, "LLL dd, y")}
+                      {format(dateRange.start, "LLL dd, y")} - {format(dateRange.end, "LLL dd, y")}
                     </>
                   ) : (
                     format(dateRange.start, "LLL dd, y")
@@ -267,7 +270,7 @@ export function DonationsFilters({
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
-                initialFocus
+                autoFocus
                 mode="range"
                 defaultMonth={dateRange.start}
                 selected={{

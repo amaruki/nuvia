@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -27,50 +27,55 @@ interface MediaFiltersProps {
   className?: string;
 }
 
-export function MediaFilters({ filters, onFiltersChange, onClearFilters, className }: MediaFiltersProps) {
+export function MediaFilters({
+  filters,
+  onFiltersChange,
+  onClearFilters,
+  className,
+}: MediaFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleFilterChange = (key: keyof MediaFilters, value: any) => {
     onFiltersChange({
       ...filters,
-      [key]: value
+      [key]: value,
     });
   };
 
   const handleTypeToggle = (type: MediaType) => {
     const currentTypes = filters.type || [];
     const newTypes = currentTypes.includes(type)
-      ? currentTypes.filter(t => t !== type)
+      ? currentTypes.filter((t) => t !== type)
       : [...currentTypes, type];
-    
-    handleFilterChange('type', newTypes.length > 0 ? newTypes : undefined);
+
+    handleFilterChange("type", newTypes.length > 0 ? newTypes : undefined);
   };
 
   const handleStatusToggle = (status: MediaStatus) => {
     const currentStatuses = filters.status || [];
     const newStatuses = currentStatuses.includes(status)
-      ? currentStatuses.filter(s => s !== status)
+      ? currentStatuses.filter((s) => s !== status)
       : [...currentStatuses, status];
-    
-    handleFilterChange('status', newStatuses.length > 0 ? newStatuses : undefined);
+
+    handleFilterChange("status", newStatuses.length > 0 ? newStatuses : undefined);
   };
 
   const handleVisibilityToggle = (visibility: MediaVisibility) => {
     const currentVisibilities = filters.visibility || [];
     const newVisibilities = currentVisibilities.includes(visibility)
-      ? currentVisibilities.filter(v => v !== visibility)
+      ? currentVisibilities.filter((v) => v !== visibility)
       : [...currentVisibilities, visibility];
-    
-    handleFilterChange('visibility', newVisibilities.length > 0 ? newVisibilities : undefined);
+
+    handleFilterChange("visibility", newVisibilities.length > 0 ? newVisibilities : undefined);
   };
 
   const handleTagToggle = (tag: string) => {
     const currentTags = filters.tags || [];
     const newTags = currentTags.includes(tag)
-      ? currentTags.filter(t => t !== tag)
+      ? currentTags.filter((t) => t !== tag)
       : [...currentTags, tag];
-    
-    handleFilterChange('tags', newTags.length > 0 ? newTags : undefined);
+
+    handleFilterChange("tags", newTags.length > 0 ? newTags : undefined);
   };
 
   const clearAllFilters = () => {
@@ -88,12 +93,31 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
     filters.sizeRange
   );
 
-  const mediaTypes: MediaType[] = ['image', 'video', 'audio', 'document', 'archive', 'spreadsheet', 'presentation', 'pdf', 'vector', 'font'];
-  const mediaStatuses: MediaStatus[] = ['uploading', 'processing', 'ready', 'failed', 'archived'];
-  const mediaVisibilities: MediaVisibility[] = ['public', 'private', 'restricted', 'draft'];
+  const mediaTypes: MediaType[] = [
+    "image",
+    "video",
+    "audio",
+    "document",
+    "archive",
+    "spreadsheet",
+    "presentation",
+    "pdf",
+    "vector",
+    "font",
+  ];
+  const mediaStatuses: MediaStatus[] = ["uploading", "processing", "ready", "failed", "archived"];
+  const mediaVisibilities: MediaVisibility[] = ["public", "private", "restricted", "draft"];
 
   const commonTags = [
-    'featured', 'banner', 'thumbnail', 'document', 'video', 'image', 'audio', 'presentation', 'spreadsheet'
+    "featured",
+    "banner",
+    "thumbnail",
+    "document",
+    "video",
+    "image",
+    "audio",
+    "presentation",
+    "spreadsheet",
   ];
 
   return (
@@ -119,12 +143,8 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
             <X className="h-4 w-4 mr-2" />
             Clear All
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? 'Collapse' : 'Expand'}
+          <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
+            {isExpanded ? "Collapse" : "Expand"}
           </Button>
         </div>
       </div>
@@ -139,8 +159,8 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
             <Input
               id="search"
               placeholder="Search by title, description, or tags..."
-              value={filters.search || ''}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
+              value={filters.search || ""}
+              onChange={(e) => handleFilterChange("search", e.target.value)}
               className="w-full"
             />
           </div>
@@ -215,11 +235,13 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !filters.dateRange?.start && "text-muted-foreground"
+                      !filters.dateRange?.start && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {filters.dateRange?.start ? format(filters.dateRange.start, "PPP") : "Pick a date"}
+                    {filters.dateRange?.start
+                      ? format(filters.dateRange.start, "PPP")
+                      : "Pick a date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -229,11 +251,11 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
                     onSelect={(date) => {
                       const newRange = {
                         start: date || new Date(),
-                        end: filters.dateRange?.end || new Date()
+                        end: filters.dateRange?.end || new Date(),
                       };
-                      handleFilterChange('dateRange', newRange);
+                      handleFilterChange("dateRange", newRange);
                     }}
-                    initialFocus
+                    autoFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -247,7 +269,7 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !filters.dateRange?.end && "text-muted-foreground"
+                      !filters.dateRange?.end && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -261,11 +283,11 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
                     onSelect={(date) => {
                       const newRange = {
                         start: filters.dateRange?.start || new Date(),
-                        end: date || new Date()
+                        end: date || new Date(),
                       };
-                      handleFilterChange('dateRange', newRange);
+                      handleFilterChange("dateRange", newRange);
                     }}
-                    initialFocus
+                    autoFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -284,14 +306,16 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
                   id="minSize"
                   type="number"
                   placeholder="0"
-                  value={filters.sizeRange?.min ? filters.sizeRange.min / 1024 / 1024 : ''}
+                  value={filters.sizeRange?.min ? filters.sizeRange.min / 1024 / 1024 : ""}
                   onChange={(e) => {
-                    const minSize = e.target.value ? parseInt(e.target.value) * 1024 * 1024 : undefined;
+                    const minSize = e.target.value
+                      ? parseInt(e.target.value) * 1024 * 1024
+                      : undefined;
                     const newRange = {
                       min: minSize,
-                      max: filters.sizeRange?.max
+                      max: filters.sizeRange?.max,
                     };
-                    handleFilterChange('sizeRange', newRange);
+                    handleFilterChange("sizeRange", newRange);
                   }}
                 />
               </div>
@@ -303,14 +327,16 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
                   id="maxSize"
                   type="number"
                   placeholder="100"
-                  value={filters.sizeRange?.max ? filters.sizeRange.max / 1024 / 1024 : ''}
+                  value={filters.sizeRange?.max ? filters.sizeRange.max / 1024 / 1024 : ""}
                   onChange={(e) => {
-                    const maxSize = e.target.value ? parseInt(e.target.value) * 1024 * 1024 : undefined;
+                    const maxSize = e.target.value
+                      ? parseInt(e.target.value) * 1024 * 1024
+                      : undefined;
                     const newRange = {
                       min: filters.sizeRange?.min,
-                      max: maxSize
+                      max: maxSize,
                     };
-                    handleFilterChange('sizeRange', newRange);
+                    handleFilterChange("sizeRange", newRange);
                   }}
                 />
               </div>
@@ -339,7 +365,7 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
                 size="sm"
                 onClick={() => {
                   // This would open a tag management dialog in a real implementation
-                  console.log('Add custom tag');
+                  console.log("Add custom tag");
                 }}
               >
                 <Plus className="h-3 w-3 mr-1" />
@@ -353,8 +379,8 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
             <div className="space-y-2">
               <Label className="text-sm font-medium">Sort By</Label>
               <Select
-                value={filters.sortBy || 'createdAt'}
-                onValueChange={(value) => handleFilterChange('sortBy', value)}
+                value={filters.sortBy || "createdAt"}
+                onValueChange={(value) => handleFilterChange("sortBy", value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sort by..." />
@@ -374,8 +400,8 @@ export function MediaFilters({ filters, onFiltersChange, onClearFilters, classNa
             <div className="space-y-2">
               <Label className="text-sm font-medium">Sort Order</Label>
               <Select
-                value={filters.sortOrder || 'desc'}
-                onValueChange={(value) => handleFilterChange('sortOrder', value)}
+                value={filters.sortOrder || "desc"}
+                onValueChange={(value) => handleFilterChange("sortOrder", value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sort order..." />

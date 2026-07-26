@@ -26,13 +26,13 @@ interface InvoicesFiltersProps {
   onClearFilters: () => void;
 }
 
-export function InvoicesFilters({ filters, onFiltersChange, onClearFilters }: InvoicesFiltersProps) {
-  const [dateRangeStart, setDateRangeStart] = useState<Date | undefined>(
-    filters.dateRange?.start
-  );
-  const [dateRangeEnd, setDateRangeEnd] = useState<Date | undefined>(
-    filters.dateRange?.end
-  );
+export function InvoicesFilters({
+  filters,
+  onFiltersChange,
+  onClearFilters,
+}: InvoicesFiltersProps) {
+  const [dateRangeStart, setDateRangeStart] = useState<Date | undefined>(filters.dateRange?.start);
+  const [dateRangeEnd, setDateRangeEnd] = useState<Date | undefined>(filters.dateRange?.end);
 
   const handleStatusChange = (value: string) => {
     if (value === "all") {
@@ -121,10 +121,7 @@ export function InvoicesFilters({ filters, onFiltersChange, onClearFilters }: In
           {/* Status Filter */}
           <div className="space-y-2">
             <Label>Status</Label>
-            <Select
-              value={filters.status?.[0] || "all"}
-              onValueChange={handleStatusChange}
-            >
+            <Select value={filters.status?.[0] || "all"} onValueChange={handleStatusChange}>
               <SelectTrigger className="text-sm">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
@@ -143,10 +140,7 @@ export function InvoicesFilters({ filters, onFiltersChange, onClearFilters }: In
           {/* Client Filter */}
           <div className="space-y-2">
             <Label>Client</Label>
-            <Select
-              value={filters.client?.[0] || "all"}
-              onValueChange={handleClientChange}
-            >
+            <Select value={filters.client?.[0] || "all"} onValueChange={handleClientChange}>
               <SelectTrigger className="text-sm">
                 <SelectValue placeholder="Select client" />
               </SelectTrigger>
@@ -172,7 +166,7 @@ export function InvoicesFilters({ filters, onFiltersChange, onClearFilters }: In
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal text-sm h-10",
-                    !dateRangeStart && "text-muted-foreground"
+                    !dateRangeStart && "text-muted-foreground",
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
@@ -186,7 +180,7 @@ export function InvoicesFilters({ filters, onFiltersChange, onClearFilters }: In
                   mode="single"
                   selected={dateRangeStart}
                   onSelect={setDateRangeStart}
-                  initialFocus
+                  autoFocus
                 />
               </PopoverContent>
             </Popover>
@@ -197,7 +191,7 @@ export function InvoicesFilters({ filters, onFiltersChange, onClearFilters }: In
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal text-sm h-10",
-                    !dateRangeEnd && "text-muted-foreground"
+                    !dateRangeEnd && "text-muted-foreground",
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
@@ -211,14 +205,19 @@ export function InvoicesFilters({ filters, onFiltersChange, onClearFilters }: In
                   mode="single"
                   selected={dateRangeEnd}
                   onSelect={setDateRangeEnd}
-                  initialFocus
+                  autoFocus
                 />
               </PopoverContent>
             </Popover>
           </div>
           {dateRangeStart && dateRangeEnd && (
             <div className="flex flex-col sm:flex-row gap-2">
-              <Button variant="outline" size="sm" onClick={handleDateRangeChange} className="text-sm">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDateRangeChange}
+                className="text-sm"
+              >
                 <Filter className="h-4 w-4 mr-1" />
                 Apply Date Range
               </Button>

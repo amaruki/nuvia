@@ -13,19 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   AnnouncementFilters,
   AnnouncementType,
@@ -64,7 +56,7 @@ import {
   Mail,
   Smartphone,
   Home,
-  Layout
+  Layout,
 } from "lucide-react";
 
 interface AnnouncementsFiltersProps {
@@ -78,16 +70,11 @@ export function AnnouncementsFilters({
   onFiltersChange,
   onReset,
 }: AnnouncementsFiltersProps) {
-  const [expandedSections, setExpandedSections] = useState<string[]>([
-    "basic",
-    "announcement",
-  ]);
+  const [expandedSections, setExpandedSections] = useState<string[]>(["basic", "announcement"]);
 
   const toggleSection = (section: string) => {
-    setExpandedSections(prev =>
-      prev.includes(section)
-        ? prev.filter(s => s !== section)
-        : [...prev, section]
+    setExpandedSections((prev) =>
+      prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section],
     );
   };
 
@@ -101,14 +88,17 @@ export function AnnouncementsFilters({
   const addArrayFilter = (key: keyof AnnouncementFilters, value: string) => {
     const currentArray = (filters[key] as string[]) || [];
     const newArray = currentArray.includes(value)
-      ? currentArray.filter(item => item !== value)
+      ? currentArray.filter((item) => item !== value)
       : [...currentArray, value];
     updateFilter(key, newArray);
   };
 
   const removeArrayFilter = (key: keyof AnnouncementFilters, value: string) => {
     const currentArray = (filters[key] as string[]) || [];
-    updateFilter(key, currentArray.filter(item => item !== value));
+    updateFilter(
+      key,
+      currentArray.filter((item) => item !== value),
+    );
   };
 
   const clearAllFilters = () => {
@@ -186,10 +176,7 @@ export function AnnouncementsFilters({
             onOpenChange={() => toggleSection("basic")}
           >
             <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full justify-between p-0 h-auto font-normal"
-              >
+              <Button variant="ghost" className="w-full justify-between p-0 h-auto font-normal">
                 <span className="font-medium">Basic Filters</span>
                 {expandedSections.includes("basic") ? (
                   <ChevronUp className="h-4 w-4" />
@@ -211,7 +198,9 @@ export function AnnouncementsFilters({
                   ].map(({ value, label, icon: Icon }) => (
                     <Badge
                       key={value}
-                      variant={filters.status?.includes(value as ArticleStatus) ? "default" : "outline"}
+                      variant={
+                        filters.status?.includes(value as ArticleStatus) ? "default" : "outline"
+                      }
                       className="cursor-pointer hover:bg-primary/80"
                       onClick={() => addArrayFilter("status", value)}
                     >
@@ -267,7 +256,7 @@ export function AnnouncementsFilters({
                             start: date,
                           })
                         }
-                        initialFocus
+                        autoFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -293,7 +282,7 @@ export function AnnouncementsFilters({
                             end: date,
                           })
                         }
-                        initialFocus
+                        autoFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -310,10 +299,7 @@ export function AnnouncementsFilters({
             onOpenChange={() => toggleSection("announcement")}
           >
             <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full justify-between p-0 h-auto font-normal"
-              >
+              <Button variant="ghost" className="w-full justify-between p-0 h-auto font-normal">
                 <span className="font-medium">Announcement Filters</span>
                 {expandedSections.includes("announcement") ? (
                   <ChevronUp className="h-4 w-4" />
@@ -352,7 +338,9 @@ export function AnnouncementsFilters({
                     return (
                       <Badge
                         key={priority}
-                        variant={filters.priority?.includes(priority) ? display.badgeVariant : "outline"}
+                        variant={
+                          filters.priority?.includes(priority) ? display.badgeVariant : "outline"
+                        }
                         className="cursor-pointer hover:bg-primary/80"
                         onClick={() => addArrayFilter("priority", priority)}
                       >
@@ -409,7 +397,7 @@ export function AnnouncementsFilters({
                             start: date,
                           })
                         }
-                        initialFocus
+                        autoFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -435,7 +423,7 @@ export function AnnouncementsFilters({
                             end: date,
                           })
                         }
-                        initialFocus
+                        autoFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -452,10 +440,7 @@ export function AnnouncementsFilters({
             onOpenChange={() => toggleSection("display")}
           >
             <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full justify-between p-0 h-auto font-normal"
-              >
+              <Button variant="ghost" className="w-full justify-between p-0 h-auto font-normal">
                 <span className="font-medium">Display Options</span>
                 {expandedSections.includes("display") ? (
                   <ChevronUp className="h-4 w-4" />
@@ -503,7 +488,10 @@ export function AnnouncementsFilters({
                       updateFilter("requiresAcknowledgment", checked === true ? true : undefined)
                     }
                   />
-                  <Label htmlFor="requires-acknowledgment" className="text-sm flex items-center gap-2">
+                  <Label
+                    htmlFor="requires-acknowledgment"
+                    className="text-sm flex items-center gap-2"
+                  >
                     <Target className="h-4 w-4" />
                     Requires acknowledgment
                   </Label>
@@ -599,11 +587,7 @@ export function AnnouncementsFilters({
                     </Badge>
                   )}
                   {filters.status?.map((status) => (
-                    <Badge
-                      key={status}
-                      variant="secondary"
-                      className="flex items-center gap-1"
-                    >
+                    <Badge key={status} variant="secondary" className="flex items-center gap-1">
                       Status: {status}
                       <X
                         className="h-3 w-3 cursor-pointer"
@@ -612,11 +596,7 @@ export function AnnouncementsFilters({
                     </Badge>
                   ))}
                   {filters.type?.map((type) => (
-                    <Badge
-                      key={type}
-                      variant="secondary"
-                      className="flex items-center gap-1"
-                    >
+                    <Badge key={type} variant="secondary" className="flex items-center gap-1">
                       Type: {ANNOUNCEMENT_TYPE_DISPLAY[type].name}
                       <X
                         className="h-3 w-3 cursor-pointer"
@@ -625,11 +605,7 @@ export function AnnouncementsFilters({
                     </Badge>
                   ))}
                   {filters.priority?.map((priority) => (
-                    <Badge
-                      key={priority}
-                      variant="secondary"
-                      className="flex items-center gap-1"
-                    >
+                    <Badge key={priority} variant="secondary" className="flex items-center gap-1">
                       Priority: {ANNOUNCEMENT_PRIORITY_DISPLAY[priority].name}
                       <X
                         className="h-3 w-3 cursor-pointer"
@@ -638,11 +614,7 @@ export function AnnouncementsFilters({
                     </Badge>
                   ))}
                   {filters.targetAudience?.map((audience) => (
-                    <Badge
-                      key={audience}
-                      variant="secondary"
-                      className="flex items-center gap-1"
-                    >
+                    <Badge key={audience} variant="secondary" className="flex items-center gap-1">
                       Audience: {ANNOUNCEMENT_TARGET_AUDIENCE_DISPLAY[audience].name}
                       <X
                         className="h-3 w-3 cursor-pointer"
@@ -651,11 +623,7 @@ export function AnnouncementsFilters({
                     </Badge>
                   ))}
                   {filters.author?.map((author) => (
-                    <Badge
-                      key={author}
-                      variant="secondary"
-                      className="flex items-center gap-1"
-                    >
+                    <Badge key={author} variant="secondary" className="flex items-center gap-1">
                       Author: {author}
                       <X
                         className="h-3 w-3 cursor-pointer"

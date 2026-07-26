@@ -7,13 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
   Table,
   TableBody,
   TableCell,
@@ -43,11 +38,12 @@ import {
   XCircle,
   Clock,
   AlertTriangle,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Instagram,
-  Youtube,
+  // lucide-react v1 dropped brand/logo icons — see TODO.md
+  Users as Facebook,
+  MessageCircle as Twitter,
+  Link2 as Linkedin,
+  Image as Instagram,
+  Video as Youtube,
   Edit,
   Power,
   PowerOff,
@@ -64,16 +60,10 @@ export default function ChapterDetailsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const { setHeader, clearHeader } = useHeader();
 
-  const {
-    chapters,
-    loading,
-    error,
-    refreshData,
-    toggleChapterStatus,
-  } = useChapters();
+  const { chapters, loading, error, refreshData, toggleChapterStatus } = useChapters();
 
   const chapterId = params.id as string;
-  const chapter = chapters.find(c => c.id === chapterId);
+  const chapter = chapters.find((c) => c.id === chapterId);
 
   useEffect(() => {
     if (chapter) {
@@ -110,7 +100,7 @@ export default function ChapterDetailsPage() {
       pending: "outline" as const,
       suspended: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -125,7 +115,7 @@ export default function ChapterDetailsPage() {
       fair: "outline" as const,
       poor: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[health as keyof typeof variants] || "secondary"}>
         {health.charAt(0).toUpperCase() + health.slice(1)}
@@ -333,7 +323,9 @@ export default function ChapterDetailsPage() {
                   <span className="text-sm font-medium">Growth Rate</span>
                   <div className="flex items-center gap-2">
                     {getGrowthIcon(chapter.metrics.memberGrowthRate)}
-                    <span className={`text-sm font-bold ${getGrowthColor(chapter.metrics.memberGrowthRate)}`}>
+                    <span
+                      className={`text-sm font-bold ${getGrowthColor(chapter.metrics.memberGrowthRate)}`}
+                    >
                       {formatPercentage(chapter.metrics.memberGrowthRate)}
                     </span>
                   </div>
@@ -352,8 +344,11 @@ export default function ChapterDetailsPage() {
                   <div>
                     <p className="text-sm font-medium">Address</p>
                     <p className="text-sm text-muted-foreground">
-                      {chapter.location.address}<br />
-                      {chapter.location.city}, {chapter.location.state} {chapter.location.postalCode}<br />
+                      {chapter.location.address}
+                      <br />
+                      {chapter.location.city}, {chapter.location.state}{" "}
+                      {chapter.location.postalCode}
+                      <br />
                       {chapter.location.country}
                     </p>
                   </div>
@@ -387,7 +382,10 @@ export default function ChapterDetailsPage() {
                   <Mail className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Email</p>
-                    <a href={`mailto:${chapter.contactInfo.email}`} className="text-sm text-primary hover:underline">
+                    <a
+                      href={`mailto:${chapter.contactInfo.email}`}
+                      className="text-sm text-primary hover:underline"
+                    >
                       {chapter.contactInfo.email}
                     </a>
                   </div>
@@ -397,7 +395,10 @@ export default function ChapterDetailsPage() {
                     <Phone className="h-4 w-4 text-muted-foreground" />
                     <div>
                       <p className="text-sm font-medium">Phone</p>
-                      <a href={`tel:${chapter.contactInfo.phone}`} className="text-sm text-primary hover:underline">
+                      <a
+                        href={`tel:${chapter.contactInfo.phone}`}
+                        className="text-sm text-primary hover:underline"
+                      >
                         {chapter.contactInfo.phone}
                       </a>
                     </div>
@@ -408,9 +409,9 @@ export default function ChapterDetailsPage() {
                     <Globe className="h-4 w-4 text-muted-foreground" />
                     <div>
                       <p className="text-sm font-medium">Website</p>
-                      <a 
-                        href={chapter.contactInfo.website} 
-                        target="_blank" 
+                      <a
+                        href={chapter.contactInfo.website}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-primary hover:underline flex items-center gap-1"
                       >
@@ -425,7 +426,7 @@ export default function ChapterDetailsPage() {
           </Card>
 
           {/* Social Media */}
-          {Object.values(chapter.socialMedia).some(value => value) && (
+          {Object.values(chapter.socialMedia).some((value) => value) && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Social Media</CardTitle>
@@ -463,25 +464,29 @@ export default function ChapterDetailsPage() {
               {chapter.leadership.length > 0 ? (
                 <div className="space-y-4">
                   {chapter.leadership.map((leader) => (
-                    <div key={leader.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={leader.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div className="flex items-center gap-4">
                         <Avatar className="h-12 w-12">
                           <AvatarImage src={leader.avatar} alt={leader.name} />
                           <AvatarFallback>
-                            {leader.name.split(' ').map(n => n[0]).join('')}
+                            {leader.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <p className="font-medium">{leader.name}</p>
                           <p className="text-sm text-muted-foreground">{leader.title}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {leader.email}
-                          </p>
+                          <p className="text-xs text-muted-foreground">{leader.email}</p>
                         </div>
                       </div>
                       <div className="text-right">
                         <Badge variant="outline" className="capitalize">
-                          {leader.role.replace('_', ' ')}
+                          {leader.role.replace("_", " ")}
                         </Badge>
                         <p className="text-xs text-muted-foreground mt-1">
                           Since {formatDistanceToNow(leader.startDate, { addSuffix: true })}
@@ -510,15 +515,21 @@ export default function ChapterDetailsPage() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Engagement Score</span>
-                  <span className="text-sm font-bold">{chapter.metrics.engagementScore.toFixed(1)}</span>
+                  <span className="text-sm font-bold">
+                    {chapter.metrics.engagementScore.toFixed(1)}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Event Attendance Rate</span>
-                  <span className="text-sm font-bold">{formatPercentage(chapter.metrics.eventAttendanceRate)}</span>
+                  <span className="text-sm font-bold">
+                    {formatPercentage(chapter.metrics.eventAttendanceRate)}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Retention Rate</span>
-                  <span className="text-sm font-bold">{formatPercentage(chapter.metrics.retentionRate)}</span>
+                  <span className="text-sm font-bold">
+                    {formatPercentage(chapter.metrics.retentionRate)}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">New Members (This Month)</span>
@@ -526,7 +537,9 @@ export default function ChapterDetailsPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Active Members (This Month)</span>
-                  <span className="text-sm font-bold">{chapter.metrics.activeMembersThisMonth}</span>
+                  <span className="text-sm font-bold">
+                    {chapter.metrics.activeMembersThisMonth}
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -539,12 +552,13 @@ export default function ChapterDetailsPage() {
               <CardContent>
                 <div className="space-y-3">
                   {chapter.metrics.monthlyTrend.map((trend, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div>
                         <p className="font-medium">{trend.month}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {trend.eventCount} events
-                        </p>
+                        <p className="text-sm text-muted-foreground">{trend.eventCount} events</p>
                       </div>
                       <div className="text-right">
                         <p className="font-bold">{trend.memberCount} members</p>
@@ -585,10 +599,15 @@ export default function ChapterDetailsPage() {
                         <TableCell>{event.attendance}</TableCell>
                         <TableCell>{formatCurrency(event.revenue)}</TableCell>
                         <TableCell>
-                          <Badge variant={
-                            event.status === "completed" ? "default" :
-                            event.status === "upcoming" ? "secondary" : "outline"
-                          }>
+                          <Badge
+                            variant={
+                              event.status === "completed"
+                                ? "default"
+                                : event.status === "upcoming"
+                                  ? "secondary"
+                                  : "outline"
+                            }
+                          >
                             {event.status}
                           </Badge>
                         </TableCell>
@@ -616,26 +635,36 @@ export default function ChapterDetailsPage() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Total Revenue</span>
-                  <span className="text-sm font-bold">{formatCurrency(chapter.finances.totalRevenue)}</span>
+                  <span className="text-sm font-bold">
+                    {formatCurrency(chapter.finances.totalRevenue)}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Total Expenses</span>
-                  <span className="text-sm font-bold">{formatCurrency(chapter.finances.totalExpenses)}</span>
+                  <span className="text-sm font-bold">
+                    {formatCurrency(chapter.finances.totalExpenses)}
+                  </span>
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Net Income</span>
-                  <span className={`text-sm font-bold ${chapter.finances.netIncome >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  <span
+                    className={`text-sm font-bold ${chapter.finances.netIncome >= 0 ? "text-emerald-600" : "text-rose-600"}`}
+                  >
                     {formatCurrency(chapter.finances.netIncome)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Budget</span>
-                  <span className="text-sm font-bold">{formatCurrency(chapter.finances.budget)}</span>
+                  <span className="text-sm font-bold">
+                    {formatCurrency(chapter.finances.budget)}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Budget Utilization</span>
-                  <span className="text-sm font-bold">{formatPercentage(chapter.finances.budgetUtilization)}</span>
+                  <span className="text-sm font-bold">
+                    {formatPercentage(chapter.finances.budgetUtilization)}
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -648,7 +677,9 @@ export default function ChapterDetailsPage() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Membership Dues</span>
-                  <span className="text-sm font-bold">{formatCurrency(chapter.settings.membershipDues)}</span>
+                  <span className="text-sm font-bold">
+                    {formatCurrency(chapter.settings.membershipDues)}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Meeting Frequency</span>
@@ -658,7 +689,9 @@ export default function ChapterDetailsPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Online Registration</span>
-                  <Badge variant={chapter.settings.allowOnlineRegistration ? "default" : "secondary"}>
+                  <Badge
+                    variant={chapter.settings.allowOnlineRegistration ? "default" : "secondary"}
+                  >
                     {chapter.settings.allowOnlineRegistration ? "Enabled" : "Disabled"}
                   </Badge>
                 </div>

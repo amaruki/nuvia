@@ -5,14 +5,49 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Upload, X, Plus, Trash2, Eye, EyeOff, Megaphone, Calendar as CalendarLucide, Shield, Settings, Star, Lock, Bell, Gift, AlertTriangle, Layout, Users, Building, Users2, Crown, ShieldCheck, Award, UserCheck, Globe, ArrowDown, Minus, ArrowUp } from "lucide-react";
+import {
+  CalendarIcon,
+  Upload,
+  X,
+  Plus,
+  Trash2,
+  Eye,
+  EyeOff,
+  Megaphone,
+  Calendar as CalendarLucide,
+  Shield,
+  Settings,
+  Star,
+  Lock,
+  Bell,
+  Gift,
+  AlertTriangle,
+  Layout,
+  Users,
+  Building,
+  Users2,
+  Crown,
+  ShieldCheck,
+  Award,
+  UserCheck,
+  Globe,
+  ArrowDown,
+  Minus,
+  ArrowUp,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,22 +58,28 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
-import { 
-  ANNOUNCEMENT_TYPES, 
-  ANNOUNCEMENT_PRIORITIES, 
+import {
+  ANNOUNCEMENT_TYPES,
+  ANNOUNCEMENT_PRIORITIES,
   ANNOUNCEMENT_TARGET_AUDIENCES,
   ANNOUNCEMENT_TYPE_DISPLAY,
   ANNOUNCEMENT_PRIORITY_DISPLAY,
   ANNOUNCEMENT_TARGET_AUDIENCE_DISPLAY,
   type AnnouncementFormData,
   type AnnouncementFormValues,
-  type Attachment
+  type Attachment,
 } from "@/types/announcement.types";
 
 // Form validation schema
 const announcementFormSchema = z.object({
-  title: z.string().min(3, "Title must be at least 3 characters").max(200, "Title must be less than 200 characters"),
-  excerpt: z.string().min(10, "Excerpt must be at least 10 characters").max(500, "Excerpt must be less than 500 characters"),
+  title: z
+    .string()
+    .min(3, "Title must be at least 3 characters")
+    .max(200, "Title must be less than 200 characters"),
+  excerpt: z
+    .string()
+    .min(10, "Excerpt must be at least 10 characters")
+    .max(500, "Excerpt must be less than 500 characters"),
   content: z.string().min(50, "Content must be at least 50 characters"),
   type: z.enum(ANNOUNCEMENT_TYPES),
   priority: z.enum(ANNOUNCEMENT_PRIORITIES),
@@ -55,7 +96,13 @@ const announcementFormSchema = z.object({
   sendPushNotification: z.boolean().default(false),
   displayOnHomepage: z.boolean().default(false),
   displayInDashboard: z.boolean().default(false),
-  visibility: z.enum(["public", "members_only", "premium_only", "chapter_only", "committee_only"] as const),
+  visibility: z.enum([
+    "public",
+    "members_only",
+    "premium_only",
+    "chapter_only",
+    "committee_only",
+  ] as const),
   allowedRoles: z.array(z.string()).default([]),
   allowedChapters: z.array(z.string()).default([]),
   allowedCommittees: z.array(z.string()).default([]),
@@ -72,14 +119,18 @@ interface AddAnnouncementFormProps {
   isLoading?: boolean;
 }
 
-export function AddAnnouncementForm({ 
-  initialData, 
-  onSubmit, 
-  onCancel, 
-  isLoading = false 
+export function AddAnnouncementForm({
+  initialData,
+  onSubmit,
+  onCancel,
+  isLoading = false,
 }: AddAnnouncementFormProps) {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [newAttachment, setNewAttachment] = useState({ name: "", url: "", type: "document" as const });
+  const [newAttachment, setNewAttachment] = useState({
+    name: "",
+    url: "",
+    type: "document" as const,
+  });
   const [showPreview, setShowPreview] = useState(false);
 
   const form = useForm<AnnouncementFormValues>({
@@ -119,13 +170,16 @@ export function AddAnnouncementForm({
     const formData: AnnouncementFormData = {
       ...values,
       category: "announcements", // Always announcements
-      attachments: attachments.length > 0 ? attachments.map(att => ({
-        id: att.id,
-        name: att.name,
-        url: att.url,
-        size: 0, // Default size since we don't have it
-        type: att.type
-      })) : undefined,
+      attachments:
+        attachments.length > 0
+          ? attachments.map((att) => ({
+              id: att.id,
+              name: att.name,
+              url: att.url,
+              size: 0, // Default size since we don't have it
+              type: att.type,
+            }))
+          : undefined,
     };
     onSubmit(formData);
   };
@@ -138,7 +192,7 @@ export function AddAnnouncementForm({
   };
 
   const removeAttachment = (id: string) => {
-    setAttachments(attachments.filter(att => att.id !== id));
+    setAttachments(attachments.filter((att) => att.id !== id));
   };
 
   const { watch } = form;
@@ -152,9 +206,7 @@ export function AddAnnouncementForm({
       <Card>
         <CardHeader>
           <CardTitle>Create Announcement</CardTitle>
-          <CardDescription>
-            Create a new announcement for your organization members
-          </CardDescription>
+          <CardDescription>Create a new announcement for your organization members</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -182,8 +234,8 @@ export function AddAnnouncementForm({
 
                   <div className="space-y-2">
                     <Label htmlFor="type">Type *</Label>
-                    <Select 
-                      value={selectedType} 
+                    <Select
+                      value={selectedType}
                       onValueChange={(value) => form.setValue("type", value as any)}
                     >
                       <SelectTrigger>
@@ -192,8 +244,8 @@ export function AddAnnouncementForm({
                       <SelectContent>
                         {ANNOUNCEMENT_TYPES.map((type) => {
                           const iconMap = {
-                          general: Megaphone,
-                          event: CalendarLucide,
+                            general: Megaphone,
+                            event: CalendarLucide,
                             policy: Shield,
                             maintenance: Settings,
                             feature: Star,
@@ -201,10 +253,10 @@ export function AddAnnouncementForm({
                             reminder: Bell,
                             celebration: Gift,
                             emergency: AlertTriangle,
-                            banner: Layout
+                            banner: Layout,
                           };
                           const IconComponent = iconMap[type as keyof typeof iconMap];
-                          
+
                           return (
                             <SelectItem key={type} value={type}>
                               <div className="flex items-center gap-2">
@@ -248,8 +300,8 @@ export function AddAnnouncementForm({
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="priority">Priority</Label>
-                    <Select 
-                      value={selectedPriority} 
+                    <Select
+                      value={selectedPriority}
                       onValueChange={(value) => form.setValue("priority", value as any)}
                     >
                       <SelectTrigger>
@@ -261,14 +313,17 @@ export function AddAnnouncementForm({
                             low: ArrowDown,
                             medium: Minus,
                             high: ArrowUp,
-                            urgent: AlertTriangle
+                            urgent: AlertTriangle,
                           };
-                          const PriorityIconComponent = priorityIconMap[priority as keyof typeof priorityIconMap];
-                          
+                          const PriorityIconComponent =
+                            priorityIconMap[priority as keyof typeof priorityIconMap];
+
                           return (
                             <SelectItem key={priority} value={priority}>
                               <div className="flex items-center gap-2">
-                                {PriorityIconComponent && <PriorityIconComponent className="h-4 w-4" />}
+                                {PriorityIconComponent && (
+                                  <PriorityIconComponent className="h-4 w-4" />
+                                )}
                                 <span>{ANNOUNCEMENT_PRIORITY_DISPLAY[priority].name}</span>
                               </div>
                             </SelectItem>
@@ -280,8 +335,8 @@ export function AddAnnouncementForm({
 
                   <div className="space-y-2">
                     <Label htmlFor="targetAudience">Target Audience</Label>
-                    <Select 
-                      value={selectedAudience} 
+                    <Select
+                      value={selectedAudience}
                       onValueChange={(value) => form.setValue("targetAudience", value as any)}
                     >
                       <SelectTrigger>
@@ -297,14 +352,17 @@ export function AddAnnouncementForm({
                             chapter_admins: ShieldCheck,
                             committee_chairs: Award,
                             staff_only: UserCheck,
-                            public: Globe
+                            public: Globe,
                           };
-                          const AudienceIconComponent = audienceIconMap[audience as keyof typeof audienceIconMap];
-                          
+                          const AudienceIconComponent =
+                            audienceIconMap[audience as keyof typeof audienceIconMap];
+
                           return (
                             <SelectItem key={audience} value={audience}>
                               <div className="flex items-center gap-2">
-                                {AudienceIconComponent && <AudienceIconComponent className="h-4 w-4" />}
+                                {AudienceIconComponent && (
+                                  <AudienceIconComponent className="h-4 w-4" />
+                                )}
                                 <span>{ANNOUNCEMENT_TARGET_AUDIENCE_DISPLAY[audience].name}</span>
                               </div>
                             </SelectItem>
@@ -322,11 +380,13 @@ export function AddAnnouncementForm({
                           variant="outline"
                           className={cn(
                             "w-full justify-start text-left font-normal",
-                            !formValues.expiresAt && "text-muted-foreground"
+                            !formValues.expiresAt && "text-muted-foreground",
                           )}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {formValues.expiresAt ? format(formValues.expiresAt, "PPP") : "Pick a date"}
+                          {formValues.expiresAt
+                            ? format(formValues.expiresAt, "PPP")
+                            : "Pick a date"}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
@@ -334,7 +394,7 @@ export function AddAnnouncementForm({
                           mode="single"
                           selected={formValues.expiresAt}
                           onSelect={(date) => form.setValue("expiresAt", date)}
-                          initialFocus
+                          autoFocus
                         />
                       </PopoverContent>
                     </Popover>
@@ -346,8 +406,8 @@ export function AddAnnouncementForm({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="status">Status</Label>
-                    <Select 
-                      value={formValues.status} 
+                    <Select
+                      value={formValues.status}
                       onValueChange={(value) => form.setValue("status", value as any)}
                     >
                       <SelectTrigger>
@@ -365,8 +425,8 @@ export function AddAnnouncementForm({
 
                   <div className="space-y-2">
                     <Label htmlFor="visibility">Visibility</Label>
-                    <Select 
-                      value={formValues.visibility} 
+                    <Select
+                      value={formValues.visibility}
                       onValueChange={(value) => form.setValue("visibility", value as any)}
                     >
                       <SelectTrigger>
@@ -406,7 +466,9 @@ export function AddAnnouncementForm({
                     <Checkbox
                       id="requiresAcknowledgment"
                       checked={formValues.requiresAcknowledgment}
-                      onCheckedChange={(checked) => form.setValue("requiresAcknowledgment", checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("requiresAcknowledgment", checked as boolean)
+                      }
                     />
                     <Label htmlFor="requiresAcknowledgment">Require acknowledgment</Label>
                   </div>
@@ -429,7 +491,9 @@ export function AddAnnouncementForm({
                     <Checkbox
                       id="sendEmailNotification"
                       checked={formValues.sendEmailNotification}
-                      onCheckedChange={(checked) => form.setValue("sendEmailNotification", checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("sendEmailNotification", checked as boolean)
+                      }
                     />
                     <Label htmlFor="sendEmailNotification">Send email notification</Label>
                   </div>
@@ -438,7 +502,9 @@ export function AddAnnouncementForm({
                     <Checkbox
                       id="sendPushNotification"
                       checked={formValues.sendPushNotification}
-                      onCheckedChange={(checked) => form.setValue("sendPushNotification", checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("sendPushNotification", checked as boolean)
+                      }
                     />
                     <Label htmlFor="sendPushNotification">Send push notification</Label>
                   </div>
@@ -452,7 +518,9 @@ export function AddAnnouncementForm({
                     <Checkbox
                       id="displayOnHomepage"
                       checked={formValues.displayOnHomepage}
-                      onCheckedChange={(checked) => form.setValue("displayOnHomepage", checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("displayOnHomepage", checked as boolean)
+                      }
                     />
                     <Label htmlFor="displayOnHomepage">Display on homepage</Label>
                   </div>
@@ -461,7 +529,9 @@ export function AddAnnouncementForm({
                     <Checkbox
                       id="displayInDashboard"
                       checked={formValues.displayInDashboard}
-                      onCheckedChange={(checked) => form.setValue("displayInDashboard", checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("displayInDashboard", checked as boolean)
+                      }
                     />
                     <Label htmlFor="displayInDashboard">Display in dashboard</Label>
                   </div>
@@ -470,7 +540,9 @@ export function AddAnnouncementForm({
                     <Checkbox
                       id="commentsEnabled"
                       checked={formValues.commentsEnabled}
-                      onCheckedChange={(checked) => form.setValue("commentsEnabled", checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("commentsEnabled", checked as boolean)
+                      }
                     />
                     <Label htmlFor="commentsEnabled">Enable comments</Label>
                   </div>
@@ -479,7 +551,9 @@ export function AddAnnouncementForm({
                     <Checkbox
                       id="sharingEnabled"
                       checked={formValues.sharingEnabled}
-                      onCheckedChange={(checked) => form.setValue("sharingEnabled", checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("sharingEnabled", checked as boolean)
+                      }
                     />
                     <Label htmlFor="sharingEnabled">Enable sharing</Label>
                   </div>
@@ -488,7 +562,9 @@ export function AddAnnouncementForm({
                     <Checkbox
                       id="downloadEnabled"
                       checked={formValues.downloadEnabled}
-                      onCheckedChange={(checked) => form.setValue("downloadEnabled", checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("downloadEnabled", checked as boolean)
+                      }
                     />
                     <Label htmlFor="downloadEnabled">Enable download</Label>
                   </div>
@@ -518,7 +594,10 @@ export function AddAnnouncementForm({
                       <Label>Current Attachments</Label>
                       <div className="space-y-2">
                         {attachments.map((attachment) => (
-                          <div key={attachment.id} className="flex items-center justify-between p-2 border rounded">
+                          <div
+                            key={attachment.id}
+                            className="flex items-center justify-between p-2 border rounded"
+                          >
                             <div className="flex items-center gap-2">
                               <Badge variant="outline">{attachment.type}</Badge>
                               <span className="text-sm">{attachment.name}</span>

@@ -35,6 +35,7 @@ import {
   Permission,
 } from "@/types/committee.types";
 import { X, Plus, Trash2 } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 const workspaceFormSchema = z.object({
   name: z
@@ -207,7 +208,7 @@ export function AddWorkspaceForm({
       form.reset();
       onOpenChange(false);
     } catch (error) {
-      console.error("Error submitting workspace form:", error);
+      logger.error("Error submitting workspace form", error);
     } finally {
       setIsSubmitting(false);
     }

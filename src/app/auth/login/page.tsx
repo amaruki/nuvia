@@ -18,6 +18,7 @@ import { OAuthButton } from "@/components/auth/oauth-button";
 import { FormMessage } from "@/components/auth/form-message";
 import { FormDivider } from "@/components/auth/form-divider";
 import { loginAction } from "@/lib/actions/auth.actions";
+import { logger } from "@/lib/logger";
 import { toast } from "sonner";
 
 const loginSchema = z.object({
@@ -120,7 +121,7 @@ function LoginForm() {
       }
     } catch (err) {
       toast.error("An unexpected error occurred. Please try again.");
-      console.error(err);
+      logger.error("An unexpected error occurred. Please try again.", err);
     } finally {
       setIsLoading(false);
     }

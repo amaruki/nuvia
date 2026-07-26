@@ -1,5 +1,6 @@
 import React from "react";
 import { render } from "@react-email/render";
+import { logger } from "@/lib/logger";
 
 export async function renderEmailTemplate(component: React.ReactElement): Promise<{
   html: string;
@@ -23,7 +24,7 @@ export async function renderEmailTemplate(component: React.ReactElement): Promis
 
     return { html, text };
   } catch (error) {
-    console.error("Failed to render email template:", error);
+    logger.error("Failed to render email template", error);
     throw new Error("Email template rendering failed");
   }
 }

@@ -18,6 +18,7 @@ import {
 
 // Mock service imports - will be replaced with actual service
 import { MediaService } from "@/lib/services/media.service";
+import { logger } from "@/lib/logger";
 
 interface UseMediaReturn {
   // State
@@ -125,7 +126,7 @@ export const useMedia = (): UseMediaReturn => {
       const result = await MediaService.getFolders();
       setFolders(result.data);
     } catch (err) {
-      console.error("Failed to load folders:", err);
+      logger.error("Failed to load folders", err);
     }
   }, []);
 
@@ -135,7 +136,7 @@ export const useMedia = (): UseMediaReturn => {
       const result = await MediaService.getStatistics();
       setStatistics(result.data);
     } catch (err) {
-      console.error("Failed to load statistics:", err);
+      logger.error("Failed to load statistics", err);
     }
   }, []);
 

@@ -29,6 +29,7 @@ import { ReportsFilters } from "@/components/finance/reports-filters";
 import { useReports } from "@/lib/hooks/use-reports";
 import { useHeader } from "@/contexts/dashboard-context";
 import { FinancialReport } from "@/types/finance.types";
+import { logger } from "@/lib/logger";
 
 export default function FinanceReports() {
   const router = useRouter();
@@ -80,12 +81,12 @@ export default function FinanceReports() {
 
   const handleEdit = (report: FinancialReport) => {
     // TODO: Implement edit functionality
-    console.log("Edit report:", report);
+    logger.info("Edit report", report);
   };
 
   const handleShare = (report: FinancialReport) => {
     // TODO: Implement share functionality
-    console.log("Share report:", report);
+    logger.info("Share report", report);
   };
 
   const handleDelete = (report: FinancialReport) => {
@@ -100,7 +101,7 @@ export default function FinanceReports() {
 
   const handleGenerateReport = () => {
     // TODO: Implement generate report functionality
-    console.log("Generate new report");
+    logger.info("Generate new report");
   };
 
   if (loading) {
@@ -388,7 +389,7 @@ export default function FinanceReports() {
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => console.log("Use template:", template.type)}
+                    onClick={() => logger.info("Use template", template.type)}
                   >
                     Use Template
                   </Button>
@@ -410,7 +411,7 @@ export default function FinanceReports() {
               <div className="text-center py-8">
                 <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">No scheduled reports yet</p>
-                <Button className="mt-4" onClick={() => console.log("Schedule report")}>
+                <Button className="mt-4" onClick={() => logger.info("Schedule report")}>
                   <Plus className="mr-2 h-4 w-4" />
                   Schedule Report
                 </Button>

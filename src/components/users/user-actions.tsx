@@ -44,6 +44,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 import { type UserRole } from "@/types/dashboard.types";
 
 interface UserActionsProps {
@@ -79,7 +80,7 @@ export function UserActions({
   className,
 }: UserActionsProps) {
   // DEBUG: Log UserRole type validation
-  console.log("DEBUG: UserRole type validation:", {
+  logger.info("DEBUG: UserRole type validation", {
     currentUserRole,
     isAdmin: currentUserRole === "admin",
     isModerator: currentUserRole === "moderator",
@@ -110,7 +111,7 @@ export function UserActions({
   const isModerator = currentUserRole === "moderator";
 
   // DEBUG: Log bulk action creation
-  console.log("DEBUG: Creating bulk actions array");
+  logger.info("DEBUG: Creating bulk actions array");
 
   const bulkActions: BulkAction[] = [
     {
@@ -137,7 +138,7 @@ export function UserActions({
     // DEBUG: Log conditional moderator actions
     ...(isModerator
       ? (() => {
-          console.log("DEBUG: Adding moderator actions");
+          logger.info("DEBUG: Adding moderator actions");
           return [
             {
               type: "suspend",
@@ -150,12 +151,12 @@ export function UserActions({
           ];
         })()
       : (() => {
-          console.log("DEBUG: Skipping moderator actions");
+          logger.info("DEBUG: Skipping moderator actions");
           return [];
         })()),
     ...(isAdmin
       ? (() => {
-          console.log("DEBUG: Adding admin actions");
+          logger.info("DEBUG: Adding admin actions");
           return [
             {
               type: "change_role",
@@ -208,7 +209,7 @@ export function UserActions({
     if (!selectedAction) return;
 
     // DEBUG: Log validation checks
-    console.log("DEBUG: Validating action requirements:", {
+    logger.info("DEBUG: Validating action requirements", {
       actionType: selectedAction.type,
       requiresReason: selectedAction.requiresReason,
       hasReason: !!reason,
@@ -219,12 +220,12 @@ export function UserActions({
 
     // Validate required fields
     if (selectedAction.requiresReason && !reason.trim()) {
-      console.log("DEBUG: Validation failed - reason required but not provided");
+      logger.info("DEBUG: Validation failed - reason required but not provided");
       return;
     }
 
     if (selectedAction.requiresRole && !newRole) {
-      console.log("DEBUG: Validation failed - role required but not selected");
+      logger.info("DEBUG: Validation failed - role required but not selected");
       return;
     }
 
@@ -236,7 +237,7 @@ export function UserActions({
       newRole: selectedAction.requiresRole ? newRole : undefined,
     };
 
-    console.log("DEBUG: Performing bulk action:", actionData);
+    logger.info("DEBUG: Performing bulk action", actionData);
 
     // Reset state
     setShowConfirmDialog(false);

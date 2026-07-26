@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function GET(
   request: NextRequest,
@@ -28,7 +29,7 @@ export async function GET(
 
     return response;
   } catch (error) {
-    console.error("OAuth callback error:", error);
+    logger.error("OAuth callback error", error);
 
     // If there's an error, redirect to the callback page with error details
     const errorUrl = new URL("/auth/callback", request.url);

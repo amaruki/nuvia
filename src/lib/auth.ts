@@ -13,6 +13,7 @@ import * as schema from "@/db/schema";
 import { validatePasswordStrength } from "./utils/password";
 import { SOCIAL_PROVIDERS, FEATURES, APP_URL, EMAIL_CONFIG } from "./config";
 import { renderEmailTemplate } from "./email-utils";
+import { logger } from "./logger";
 import PasswordResetEmail from "@/components/email-template/password-reset";
 import EmailVerificationEmail from "@/components/email-template/email-verification";
 import WelcomeEmail from "@/components/email-template/welcome";
@@ -38,7 +39,7 @@ const validateEnvironment = () => {
       throw new AuthError(AuthErrorType.INTERNAL, message);
     }
 
-    console.warn(`WARNING: ${message}`);
+    logger.warn(`WARNING: ${message}`);
   }
 
   if (!APP_URL) {
@@ -72,9 +73,9 @@ class EmailService {
       try {
         const { Resend } = await import("resend");
         this.resendClient = new Resend(process.env.RESEND_API_KEY);
-        console.log("✅ Resend email service initialized");
+        logger.info("✅ Resend email service initialized");
       } catch (error) {
-        console.warn("❌ Failed to initialize Resend:", error);
+        logger.warn("❌ Failed to initialize Resend", error);
         this.service = "none";
       }
     }
@@ -92,15 +93,15 @@ class EmailService {
             pass: EMAIL_CONFIG.PASS,
           },
         });
-        console.log("✅ Nodemailer email service initialized");
+        logger.info("✅ Nodemailer email service initialized");
       } catch (error) {
-        console.warn("❌ Failed to initialize Nodemailer:", error);
+        logger.warn("❌ Failed to initialize Nodemailer", error);
         this.service = "none";
       }
     }
     // No email service configured
     else {
-      console.warn("⚠️ No email service configured. Email functionality will be disabled.");
+      logger.warn("⚠️ No email service configured. Email functionality will be disabled.");
     }
   }
 
@@ -118,7 +119,7 @@ class EmailService {
     try {
       // Development mode fallback
       if (this.service === "none" && !isProduction) {
-        console.log("📧 Email would be sent (development mode):", {
+        logger.info("📧 Email would be sent (development mode)", {
           to: options.to,
           subject: options.subject,
           textPreview: options.text?.substring(0, 100) + "...",
@@ -142,7 +143,7 @@ class EmailService {
           throw new Error(`Resend error: ${error.message}`);
         }
 
-        console.log("✅ Email sent via Resend:", data);
+        logger.info("✅ Email sent via Resend", data);
         return { success: true };
       }
 
@@ -157,14 +158,14 @@ class EmailService {
         };
 
         const result = await this.nodemailerTransporter.sendMail(mailOptions);
-        console.log("✅ Email sent via Nodemailer:", result.messageId);
+        logger.info("✅ Email sent via Nodemailer", result.messageId);
         return { success: true };
       }
 
       throw new Error("No email service is properly configured");
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown email error";
-      console.error("❌ Failed to send email:", errorMessage);
+      logger.error("❌ Failed to send email", errorMessage);
       return { success: false, error: errorMessage };
     }
   }
@@ -312,12 +313,12 @@ export const auth = betterAuth({
       });
 
       if (!result.success) {
-        console.error("Failed to send password reset email:", result.error);
+        logger.error("Failed to send password reset email", result.error);
         throw new Error("Failed to send password reset email");
       }
     },
     onPasswordReset: async ({ user }: { user: { email: string } }) => {
-      console.log(`Password for user ${user.email} has been reset.`);
+      logger.info(`Password for user ${user.email} has been reset.`);
     },
     resetPasswordTokenExpiresIn: 3600, // 1 hour
   },
@@ -444,7 +445,7 @@ export const auth = betterAuth({
     },
     hooks: {
       onError: async (event: any) => {
-        console.error("Better Auth Error:", {
+        logger.error("Better Auth Error", {
           event: event.name,
           error: event.error?.message || event.error,
           context: event.context,
@@ -453,7 +454,7 @@ export const auth = betterAuth({
       },
       beforeOAuthStart: async (event: any) => {
         if (isDevelopment) {
-          console.log("Starting OAuth Flow:", {
+          logger.info("Starting OAuth Flow", {
             provider: event.provider,
             state: event.state,
             timestamp: new Date().toISOString(),
@@ -461,14 +462,14 @@ export const auth = betterAuth({
         }
       },
       onOAuthAccountCreation: async (event: any) => {
-        console.log("OAuth Account Creation:", {
+        logger.info("OAuth Account Creation", {
           provider: event.provider,
           email: event.email,
           timestamp: new Date().toISOString(),
         });
       },
       onOAuthSignIn: async (event: any) => {
-        console.log("OAuth Sign In:", {
+        logger.info("OAuth Sign In", {
           provider: event.provider,
           email: event.email,
           timestamp: new Date().toISOString(),
@@ -476,7 +477,7 @@ export const auth = betterAuth({
       },
       beforeOAuthCallback: async (event: any) => {
         if (isDevelopment) {
-          console.log("Before OAuth Callback:", {
+          logger.info("Before OAuth Callback", {
             provider: event.provider,
             state: event.state,
             query: event.query,
@@ -495,7 +496,7 @@ export const auth = betterAuth({
 
   // Global error handler
   onError: (error: any) => {
-    console.error("Better Auth Error:", error?.message || error);
+    logger.error("Better Auth Error", error?.message || error);
   },
 });
 

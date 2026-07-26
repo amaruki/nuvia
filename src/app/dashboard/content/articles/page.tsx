@@ -25,6 +25,7 @@ import { ArticlesTable } from "@/components/content/articles-table";
 import { ArticlesFilters } from "@/components/content/articles-filters";
 import AddArticleForm from "@/components/content/add-article-form";
 import { useArticles } from "@/lib/hooks/use-articles";
+import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Article } from "@/types/article.types";
 
@@ -93,7 +94,7 @@ export default function ContentArticles() {
       try {
         await deleteArticle(article.id);
       } catch (error) {
-        console.error("Error deleting article:", error);
+        logger.error("Error deleting article", error);
       }
     }
   };
@@ -102,7 +103,7 @@ export default function ContentArticles() {
     try {
       await publishArticle(article.id);
     } catch (error) {
-      console.error("Error publishing article:", error);
+      logger.error("Error publishing article", error);
     }
   };
 
@@ -110,7 +111,7 @@ export default function ContentArticles() {
     try {
       await archiveArticle(article.id);
     } catch (error) {
-      console.error("Error archiving article:", error);
+      logger.error("Error archiving article", error);
     }
   };
 
@@ -118,7 +119,7 @@ export default function ContentArticles() {
     try {
       await scheduleArticle(article.id, date);
     } catch (error) {
-      console.error("Error scheduling article:", error);
+      logger.error("Error scheduling article", error);
     }
   };
 
@@ -126,7 +127,7 @@ export default function ContentArticles() {
     try {
       await duplicateArticle(article.id);
     } catch (error) {
-      console.error("Error duplicating article:", error);
+      logger.error("Error duplicating article", error);
     }
   };
 
@@ -138,7 +139,7 @@ export default function ContentArticles() {
         await bulkPublish(selectedArticles);
         setSelectedArticles([]);
       } catch (error) {
-        console.error("Error bulk publishing:", error);
+        logger.error("Error bulk publishing", error);
       }
     }
   };
@@ -151,7 +152,7 @@ export default function ContentArticles() {
         await bulkArchive(selectedArticles);
         setSelectedArticles([]);
       } catch (error) {
-        console.error("Error bulk archiving:", error);
+        logger.error("Error bulk archiving", error);
       }
     }
   };
@@ -168,7 +169,7 @@ export default function ContentArticles() {
         await bulkDelete(selectedArticles);
         setSelectedArticles([]);
       } catch (error) {
-        console.error("Error bulk deleting:", error);
+        logger.error("Error bulk deleting", error);
       }
     }
   };
@@ -183,7 +184,7 @@ export default function ContentArticles() {
       try {
         await importArticles(file);
       } catch (error) {
-        console.error("Error importing articles:", error);
+        logger.error("Error importing articles", error);
       }
     }
   };

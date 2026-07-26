@@ -3,6 +3,7 @@ import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
 import { loginSchema } from "@/lib/validation/auth.validation";
 import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
+import { logger } from "@/lib/logger";
 import { rateLimitOrProblem } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Login error:", error);
+    logger.error("Login error", error);
     return problemResponse(problems.internalError("An unexpected error occurred during login"));
   }
 }

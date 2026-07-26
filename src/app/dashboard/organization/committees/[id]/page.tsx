@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useHeader } from "@/contexts/dashboard-context";
+import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -71,7 +72,7 @@ export default function CommitteeDetailPage() {
         const foundCommittee = mockCommittees.find((c) => c.id === committeeId);
         setCommittee(foundCommittee || null);
       } catch (error) {
-        console.error("Error fetching committee:", error);
+        logger.error("Error fetching committee", error);
       } finally {
         setLoading(false);
       }

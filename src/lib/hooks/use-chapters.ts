@@ -8,6 +8,7 @@ import {
   ChapterFormData,
 } from "@/types/chapter.types";
 import { mockChapters, mockChapterStatistics } from "@/lib/data/mock-chapter-data";
+import { logger } from "@/lib/logger";
 
 export function useChapters() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -29,7 +30,7 @@ export function useChapters() {
         setError(null);
       } catch (err) {
         setError("Failed to load chapter data");
-        console.error("Error loading chapter data:", err);
+        logger.error("Error loading chapter data", err);
       } finally {
         setLoading(false);
       }
@@ -88,7 +89,7 @@ export function useChapters() {
       setError(null);
     } catch (err) {
       setError("Failed to refresh chapter data");
-      console.error("Error refreshing chapter data:", err);
+      logger.error("Error refreshing chapter data", err);
     } finally {
       setLoading(false);
     }
@@ -144,7 +145,7 @@ export function useChapters() {
       return newChapter;
     } catch (err) {
       setError("Failed to add chapter");
-      console.error("Error adding chapter:", err);
+      logger.error("Error adding chapter", err);
       throw err;
     }
   }, []);
@@ -183,7 +184,7 @@ export function useChapters() {
       );
     } catch (err) {
       setError("Failed to update chapter");
-      console.error("Error updating chapter:", err);
+      logger.error("Error updating chapter", err);
       throw err;
     }
   }, []);
@@ -197,7 +198,7 @@ export function useChapters() {
       setChapters((prev) => prev.filter((chapter) => chapter.id !== id));
     } catch (err) {
       setError("Failed to delete chapter");
-      console.error("Error deleting chapter:", err);
+      logger.error("Error deleting chapter", err);
       throw err;
     }
   }, []);
@@ -222,7 +223,7 @@ export function useChapters() {
       );
     } catch (err) {
       setError("Failed to toggle chapter status");
-      console.error("Error toggling chapter status:", err);
+      logger.error("Error toggling chapter status", err);
       throw err;
     }
   }, []);
@@ -254,7 +255,7 @@ export function useChapters() {
       );
     } catch (err) {
       setError("Failed to add leadership member");
-      console.error("Error adding leadership member:", err);
+      logger.error("Error adding leadership member", err);
       throw err;
     }
   }, []);
@@ -279,7 +280,7 @@ export function useChapters() {
       );
     } catch (err) {
       setError("Failed to remove leadership member");
-      console.error("Error removing leadership member:", err);
+      logger.error("Error removing leadership member", err);
       throw err;
     }
   }, []);

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { createContext, useContext, use } from "react";
+import { logger } from "@/lib/logger";
 
 export interface DashboardNotification {
   id: string;
@@ -185,7 +186,7 @@ export function DashboardProvider({ children }: DashboardProviderProps) {
         dispatch({ type: "TOGGLE_SIDEBAR" });
       }
     } catch (error) {
-      console.warn("Failed to load dashboard state from localStorage:", error);
+      logger.warn("Failed to load dashboard state from localStorage", error);
     }
   }, []);
 
@@ -195,7 +196,7 @@ export function DashboardProvider({ children }: DashboardProviderProps) {
       localStorage.setItem("dashboard-theme", state.theme);
       localStorage.setItem("dashboard-sidebar-collapsed", state.sidebarCollapsed.toString());
     } catch (error) {
-      console.warn("Failed to save dashboard state to localStorage:", error);
+      logger.warn("Failed to save dashboard state to localStorage", error);
     }
   }, [state.theme, state.sidebarCollapsed]);
 

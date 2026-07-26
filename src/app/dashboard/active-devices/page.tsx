@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { formatDate } from "@/lib/utils/date-utils";
 import { getDeviceIcon } from "@/lib/utils/activity-icons";
+import { logger } from "@/lib/logger";
 
 interface Device {
   deviceId: string;
@@ -62,7 +63,7 @@ export default function ActiveDevicesPage() {
       }
     } catch (err) {
       setError("An error occurred while fetching active devices");
-      console.error(err);
+      logger.error("An error occurred while fetching active devices", err);
     } finally {
       setLoading(false);
     }
@@ -90,7 +91,7 @@ export default function ActiveDevicesPage() {
       }
     } catch (err) {
       setError("An error occurred while deactivating device");
-      console.error(err);
+      logger.error("An error occurred while deactivating device", err);
     }
   };
 
@@ -122,7 +123,7 @@ export default function ActiveDevicesPage() {
       }
     } catch (err) {
       setError("An error occurred while deactivating other devices");
-      console.error(err);
+      logger.error("An error occurred while deactivating other devices", err);
     }
   };
 

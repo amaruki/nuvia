@@ -45,6 +45,7 @@ import {
 import { useReports } from "@/lib/hooks/use-reports";
 import { useHeader } from "@/contexts/dashboard-context";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 export default function ReportDetailsPage() {
   const params = useParams();
@@ -144,14 +145,14 @@ export default function ReportDetailsPage() {
   const handleEdit = () => {
     if (report) {
       // TODO: Implement edit functionality
-      console.log("Edit report:", report);
+      logger.info("Edit report", report);
     }
   };
 
   const handleShare = () => {
     if (report) {
       // TODO: Implement share functionality
-      console.log("Share report:", report);
+      logger.info("Share report", report);
     }
   };
 

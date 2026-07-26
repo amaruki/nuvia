@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
+import { logger } from "@/lib/logger";
 import { AddAnnouncementForm } from "@/components/content/add-announcement-form";
 import { AnnouncementFormData } from "@/types/announcement.types";
 
@@ -87,7 +88,7 @@ export default function EditAnnouncementPage() {
       await updateAnnouncement(announcementId, data);
       router.push("/dashboard/content/announcements");
     } catch (error) {
-      console.error("Error updating announcement:", error);
+      logger.error("Error updating announcement", error);
     }
   };
 

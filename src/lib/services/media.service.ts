@@ -25,6 +25,7 @@ import {
   mockAnalytics,
   mockTags,
 } from "@/lib/data/mock-media-data";
+import { logger } from "@/lib/logger";
 
 // Simulate API delay
 const delay = (ms: number = 300) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -1103,7 +1104,7 @@ export class MediaService {
         const { data: media } = await this.createMedia(mediaData);
         uploadedMedia.push(media);
       } catch (error) {
-        console.error(`Failed to upload ${file.name}:`, error);
+        logger.error(`Failed to upload ${file.name}`, error);
       }
     }
 

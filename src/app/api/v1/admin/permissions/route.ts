@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { requirePermission } from "@/lib/rbac";
 import { problemResponse, problems, successResponse } from "@/lib/http";
+import { logger } from "@/lib/logger";
 import { AVAILABLE_PERMISSIONS, PERMISSION_CATEGORIES, formatPermission } from "@/types/role.types";
 
 /**
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("Error getting permissions:", error);
+    logger.error("Error getting permissions", error);
     return problemResponse(problems.internalError("Failed to retrieve permissions"));
   }
 }

@@ -24,6 +24,7 @@ import { CommitteesTable } from "@/components/committees/committees-table";
 import { CommitteesFilters } from "@/components/committees/committees-filters";
 import { AddCommitteeForm } from "@/components/committees/add-committee-form";
 import { useCommittees } from "@/lib/hooks/use-committees";
+import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Committee } from "@/types/committee.types";
 import { useRouter } from "next/navigation";
@@ -87,7 +88,7 @@ export default function OrganizationCommittees() {
       setShowAddForm(false);
       setEditingCommittee(null);
     } catch (error) {
-      console.error("Error saving committee:", error);
+      logger.error("Error saving committee", error);
     }
   };
 
@@ -100,7 +101,7 @@ export default function OrganizationCommittees() {
       try {
         await deleteCommittee(committee.id);
       } catch (error) {
-        console.error("Error deleting committee:", error);
+        logger.error("Error deleting committee", error);
       }
     }
   };
@@ -109,7 +110,7 @@ export default function OrganizationCommittees() {
     try {
       await toggleCommitteeStatus(committee.id, status);
     } catch (error) {
-      console.error("Error toggling committee status:", error);
+      logger.error("Error toggling committee status", error);
     }
   };
 

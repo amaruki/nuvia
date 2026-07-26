@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSession } from "@/hooks/use-session";
+import { logger } from "@/lib/logger";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ExternalLink as ExternalLinkType } from "@/types/auth.types";
 
@@ -180,7 +181,7 @@ export function SocialLinksForm({ user }: SocialLinksFormProps) {
       setTimeout(() => setIsSuccess(false), 3000);
     },
     onError: (error: any) => {
-      console.error("Failed to update social links:", error);
+      logger.error("Failed to update social links", error);
     },
   });
 

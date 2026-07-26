@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { resetPasswordAction } from "@/lib/actions/auth.actions";
+import { logger } from "@/lib/logger";
 
 const resetPasswordSchema = z
   .object({
@@ -81,7 +82,7 @@ function ResetPasswordForm() {
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
-      console.error(err);
+      logger.error("An unexpected error occurred. Please try again.", err);
     } finally {
       setIsLoading(false);
     }

@@ -19,6 +19,7 @@ import { ArrowLeft, Save, X, Plus } from "lucide-react";
 import { EventType, EventStatus, Event } from "@/types/event.types";
 import { EventLayout } from "@/components/events/event-layout";
 import { getEventById } from "@/lib/services/event.service";
+import { logger } from "@/lib/logger";
 
 const eventTypeOptions = [
   { value: EventType.WORKSHOP, label: "Workshop" },
@@ -96,7 +97,7 @@ export default function EditEventPage() {
             : "",
         });
       } catch (error) {
-        console.error("Error fetching event data:", error);
+        logger.error("Error fetching event data", error);
         router.push("/events");
       } finally {
         setIsLoading(false);
@@ -155,7 +156,7 @@ export default function EditEventPage() {
 
     try {
       // Here you would typically call your API to update the event
-      console.log("Updating event with data:", { ...formData, tags });
+      logger.info("Updating event with data", { ...formData, tags });
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -163,7 +164,7 @@ export default function EditEventPage() {
       // Redirect to event details page
       router.push(`/events/${eventId}`);
     } catch (error) {
-      console.error("Error updating event:", error);
+      logger.error("Error updating event", error);
     } finally {
       setIsSubmitting(false);
     }

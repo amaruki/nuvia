@@ -14,6 +14,7 @@ import {
   mockDonationPayments,
   mockDonationStatistics,
 } from "@/lib/data/mock-donation-data";
+import { logger } from "@/lib/logger";
 
 export function useDonations() {
   const [donations, setDonations] = useState<Donation[]>([]);
@@ -39,7 +40,7 @@ export function useDonations() {
         setError(null);
       } catch (err) {
         setError("Failed to load donation data");
-        console.error("Error loading donation data:", err);
+        logger.error("Error loading donation data", err);
       } finally {
         setLoading(false);
       }
@@ -107,7 +108,7 @@ export function useDonations() {
 
       return true;
     } catch (err) {
-      console.error("Error updating donation status:", err);
+      logger.error("Error updating donation status", err);
       return false;
     }
   };
@@ -155,7 +156,7 @@ export function useDonations() {
 
       return true;
     } catch (err) {
-      console.error("Error recording payment:", err);
+      logger.error("Error recording payment", err);
       return false;
     }
   };
@@ -174,7 +175,7 @@ export function useDonations() {
 
       return true;
     } catch (err) {
-      console.error("Error sending receipt:", err);
+      logger.error("Error sending receipt", err);
       return false;
     }
   };
@@ -214,16 +215,16 @@ export function useDonations() {
 
       // Simulate sending receipt and thank you if requested
       if (data.sendReceipt) {
-        console.log("Receipt sent to:", newDonation.donorEmail);
+        logger.info("Receipt sent to", newDonation.donorEmail);
       }
 
       if (data.sendThankYou) {
-        console.log("Thank you message sent to:", newDonation.donorEmail);
+        logger.info("Thank you message sent to", newDonation.donorEmail);
       }
 
       return true;
     } catch (err) {
-      console.error("Error adding donation:", err);
+      logger.error("Error adding donation", err);
       return false;
     }
   };
@@ -242,7 +243,7 @@ export function useDonations() {
       setError(null);
     } catch (err) {
       setError("Failed to refresh donation data");
-      console.error("Error refreshing donation data:", err);
+      logger.error("Error refreshing donation data", err);
     } finally {
       setLoading(false);
     }

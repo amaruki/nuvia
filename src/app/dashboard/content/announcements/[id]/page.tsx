@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
+import { logger } from "@/lib/logger";
 import { Announcement } from "@/types/announcement.types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -98,7 +99,7 @@ export default function AnnouncementViewPage() {
         await deleteAnnouncement(announcementId);
         router.push("/dashboard/content/announcements");
       } catch (error) {
-        console.error("Error deleting announcement:", error);
+        logger.error("Error deleting announcement", error);
       }
     }
   };
@@ -108,7 +109,7 @@ export default function AnnouncementViewPage() {
       await publishAnnouncement(announcementId);
       router.refresh();
     } catch (error) {
-      console.error("Error publishing announcement:", error);
+      logger.error("Error publishing announcement", error);
     }
   };
 
@@ -117,7 +118,7 @@ export default function AnnouncementViewPage() {
       await archiveAnnouncement(announcementId);
       router.refresh();
     } catch (error) {
-      console.error("Error archiving announcement:", error);
+      logger.error("Error archiving announcement", error);
     }
   };
 

@@ -32,6 +32,7 @@ import {
   AuthorizationError,
   BusinessLogicError,
 } from "@/lib/errors";
+import { logger } from "@/lib/logger";
 
 /**
  * Helper function to handle API responses
@@ -97,7 +98,7 @@ export async function getEvents(
     // Using mock data for demonstration
     return getMockEvents(filter, page, pageSize);
   } catch (error) {
-    console.error("Error fetching events:", error);
+    logger.error("Error fetching events", error);
     throw error;
   }
 }
@@ -114,7 +115,7 @@ export async function getEventById(id: string): Promise<EventDetailsResponse> {
     // Using mock data for demonstration
     return getMockEventById(id);
   } catch (error) {
-    console.error(`Error fetching event with ID ${id}:`, error);
+    logger.error(`Error fetching event with ID ${id}`, error);
     throw error;
   }
 }
@@ -134,7 +135,7 @@ export async function createEvent(eventData: CreateEventRequest): Promise<Event>
 
     return await handleApiResponse<Event>(response);
   } catch (error) {
-    console.error("Error creating event:", error);
+    logger.error("Error creating event", error);
     throw error;
   }
 }
@@ -158,7 +159,7 @@ export async function updateEvent(id: string, eventData: UpdateEventRequest): Pr
 
     return await handleApiResponse<Event>(response);
   } catch (error) {
-    console.error(`Error updating event with ID ${id}:`, error);
+    logger.error(`Error updating event with ID ${id}`, error);
     throw error;
   }
 }
@@ -181,7 +182,7 @@ export async function deleteEvent(id: string): Promise<void> {
 
     return await handleApiResponse<void>(response);
   } catch (error) {
-    console.error(`Error deleting event with ID ${id}:`, error);
+    logger.error(`Error deleting event with ID ${id}`, error);
     throw error;
   }
 }
@@ -207,7 +208,7 @@ export async function registerForEvent(
 
     return await handleApiResponse<EventRegistrationResponse>(response);
   } catch (error) {
-    console.error("Error registering for event:", error);
+    logger.error("Error registering for event", error);
     throw error;
   }
 }
@@ -230,7 +231,7 @@ export async function cancelEventRegistration(eventId: string): Promise<EventReg
 
     return await handleApiResponse<EventRegistrationResponse>(response);
   } catch (error) {
-    console.error(`Error cancelling registration for event ${eventId}:`, error);
+    logger.error(`Error cancelling registration for event ${eventId}`, error);
     throw error;
   }
 }
@@ -256,7 +257,7 @@ export async function checkInToEvent(
 
     return await handleApiResponse<EventCheckInResponse>(response);
   } catch (error) {
-    console.error("Error checking in to event:", error);
+    logger.error("Error checking in to event", error);
     throw error;
   }
 }
@@ -276,7 +277,7 @@ export async function getEventStatistics(): Promise<EventStatistics> {
 
     return await handleApiResponse<EventStatistics>(response);
   } catch (error) {
-    console.error("Error fetching event statistics:", error);
+    logger.error("Error fetching event statistics", error);
     throw error;
   }
 }
@@ -289,7 +290,7 @@ export async function getEventDashboardData(): Promise<EventDashboardData> {
     // Using mock data for demonstration
     return getMockEventDashboardData();
   } catch (error) {
-    console.error("Error fetching event dashboard data:", error);
+    logger.error("Error fetching event dashboard data", error);
     throw error;
   }
 }
@@ -309,7 +310,7 @@ export async function getUserEventRegistrations(
     // Using mock data for demonstration
     return getMockUserEventRegistrations(userId, status as any);
   } catch (error) {
-    console.error(`Error fetching event registrations for user ${userId}:`, error);
+    logger.error(`Error fetching event registrations for user ${userId}`, error);
     throw error;
   }
 }
@@ -333,7 +334,7 @@ export async function getUserOrganizedEvents(userId: string): Promise<Event[]> {
 
     return await handleApiResponse<Event[]>(response);
   } catch (error) {
-    console.error(`Error fetching organized events for user ${userId}:`, error);
+    logger.error(`Error fetching organized events for user ${userId}`, error);
     throw error;
   }
 }
@@ -363,7 +364,7 @@ export async function getEventCertificate(
 
     return await handleApiResponse<EventCertificate>(response);
   } catch (error) {
-    console.error(`Error fetching certificate for event ${eventId} and user ${userId}:`, error);
+    logger.error(`Error fetching certificate for event ${eventId} and user ${userId}`, error);
     throw error;
   }
 }
@@ -389,7 +390,7 @@ export async function verifyEventCertificate(verificationCode: string): Promise<
 
     return await handleApiResponse<EventCertificate>(response);
   } catch (error) {
-    console.error(`Error verifying certificate with code ${verificationCode}:`, error);
+    logger.error(`Error verifying certificate with code ${verificationCode}`, error);
     throw error;
   }
 }

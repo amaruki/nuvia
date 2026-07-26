@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Save, X, Plus } from "lucide-react";
 import { EventType, EventStatus } from "@/types/event.types";
 import { EventLayout } from "@/components/events/event-layout";
+import { logger } from "@/lib/logger";
 
 const eventTypeOptions = [
   { value: EventType.WORKSHOP, label: "Workshop" },
@@ -84,7 +85,7 @@ export default function CreateEventPage() {
 
     try {
       // Here you would typically call your API to create the event
-      console.log("Creating event with data:", { ...formData, tags });
+      logger.info("Creating event with data", { ...formData, tags });
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -92,7 +93,7 @@ export default function CreateEventPage() {
       // Redirect to events page
       router.push("/events");
     } catch (error) {
-      console.error("Error creating event:", error);
+      logger.error("Error creating event", error);
     } finally {
       setIsSubmitting(false);
     }

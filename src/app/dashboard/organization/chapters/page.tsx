@@ -24,6 +24,7 @@ import { ChaptersTable } from "@/components/chapters/chapters-table";
 import { ChaptersFilters } from "@/components/chapters/chapters-filters";
 import { AddChapterForm } from "@/components/chapters/add-chapter-form";
 import { useChapters } from "@/lib/hooks/use-chapters";
+import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Chapter } from "@/types/chapter.types";
 import { useRouter } from "next/navigation";
@@ -87,7 +88,7 @@ export default function OrganizationChapters() {
       setShowAddForm(false);
       setEditingChapter(null);
     } catch (error) {
-      console.error("Error saving chapter:", error);
+      logger.error("Error saving chapter", error);
     }
   };
 
@@ -100,7 +101,7 @@ export default function OrganizationChapters() {
       try {
         await deleteChapter(chapter.id);
       } catch (error) {
-        console.error("Error deleting chapter:", error);
+        logger.error("Error deleting chapter", error);
       }
     }
   };
@@ -109,7 +110,7 @@ export default function OrganizationChapters() {
     try {
       await toggleChapterStatus(chapter.id, status);
     } catch (error) {
-      console.error("Error toggling chapter status:", error);
+      logger.error("Error toggling chapter status", error);
     }
   };
 

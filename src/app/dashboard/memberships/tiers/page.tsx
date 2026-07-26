@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { logger } from "@/lib/logger";
 
 interface TierData {
   tier: MembershipTier;
@@ -245,7 +246,7 @@ export default function MembershipTiers() {
 
   const handleSaveTier = (updatedTier: any) => {
     // TODO: Implement API call to save tier
-    console.log("Saving tier:", updatedTier);
+    logger.info("Saving tier", updatedTier);
     // You would typically call an API here
   };
 
@@ -277,7 +278,7 @@ export default function MembershipTiers() {
 
   const handleSaveConfig = (config: MembershipConfig) => {
     // TODO: Implement API call to save configuration
-    console.log("Saving configuration:", config);
+    logger.info("Saving configuration", config);
     // You would typically call an API here
     setConfigModalOpen(false);
   };

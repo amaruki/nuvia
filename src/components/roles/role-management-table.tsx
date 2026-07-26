@@ -49,6 +49,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, MoreHorizontal, User, Shield, Settings, Search, Users } from "lucide-react";
 import { Role, ROLE_DISPLAY_INFO } from "@/types/role.types";
 import { UserWithRoleInfo } from "@/lib/services/role.service";
+import { logger } from "@/lib/logger";
 
 // Props interface
 interface RoleManagementTableProps {
@@ -103,7 +104,7 @@ export function RoleManagementTable({
       setReason("");
       onRefresh?.();
     } catch (error) {
-      console.error("Failed to update role:", error);
+      logger.error("Failed to update role", error);
     } finally {
       setIsUpdating(false);
     }
@@ -121,7 +122,7 @@ export function RoleManagementTable({
       setReason("");
       onRefresh?.();
     } catch (error) {
-      console.error("Failed to update roles:", error);
+      logger.error("Failed to update roles", error);
     } finally {
       setIsUpdating(false);
     }

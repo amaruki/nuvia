@@ -4,6 +4,7 @@ import { and, count, desc, asc, eq, ilike, or } from "drizzle-orm";
 import { hashPassword } from "better-auth/crypto";
 import { requirePermission } from "@/lib/rbac";
 import { problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
+import { logger } from "@/lib/logger";
 import { db } from "@/db/client";
 import { user } from "@/db/schema";
 import { ROLE_PERMISSIONS, isPredefinedRole } from "@/types/role.types";
@@ -100,7 +101,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error getting users:", error);
+    logger.error("Error getting users", error);
     return problemResponse(problems.internalError("Failed to retrieve users"));
   }
 }
@@ -171,7 +172,7 @@ export async function POST(request: NextRequest) {
 
     return successResponse({ user: newUser });
   } catch (error) {
-    console.error("Error creating user:", error);
+    logger.error("Error creating user", error);
     return problemResponse(problems.internalError("Failed to create user"));
   }
 }

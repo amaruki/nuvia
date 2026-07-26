@@ -35,6 +35,7 @@ import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { logger } from "@/lib/logger";
 
 export function ReportList() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -52,7 +53,7 @@ export function ReportList() {
       const data = await getMockReports();
       setReports(data);
     } catch (error) {
-      console.error("Failed to load reports", error);
+      logger.error("Failed to load reports", error);
     } finally {
       setIsLoading(false);
     }

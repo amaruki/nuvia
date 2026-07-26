@@ -21,6 +21,7 @@ import {
 } from "@/types/role.types";
 import { AuthError, AuthErrorType } from "./auth/common";
 import { problems, type ProblemDetails } from "@/lib/http";
+import { logger } from "@/lib/logger";
 
 // Enhanced user type with role information
 export interface UserWithRole {
@@ -106,7 +107,7 @@ export async function getCurrentUser(headersOverride?: Headers): Promise<UserWit
       permissions,
     };
   } catch (error) {
-    console.error("Error getting current user:", error);
+    logger.error("Error getting current user", error);
     return null;
   }
 }
@@ -234,7 +235,7 @@ export async function requirePermission(
       user: currentUser,
     };
   } catch (error) {
-    console.error("Error in requirePermission:", error);
+    logger.error("Error in requirePermission", error);
     return {
       success: false,
       error: problems.internalError(),
@@ -277,7 +278,7 @@ export async function requireRole(
       user: currentUser,
     };
   } catch (error) {
-    console.error("Error in requireRole:", error);
+    logger.error("Error in requireRole", error);
     return {
       success: false,
       error: problems.internalError(),
@@ -313,7 +314,7 @@ export async function canManageUserRole(managerId: string, targetUserId: string)
 
     return canManageRole(manager.role as Role, target.role as Role);
   } catch (error) {
-    console.error("Error checking role management permission:", error);
+    logger.error("Error checking role management permission", error);
     return false;
   }
 }
@@ -392,7 +393,7 @@ export async function changeUserRole(
       success: true,
     };
   } catch (error) {
-    console.error("Error changing user role:", error);
+    logger.error("Error changing user role", error);
     return {
       success: false,
       error: "INTERNAL_ERROR",
@@ -454,7 +455,7 @@ export async function getRoleStatistics(): Promise<{
       roleBreakdown,
     };
   } catch (error) {
-    console.error("Error getting role statistics:", error);
+    logger.error("Error getting role statistics", error);
     return {
       totalUsers: 0,
       roleDistribution: {},
@@ -512,7 +513,7 @@ export async function getAllRoles(): Promise<
 
     return [...roles, ...customRoleEntries];
   } catch (error) {
-    console.error("Error getting all roles:", error);
+    logger.error("Error getting all roles", error);
     return [];
   }
 }
@@ -594,7 +595,7 @@ export async function getUserPermissions(userId: string): Promise<{
       permissions,
     };
   } catch (error) {
-    console.error("Error getting user permissions:", error);
+    logger.error("Error getting user permissions", error);
     return {
       role: "user",
       permissions: [],

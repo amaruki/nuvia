@@ -9,6 +9,7 @@ import {
   resetPasswordSchema,
 } from "@/lib/validation/auth.validation";
 import { auth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 import { headers } from "next/headers";
 import type { AuthResponse, PasswordResetResponse, SafeUser } from "@/types/auth.types";
 
@@ -246,7 +247,7 @@ export async function updateProfileAction(formData: FormData): Promise<AuthRespo
       try {
         externalLinks = JSON.parse(externalLinksStr);
       } catch (parseError) {
-        console.warn("Failed to parse externalLinks:", parseError);
+        logger.warn("Failed to parse externalLinks", parseError);
         externalLinks = null;
       }
     }
@@ -463,7 +464,7 @@ export async function signOutAction(): Promise<PasswordResetResponse> {
  */
 export async function deleteAccountAction(): Promise<PasswordResetResponse> {
   try {
-    console.log("Account deletion attempt");
+    logger.info("Account deletion attempt");
 
     return {
       success: true,

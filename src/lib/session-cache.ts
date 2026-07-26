@@ -9,6 +9,7 @@ import { Redis } from "ioredis";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { session as sessionTable } from "@/db/schema";
+import { logger } from "@/lib/logger";
 
 // Cache configuration
 const CACHE_TTL = 60; // 60 seconds cache TTL
@@ -45,13 +46,13 @@ function getRedisClient(): Redis | null {
 
       redisClient.on("error", (err) => {
         if (redisAvailable) {
-          console.warn("Redis connection lost:", err.message);
+          logger.warn("Redis connection lost", err.message);
           redisAvailable = false;
         }
       });
 
       redisClient.on("connect", () => {
-        console.log("✅ Redis connected for session caching");
+        logger.info("✅ Redis connected for session caching");
         redisAvailable = true;
       });
 
@@ -59,8 +60,8 @@ function getRedisClient(): Redis | null {
         redisAvailable = false;
       });
     } catch (error) {
-      console.warn(
-        "Redis not available - session caching disabled:",
+      logger.warn(
+        "Redis not available - session caching disabled",
         error instanceof Error ? error.message : "Unknown error",
       );
       redisAvailable = false;
@@ -115,8 +116,8 @@ export async function cacheSession(sessionToken: string, sessionData: any): Prom
     // Silent fail - session caching is optional
     // Only log in development
     if (process.env.NODE_ENV === "development") {
-      console.debug(
-        "Redis cache failed (session caching disabled):",
+      logger.debug(
+        "Redis cache failed (session caching disabled)",
         error instanceof Error ? error.message : error,
       );
     }
@@ -144,7 +145,7 @@ export async function getCachedSession(sessionToken: string): Promise<CachedSess
 
     return sessionData;
   } catch (error) {
-    console.warn("Failed to get cached session:", error);
+    logger.warn("Failed to get cached session", error);
     return null;
   }
 }
@@ -159,7 +160,7 @@ export async function invalidateSessionCache(sessionToken: string): Promise<void
   try {
     await redis.del(getCacheKey(sessionToken));
   } catch (error) {
-    console.warn("Failed to invalidate session cache:", error);
+    logger.warn("Failed to invalidate session cache", error);
   }
 }
 
@@ -189,7 +190,7 @@ export async function invalidateUserSessionCaches(userId: string): Promise<void>
       }
     }
   } catch (error) {
-    console.warn("Failed to invalidate user session caches:", error);
+    logger.warn("Failed to invalidate user session caches", error);
   }
 }
 
@@ -290,7 +291,7 @@ export async function validateSessionWithCache(sessionToken: string) {
       fromCache: false,
     };
   } catch (error) {
-    console.error("Session validation error:", error);
+    logger.error("Session validation error", error);
     return null;
   }
 }
@@ -304,7 +305,7 @@ export async function closeRedisConnection(): Promise<void> {
       await redisClient.quit();
       redisClient = null;
     } catch (error) {
-      console.warn("Error closing Redis connection:", error);
+      logger.warn("Error closing Redis connection", error);
     }
   }
 }

@@ -14,6 +14,7 @@ import {
   CATEGORY_STATUSES,
   CATEGORY_SCOPES,
 } from "@/types/category.types";
+import { logger } from "@/lib/logger";
 
 // Mock data for development
 const mockCategories: Category[] = [
@@ -422,7 +423,7 @@ export function useCategories() {
           URL.revokeObjectURL(url);
         } else {
           // CSV export would be implemented here
-          console.log("CSV export not implemented yet");
+          logger.info("CSV export not implemented yet");
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to export categories");

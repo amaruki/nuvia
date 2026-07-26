@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { authClient } from "@/lib/client";
+import { logger } from "@/lib/logger";
 
 interface User {
   id: string;
@@ -93,7 +94,7 @@ export function useSession(): SessionData {
             },
           }),
         }).catch((error) => {
-          console.warn("Failed to cache session:", error);
+          logger.warn("Failed to cache session", error);
         });
       }
 
@@ -151,7 +152,7 @@ export function invalidateSessionCache(sessionToken?: string): void {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: sessionToken }),
     }).catch((error) => {
-      console.warn("Failed to invalidate server session cache:", error);
+      logger.warn("Failed to invalidate server session cache", error);
     });
   }
 }

@@ -7,6 +7,7 @@ import {
   WorkspaceFilterOptions,
 } from "@/types/committee.types";
 import { mockWorkspaces, mockWorkspaceStatistics } from "@/lib/data/mock-workspace-data";
+import { logger } from "@/lib/logger";
 
 export function useWorkspaces() {
   const [workspaces, setWorkspaces] = useState<CommitteeWorkspace[]>([]);
@@ -67,7 +68,7 @@ export function useWorkspaces() {
       setStatistics(mockWorkspaceStatistics);
     } catch (err) {
       setError("Failed to fetch workspaces. Please try again.");
-      console.error("Error fetching workspaces:", err);
+      logger.error("Error fetching workspaces", err);
     } finally {
       setLoading(false);
     }

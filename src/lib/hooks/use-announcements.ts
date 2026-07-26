@@ -15,6 +15,7 @@ import {
 } from "@/types/announcement.types";
 import { ArticleStatus } from "@/types/article.types";
 import { mockArticles, mockStatistics, mockAnnouncements } from "@/lib/data/mock-article-data";
+import { logger } from "@/lib/logger";
 
 interface UseAnnouncementsReturn {
   // Data
@@ -791,7 +792,7 @@ export function useAnnouncements(): UseAnnouncementsReturn {
         const data = JSON.parse(text);
 
         // In a real app, you'd validate and process imported data
-        console.log("Imported announcements:", data);
+        logger.info("Imported announcements", data);
 
         // Simulate processing
         await new Promise((resolve) => setTimeout(resolve, 2000));

@@ -7,6 +7,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, RefreshCw } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 interface AsyncContentProps {
   isLoading: boolean;
@@ -88,7 +89,7 @@ class AsyncBoundary extends React.Component<AsyncBoundaryProps, AsyncBoundarySta
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("AsyncBoundary caught an error:", error, errorInfo);
+    logger.error("AsyncBoundary caught an error", { error, errorInfo });
   }
 
   render() {

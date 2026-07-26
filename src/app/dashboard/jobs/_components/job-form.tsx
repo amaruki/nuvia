@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/card";
 import { Job } from "../_data/mock-jobs";
 import { Label } from "@/components/ui/label";
+import { logger } from "@/lib/logger";
 
 interface JobFormProps {
   initialData?: Job;
@@ -59,7 +60,7 @@ export function JobForm({ initialData, mode }: JobFormProps) {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    console.log("Form submitted:", formData);
+    logger.info("Form submitted", formData);
     setLoading(false);
     router.push("/dashboard/jobs");
     router.refresh();

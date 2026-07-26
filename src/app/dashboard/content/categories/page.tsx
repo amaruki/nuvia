@@ -33,6 +33,7 @@ import {
 } from "@/components/content/categories-overview-cards";
 import { AddCategoryForm } from "@/components/content/add-category-form";
 import { useCategories } from "@/lib/hooks/use-categories";
+import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Category, CategoryFormData, CategoryStatus } from "@/types/category.types";
 
@@ -80,7 +81,7 @@ export default function ContentCategories() {
   const handleViewDetails = (category: Category) => {
     setViewingCategory(category);
     // In a real app, this might navigate to a details page
-    console.log("View category details:", category);
+    logger.info("View category details", category);
   };
 
   const handleEdit = (category: Category) => {
@@ -95,7 +96,7 @@ export default function ContentCategories() {
       try {
         await deleteCategory(category.id);
       } catch (error) {
-        console.error("Error deleting category:", error);
+        logger.error("Error deleting category", error);
       }
     }
   };
@@ -119,7 +120,7 @@ export default function ContentCategories() {
       };
       await createCategory(duplicateData);
     } catch (error) {
-      console.error("Error duplicating category:", error);
+      logger.error("Error duplicating category", error);
     }
   };
 
@@ -127,7 +128,7 @@ export default function ContentCategories() {
     try {
       await updateCategory(category.id, { status });
     } catch (error) {
-      console.error("Error changing category status:", error);
+      logger.error("Error changing category status", error);
     }
   };
 
@@ -142,7 +143,7 @@ export default function ContentCategories() {
       setShowAddForm(false);
       setEditingCategory(null);
     } catch (error) {
-      console.error("Error adding category:", error);
+      logger.error("Error adding category", error);
     }
   };
 
@@ -154,7 +155,7 @@ export default function ContentCategories() {
       setShowAddForm(false);
       setEditingCategory(null);
     } catch (error) {
-      console.error("Error updating category:", error);
+      logger.error("Error updating category", error);
     }
   };
 
@@ -168,7 +169,7 @@ export default function ContentCategories() {
         await bulkUpdateStatus(selectedCategories, "active");
         setSelectedCategories([]);
       } catch (error) {
-        console.error("Error bulk activating categories:", error);
+        logger.error("Error bulk activating categories", error);
       }
     }
   };
@@ -183,7 +184,7 @@ export default function ContentCategories() {
         await bulkUpdateStatus(selectedCategories, "archived");
         setSelectedCategories([]);
       } catch (error) {
-        console.error("Error bulk archiving categories:", error);
+        logger.error("Error bulk archiving categories", error);
       }
     }
   };
@@ -200,7 +201,7 @@ export default function ContentCategories() {
         await bulkDelete(selectedCategories);
         setSelectedCategories([]);
       } catch (error) {
-        console.error("Error bulk deleting categories:", error);
+        logger.error("Error bulk deleting categories", error);
       }
     }
   };

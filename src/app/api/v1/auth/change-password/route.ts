@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
 import { problem, problemResponse, problems, successResponse } from "@/lib/http";
+import { logger } from "@/lib/logger";
 import { rateLimitOrProblem } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Change password error:", error);
+    logger.error("Change password error", error);
     return problemResponse(
       problems.internalError("An unexpected error occurred while changing password"),
     );

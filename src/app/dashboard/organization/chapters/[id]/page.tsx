@@ -52,6 +52,7 @@ import {
 } from "lucide-react";
 import { useChapters } from "@/lib/hooks/use-chapters";
 import { useHeader } from "@/contexts/dashboard-context";
+import { logger } from "@/lib/logger";
 
 export default function ChapterDetailsPage() {
   const params = useParams();
@@ -170,7 +171,7 @@ export default function ChapterDetailsPage() {
     try {
       await toggleChapterStatus(chapter.id, status);
     } catch (error) {
-      console.error("Error toggling chapter status:", error);
+      logger.error("Error toggling chapter status", error);
     }
   };
 

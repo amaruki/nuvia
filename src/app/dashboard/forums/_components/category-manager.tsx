@@ -46,6 +46,7 @@ import { Badge } from "@/components/ui/badge";
 import { getMockCategories, ForumCategory } from "@/lib/data/mock-forums";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 const iconMap: Record<string, React.ReactNode> = {
   MessageSquare: <MessageSquare className="h-5 w-5" />,
@@ -74,7 +75,7 @@ export function CategoryManager() {
       const data = await getMockCategories();
       setCategories(data);
     } catch (error) {
-      console.error("Failed to load categories", error);
+      logger.error("Failed to load categories", error);
     } finally {
       setIsLoading(false);
     }

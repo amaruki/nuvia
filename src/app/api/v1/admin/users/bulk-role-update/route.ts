@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requirePermission } from "@/lib/rbac";
 import { changeUserRole, getCurrentUser } from "@/lib/rbac";
 import { problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
+import { logger } from "@/lib/logger";
 
 /**
  * POST /api/v1/admin/users/bulk-role-update - Update multiple users' roles
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
       },
     );
   } catch (error) {
-    console.error("Error in bulk role update:", error);
+    logger.error("Error in bulk role update", error);
     return problemResponse(problems.internalError("Failed to process bulk role update"));
   }
 }
@@ -169,7 +170,7 @@ export async function GET(request: NextRequest) {
       canProceed: cannotManage.length === 0 && users.length > 0,
     });
   } catch (error) {
-    console.error("Error generating bulk role update preview:", error);
+    logger.error("Error generating bulk role update preview", error);
     return problemResponse(problems.internalError("Failed to generate preview"));
   }
 }

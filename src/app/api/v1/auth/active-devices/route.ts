@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
 import { problem, problemResponse, problems, successResponse } from "@/lib/http";
+import { logger } from "@/lib/logger";
 
 // GET /api/v1/auth/active-devices - Get user's active devices
 export async function GET(request: NextRequest) {
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
 
     return successResponse({ devices: sessions });
   } catch (error) {
-    console.error("List active devices error:", error);
+    logger.error("List active devices error", error);
     return problemResponse(
       problems.internalError("An unexpected error occurred while retrieving active devices"),
     );
@@ -52,7 +53,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    console.error("Deactivate device error:", error);
+    logger.error("Deactivate device error", error);
     return problemResponse(
       problems.internalError("An unexpected error occurred while deactivating device"),
     );

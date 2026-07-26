@@ -12,6 +12,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { forgotPasswordAction } from "@/lib/actions/auth.actions";
+import { logger } from "@/lib/logger";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -63,7 +64,7 @@ export default function ForgotPasswordPage() {
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
-      console.error(err);
+      logger.error("An unexpected error occurred. Please try again.", err);
     } finally {
       setIsLoading(false);
     }

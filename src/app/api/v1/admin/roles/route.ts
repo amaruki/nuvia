@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { requirePermission } from "@/lib/rbac";
 import { getAllRoles, getRoleStatistics } from "@/lib/rbac";
 import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
+import { logger } from "@/lib/logger";
 import { db } from "@/db/client";
 import { customRole } from "@/db/schema";
 import { AVAILABLE_PERMISSIONS } from "@/types/role.types";
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
 
     return successResponse(data);
   } catch (error) {
-    console.error("Error getting roles:", error);
+    logger.error("Error getting roles", error);
     return problemResponse(problems.internalError("Failed to retrieve roles"));
   }
 }
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     return successResponse({ role: newRole });
   } catch (error) {
-    console.error("Error creating role:", error);
+    logger.error("Error creating role", error);
     return problemResponse(problems.internalError("Failed to create role"));
   }
 }

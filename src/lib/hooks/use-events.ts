@@ -5,6 +5,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Event, EventFilter, EventListResponse, EventDetailsResponse } from "@/types/event.types";
 import { getEvents, getEventById } from "@/lib/services/event.service";
+import { logger } from "@/lib/logger";
 
 /**
  * Hook for fetching events with optional filtering and pagination
@@ -25,7 +26,7 @@ export function useEvents(filter?: EventFilter, page = 1, pageSize = 10) {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch events";
       setError(errorMessage);
-      console.error("Error fetching events:", err);
+      logger.error("Error fetching events", err);
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +68,7 @@ export function useEvent(eventId: string) {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch event";
       setError(errorMessage);
-      console.error(`Error fetching event with ID ${eventId}:`, err);
+      logger.error(`Error fetching event with ID ${eventId}`, err);
     } finally {
       setIsLoading(false);
     }

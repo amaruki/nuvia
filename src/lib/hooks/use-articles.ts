@@ -14,6 +14,7 @@ import {
   ArticleAuthor,
 } from "@/types/article.types";
 import { mockArticles, mockStatistics } from "@/lib/data/mock-article-data";
+import { logger } from "@/lib/logger";
 
 interface UseArticlesReturn {
   // Data
@@ -665,7 +666,7 @@ export function useArticles(): UseArticlesReturn {
         const data = JSON.parse(text);
 
         // In a real app, you'd validate and process the imported data
-        console.log("Imported articles:", data);
+        logger.info("Imported articles", data);
 
         // Simulate processing
         await new Promise((resolve) => setTimeout(resolve, 2000));

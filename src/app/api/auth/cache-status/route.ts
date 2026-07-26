@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCacheStatus } from "@/lib/session-cache";
+import { logger } from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -32,7 +33,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error("Error getting cache status:", error);
+    logger.error("Error getting cache status", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

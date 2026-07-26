@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
+import { logger } from "@/lib/logger";
 import { AddAnnouncementForm } from "@/components/content/add-announcement-form";
 import { AnnouncementFormData } from "@/types/announcement.types";
 import { useEffect } from "react";
@@ -28,7 +29,7 @@ export default function CreateAnnouncementPage() {
       await addAnnouncement(data);
       router.push("/dashboard/content/announcements");
     } catch (error) {
-      console.error("Error creating announcement:", error);
+      logger.error("Error creating announcement", error);
     }
   };
 

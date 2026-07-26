@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { logger } from "@/lib/logger";
 import {
   Dialog,
   DialogContent,
@@ -201,7 +202,7 @@ export function AddChapterForm({
       form.reset();
       onOpenChange(false);
     } catch (error) {
-      console.error("Error submitting chapter form:", error);
+      logger.error("Error submitting chapter form", error);
     } finally {
       setIsSubmitting(false);
     }

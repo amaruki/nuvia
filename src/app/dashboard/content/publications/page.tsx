@@ -25,6 +25,7 @@ import { PublicationsTable } from "@/components/content/publications-table";
 import { PublicationsFilters } from "@/components/content/publications-filters";
 import PublicationPageForm from "@/components/content/add-publication-form";
 import { usePublications } from "@/lib/hooks/use-publications";
+import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Publication } from "@/types/publication.types";
 
@@ -95,7 +96,7 @@ export default function ContentPublications() {
       try {
         await deletePublication(publication.id);
       } catch (error) {
-        console.error("Error deleting publication:", error);
+        logger.error("Error deleting publication", error);
       }
     }
   };
@@ -104,7 +105,7 @@ export default function ContentPublications() {
     try {
       await publishPublication(publication.id);
     } catch (error) {
-      console.error("Error publishing publication:", error);
+      logger.error("Error publishing publication", error);
     }
   };
 
@@ -112,7 +113,7 @@ export default function ContentPublications() {
     try {
       await archivePublication(publication.id);
     } catch (error) {
-      console.error("Error archiving publication:", error);
+      logger.error("Error archiving publication", error);
     }
   };
 
@@ -120,7 +121,7 @@ export default function ContentPublications() {
     try {
       await schedulePublication(publication.id, date);
     } catch (error) {
-      console.error("Error scheduling publication:", error);
+      logger.error("Error scheduling publication", error);
     }
   };
 
@@ -128,7 +129,7 @@ export default function ContentPublications() {
     try {
       await duplicatePublication(publication.id);
     } catch (error) {
-      console.error("Error duplicating publication:", error);
+      logger.error("Error duplicating publication", error);
     }
   };
 
@@ -144,7 +145,7 @@ export default function ContentPublications() {
         await bulkPublish(selectedPublications);
         setSelectedPublications([]);
       } catch (error) {
-        console.error("Error bulk publishing:", error);
+        logger.error("Error bulk publishing", error);
       }
     }
   };
@@ -161,7 +162,7 @@ export default function ContentPublications() {
         await bulkArchive(selectedPublications);
         setSelectedPublications([]);
       } catch (error) {
-        console.error("Error bulk archiving:", error);
+        logger.error("Error bulk archiving", error);
       }
     }
   };
@@ -178,7 +179,7 @@ export default function ContentPublications() {
         await bulkDelete(selectedPublications);
         setSelectedPublications([]);
       } catch (error) {
-        console.error("Error bulk deleting:", error);
+        logger.error("Error bulk deleting", error);
       }
     }
   };
@@ -193,7 +194,7 @@ export default function ContentPublications() {
       try {
         await importPublications(file);
       } catch (error) {
-        console.error("Error importing publications:", error);
+        logger.error("Error importing publications", error);
       }
     }
   };

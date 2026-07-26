@@ -39,6 +39,7 @@ import {
 import * as LucideIcons from "lucide-react";
 
 import { useMedia } from "@/lib/hooks/use-media";
+import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Media, MediaFolder, MediaType, MediaStatus, MediaVisibility } from "@/types/media.types";
 import { MediaDetailsModal } from "@/components/content/media-details-modal";
@@ -109,7 +110,7 @@ export default function ContentMedia() {
       try {
         await deleteMedia(mediaItem.id);
       } catch (error) {
-        console.error("Error deleting media:", error);
+        logger.error("Error deleting media", error);
       }
     }
   };
@@ -118,7 +119,7 @@ export default function ContentMedia() {
     try {
       await duplicateMedia(mediaItem.id);
     } catch (error) {
-      console.error("Error duplicating media:", error);
+      logger.error("Error duplicating media", error);
     }
   };
 
@@ -134,7 +135,7 @@ export default function ContentMedia() {
         await bulkDelete(selectedMedia);
         clearSelection();
       } catch (error) {
-        console.error("Error bulk deleting:", error);
+        logger.error("Error bulk deleting", error);
       }
     }
   };
@@ -146,7 +147,7 @@ export default function ContentMedia() {
       await bulkMove(selectedMedia, folderId);
       clearSelection();
     } catch (error) {
-      console.error("Error bulk moving:", error);
+      logger.error("Error bulk moving", error);
     }
   };
 
@@ -160,7 +161,7 @@ export default function ContentMedia() {
       try {
         await importMedia(file);
       } catch (error) {
-        console.error("Error importing media:", error);
+        logger.error("Error importing media", error);
       }
     }
   };
@@ -175,7 +176,7 @@ export default function ContentMedia() {
         extractMetadata: true,
       });
     } catch (error) {
-      console.error("Error uploading media:", error);
+      logger.error("Error uploading media", error);
     }
   };
 

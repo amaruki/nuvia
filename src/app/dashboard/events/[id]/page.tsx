@@ -10,6 +10,7 @@ import { ArrowLeft, Edit, Share2, QrCode } from "lucide-react";
 import { EventRegistration, RegistrationStatus } from "@/types/event.types";
 import { useEvent } from "@/lib/hooks/use-events";
 import { formatDateLong, formatEventTimeRange } from "@/lib/utils/event-utils";
+import { logger } from "@/lib/logger";
 
 export default function EventDetailsPage() {
   const params = useParams();
@@ -25,7 +26,7 @@ export default function EventDetailsPage() {
 
   const handleCancelRegistration = (eventId: string) => {
     // Handle cancellation logic
-    console.log("Cancel registration for event:", eventId);
+    logger.info("Cancel registration for event", eventId);
   };
 
   const handleCheckIn = (eventId: string) => {

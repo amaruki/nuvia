@@ -3,6 +3,7 @@
 import { auth } from "@/lib/auth";
 import { AuthResponseFactory } from "@/lib/auth/common";
 import { BusinessLogicError } from "@/lib/errors";
+import { logger } from "@/lib/logger";
 
 /**
  * OAuth Actions using better-auth (Server-side)
@@ -50,7 +51,7 @@ export async function signInWithOAuthAction(provider: string, callbackURL?: stri
 
     throw new BusinessLogicError("No OAuth redirect URL received", "OAUTH_NO_REDIRECT_URL");
   } catch (error) {
-    console.error("OAuth sign-in error:", error instanceof Error ? error.message : String(error));
+    logger.error("OAuth sign-in error", error instanceof Error ? error.message : String(error));
 
     return {
       success: false,

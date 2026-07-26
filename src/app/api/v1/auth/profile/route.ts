@@ -3,6 +3,7 @@ import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
 import { AuthUtils } from "@/lib/auth/utils";
 import { problem, problemResponse, problems, successResponse } from "@/lib/http";
+import { logger } from "@/lib/logger";
 
 // GET /api/v1/auth/profile - Get user profile
 export async function GET(request: NextRequest) {
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     return successResponse({ user });
   } catch (error) {
-    console.error("Get profile error:", error);
+    logger.error("Get profile error", error);
     return problemResponse(
       problems.internalError("An unexpected error occurred while retrieving profile"),
     );
@@ -48,7 +49,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    console.error("Update profile error:", error);
+    logger.error("Update profile error", error);
     return problemResponse(
       problems.internalError("An unexpected error occurred while updating profile"),
     );

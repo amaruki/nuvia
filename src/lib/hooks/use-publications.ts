@@ -11,6 +11,7 @@ import {
   PublicationCategory,
 } from "@/types/publication.types";
 import { mockPublications, mockStatistics } from "@/lib/data/mock-publication-data";
+import { logger } from "@/lib/logger";
 
 interface UsePublicationsReturn {
   // Data
@@ -550,7 +551,7 @@ export function usePublications(): UsePublicationsReturn {
         const data = JSON.parse(text);
 
         // In a real app, you'd validate and process the imported data
-        console.log("Imported publications:", data);
+        logger.info("Imported publications", data);
 
         // Simulate processing
         await new Promise((resolve) => setTimeout(resolve, 2000));

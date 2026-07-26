@@ -28,6 +28,7 @@ import { WorkspacesTable } from "@/components/workspaces/workspaces-table";
 import { WorkspacesFilters } from "@/components/workspaces/workspaces-filters";
 import { AddWorkspaceForm } from "@/components/workspaces/add-workspace-form";
 import { useWorkspaces } from "@/lib/hooks/use-workspaces";
+import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { CommitteeWorkspace } from "@/types/committee.types";
 import { useRouter } from "next/navigation";
@@ -91,7 +92,7 @@ export default function OrganizationWorkspaces() {
       setShowAddForm(false);
       setEditingWorkspace(null);
     } catch (error) {
-      console.error("Error saving workspace:", error);
+      logger.error("Error saving workspace", error);
     }
   };
 
@@ -102,7 +103,7 @@ export default function OrganizationWorkspaces() {
       try {
         await deleteWorkspace(workspace.id);
       } catch (error) {
-        console.error("Error deleting workspace:", error);
+        logger.error("Error deleting workspace", error);
       }
     }
   };
@@ -114,7 +115,7 @@ export default function OrganizationWorkspaces() {
     try {
       await toggleWorkspaceStatus(workspace.id, status);
     } catch (error) {
-      console.error("Error toggling workspace status:", error);
+      logger.error("Error toggling workspace status", error);
     }
   };
 

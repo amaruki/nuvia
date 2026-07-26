@@ -7,6 +7,7 @@ import {
   CommitteeFilterOptions,
 } from "@/types/committee.types";
 import { mockCommittees, mockCommitteeStatistics } from "@/lib/data/mock-committee-data";
+import { logger } from "@/lib/logger";
 
 export function useCommittees() {
   const [committees, setCommittees] = useState<Committee[]>([]);
@@ -60,7 +61,7 @@ export function useCommittees() {
       setStatistics(mockCommitteeStatistics);
     } catch (err) {
       setError("Failed to fetch committees. Please try again.");
-      console.error("Error fetching committees:", err);
+      logger.error("Error fetching committees", err);
     } finally {
       setLoading(false);
     }

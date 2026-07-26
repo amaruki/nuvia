@@ -2,6 +2,7 @@ import { eq, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import { account, user } from "@/db/schema";
 import { BusinessLogicError, OAuthConflictError } from "@/lib/errors";
+import { logger } from "@/lib/logger";
 
 /**
  * OAuth Service for handling OAuth authentication flows
@@ -26,7 +27,7 @@ export class OAuthService {
       // If user exists and has a password hash, they registered with email/password
       return !!existingUser && !!existingUser.passwordHash;
     } catch (error) {
-      console.error("Error checking email registration:", error);
+      logger.error("Error checking email registration", error);
       throw new BusinessLogicError("Failed to check email registration", "EMAIL_CHECK_FAILED");
     }
   }
@@ -51,7 +52,7 @@ export class OAuthService {
       // If user exists and has OAuth accounts, they registered with OAuth
       return !!existingUser && existingUser.accounts.length > 0;
     } catch (error) {
-      console.error("Error checking OAuth registration:", error);
+      logger.error("Error checking OAuth registration", error);
       throw new BusinessLogicError("Failed to check OAuth registration", "OAUTH_CHECK_FAILED");
     }
   }
@@ -71,7 +72,7 @@ export class OAuthService {
         },
       });
     } catch (error) {
-      console.error("Error getting user with auth methods:", error);
+      logger.error("Error getting user with auth methods", error);
       throw new BusinessLogicError(
         "Failed to get user authentication methods",
         "USER_AUTH_METHODS_FAILED",
@@ -133,7 +134,7 @@ export class OAuthService {
         };
       }
 
-      console.error("Error validating OAuth sign-in:", error);
+      logger.error("Error validating OAuth sign-in", error);
       return {
         isValid: false,
         error: "An error occurred while validating your sign-in attempt. Please try again.",
@@ -170,7 +171,7 @@ export class OAuthService {
         ...additionalData,
       });
     } catch (error) {
-      console.error("Error linking OAuth account:", error);
+      logger.error("Error linking OAuth account", error);
       throw new BusinessLogicError("Failed to link OAuth account", "OAUTH_LINK_FAILED");
     }
   }

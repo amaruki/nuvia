@@ -18,6 +18,7 @@ import { useBudget } from "@/lib/hooks/use-budget";
 import { BudgetCategory, BudgetTransaction, BudgetFormData } from "@/types/finance.types";
 import { useSession } from "@/hooks/use-session";
 import { useHeader } from "@/contexts/dashboard-context";
+import { logger } from "@/lib/logger";
 
 export default function FinanceBudget() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -60,7 +61,7 @@ export default function FinanceBudget() {
       }
       await refreshData();
     } catch (err) {
-      console.error("Error saving category:", err);
+      logger.error("Error saving category", err);
     }
   };
 
@@ -69,7 +70,7 @@ export default function FinanceBudget() {
       await deleteTransaction(transaction.id);
       await refreshData();
     } catch (err) {
-      console.error("Error deleting transaction:", err);
+      logger.error("Error deleting transaction", err);
     }
   };
 

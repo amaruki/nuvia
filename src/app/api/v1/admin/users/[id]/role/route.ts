@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requirePermission } from "@/lib/rbac";
 import { changeUserRole } from "@/lib/rbac";
 import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
+import { logger } from "@/lib/logger";
 
 /**
  * PATCH /api/v1/admin/users/[id]/role - Update user role
@@ -84,7 +85,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       changedAt: new Date(),
     });
   } catch (error) {
-    console.error("Error updating user role:", error);
+    logger.error("Error updating user role", error);
     return problemResponse(problems.internalError("Failed to update user role"));
   }
 }
@@ -135,7 +136,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
   } catch (error) {
-    console.error("Error getting user role:", error);
+    logger.error("Error getting user role", error);
     return problemResponse(problems.internalError("Failed to retrieve user role"));
   }
 }

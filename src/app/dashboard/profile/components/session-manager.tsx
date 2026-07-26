@@ -25,6 +25,7 @@ import {
   revokeSessionAction,
   revokeAllOtherSessionsAction,
 } from "@/lib/actions/auth.actions";
+import { logger } from "@/lib/logger";
 
 interface SessionManagerProps {
   user: any;
@@ -85,7 +86,7 @@ export function SessionManager({ user }: SessionManagerProps) {
         setSessions([]);
       }
     } catch (err) {
-      console.error("Failed to load sessions:", err);
+      logger.error("Failed to load sessions", err);
       setError("Failed to load active sessions");
       setSessions([]);
     } finally {

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { problemResponse, problems, successResponse } from "@/lib/http";
+import { logger } from "@/lib/logger";
 import { rateLimitOrProblem } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
     // Always return success for security (don't reveal if email exists)
     return successResponse(null, { message: "Password reset email sent if account exists" });
   } catch (error) {
-    console.error("Forgot password error:", error);
+    logger.error("Forgot password error", error);
     return problemResponse(
       problems.internalError("An unexpected error occurred during forgot password"),
     );

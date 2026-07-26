@@ -32,6 +32,7 @@ import { RoleStatistics, RoleStatisticsData } from "@/components/roles/role-stat
 // Import types and services
 import { Role, Permission } from "@/types/role.types";
 import { UserWithRoleInfo } from "@/lib/services/role.service";
+import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 
 export default function UserRoles() {
@@ -160,7 +161,7 @@ export default function UserRoles() {
   // Handle permission toggle (for custom roles)
   const handlePermissionToggle = async (role: Role, permission: Permission, granted: boolean) => {
     // TODO: Implement custom role permission management
-    console.log("Permission toggle:", { role, permission, granted });
+    logger.info("Permission toggle", { role, permission, granted });
   };
 
   // Load data on mount

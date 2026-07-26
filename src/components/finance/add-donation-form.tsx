@@ -41,6 +41,7 @@ import {
   Info,
 } from "lucide-react";
 import { DonationFormData, DonationCampaign } from "@/types/finance.types";
+import { logger } from "@/lib/logger";
 
 interface AddDonationFormProps {
   open: boolean;
@@ -126,7 +127,7 @@ export function AddDonationForm({ open, onOpenChange, onSubmit, campaigns }: Add
       setDonorInfo({ name: "", email: "" });
       onOpenChange(false);
     } catch (error) {
-      console.error("Error adding donation:", error);
+      logger.error("Error adding donation", error);
     } finally {
       setIsSubmitting(false);
     }

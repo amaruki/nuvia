@@ -20,6 +20,7 @@ import {
   Eye,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 import { MediaUploadOptions, MediaType } from "@/types/media.types";
 
 interface MediaUploadProps {
@@ -174,7 +175,7 @@ export function MediaUpload({ onUpload, onClose, className }: MediaUploadProps) 
         setIsUploading(false);
       }, 1000);
     } catch (error) {
-      console.error("Upload failed:", error);
+      logger.error("Upload failed", error);
       setFiles((prev) =>
         prev.map((f) =>
           f.status === "uploading" ? { ...f, status: "error", error: "Upload failed" } : f,

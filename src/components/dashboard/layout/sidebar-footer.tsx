@@ -22,6 +22,7 @@ import { BadgeCheck, CreditCard, Settings, Bell, LogOut, ChevronsUpDown } from "
 import { useSession } from "@/hooks/use-session";
 import { useState } from "react";
 import { logoutAction } from "@/lib/actions/auth.actions";
+import { logger } from "@/lib/logger";
 import { useSidebar } from "@/components/ui/sidebar";
 
 interface SidebarFooterComponentProps {
@@ -51,11 +52,11 @@ export function SidebarFooterComponent({ className }: SidebarFooterComponentProp
         router.push("/auth/login");
         router.refresh();
       } else {
-        console.error("Logout failed:", result.message);
+        logger.error("Logout failed", result.message);
         alert(result.message || "Failed to logout");
       }
     } catch (error) {
-      console.error("Logout error:", error);
+      logger.error("Logout error", error);
       alert("An error occurred during logout");
     } finally {
       setIsLoggingOut(false);

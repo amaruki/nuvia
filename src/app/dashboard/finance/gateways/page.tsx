@@ -23,6 +23,7 @@ import { AddGatewayForm } from "@/components/finance/add-gateway-form";
 import { GatewayDetailsModal } from "@/components/finance/gateway-details-modal";
 import { useGateways } from "@/lib/hooks/use-gateways";
 import { useHeader } from "@/contexts/dashboard-context";
+import { logger } from "@/lib/logger";
 import { PaymentGateway, GatewayTransaction } from "@/types/finance.types";
 
 export default function FinanceGateways() {
@@ -87,7 +88,7 @@ export default function FinanceGateways() {
       setShowAddForm(false);
       setEditingGateway(null);
     } catch (error) {
-      console.error("Error saving gateway:", error);
+      logger.error("Error saving gateway", error);
     }
   };
 
@@ -100,7 +101,7 @@ export default function FinanceGateways() {
       try {
         await deleteGateway(gateway.id);
       } catch (error) {
-        console.error("Error deleting gateway:", error);
+        logger.error("Error deleting gateway", error);
       }
     }
   };
@@ -109,7 +110,7 @@ export default function FinanceGateways() {
     try {
       await toggleGatewayStatus(gateway.id, enabled);
     } catch (error) {
-      console.error("Error toggling gateway status:", error);
+      logger.error("Error toggling gateway status", error);
     }
   };
 
@@ -117,7 +118,7 @@ export default function FinanceGateways() {
     try {
       await testGateway(gateway.id);
     } catch (error) {
-      console.error("Error testing gateway:", error);
+      logger.error("Error testing gateway", error);
     }
   };
 
@@ -125,7 +126,7 @@ export default function FinanceGateways() {
     try {
       await setDefaultGateway(gateway.id);
     } catch (error) {
-      console.error("Error setting default gateway:", error);
+      logger.error("Error setting default gateway", error);
     }
   };
 

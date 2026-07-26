@@ -15,6 +15,7 @@ import {
   mockGatewayTransactions,
   mockGatewayTestResults,
 } from "@/lib/data/mock-gateway-data";
+import { logger } from "@/lib/logger";
 
 export function useGateways() {
   const [gateways, setGateways] = useState<PaymentGateway[]>([]);
@@ -40,7 +41,7 @@ export function useGateways() {
         setError(null);
       } catch (err) {
         setError("Failed to load gateway data");
-        console.error("Error loading gateway data:", err);
+        logger.error("Error loading gateway data", err);
       } finally {
         setLoading(false);
       }
@@ -111,7 +112,7 @@ export function useGateways() {
       setError(null);
     } catch (err) {
       setError("Failed to refresh gateway data");
-      console.error("Error refreshing gateway data:", err);
+      logger.error("Error refreshing gateway data", err);
     } finally {
       setLoading(false);
     }
@@ -192,7 +193,7 @@ export function useGateways() {
       return newGateway;
     } catch (err) {
       setError("Failed to add gateway");
-      console.error("Error adding gateway:", err);
+      logger.error("Error adding gateway", err);
       throw err;
     }
   }, []);
@@ -257,7 +258,7 @@ export function useGateways() {
       );
     } catch (err) {
       setError("Failed to update gateway");
-      console.error("Error updating gateway:", err);
+      logger.error("Error updating gateway", err);
       throw err;
     }
   }, []);
@@ -271,7 +272,7 @@ export function useGateways() {
       setGateways((prev) => prev.filter((gateway) => gateway.id !== id));
     } catch (err) {
       setError("Failed to delete gateway");
-      console.error("Error deleting gateway:", err);
+      logger.error("Error deleting gateway", err);
       throw err;
     }
   }, []);
@@ -297,7 +298,7 @@ export function useGateways() {
       );
     } catch (err) {
       setError("Failed to toggle gateway status");
-      console.error("Error toggling gateway status:", err);
+      logger.error("Error toggling gateway status", err);
       throw err;
     }
   }, []);
@@ -367,7 +368,7 @@ export function useGateways() {
       );
     } catch (err) {
       setError("Failed to set default gateway");
-      console.error("Error setting default gateway:", err);
+      logger.error("Error setting default gateway", err);
       throw err;
     }
   }, []);

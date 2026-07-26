@@ -34,6 +34,7 @@ import { AnnouncementsTable } from "@/components/content/announcements-table";
 import { AnnouncementsFilters } from "@/components/content/announcements-filters";
 import { AddAnnouncementForm } from "@/components/content/add-announcement-form";
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
+import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Announcement, AnnouncementFormData } from "@/types/announcement.types";
 import { ArticleStatus } from "@/types/article.types";
@@ -106,7 +107,7 @@ export default function ContentAnnouncements() {
       try {
         await deleteAnnouncement(announcement.id);
       } catch (error) {
-        console.error("Error deleting announcement:", error);
+        logger.error("Error deleting announcement", error);
       }
     }
   };
@@ -115,7 +116,7 @@ export default function ContentAnnouncements() {
     try {
       await updateAnnouncement(announcement.id, { status });
     } catch (error) {
-      console.error("Error changing announcement status:", error);
+      logger.error("Error changing announcement status", error);
     }
   };
 
@@ -123,7 +124,7 @@ export default function ContentAnnouncements() {
     try {
       await publishAnnouncement(announcement.id);
     } catch (error) {
-      console.error("Error publishing announcement:", error);
+      logger.error("Error publishing announcement", error);
     }
   };
 
@@ -131,7 +132,7 @@ export default function ContentAnnouncements() {
     try {
       await archiveAnnouncement(announcement.id);
     } catch (error) {
-      console.error("Error archiving announcement:", error);
+      logger.error("Error archiving announcement", error);
     }
   };
 
@@ -139,7 +140,7 @@ export default function ContentAnnouncements() {
     try {
       await scheduleAnnouncement(announcement.id, date);
     } catch (error) {
-      console.error("Error scheduling announcement:", error);
+      logger.error("Error scheduling announcement", error);
     }
   };
 
@@ -147,7 +148,7 @@ export default function ContentAnnouncements() {
     try {
       await duplicateAnnouncement(announcement.id);
     } catch (error) {
-      console.error("Error duplicating announcement:", error);
+      logger.error("Error duplicating announcement", error);
     }
   };
 
@@ -163,7 +164,7 @@ export default function ContentAnnouncements() {
         await bulkPublish(selectedAnnouncements);
         setSelectedAnnouncements([]);
       } catch (error) {
-        console.error("Error bulk publishing:", error);
+        logger.error("Error bulk publishing", error);
       }
     }
   };
@@ -180,7 +181,7 @@ export default function ContentAnnouncements() {
         await bulkArchive(selectedAnnouncements);
         setSelectedAnnouncements([]);
       } catch (error) {
-        console.error("Error bulk archiving:", error);
+        logger.error("Error bulk archiving", error);
       }
     }
   };
@@ -197,7 +198,7 @@ export default function ContentAnnouncements() {
         await bulkDelete(selectedAnnouncements);
         setSelectedAnnouncements([]);
       } catch (error) {
-        console.error("Error bulk deleting:", error);
+        logger.error("Error bulk deleting", error);
       }
     }
   };
@@ -212,7 +213,7 @@ export default function ContentAnnouncements() {
       try {
         await importAnnouncements(file);
       } catch (error) {
-        console.error("Error importing announcements:", error);
+        logger.error("Error importing announcements", error);
       }
     }
   };
@@ -222,7 +223,7 @@ export default function ContentAnnouncements() {
       await addAnnouncement(data);
       setShowAddForm(false);
     } catch (error) {
-      console.error("Error adding announcement:", error);
+      logger.error("Error adding announcement", error);
     }
   };
 

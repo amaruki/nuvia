@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { formatDate } from "@/lib/utils/date-utils";
 import { getActivityIcon } from "@/lib/utils/activity-icons";
+import { logger } from "@/lib/logger";
 
 interface LoginActivity {
   id: string;
@@ -70,7 +71,7 @@ export default function LoginActivitiesPage() {
       }
     } catch (err) {
       setError("An error occurred while fetching login activities");
-      console.error(err);
+      logger.error("Failed to fetch login activities", err);
     } finally {
       setLoading(false);
     }

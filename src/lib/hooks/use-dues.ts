@@ -14,6 +14,7 @@ import {
   mockDueReminders,
   mockDueStatistics,
 } from "@/lib/data/mock-dues-data";
+import { logger } from "@/lib/logger";
 
 export function useDues() {
   const [dues, setDues] = useState<MemberDue[]>([]);
@@ -39,7 +40,7 @@ export function useDues() {
         setError(null);
       } catch (err) {
         setError("Failed to fetch dues data");
-        console.error("Error fetching dues:", err);
+        logger.error("Error fetching dues", err);
       } finally {
         setLoading(false);
       }
@@ -102,7 +103,7 @@ export function useDues() {
       }
     } catch (err) {
       setError("Failed to update due status");
-      console.error("Error updating due status:", err);
+      logger.error("Error updating due status", err);
     }
   };
 
@@ -169,7 +170,7 @@ export function useDues() {
       updateStatistics(updatedDues);
     } catch (err) {
       setError("Failed to record payment");
-      console.error("Error recording payment:", err);
+      logger.error("Error recording payment", err);
     }
   };
 
@@ -196,7 +197,7 @@ export function useDues() {
       setReminders((prev) => [...prev, newReminder]);
     } catch (err) {
       setError("Failed to send reminder");
-      console.error("Error sending reminder:", err);
+      logger.error("Error sending reminder", err);
     }
   };
 
@@ -213,7 +214,7 @@ export function useDues() {
       setError(null);
     } catch (err) {
       setError("Failed to refresh data");
-      console.error("Error refreshing data:", err);
+      logger.error("Error refreshing data", err);
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,8 @@
  * Application configuration
  */
 
+import { logger } from "@/lib/logger";
+
 // Rate limiting configuration
 export const RATE_LIMITING = {
   // Max requests per window
@@ -141,7 +143,7 @@ export function validateEnvironment(): void {
     NODE_ENV === "production" &&
     process.env.JWT_SECRET === "your-secret-key-change-in-production"
   ) {
-    console.warn(
+    logger.warn(
       "WARNING: Using default JWT secret in production. Please set a secure JWT_SECRET environment variable.",
     );
   }

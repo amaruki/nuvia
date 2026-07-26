@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { animate } from "animejs";
 import { authClient } from "@/lib/client";
+import { logger } from "@/lib/logger";
 import Image from "next/image";
 
 export default function OAuthCallbackPage() {
@@ -120,7 +121,7 @@ export default function OAuthCallbackPage() {
                 }, 2000);
               }
             } catch (oauthError) {
-              console.error("OAuth completion error:", oauthError);
+              logger.error("OAuth completion error", oauthError);
               setStatus("error");
               setMessage("Failed to complete authentication. Please try again.");
 
@@ -140,8 +141,8 @@ export default function OAuthCallbackPage() {
           }
         }
       } catch (error) {
-        console.error(
-          "OAuth callback error:",
+        logger.error(
+          "OAuth callback error",
           error instanceof Error ? error.message : String(error),
         );
         setStatus("error");

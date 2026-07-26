@@ -1,6 +1,7 @@
 "use server";
 
 import { validateSessionWithCache } from "@/lib/session-cache";
+import { logger } from "@/lib/logger";
 import { cookies } from "next/headers";
 
 /**
@@ -18,7 +19,7 @@ export async function getSessionWithCache() {
 
     return await validateSessionWithCache(sessionToken);
   } catch (error) {
-    console.error("Error getting cached session:", error);
+    logger.error("Error getting cached session", error);
     return null;
   }
 }
@@ -37,6 +38,6 @@ export async function invalidateUserSessionCache() {
       await invalidateSessionCache(sessionToken);
     }
   } catch (error) {
-    console.error("Error invalidating session cache:", error);
+    logger.error("Error invalidating session cache", error);
   }
 }

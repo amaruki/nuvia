@@ -11,6 +11,7 @@ import { createAuthMiddleware } from "@/lib/auth/middleware";
 
 import { AuthResponseFactory } from "@/lib/auth/common";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
+import { logger } from "@/lib/logger";
 
 // TODO: Add support for API key authentication for external services
 // TODO: Add support for request logging and analytics
@@ -68,7 +69,7 @@ export async function proxy(request: NextRequest) {
     // Continue to the route handler
     return NextResponse.next();
   } catch (error) {
-    console.error("Middleware error:", error);
+    logger.error("Middleware error", error);
     return AuthResponseFactory.internalError("Internal server error");
   }
 }
@@ -88,7 +89,7 @@ async function authenticate(request: NextRequest): Promise<{ success: boolean; u
 
     return { success: true, user };
   } catch (error) {
-    console.error("Authentication error:", error);
+    logger.error("Authentication error", error);
     return { success: false };
   }
 }

@@ -16,6 +16,7 @@ import {
   mockBudgetOverview,
   mockBudgetAnalytics,
 } from "@/lib/data/mock-budget-data";
+import { logger } from "@/lib/logger";
 
 export function useBudget() {
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
@@ -43,7 +44,7 @@ export function useBudget() {
         setAnalytics(mockBudgetAnalytics);
       } catch (err) {
         setError("Failed to load budget data");
-        console.error("Error loading budget data:", err);
+        logger.error("Error loading budget data", err);
       } finally {
         setLoading(false);
       }
@@ -249,7 +250,7 @@ export function useBudget() {
       setAnalytics(mockBudgetAnalytics);
     } catch (err) {
       setError("Failed to refresh data");
-      console.error("Error refreshing budget data:", err);
+      logger.error("Error refreshing budget data", err);
     } finally {
       setLoading(false);
     }

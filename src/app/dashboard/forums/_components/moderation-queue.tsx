@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 export function ModerationQueue() {
   const [posts, setPosts] = useState<ForumPost[]>([]);
@@ -49,7 +50,7 @@ export function ModerationQueue() {
       const data = await getMockModerationQueue();
       setPosts(data);
     } catch (error) {
-      console.error("Failed to load moderation queue", error);
+      logger.error("Failed to load moderation queue", error);
     } finally {
       setIsLoading(false);
     }

@@ -25,6 +25,7 @@ import {
   checkInToEvent,
 } from "@/lib/services/event.service";
 import { createSuccessResponse, createErrorResponse, ValidationError } from "@/lib/errors";
+import { logger } from "@/lib/logger";
 import {
   createEventSchema,
   updateEventSchema,
@@ -55,7 +56,7 @@ export async function createEventAction(eventData: CreateEventRequest) {
 
     return createSuccessResponse(event, "Event created successfully");
   } catch (error) {
-    console.error("Error creating event:", error);
+    logger.error("Error creating event", error);
 
     if (error instanceof z.ZodError) {
       const fieldErrors = error.issues.map((err) => ({
@@ -97,7 +98,7 @@ export async function updateEventAction(eventId: string, eventData: UpdateEventR
 
     return createSuccessResponse(event, "Event updated successfully");
   } catch (error) {
-    console.error("Error updating event:", error);
+    logger.error("Error updating event", error);
 
     if (error instanceof z.ZodError) {
       const fieldErrors = error.issues.map((err) => ({
@@ -135,7 +136,7 @@ export async function deleteEventAction(eventId: string) {
     // Redirect to events page
     redirect("/events");
   } catch (error) {
-    console.error("Error deleting event:", error);
+    logger.error("Error deleting event", error);
 
     if (error instanceof ValidationError) {
       return createErrorResponse(error);
@@ -168,7 +169,7 @@ export async function registerForEventAction(registrationData: RegisterForEventR
 
     return createSuccessResponse(result.data, result.message);
   } catch (error) {
-    console.error("Error registering for event:", error);
+    logger.error("Error registering for event", error);
 
     if (error instanceof z.ZodError) {
       const fieldErrors = error.issues.map((err) => ({
@@ -206,7 +207,7 @@ export async function cancelEventRegistrationAction(eventId: string) {
 
     return createSuccessResponse(result.data, result.message);
   } catch (error) {
-    console.error("Error cancelling event registration:", error);
+    logger.error("Error cancelling event registration", error);
 
     if (error instanceof ValidationError) {
       return createErrorResponse(error);
@@ -240,7 +241,7 @@ export async function checkInToEventAction(checkInData: CheckInToEventRequest) {
 
     return createSuccessResponse(result.data, result.message);
   } catch (error) {
-    console.error("Error checking in to event:", error);
+    logger.error("Error checking in to event", error);
 
     if (error instanceof z.ZodError) {
       const fieldErrors = error.issues.map((err) => ({

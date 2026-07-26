@@ -22,6 +22,7 @@ import {
   mockTaxDocumentData,
   mockAuditTrailData,
 } from "@/lib/data/mock-reports-data";
+import { logger } from "@/lib/logger";
 
 export function useReports() {
   const [reports, setReports] = useState<FinancialReport[]>([]);
@@ -108,7 +109,7 @@ export function useReports() {
       setAuditTrailData(mockAuditTrailData);
     } catch (err) {
       setError("Failed to fetch reports data");
-      console.error("Error fetching reports:", err);
+      logger.error("Error fetching reports", err);
     } finally {
       setLoading(false);
     }
@@ -164,7 +165,7 @@ export function useReports() {
 
       return true;
     } catch (err) {
-      console.error("Error updating report status:", err);
+      logger.error("Error updating report status", err);
       return false;
     }
   }, []);
@@ -186,13 +187,13 @@ export function useReports() {
         // In a real app, this would trigger a file download
         const report = getReportById(id);
         if (report?.fileUrl) {
-          console.log(`Downloading report: ${report.fileUrl}`);
+          logger.info(`Downloading report: ${report.fileUrl}`);
           // window.open(report.fileUrl, '_blank');
         }
 
         return true;
       } catch (err) {
-        console.error("Error downloading report:", err);
+        logger.error("Error downloading report", err);
         return false;
       }
     },
@@ -209,7 +210,7 @@ export function useReports() {
 
       return true;
     } catch (err) {
-      console.error("Error deleting report:", err);
+      logger.error("Error deleting report", err);
       return false;
     }
   }, []);
@@ -235,7 +236,7 @@ export function useReports() {
 
         return newReport;
       } catch (err) {
-        console.error("Error generating report:", err);
+        logger.error("Error generating report", err);
         return null;
       }
     },

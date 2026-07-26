@@ -12,6 +12,7 @@ import {
   mockInvoicePayments,
   mockInvoiceStatistics,
 } from "@/lib/data/mock-invoice-data";
+import { logger } from "@/lib/logger";
 
 export function useInvoices() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -35,7 +36,7 @@ export function useInvoices() {
         setError(null);
       } catch (err) {
         setError("Failed to fetch invoices data");
-        console.error("Error fetching invoices:", err);
+        logger.error("Error fetching invoices", err);
       } finally {
         setLoading(false);
       }
@@ -105,7 +106,7 @@ export function useInvoices() {
       }
     } catch (err) {
       setError("Failed to update invoice status");
-      console.error("Error updating invoice status:", err);
+      logger.error("Error updating invoice status", err);
     }
   };
 
@@ -165,7 +166,7 @@ export function useInvoices() {
       updateStatistics(updatedInvoices);
     } catch (err) {
       setError("Failed to record payment");
-      console.error("Error recording payment:", err);
+      logger.error("Error recording payment", err);
     }
   };
 
@@ -183,7 +184,7 @@ export function useInvoices() {
       );
     } catch (err) {
       setError("Failed to send invoice");
-      console.error("Error sending invoice:", err);
+      logger.error("Error sending invoice", err);
     }
   };
 
@@ -199,7 +200,7 @@ export function useInvoices() {
       setError(null);
     } catch (err) {
       setError("Failed to refresh data");
-      console.error("Error refreshing data:", err);
+      logger.error("Error refreshing data", err);
     } finally {
       setLoading(false);
     }

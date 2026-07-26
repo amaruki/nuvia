@@ -1,4 +1,5 @@
 import { MediaType, MediaStatus, MediaVisibility } from "@/types/media.types";
+import { logger } from "@/lib/logger";
 
 // File size formatting
 export const formatFileSize = (bytes: number): string => {
@@ -310,7 +311,7 @@ export const downloadFileFromUrl = async (url: string, filename?: string): Promi
     document.body.removeChild(link);
     window.URL.revokeObjectURL(downloadUrl);
   } catch (error) {
-    console.error("Download failed:", error);
+    logger.error("Download failed", error);
     throw error;
   }
 };

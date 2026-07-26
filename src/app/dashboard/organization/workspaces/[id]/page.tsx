@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useHeader } from "@/contexts/dashboard-context";
+import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -84,7 +85,7 @@ export default function WorkspaceDetailPage() {
         const foundWorkspace = mockWorkspaces.find((w) => w.id === workspaceId);
         setWorkspace(foundWorkspace || null);
       } catch (error) {
-        console.error("Error fetching workspace:", error);
+        logger.error("Error fetching workspace", error);
       } finally {
         setLoading(false);
       }

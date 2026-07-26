@@ -47,6 +47,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 import { Course } from "../../courses/_types";
+import { logger } from "@/lib/logger";
 
 const lessonSchema = z.object({
   id: z.string().optional(),
@@ -101,7 +102,7 @@ export function CourseForm({ initialData }: CourseFormProps) {
   const onSubmit = async (data: CourseFormValues) => {
     setIsLoading(true);
     // Simulate API call
-    console.log("Submitting Course Data:", data);
+    logger.info("Submitting Course Data", data);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsLoading(false);
     router.push("/dashboard/learning/admin");

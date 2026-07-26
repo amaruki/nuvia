@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { signInWithOAuthAction } from "@/lib/actions/oauth-better-auth.actions";
+import { logger } from "@/lib/logger";
 import type { OAuthProvider } from "@/types/auth.types";
 
 interface OAuthError {
@@ -55,7 +56,7 @@ export function useOAuthLogin(options: UseOAuthLoginOptions = {}) {
           provider,
         };
 
-        console.error(`OAuth error for ${provider}:`, err);
+        logger.error(`OAuth error for ${provider}`, err);
         setError(oauthError);
         onError?.(oauthError);
       } finally {

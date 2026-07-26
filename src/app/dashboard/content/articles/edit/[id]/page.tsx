@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useArticles } from "@/lib/hooks/use-articles";
+import { logger } from "@/lib/logger";
 import AddArticleForm from "@/components/content/add-article-form";
 import { ArticleFormData } from "@/types/article.types";
 
@@ -87,7 +88,7 @@ export default function EditArticlePage() {
       await updateArticle(articleId, data);
       router.push("/dashboard/content/articles");
     } catch (error) {
-      console.error("Error updating article:", error);
+      logger.error("Error updating article", error);
     }
   };
 

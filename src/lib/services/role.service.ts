@@ -16,6 +16,7 @@ import {
   ROLE_PERMISSIONS,
   ROLE_DISPLAY_INFO,
 } from "@/types/role.types";
+import { logger } from "@/lib/logger";
 
 // Service response interface
 export interface ServiceResponse<T = any> {
@@ -107,7 +108,7 @@ export async function getUserWithRoleInfo(
       },
     };
   } catch (error) {
-    console.error("Error getting user with role info:", error);
+    logger.error("Error getting user with role info", error);
     return {
       success: false,
       error: "INTERNAL_ERROR",
@@ -204,7 +205,7 @@ export async function updateUserRole(
       },
     };
   } catch (error) {
-    console.error("Error updating user role:", error);
+    logger.error("Error updating user role", error);
     return {
       success: false,
       error: "INTERNAL_ERROR",
@@ -268,7 +269,7 @@ export async function bulkUpdateUserRoles(
       },
     };
   } catch (error) {
-    console.error("Error in bulk role update:", error);
+    logger.error("Error in bulk role update", error);
     return {
       success: false,
       error: "INTERNAL_ERROR",
@@ -322,7 +323,7 @@ export async function getUserRoleHistory(
       data: history,
     };
   } catch (error) {
-    console.error("Error getting user role history:", error);
+    logger.error("Error getting user role history", error);
     return {
       success: false,
       error: "INTERNAL_ERROR",
@@ -389,7 +390,7 @@ export async function getRoleDistributionStatistics(): Promise<
       },
     };
   } catch (error) {
-    console.error("Error getting role distribution statistics:", error);
+    logger.error("Error getting role distribution statistics", error);
     return {
       success: false,
       error: "INTERNAL_ERROR",
@@ -492,7 +493,7 @@ export async function getUsersByRole(
       },
     };
   } catch (error) {
-    console.error("Error getting users by role:", error);
+    logger.error("Error getting users by role", error);
     return {
       success: false,
       error: "INTERNAL_ERROR",
@@ -528,7 +529,7 @@ async function logRoleChange(data: {
       },
     });
   } catch (error) {
-    console.error("Error logging role change:", error);
+    logger.error("Error logging role change", error);
     // Don't fail the operation if logging fails
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
 import { problem, problemResponse, problems, successResponse } from "@/lib/http";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Deactivate other devices error:", error);
+    logger.error("Deactivate other devices error", error);
     return problemResponse(
       problems.internalError("An unexpected error occurred while deactivating other devices"),
     );

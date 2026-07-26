@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { invalidateSessionCache } from "@/lib/session-cache";
 import { auth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error invalidating session cache:", error);
+    logger.error("Error invalidating session cache", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

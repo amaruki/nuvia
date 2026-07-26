@@ -14,6 +14,7 @@ import { Redis } from "ioredis";
 import type { NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { problemResponse, problems } from "@/lib/http";
+import { logger } from "@/lib/logger";
 
 export interface RateLimitConfig {
   windowSeconds: number;
@@ -48,7 +49,7 @@ function getClient(): Redis | null {
   if (!env.REDIS_URL) {
     // Only reachable outside production — env.ts requires REDIS_URL there.
     if (!warnedNoRedis) {
-      console.warn("REDIS_URL not set — rate limiting is disabled for this process.");
+      logger.warn("REDIS_URL not set — rate limiting is disabled for this process.");
       warnedNoRedis = true;
     }
     return null;

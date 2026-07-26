@@ -9,6 +9,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 import { AuthError, AuthErrorType, AuthResponseFactory, withAuthErrorHandling } from "./common";
+import { logger } from "@/lib/logger";
 import { SafeUser, UserSession } from "@/types/auth.types";
 
 // Better Auth Session type - matches the actual response from auth.api.getSession()
@@ -75,7 +76,7 @@ export class AuthUtils {
         });
       }
     } catch (error) {
-      console.error("Error getting session:", error);
+      logger.error("Error getting session", error);
       return null;
     }
   }
@@ -88,7 +89,7 @@ export class AuthUtils {
       const session = await this.getSession(request);
       return session?.user || null;
     } catch (error) {
-      console.error("Error getting current user:", error);
+      logger.error("Error getting current user", error);
       return null;
     }
   }
@@ -101,7 +102,7 @@ export class AuthUtils {
       const user = await this.getCurrentUser(request);
       return user?.id || null;
     } catch (error) {
-      console.error("Error getting current user ID:", error);
+      logger.error("Error getting current user ID", error);
       return null;
     }
   }
@@ -114,7 +115,7 @@ export class AuthUtils {
       const session = await this.getSession(request);
       return !!session && !!session.user;
     } catch (error) {
-      console.error("Error checking authentication:", error);
+      logger.error("Error checking authentication", error);
       return false;
     }
   }
@@ -140,7 +141,7 @@ export class AuthUtils {
       const user = await this.getCurrentUser(request);
       return user?.role === role;
     } catch (error) {
-      console.error("Error checking user role:", error);
+      logger.error("Error checking user role", error);
       return false;
     }
   }
@@ -286,7 +287,7 @@ export class AuthUtils {
       // await auth.api.deleteUser({ headers: headersToUse });
       // or use a direct database call through your manager layer
 
-      console.log("Account deletion process initiated for user:", session.user.id);
+      logger.info("Account deletion process initiated for user", session.user.id);
 
       return {
         success: true,

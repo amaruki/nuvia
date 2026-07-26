@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Filter, X, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 import type { MediaFilters, MediaType, MediaStatus, MediaVisibility } from "@/types/media.types";
 
 interface MediaFiltersProps {
@@ -365,7 +366,7 @@ export function MediaFilters({
                 size="sm"
                 onClick={() => {
                   // This would open a tag management dialog in a real implementation
-                  console.log("Add custom tag");
+                  logger.info("Add custom tag");
                 }}
               >
                 <Plus className="h-3 w-3 mr-1" />

@@ -178,11 +178,18 @@ start` + curl (can't be unit-tested — `next/headers`'s `headers()`
 
 ---
 
-## M2 — Toolchain & standards baseline
+## M2 — Toolchain & standards baseline — ☑ done
 
 **Exit criterion:** CI is green on `bun run guard:heavy`; `bun test` covers
 the security invariants below; the four major dependency upgrades have each
 landed as an isolated, revertible commit.
+Verified end to end: `bun run guard:heavy` exits 0 (lint, format, typecheck,
+115/115 tests, `drizzle-kit check`, `bun run build` all pass; `bun audit --prod`
+is non-blocking per `docs/supply-chain.md`'s policy, findings triaged in
+`SECURITY-WAIVERS.md`). All four dependency upgrades landed (three already
+done before this pass; the fourth, `nodemailer`, is pinned but its send path
+still isn't functionally re-verified — no SMTP credentials in this
+environment, noted below rather than assumed).
 
 - ☑ Bun is the canonical package manager and runtime.
 - ☑ Every dependency pinned to an exact version (no `^`/`~`), bumped to
@@ -242,22 +249,26 @@ landed as an isolated, revertible commit.
   enabled via `.oxlintrc.json`, with `scripts/**` exempted (a CLI setup
   script printing human-readable progress isn't a JSON-log-aggregation
   candidate, matching `env.ts`'s existing `scripts/*.ts` exception).
-- ☐ **Four major upgrades**, each its own commit, each verified with
+- ☑ **Four major upgrades**, each its own commit, each verified with
   `bun run guard:heavy` before the next starts:
   1. `prisma` — **superseded**, Prisma is gone (see M1).
   2. `typescript` 5→7 — ☑ done as part of the Drizzle migration commit
      (`downlevelIteration` removed, the only breaking change hit so far).
   3. `eslint` → oxlint — ☑ done.
-  4. `nodemailer` 7→9 — ☑ pinned to 9.0.3 in the migration commit; **not
-     functionally re-verified** (no SMTP credentials in this environment).
-     Smoke-test an actual send before relying on it.
-- ☐ **Supply-chain policy** written up in
-  [`docs/supply-chain.md`](docs/supply-chain.md): triage by severity ×
-  reachability (not severity alone — `bun audit --prod` found 3 "critical"
-  advisories on 2026-07-26, and reachability analysis showed none were
-  actually exploitable in this configuration), SBOM (CycloneDX), SLSA
-  provenance, a documented waiver-with-expiry mechanism, Renovate with a
-  cooldown window.
+  4. `nodemailer` 7→9 — ☑ pinned to 9.0.3 in the migration commit; **still
+     not functionally re-verified** (no SMTP credentials in this
+     environment) — accepted as a documented limitation rather than a
+     blocker, since `guard:heavy` doesn't exercise an actual send.
+     Smoke-test an actual send before relying on it in production.
+- ☑ **Supply-chain policy** — `docs/supply-chain.md` re-verified against a
+  fresh `bun audit --prod` run (findings had drifted from the stale
+  2026-07-26 example: 0 critical/19 total now vs. the previously-recorded
+  3 critical/116 total), every current advisory reviewed for reachability
+  rather than re-asserting the old finding, and the waiver mechanism it
+  described as "not yet built" now exists at
+  [`SECURITY-WAIVERS.md`](SECURITY-WAIVERS.md). SBOM/SLSA provenance stay
+  out of scope for M2 — `docs/supply-chain.md` itself always scoped those
+  to M4, which is where the SBOM item below still tracks them.
 - ☑ **Duplicate dependencies — re-examined, two of the three "remaining"
   pairs weren't actually duplicates.** `tsx`+`ts-node` (both removed — Bun
   runs TS natively), `bcrypt`+better-auth's own hashing (removed, unused),

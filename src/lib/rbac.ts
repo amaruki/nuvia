@@ -80,23 +80,16 @@ export async function getCurrentUser(): Promise<UserWithRole | null> {
     if (isPredefinedRole(role)) {
       permissions = ROLE_PERMISSIONS[role as PredefinedRole];
     } else {
-      // For custom roles, get permissions from database
-      // TODO: Implement customRole lookup here — the custom_roles table
-      // exists (src/db/schema/auth.ts: customRole) and a full admin UI
-      // ships on top of it, but nothing reads it yet. Tracked in TODO.md.
-      /*
-      const role = await db.query.customRole.findFirst({
-        where: (customRole, { eq }) => eq(customRole.name, role),
-        columns: { permissions: true },
+      // Not one of the 14 predefined roles — user.role holds a custom
+      // role's name instead (custom_roles.name, unique).
+      const customRoleRecord = await db.query.customRole.findFirst({
+        where: (customRoleTable, { eq: eqOp }) => eqOp(customRoleTable.name, role),
+        columns: { permissions: true, isActive: true },
       });
 
-      if (role) {
-        permissions = role.permissions as Permission[];
-      }
-      */
-
-      // For now, give custom roles no permissions
-      permissions = [];
+      permissions = customRoleRecord?.isActive
+        ? (customRoleRecord.permissions as Permission[])
+        : [];
     }
 
     return {
@@ -483,10 +476,19 @@ export async function getAllRoles(): Promise<
       userCount: roleUserCounts[role] || 0,
     }));
 
-    // TODO: Add custom roles when we implement the CustomRole model
-    // For now, only return predefined roles
+    const customRoles = await db.query.customRole.findMany({
+      where: (customRoleTable, { eq: eqOp }) => eqOp(customRoleTable.isActive, true),
+    });
 
-    return roles;
+    const customRoleEntries = customRoles.map((customRoleRecord) => ({
+      role: customRoleRecord.name,
+      name: customRoleRecord.displayName || customRoleRecord.name,
+      description: customRoleRecord.description ?? undefined,
+      isPredefined: false,
+      userCount: roleUserCounts[customRoleRecord.name] || 0,
+    }));
+
+    return [...roles, ...customRoleEntries];
   } catch (error) {
     console.error("Error getting all roles:", error);
     return [];
@@ -555,8 +557,14 @@ export async function getUserPermissions(userId: string): Promise<{
     if (isPredefinedRole(targetUser.role as Role)) {
       permissions = ROLE_PERMISSIONS[targetUser.role as PredefinedRole];
     } else {
-      // TODO: Get custom role permissions from database
-      // For now, return empty permissions for custom roles
+      const customRoleRecord = await db.query.customRole.findFirst({
+        where: (customRoleTable, { eq: eqOp }) => eqOp(customRoleTable.name, targetUser.role),
+        columns: { permissions: true, isActive: true },
+      });
+
+      if (customRoleRecord?.isActive) {
+        permissions = customRoleRecord.permissions as Permission[];
+      }
     }
 
     return {

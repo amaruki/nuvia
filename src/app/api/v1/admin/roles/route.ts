@@ -1,8 +1,12 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
+import { eq } from "drizzle-orm";
 import { requirePermission } from "@/lib/rbac";
 import { getAllRoles, getRoleStatistics } from "@/lib/rbac";
-import { problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
+import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
+import { db } from "@/db/client";
+import { customRole } from "@/db/schema";
+import { AVAILABLE_PERMISSIONS } from "@/types/role.types";
 
 /**
  * GET /api/v1/admin/roles - Get all roles with statistics
@@ -63,7 +67,9 @@ export async function POST(request: NextRequest) {
         .min(1, "Role name is required")
         .max(100, "Role name must be less than 100 characters"),
       description: z.string().optional(),
-      permissions: z.array(z.string()).min(1, "At least one permission is required"),
+      permissions: z
+        .array(z.enum(AVAILABLE_PERMISSIONS))
+        .min(1, "At least one permission is required"),
     });
 
     const validationResult = createRoleSchema.safeParse(body);
@@ -74,17 +80,20 @@ export async function POST(request: NextRequest) {
 
     const { name, description, permissions } = validationResult.data;
 
-    // TODO: Implement custom role creation in database
-    // For now, return a placeholder response
-    const newRole = {
-      id: `custom_${Date.now()}`,
-      name,
-      description,
-      permissions,
-      isSystem: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const existing = await db.query.customRole.findFirst({
+      where: eq(customRole.name, name),
+    });
+
+    if (existing) {
+      return problemResponse(
+        problem("conflict", 409, "Conflict", `A role named "${name}" already exists`),
+      );
+    }
+
+    const [newRole] = await db
+      .insert(customRole)
+      .values({ name, description, permissions, isSystem: false })
+      .returning();
 
     return successResponse({ role: newRole });
   } catch (error) {

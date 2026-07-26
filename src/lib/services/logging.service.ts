@@ -3,6 +3,7 @@ import { db } from "@/db/client";
 import { authLog } from "@/db/schema";
 import { LOGGING } from "@/lib/config";
 import { logError } from "@/lib/errors";
+import { logger } from "@/lib/logger";
 
 /**
  * Authentication event types
@@ -81,7 +82,7 @@ export class LoggingService {
 
       // Log to console for development/debugging
       if (LOGGING.REQUESTS || LOGGING.ERRORS) {
-        console.log(`[AuthEvent] ${logEntry.eventType}: ${logEntry.message}`, {
+        logger.info(`[AuthEvent] ${logEntry.eventType}: ${logEntry.message}`, {
           userId: logEntry.userId,
           severity: logEntry.severity,
           ipAddress: logEntry.ipAddress,
@@ -106,8 +107,7 @@ export class LoggingService {
       // Check for suspicious activity patterns
       await this.detectSuspiciousActivity(logEntry);
     } catch (error) {
-      // Don't use logError here to avoid infinite recursion
-      console.error("Failed to log authentication event:", error);
+      logger.error("Failed to log authentication event", error);
     }
   }
 
@@ -390,8 +390,7 @@ export class LoggingService {
         }
       }
     } catch (error) {
-      // Don't use logError here to avoid infinite recursion
-      console.error("Failed to detect suspicious activity:", error);
+      logger.error("Failed to detect suspicious activity", error);
     }
   }
 

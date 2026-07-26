@@ -2,6 +2,8 @@
  * Custom error classes for the application
  */
 
+import { logger } from "@/lib/logger";
+
 export class ValidationError extends Error {
   public fields: Array<{ field: string; message: string }>;
 
@@ -228,15 +230,7 @@ export function validateEnvironmentVariables(requiredVars: string[]): void {
  * @param context - Additional context information
  */
 export function logError(error: Error, context: Record<string, any> = {}): void {
-  console.error({
-    error: {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-    },
-    context,
-    timestamp: new Date().toISOString(),
-  });
+  logger.error(error.message, error, context);
 }
 
 export class OAuthConflictError extends Error {

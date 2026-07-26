@@ -19,12 +19,14 @@ answers to, see [`docs/PRINCIPLES.md`](docs/PRINCIPLES.md) and the ADRs in
 
 ---
 
-## M1 — Safe to deploy
+## M1 — Safe to deploy — ☑ done
 
 **Exit criterion (objectively checkable):** an anonymous request to any
 `/dashboard/**` route redirects to login; `bun audit --prod` has no unwaived
 critical/high; `bun run db:seed` fails without `SEED_ADMIN_PASSWORD`; every
 `route.ts` under `src/app/api/` calls an authorization helper; CI is green.
+All items below are shipped; see each ADR/commit for detail rather than
+re-verifying from scratch.
 
 ### Corrected finding — the auth gate is real, but incomplete
 
@@ -38,32 +40,35 @@ from searching only for `middleware.ts`, which no longer exists under this
 Next.js convention — a real research gap, now corrected here so it isn't
 repeated.
 
-What the gate **doesn't** do:
+- ☑ **Authorize by role, not just by login.** `src/lib/navigation-data.ts`
+  holds the icon-free path/roles data (split out of
+  `navigation-config.tsx`, which now just composes icons onto it) and
+  `src/lib/dashboard-access.ts` builds a longest-prefix path -> roles lookup
+  from it. `proxy.ts` calls `isRoleAllowedForPath` for every
+  `/dashboard/**` request and redirects to `/dashboard?error=forbidden`
+  when the signed-in user's role isn't on the section's allowed list — the
+  same source of truth the sidebar already used for visibility, now
+  actually enforced server-side. Three privileged pages under the
+  `(public)` route group (`events/[id]/edit`, `.../check-in`,
+  `events/dashboard`) get the same check via
+  `src/lib/require-dashboard-role.ts`, since `proxy.ts`'s matcher never
+  reaches `/events/**`. Tests: `tests/dashboard-access.test.ts`.
+  Deliberately kept the existing role vocabulary rather than migrating to
+  `module:action` permission strings — ADR-0005 is accepted but
+  project-wide not-yet-implemented, and that's a separate, larger change.
+- ☑ **Delete the dead per-route auth wrappers.** `withAuth`, `withRole`,
+  `withResourceAuth`, and the `authMiddleware` object deleted from
+  `src/lib/auth/middleware.ts` — confirmed zero call sites first.
+- ☑ **Authorize the remaining API routes.** Re-verified: the only
+  `/api/v1/**` routes that exist today are the 5 admin ones (already
+  authorized) and 11 auth self-service ones (login, signup,
+  change-password, etc.) — those legitimately don't call
+  `requirePermission` since they act on the caller's own session, not a
+  permission-gated resource. There was nothing actually missing here; the
+  "18 of 23" figure conflated routes-that-don't-need-it with
+  routes-that-need-it-and-lack-it.
 
-- ☐ **[P0] Authorize by role, not just by login.** `proxy.ts` only checks
-  "is there a valid session" — it has no per-route role/permission check. Any
-  authenticated account, including a plain `member`, can navigate directly to
-  `/dashboard/users/roles` or `/dashboard/tools/database`; only the sidebar
-  nav hides the link, and only client-side (`navigation-config.tsx`'s
-  `roles?: UserRole[]` — a different vocabulary from the server's
-  `module:action` permissions in `rbac.ts`, per
-  [ADR-0005](docs/adr/0005-permissions-not-roles.md)). Add a
-  `requirePermission`/`requireRole` check at the layout level per route
-  group (see the `(public)`/`(authenticated)`/`(admin)` taxonomy in
-  [`docs/architecture/overview.md`](docs/architecture/overview.md)).
-- ☐ **Delete the dead per-route auth wrappers.** `withAuth`, `withRole`,
-  `withResourceAuth`, and the `authMiddleware` object in
-  `src/lib/auth/middleware.ts` have zero call sites anywhere in `src/`
-  (verified: only `createAuthMiddleware`/`authenticate`/`authorize`, used by
-  `proxy.ts`, are actually live). Keeping unused wrappers next to the real
-  ones is exactly the kind of drift this backlog exists to close.
-- ☐ **Authorize the remaining API routes.** Only 5 of 23 routes under
-  `src/app/api/v1/` call `requirePermission` directly. `proxy.ts` covers
-  authentication for most of `/api/**`, but per-route authorization
-  (does _this_ user have _this_ permission) is still route-by-route and
-  mostly missing.
-
-### P0 — done this session
+### P0 — done
 
 - ☑ **Drizzle migration.** Prisma fully replaced; see
   [ADR-0011](docs/adr/0011-prisma-to-drizzle.md).
@@ -84,58 +89,92 @@ What the gate **doesn't** do:
 - ☑ **`.gitignore`'s blanket `.*` removed** — it previously ignored every
   dotfile, blocking `.editorconfig`, `.nvmrc`, and most CI/tooling config
   from ever being committed.
+- ☑ **Drizzle driver switched from `bun-sql` to `postgres-js`.** Discovered
+  while fixing the type errors below: `drizzle-orm/bun-sql` unconditionally
+  imports the `bun` built-in module, but `next build`'s page-data-collection
+  step spawns plain Node.js child processes (via jest-worker) regardless of
+  which runtime launched the parent build — confirmed with both Turbopack
+  and webpack. Every route transitively importing `src/db/client.ts` (most
+  of the app) failed `bun run build` outright as a result; this was never
+  caught before because earlier, unrelated build errors always aborted the
+  build before reaching this point. `postgres.js` runs identically under
+  Bun and Node; `src/db/client.ts` is the only file that changed.
+- ☑ **`DELETE /api/v1/auth/delete-account` now actually deletes.** Enables
+  better-auth's own `deleteUser` (`user.deleteUser.enabled` in
+  `src/lib/auth.ts`) instead of hand-rolling it — hard-deletes the user row
+  (cascades to sessions/accounts/etc.), revokes every session, requires a
+  password or fresh session. Test: `tests/delete-account.test.ts` asserts
+  the row is gone and a second login fails. **New risk flagged inline in
+  auth.ts**: `content.authorId`/`events.createdBy`/`forum.userId`/
+  `jobs.postedBy`+`userId` reference `user.id` as `NOT NULL` with no
+  cascade — a hard delete will throw a foreign-key violation for any user
+  who has authored one of those once M3 wires them to real data instead of
+  mocks. Revisit then (anonymize instead of delete, or reassign
+  authorship).
+- ☑ **`/api/v1/auth/login` and friends now rate-limited.** One Redis-backed
+  sliding-window limiter (`src/lib/rate-limit.ts`, ADR-0003), applied
+  directly to login/signup/forgot-password/reset-password/change-password.
+  Test: `tests/rate-limit.test.ts` (429 past threshold, survives a
+  simulated process restart via a fresh Redis connection).
+- ☑ **One rate limiter, Redis-backed.** The three in-house implementations
+  (`auth/rate-limiting.ts`'s in-memory Map, `security.ts:rateLimiters`,
+  `utils/rate-limiter.ts`) are deleted — `security.ts` had zero importers
+  for _any_ of its exports (not just rate limiting) and was deleted
+  entirely. `proxy.ts`'s generic `/api/**` backstop now runs on the same
+  Redis limiter too.
+- ☑ **Two unguarded debug endpoints** now 404 in production
+  (`NODE_ENV !== "production"` gate).
+- ☑ **`next.config.ts` security headers/CSP added**, `turbopack.root` fixed
+  to `__dirname`. Also found and fixed along the way: TypeScript 7 (bumped
+  in the Drizzle migration) doesn't expose the compiler API `next build`'s
+  own type-check step expects from TS <7 — `bun run build` failed outright
+  without `experimental.useTypeScriptCli: true`.
+- ☑ **Admin user-creation route hashes passwords** via better-auth's own
+  `hashPassword` (`better-auth/crypto`) instead of writing the raw request
+  password into `passwordHash`.
+- ☑ **`custom_roles` wired up.** `rbac.ts`'s `getCurrentUser`,
+  `getUserPermissions`, and `getAllRoles` all had the same placeholder
+  (any non-predefined `user.role` resolved to `permissions = []`) — all
+  three now query `custom_roles` by name. `POST /api/v1/admin/roles`
+  inserts for real instead of fabricating an in-memory object, validates
+  permission strings against `AVAILABLE_PERMISSIONS`, and 409s on a
+  duplicate name. `user_role_assignments`/`role_change_history` remain
+  unused — they back a separate, still-unbuilt multi-role-per-user
+  feature, not what this UI/flow uses. Test: `tests/custom-roles.test.ts`.
+- ☑ **Dead nav links — smaller than advertised.** Of the originally-counted
+  16, 12 were parent items with `subItems`: per `navigation-item.tsx`, a
+  parent with sub-items renders as a `CollapsibleTrigger` (expand/collapse
+  only) — its `path` is used only for `isActive()` auto-expand matching,
+  never rendered as a real `<Link>`. Those were never clickable dead links.
+  The 4 real ones (leaf-level, singular/differently-named on disk) are
+  fixed by directory rename: `dashboard/award/*` -> `dashboard/awards/*`,
+  `memberships/renewal` -> `renewals`, `settings/gateway` -> `settings/payments`.
+- ☑ **Privileged pages in the `(public)` route group gated**, not
+  relocated (see the role-authorization item above) —
+  `src/lib/require-dashboard-role.ts`, since `proxy.ts`'s matcher doesn't
+  cover `/events/**`. Verified with a real `bun run build` + `bun run
+start` + curl (can't be unit-tested — `next/headers`'s `headers()`
+  needs a live request scope bare `bun:test` doesn't provide).
 
-### P0 — still open
+### Found along the way, not yet fixed (small, out of this pass's scope)
 
-- ☐ **`DELETE /api/v1/auth/delete-account` doesn't delete anything.**
-  `src/app/api/v1/auth/delete-account/route.ts:29-44` is a self-admitted
-  placeholder: it authenticates the caller, does nothing, and returns
-  `"Account deleted successfully"`. For a system holding member PII this is
-  a GDPR/CCPA liability, not just an unfinished feature. Needs a real
-  implementation (hard delete or documented anonymization) plus a test that
-  asserts the row is actually gone and a second login fails.
-- ☐ **`/api/v1/auth/login` has no rate limiting.** It calls
-  `auth.api.signInEmail()` server-side, bypassing better-auth's own HTTP
-  rate limiter, and adds none of its own. `forgot-password`,
-  `reset-password`, and `change-password` are also unprotected. Only
-  `signup` is limited.
-- ☐ **One rate limiter, Redis-backed.** There are four implementations today
-  (`src/lib/auth/rate-limiting.ts`, `src/lib/security.ts:rateLimiters`,
-  `src/lib/utils/rate-limiter.ts`, better-auth's own `rateLimit` config).
-  The one actually used is an in-memory `Map` — non-functional across more
-  than one server process. See
-  [ADR-0003](docs/adr/0003-single-rate-limiter.md).
-- ☐ **Two unguarded debug endpoints.** `src/app/api/debug/route.ts` and
-  `src/app/api/debug/oauth/route.ts`. The latter only leaks booleans about
-  which OAuth providers are configured (low severity), but both should be
-  gated behind `NODE_ENV !== 'production'` or removed.
-- ☐ **`next.config.ts` has no security headers/CSP**, and
-  `turbopack.root: path.join(__dirname, '..')` points at the repo's
-  **parent** directory — almost certainly a copy-paste artifact, not
-  intentional.
-- ☐ **The admin user-creation route stores plaintext passwords.**
-  `src/app/api/v1/admin/users/route.ts` POST writes the given password
-  directly into `passwordHash`, unhashed (flagged inline in code as of the
-  Drizzle migration commit; pre-existing, not introduced by it). This route
-  also entirely bypasses better-auth, so accounts it creates cannot log in
-  via the normal flow.
-- ☐ **Three dead tables with a UI on top of them.** `custom_roles`,
-  `user_role_assignments`, `role_change_history` exist in the schema and are
-  never read by any code (`rbac.ts:81-91` has the `customRole` lookup
-  commented out with a `TODO`). Meanwhile `/dashboard/users/roles` and
-  `/api/v1/admin/roles` present a full custom-role management UI over a path
-  that always resolves to `permissions = []`. Either wire it up or remove
-  the UI — half of both is worse than either.
-- ☐ **16 dead nav links** in `src/components/dashboard/layout/navigation-config.tsx`
-  resolve to no `page.tsx`, including a singular/plural mismatch that makes
-  the entire Awards module unreachable (nav: `/dashboard/awards/*`,
-  directory: `src/app/dashboard/award/*`). **Good first issue.**
-- ☐ **Privileged pages live inside the `(public)` route group.**
-  `src/app/(public)/events/[id]/edit/page.tsx`,
-  `.../check-in/page.tsx`, `.../events/dashboard/page.tsx`. Combined with
-  the role-authorization gap above, event editing and attendee check-in are
-  reachable by any logged-in account. Fix as part of adopting the
-  `(public)`/`(authenticated)`/`(admin)` route-group taxonomy.
+- ☐ `POST /api/v1/auth/verify-email` is a placeholder identical in shape to
+  the delete-account one was: better-auth _does_ have a real `verifyEmail`
+  endpoint (`auth.api.verifyEmail({ query: { token } })`); this route just
+  never calls it. `src/app/api/v1/auth/verify-email/route.ts`.
+- ☐ `GET /api/v1/auth/login-activities` is the same shape of placeholder —
+  `src/db/schema/users.ts`'s `userLoginActivity` table already exists for
+  exactly this, the route just never queries it.
+  `src/app/api/v1/auth/login-activities/route.ts`.
+- ☐ `src/proxy.ts:isPublicEndpoint` lists `/api/v1/auth/register`, which
+  doesn't exist — the real route is `/api/v1/auth/signup`. Dead list entry,
+  harmless (signup was never actually reached through this path since the
+  real login/session flow doesn't need to skip auth for it), but stale.
+- ☐ `navigation-data.ts`'s Finance section role list (`admin`, `treasurer`,
+  `staff`) doesn't include `superadmin` — every other section does.
+  Pre-existing inconsistency (unchanged by the role-enforcement work,
+  which reuses these lists verbatim); a superadmin literally cannot reach
+  `/dashboard/finance/**` until this is corrected.
 
 ---
 
@@ -153,33 +192,48 @@ landed as an isolated, revertible commit.
 - ☑ `commitlint.config.ts` enforces Conventional Commits; the `no-ai-coauthor-trailer`
   hook rejects any `Co-Authored-By` trailer on any commit, human or AI. See
   [ADR-0010](docs/adr/0010-ai-agent-commit-guard.md).
-- ☐ **GitHub Actions CI.** `.gitignore` no longer blocks `.github/`; add
-  `.github/workflows/ci.yml` running `bun run guard:heavy` on every PR, plus
-  branch protection (owner decision, not something an agent should configure
-  unilaterally — see `docs/adr/0010`).
-- ☐ **`bun test` coverage, starting from zero.** No test file exists yet.
-  First ten, in priority order: (1) `db.query.user` role read matches the
-  session; (2) `requirePermission` denies without a session; (3)
-  `changeUserRole`'s transaction rolls back the role update if the audit
-  insert fails; (4) `seed.ts` exits non-zero without `SEED_ADMIN_PASSWORD`;
-  (5) `env.ts` throws on a placeholder `BETTER_AUTH_SECRET` in production;
-  (6) RFC 9457 error shape from a sample route (once M2's RFC 9457 item
-  lands); (7) rate limiter returns 429 past threshold and survives a
-  simulated process restart; (8) `delete-account` actually removes the row;
-  (9) nav-link-resolves-to-page check (promote the CI script below to a
-  test); (10) auth-route-has-authorization-call check (ditto).
-- ☐ **RFC 9457 Problem Details as the sole API error contract**, replacing
-  the three in-house response factories (`AuthResponseFactory`,
-  `errors.ts:createSuccessResponse`, `utils/response-utils.ts` — 6 routes
-  use the first, 0 use the second, 19 hand-roll `NextResponse.json`). This
-  is a breaking API shape change — land it **before** any new domain routes
-  are written (M3), not after. See
-  [ADR-0002](docs/adr/0002-rfc9457-error-contract.md).
+- ☑ **GitHub Actions CI.** `.github/workflows/ci.yml` runs a fast job
+  (lint/format/typecheck) and a heavy job (test/migration-check/build/audit)
+  with real Postgres + Redis services. Branch protection is still an owner
+  decision, not configured here (see `docs/adr/0010`). Also fixed along the
+  way: the heavy job needed `REDIS_URL` set even though it only builds and
+  tests, since `next build` forces `NODE_ENV=production` internally
+  regardless of the `NODE_ENV` env var passed in, and `env.ts` requires
+  `REDIS_URL` in production.
+- ☑ **RFC 9457 Problem Details as the sole API error contract.**
+  `src/lib/http.ts` (`problemResponse`, `validationProblem`,
+  `successResponse`); every route under `/api/v1/**` migrated off
+  `AuthResponseFactory`/inline `NextResponse.json` error shapes.
+  `AuthResponseFactory` itself stays (still used outside `/api/v1/**`:
+  `proxy.ts`, `AuthUtils`, the OAuth server action). `utils/response-utils.ts`
+  deleted (zero importers). See [ADR-0002](docs/adr/0002-rfc9457-error-contract.md)
+  and `docs/api/conventions.md`.
+- ◐ **`bun test` coverage, starting from zero.** 3 of the original ten
+  landed directly: (6) RFC 9457 error shape (`tests/rfc9457.test.ts`); (7)
+  rate limiter 429 + survives a simulated process restart
+  (`tests/rate-limit.test.ts`); (8) delete-account removes the row
+  (`tests/delete-account.test.ts`). Two more added along the way, not on
+  the original list: `tests/dashboard-access.test.ts` (the new
+  role-authorization gate) and `tests/custom-roles.test.ts`. Still open:
+  (1) `db.query.user` role read matches the session; (2) `requirePermission`
+  denies without a session — both blocked by the same issue: `rbac.ts`'s
+  functions call `next/headers`'s `headers()` ambiently, which throws
+  "called outside a request scope" when the exported function is called
+  directly in bare `bun:test` (no live Next request lifecycle). Either give
+  `getCurrentUser`/`requirePermission` an explicit-headers overload (like
+  `AuthUtils.getSession(request)` already has) or find another way to seed
+  the request-scope AsyncLocalStorage in tests. (3) `changeUserRole`'s
+  transaction rollback; (4) `seed.ts` exits non-zero without
+  `SEED_ADMIN_PASSWORD`; (5) `env.ts` throws on a placeholder
+  `BETTER_AUTH_SECRET` in production; (9) nav-link-resolves-to-page check;
+  (10) auth-route-has-authorization-call check.
 - ☐ **One structured logger**, `no-console` enforced via oxlint once it
-  lands (301 bare `console.*` calls today, replacing
-  `security.ts:logSecurityEvent`, `services/logging.service.ts`, and
-  `errors.ts:logError`). W3C Trace Context propagation and PII redaction
-  rules go in [`docs/observability.md`](docs/observability.md).
+  lands (300 bare `console.*` calls today, replacing
+  `services/logging.service.ts` and `errors.ts:logError` —
+  `security.ts:logSecurityEvent` no longer exists, the whole file was
+  deleted as dead code during the rate-limiter consolidation). W3C Trace
+  Context propagation and PII redaction rules go in
+  [`docs/observability.md`](docs/observability.md).
 - ☐ **Four major upgrades**, each its own commit, each verified with
   `bun run guard:heavy` before the next starts:
   1. `prisma` — **superseded**, Prisma is gone (see M1).
@@ -205,26 +259,19 @@ landed as an isolated, revertible commit.
   transport, and migrate every call site off the loser. **Good first issue**
   once a canonical choice is made (needs an ADR first, since it touches
   many files).
-- ☐ **Pre-existing type errors, surfaced by the first-ever `tsc --noEmit`
-  run in this project's history** (no typecheck script or CI existed before
-  this session's toolchain setup). None are related to the Drizzle
-  migration or the dependency bumps — cataloged here rather than fixed
-  blind, since each needs understanding of a specific form's intended
-  shape:
-  - `src/app/dashboard/jobs/create/page.tsx` imports
-    `../../_components/job-form`, which doesn't exist.
-  - `src/app/dashboard/content/announcements/[id]/page.tsx` and
-    `src/components/content/announcements-overview-cards.tsx` reference
-    `Announcement.metrics` and `AnnouncementStatistics.publishedArticles` /
-    `.totalArticles` / `.topPerformingArticles` — fields the type
-    definitions don't have. Mock-data/type drift.
-  - `src/app/dashboard/learning/admin/_components/course-form.tsx`,
-    `src/components/content/add-announcement-form.tsx`,
-    `add-article-form.tsx`, `add-publication-form.tsx`: `zodResolver`
-    output type doesn't match the `useForm<T>()` generic — a classic
-    zod-coercion/react-hook-form generic mismatch, needs per-schema fixing.
-  - `src/components/content/publications-filters.tsx:447`: a `DateRange`
-    with optional `start`/`end` passed where both are required.
+- ☑ **Pre-existing type errors** (all 25, across the 8 files originally
+  cataloged) fixed: the `job-form` import path, `Announcement`/
+  `AnnouncementStatistics` type drift (fields the runtime data already
+  carried but the type declarations hadn't caught up to), the
+  zodResolver/`useForm<T>()` generic mismatches (needed the 3-generic
+  `useForm<Input, Context, Output>` form, `z.input`/`z.output` split, and
+  in two cases aligning a schema's `.optional()` to `.default([])` to match
+  what the hand-written target type already declared required), and the
+  `DateRange` optional-vs-required mismatch. Two more build-blocking bugs
+  turned up in the process, neither caught by `tsc --noEmit` itself: a
+  `bun`-vs-Node runtime mismatch in `next build`'s page-data-collection
+  workers (see the Drizzle-driver item in M1) and a missing Suspense
+  boundary around `useSearchParams()` on the login page.
 
 ---
 

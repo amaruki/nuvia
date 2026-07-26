@@ -392,6 +392,17 @@ export const auth = betterAuth({
         input: false, // Critical: Users cannot set their own role
       },
     },
+    // Hard-deletes the user row (cascades to sessions, accounts, active
+    // devices, login activity, password reset tokens, and role-change
+    // history via each table's onDelete: "cascade" FK). Will start
+    // throwing a foreign-key violation for any user who has authored
+    // content/events/forum posts/job postings once those M3 domains move
+    // off mock data onto real Drizzle tables — those FKs are NOT NULL
+    // with no cascade today. Revisit then (anonymize instead of delete,
+    // or reassign authorship) rather than assuming this stays safe.
+    deleteUser: {
+      enabled: true,
+    },
   },
 
   // Rate limiting configuration

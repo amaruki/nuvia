@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { and, count, desc, asc, eq, ilike, or } from "drizzle-orm";
+import { hashPassword } from "better-auth/crypto";
 import { requirePermission } from "@/lib/rbac";
 import { AuthResponseFactory, AuthErrorType } from "@/lib/auth/common";
 import { db } from "@/db/client";
@@ -159,10 +160,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create user
-    // TODO: this bypasses better-auth entirely and stores the raw password as
-    // passwordHash — it is not hashed. Pre-existing issue, not introduced by
-    // the Drizzle migration; tracked in TODO.md alongside the other admin
-    // user-creation gaps.
+    const passwordHash = await hashPassword(password);
+
     const [newUser] = await db
       .insert(user)
       .values({
@@ -170,7 +169,7 @@ export async function POST(request: NextRequest) {
         email,
         name,
         role,
-        passwordHash: password,
+        passwordHash,
         emailVerified: false,
       })
       .returning({

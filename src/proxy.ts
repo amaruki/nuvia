@@ -11,6 +11,7 @@ import { createAuthMiddleware } from "@/lib/auth/middleware";
 
 import { RATE_LIMIT_CONFIGS } from "@/lib/auth/rate-limiting";
 import { AuthResponseFactory } from "@/lib/auth/common";
+import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 
 // TODO: Add support for API key authentication for external services
 // TODO: Add support for request logging and analytics
@@ -29,7 +30,10 @@ const authMiddleware = createAuthMiddleware({
  */
 export async function proxy(request: NextRequest) {
   try {
-    // Protect dashboard routes - require authentication
+    // Protect dashboard routes - require authentication and, per section,
+    // the role navigation-data.ts says that section is for (previously
+    // only the sidebar enforced this, client-side — see TODO.md M1's
+    // "Authorize by role, not just by login").
     if (request.nextUrl.pathname.startsWith("/dashboard")) {
       const authResult = await authenticate(request);
       if (!authResult.success) {
@@ -38,7 +42,14 @@ export async function proxy(request: NextRequest) {
         loginUrl.searchParams.set("redirectTo", request.nextUrl.pathname);
         return NextResponse.redirect(loginUrl);
       }
-      // Continue to dashboard page if authenticated
+
+      if (!isRoleAllowedForPath(request.nextUrl.pathname, authResult.user?.role)) {
+        const forbiddenUrl = new URL("/dashboard", request.url);
+        forbiddenUrl.searchParams.set("error", "forbidden");
+        return NextResponse.redirect(forbiddenUrl);
+      }
+
+      // Continue to dashboard page if authenticated and authorized
       return NextResponse.next();
     }
 

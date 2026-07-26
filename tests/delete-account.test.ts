@@ -3,12 +3,13 @@ import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/db/client";
 import { user } from "@/db/schema";
+import { testIp } from "./helpers";
 
 async function signUp(email: string, password: string) {
   const res = await auth.handler(
     new Request("http://localhost:3000/api/auth/sign-up/email", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-forwarded-for": testIp() },
       body: JSON.stringify({
         email,
         password,
@@ -35,7 +36,7 @@ async function signInOk(email: string, password: string) {
   const res = await auth.handler(
     new Request("http://localhost:3000/api/auth/sign-in/email", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-forwarded-for": testIp() },
       body: JSON.stringify({ email, password }),
     }),
   );

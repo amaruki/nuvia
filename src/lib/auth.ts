@@ -6,25 +6,26 @@
  */
 
 import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { prisma } from "./prisma";
+import { db } from "@/db/client";
+import * as schema from "@/db/schema";
 import { validatePasswordStrength } from "./utils/password";
 import { SOCIAL_PROVIDERS, FEATURES, APP_URL, EMAIL_CONFIG } from "./config";
 import { renderEmailTemplate } from "./email-utils";
 import PasswordResetEmail from "@/components/email-template/password-reset";
 import EmailVerificationEmail from "@/components/email-template/email-verification";
 import WelcomeEmail from "@/components/email-template/welcome";
-import React from 'react';
-import { AuthError, AuthErrorType } from './auth/common';
+import React from "react";
+import { AuthError, AuthErrorType } from "./auth/common";
 
 // TODO: Move email service logic to a separate module
 // TODO: Add support for multiple OAuth providers (GitHub, LinkedIn)
 // TODO: Add support for multi-factor authentication
 
 // Environment configuration
-const isProduction = process.env.NODE_ENV === 'production';
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isProduction = process.env.NODE_ENV === "production";
+const isDevelopment = process.env.NODE_ENV === "development";
 
 // Validate required environment variables
 const validateEnvironment = () => {
@@ -50,13 +51,13 @@ validateEnvironment();
 /**
  * Email service types
  */
-type EmailServiceType = 'resend' | 'nodemailer' | 'none';
+type EmailServiceType = "resend" | "nodemailer" | "none";
 
 /**
  * Email service configuration class
  */
 class EmailService {
-  private service: EmailServiceType = 'none';
+  private service: EmailServiceType = "none";
   private resendClient: any = null;
   private nodemailerTransporter: any = null;
 
@@ -67,21 +68,21 @@ class EmailService {
   private async initialize() {
     // Initialize Resend if available
     if (process.env.RESEND_API_KEY) {
-      this.service = 'resend';
+      this.service = "resend";
       try {
-        const { Resend } = await import('resend');
+        const { Resend } = await import("resend");
         this.resendClient = new Resend(process.env.RESEND_API_KEY);
-        console.log('✅ Resend email service initialized');
+        console.log("✅ Resend email service initialized");
       } catch (error) {
-        console.warn('❌ Failed to initialize Resend:', error);
-        this.service = 'none';
+        console.warn("❌ Failed to initialize Resend:", error);
+        this.service = "none";
       }
     }
     // Initialize Nodemailer if available
     else if (EMAIL_CONFIG.HOST && EMAIL_CONFIG.USER && EMAIL_CONFIG.PASS) {
-      this.service = 'nodemailer';
+      this.service = "nodemailer";
       try {
-        const { createTransport } = await import('nodemailer');
+        const { createTransport } = await import("nodemailer");
         this.nodemailerTransporter = createTransport({
           host: EMAIL_CONFIG.HOST,
           port: EMAIL_CONFIG.PORT,
@@ -91,15 +92,15 @@ class EmailService {
             pass: EMAIL_CONFIG.PASS,
           },
         });
-        console.log('✅ Nodemailer email service initialized');
+        console.log("✅ Nodemailer email service initialized");
       } catch (error) {
-        console.warn('❌ Failed to initialize Nodemailer:', error);
-        this.service = 'none';
+        console.warn("❌ Failed to initialize Nodemailer:", error);
+        this.service = "none";
       }
     }
     // No email service configured
     else {
-      console.warn('⚠️ No email service configured. Email functionality will be disabled.');
+      console.warn("⚠️ No email service configured. Email functionality will be disabled.");
     }
   }
 
@@ -116,18 +117,18 @@ class EmailService {
   }): Promise<{ success: boolean; error?: string }> {
     try {
       // Development mode fallback
-      if (this.service === 'none' && !isProduction) {
-        console.log('📧 Email would be sent (development mode):', {
+      if (this.service === "none" && !isProduction) {
+        console.log("📧 Email would be sent (development mode):", {
           to: options.to,
           subject: options.subject,
-          textPreview: options.text?.substring(0, 100) + '...',
+          textPreview: options.text?.substring(0, 100) + "...",
         });
         return { success: true };
       }
 
       const from = options.from || EMAIL_CONFIG.FROM;
 
-      if (this.service === 'resend' && this.resendClient) {
+      if (this.service === "resend" && this.resendClient) {
         const { data, error } = await this.resendClient.emails.send({
           from,
           to: Array.isArray(options.to) ? options.to : [options.to],
@@ -141,11 +142,11 @@ class EmailService {
           throw new Error(`Resend error: ${error.message}`);
         }
 
-        console.log('✅ Email sent via Resend:', data);
+        console.log("✅ Email sent via Resend:", data);
         return { success: true };
       }
 
-      if (this.service === 'nodemailer' && this.nodemailerTransporter) {
+      if (this.service === "nodemailer" && this.nodemailerTransporter) {
         const mailOptions = {
           from,
           to: options.to,
@@ -156,14 +157,14 @@ class EmailService {
         };
 
         const result = await this.nodemailerTransporter.sendMail(mailOptions);
-        console.log('✅ Email sent via Nodemailer:', result.messageId);
+        console.log("✅ Email sent via Nodemailer:", result.messageId);
         return { success: true };
       }
 
-      throw new Error('No email service is properly configured');
+      throw new Error("No email service is properly configured");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown email error';
-      console.error('❌ Failed to send email:', errorMessage);
+      const errorMessage = error instanceof Error ? error.message : "Unknown email error";
+      console.error("❌ Failed to send email:", errorMessage);
       return { success: false, error: errorMessage };
     }
   }
@@ -180,7 +181,7 @@ export const emailTemplates = {
     const component = React.createElement(PasswordResetEmail, { resetUrl, userName });
     const { html, text } = await renderEmailTemplate(component);
     return {
-      subject: 'Reset your password',
+      subject: "Reset your password",
       html,
       text,
     };
@@ -190,7 +191,7 @@ export const emailTemplates = {
     const component = React.createElement(EmailVerificationEmail, { verificationUrl, userName });
     const { html, text } = await renderEmailTemplate(component);
     return {
-      subject: 'Verify your email address',
+      subject: "Verify your email address",
       html,
       text,
     };
@@ -199,11 +200,11 @@ export const emailTemplates = {
   welcome: async (userName?: string) => {
     const component = React.createElement(WelcomeEmail, {
       userName,
-      dashboardUrl: `${APP_URL}/dashboard`
+      dashboardUrl: `${APP_URL}/dashboard`,
     });
     const { html, text } = await renderEmailTemplate(component);
     return {
-      subject: 'Welcome to our platform!',
+      subject: "Welcome to our platform!",
       html,
       text,
     };
@@ -214,15 +215,17 @@ export const emailTemplates = {
  * Username generator for OAuth users
  */
 async function generateUniqueUsername(baseUsername: string): Promise<string> {
-  let username = baseUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+  let username = baseUsername.toLowerCase().replace(/[^a-z0-9_]/g, "");
   let counter = 1;
   let uniqueUsername = username;
 
   // Check if username exists and generate unique one if needed
-  while (await prisma.user.findUnique({
-    where: { username: uniqueUsername },
-    select: { id: true }
-  })) {
+  while (
+    await db.query.user.findFirst({
+      where: (user, { eq }) => eq(user.username, uniqueUsername),
+      columns: { id: true },
+    })
+  ) {
     uniqueUsername = `${username}${counter}`;
     counter++;
 
@@ -240,8 +243,8 @@ async function generateUniqueUsername(baseUsername: string): Promise<string> {
  * OAuth profile mapping helper
  */
 function mapOAuthProfileToUser(profile: any) {
-  const baseUsername = profile.email?.split('@')[0] || 'user';
-  const cleanUsername = baseUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+  const baseUsername = profile.email?.split("@")[0] || "user";
+  const cleanUsername = baseUsername.toLowerCase().replace(/[^a-z0-9_]/g, "");
 
   return {
     name: profile.given_name || profile.name,
@@ -261,8 +264,9 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET || "fallback-secret-for-development",
 
   // Database configuration
-  database: prismaAdapter(prisma, {
-    provider: "postgresql",
+  database: drizzleAdapter(db, {
+    provider: "pg",
+    schema,
   }),
 
   // Database hooks for user management
@@ -271,7 +275,7 @@ export const auth = betterAuth({
       create: {
         before: async (user) => {
           // Handle username generation for OAuth users
-          if (user.username && typeof user.username === 'string') {
+          if (user.username && typeof user.username === "string") {
             const uniqueUsername = await generateUniqueUsername(user.username);
             return {
               data: {
@@ -308,8 +312,8 @@ export const auth = betterAuth({
       });
 
       if (!result.success) {
-        console.error('Failed to send password reset email:', result.error);
-        throw new Error('Failed to send password reset email');
+        console.error("Failed to send password reset email:", result.error);
+        throw new Error("Failed to send password reset email");
       }
     },
     onPasswordReset: async ({ user }: { user: { email: string } }) => {
@@ -348,7 +352,10 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24, // 1 day
     cookieOptions: {
       secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
+      // Always "lax", never `isProduction ? "none" : "lax"` — SameSite=None
+      // disabled the browser's CSRF defense on a first-party app with no
+      // cross-site cookie need. See docs/adr/0009-security-hardening-p0.md.
+      sameSite: "lax",
       httpOnly: true,
       path: "/",
     },
@@ -391,7 +398,7 @@ export const auth = betterAuth({
   rateLimit: {
     enabled: true,
     window: 60, // 1 minute
-    max: 100,   // 100 requests per minute
+    max: 100, // 100 requests per minute
   },
 
   // Email verification configuration
@@ -407,7 +414,7 @@ export const auth = betterAuth({
   advanced: {
     useSecureCookies: isProduction,
     cookieOptions: {
-      sameSite: isProduction ? "none" : "lax",
+      sameSite: "lax", // see comment on session.cookieOptions above
       secure: isProduction,
       httpOnly: true,
       path: "/",
@@ -415,15 +422,11 @@ export const auth = betterAuth({
     cookiePrefix: "nuvia-auth",
     trustedOrigins: isProduction
       ? [APP_URL]
-      : [
-          APP_URL,
-          "http://localhost:3000",
-          "http://localhost:3001",
-        ],
+      : [APP_URL, "http://localhost:3000", "http://localhost:3001"],
     generateState: true,
     stateOptions: {
       maxAge: 600, // 10 minutes
-      sameSite: isProduction ? "none" : "lax",
+      sameSite: "lax", // see comment on session.cookieOptions above
       path: "/",
       httpOnly: true,
       secure: isProduction,
@@ -470,7 +473,7 @@ export const auth = betterAuth({
           });
         }
       },
-    }
+    },
   },
 
   // Logger configuration

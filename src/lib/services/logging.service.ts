@@ -1,43 +1,45 @@
-import { prisma } from '@/lib/prisma';
-import { LOGGING } from '@/lib/config';
-import { logError } from '@/lib/errors';
+import { and, count, desc, eq, gte, isNotNull, lte, lt } from "drizzle-orm";
+import { db } from "@/db/client";
+import { authLog } from "@/db/schema";
+import { LOGGING } from "@/lib/config";
+import { logError } from "@/lib/errors";
 
 /**
  * Authentication event types
  */
 export enum AuthEventType {
-  LOGIN_SUCCESS = 'login_success',
-  LOGIN_FAILURE = 'login_failure',
-  LOGOUT = 'logout',
-  SIGNUP_SUCCESS = 'signup_success',
-  SIGNUP_FAILURE = 'signup_failure',
-  PASSWORD_RESET_REQUEST = 'password_reset_request',
-  PASSWORD_RESET_SUCCESS = 'password_reset_success',
-  PASSWORD_RESET_FAILURE = 'password_reset_failure',
-  EMAIL_VERIFICATION_SUCCESS = 'email_verification_success',
-  EMAIL_VERIFICATION_FAILURE = 'email_verification_failure',
-  ACCOUNT_DEACTIVATION = 'account_deactivation',
-  ACCOUNT_REACTIVATION = 'account_reactivation',
-  ACCOUNT_DELETION = 'account_deletion',
-  PASSWORD_CHANGE = 'password_change',
-  PROFILE_UPDATE = 'profile_update',
-  SECURITY_QUESTION_UPDATE = 'security_question_update',
-  TWO_FACTOR_ENABLE = 'two_factor_enable',
-  TWO_FACTOR_DISABLE = 'two_factor_disable',
-  SESSION_EXPIRED = 'session_expired',
-  SESSION_INVALIDATED = 'session_invalidated',
-  SUSPICIOUS_ACTIVITY = 'suspicious_activity',
-  RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded',
+  LOGIN_SUCCESS = "login_success",
+  LOGIN_FAILURE = "login_failure",
+  LOGOUT = "logout",
+  SIGNUP_SUCCESS = "signup_success",
+  SIGNUP_FAILURE = "signup_failure",
+  PASSWORD_RESET_REQUEST = "password_reset_request",
+  PASSWORD_RESET_SUCCESS = "password_reset_success",
+  PASSWORD_RESET_FAILURE = "password_reset_failure",
+  EMAIL_VERIFICATION_SUCCESS = "email_verification_success",
+  EMAIL_VERIFICATION_FAILURE = "email_verification_failure",
+  ACCOUNT_DEACTIVATION = "account_deactivation",
+  ACCOUNT_REACTIVATION = "account_reactivation",
+  ACCOUNT_DELETION = "account_deletion",
+  PASSWORD_CHANGE = "password_change",
+  PROFILE_UPDATE = "profile_update",
+  SECURITY_QUESTION_UPDATE = "security_question_update",
+  TWO_FACTOR_ENABLE = "two_factor_enable",
+  TWO_FACTOR_DISABLE = "two_factor_disable",
+  SESSION_EXPIRED = "session_expired",
+  SESSION_INVALIDATED = "session_invalidated",
+  SUSPICIOUS_ACTIVITY = "suspicious_activity",
+  RATE_LIMIT_EXCEEDED = "rate_limit_exceeded",
 }
 
 /**
  * Authentication event severity levels
  */
 export enum AuthEventSeverity {
-  INFO = 'info',
-  WARNING = 'warning',
-  ERROR = 'error',
-  CRITICAL = 'critical',
+  INFO = "info",
+  WARNING = "warning",
+  ERROR = "error",
+  CRITICAL = "critical",
 }
 
 /**
@@ -65,7 +67,7 @@ export class LoggingService {
    * Log an authentication event
    * @param entry - Log entry to record
    */
-  async logAuthEvent(entry: Omit<AuthLogEntry, 'id' | 'timestamp'>): Promise<void> {
+  async logAuthEvent(entry: Omit<AuthLogEntry, "id" | "timestamp">): Promise<void> {
     try {
       if (!LOGGING.ERRORS) {
         return;
@@ -88,26 +90,24 @@ export class LoggingService {
       }
 
       // Store in database for persistence
-      await prisma.authLog.create({
-        data: {
-          userId: logEntry.userId,
-          eventType: logEntry.eventType,
-          severity: logEntry.severity,
-          message: logEntry.message,
-          ipAddress: logEntry.ipAddress,
-          userAgent: logEntry.userAgent,
-          deviceId: logEntry.deviceId,
-          location: logEntry.location,
-          metadata: logEntry.metadata || {},
-          timestamp: logEntry.timestamp,
-        },
+      await db.insert(authLog).values({
+        userId: logEntry.userId,
+        eventType: logEntry.eventType,
+        severity: logEntry.severity,
+        message: logEntry.message,
+        ipAddress: logEntry.ipAddress,
+        userAgent: logEntry.userAgent,
+        deviceId: logEntry.deviceId,
+        location: logEntry.location,
+        metadata: logEntry.metadata || {},
+        timestamp: logEntry.timestamp,
       });
 
       // Check for suspicious activity patterns
       await this.detectSuspiciousActivity(logEntry);
     } catch (error) {
       // Don't use logError here to avoid infinite recursion
-      console.error('Failed to log authentication event:', error);
+      console.error("Failed to log authentication event:", error);
     }
   }
 
@@ -120,12 +120,13 @@ export class LoggingService {
    */
   async getUserAuthLogs(userId: string, limit = 50, offset = 0): Promise<AuthLogEntry[]> {
     try {
-      const logs = await prisma.authLog.findMany({
-        where: { userId },
-        orderBy: { timestamp: 'desc' },
-        take: limit,
-        skip: offset,
-      });
+      const logs = await db
+        .select()
+        .from(authLog)
+        .where(eq(authLog.userId, userId))
+        .orderBy(desc(authLog.timestamp))
+        .limit(limit)
+        .offset(offset);
 
       return logs.map((log: any) => ({
         id: log.id,
@@ -141,12 +142,12 @@ export class LoggingService {
         timestamp: log.timestamp,
       }));
     } catch (error) {
-      logError(error as Error, { 
-        service: 'logging',
-        operation: 'getUserAuthLogs',
+      logError(error as Error, {
+        service: "logging",
+        operation: "getUserAuthLogs",
         userId,
       });
-      throw new Error('Failed to get user authentication logs');
+      throw new Error("Failed to get user authentication logs");
     }
   }
 
@@ -160,17 +161,16 @@ export class LoggingService {
   async getRecentAuthLogs(
     eventType?: AuthEventType,
     limit = 100,
-    offset = 0
+    offset = 0,
   ): Promise<AuthLogEntry[]> {
     try {
-      const where = eventType ? { eventType } : {};
-      
-      const logs = await prisma.authLog.findMany({
-        where,
-        orderBy: { timestamp: 'desc' },
-        take: limit,
-        skip: offset,
-      });
+      const logs = await db
+        .select()
+        .from(authLog)
+        .where(eventType ? eq(authLog.eventType, eventType) : undefined)
+        .orderBy(desc(authLog.timestamp))
+        .limit(limit)
+        .offset(offset);
 
       return logs.map((log: any) => ({
         id: log.id,
@@ -186,11 +186,11 @@ export class LoggingService {
         timestamp: log.timestamp,
       }));
     } catch (error) {
-      logError(error as Error, { 
-        service: 'logging',
-        operation: 'getRecentAuthLogs',
+      logError(error as Error, {
+        service: "logging",
+        operation: "getRecentAuthLogs",
       });
-      throw new Error('Failed to get recent authentication logs');
+      throw new Error("Failed to get recent authentication logs");
     }
   }
 
@@ -202,7 +202,7 @@ export class LoggingService {
    */
   async getAuthStats(
     startDate: Date = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-    endDate: Date = new Date()
+    endDate: Date = new Date(),
   ): Promise<{
     totalEvents: number;
     eventsByType: Record<string, number>;
@@ -213,100 +213,62 @@ export class LoggingService {
     suspiciousActivities: number;
   }> {
     try {
+      const inRange = and(gte(authLog.timestamp, startDate), lte(authLog.timestamp, endDate));
+
       // Get total events count
-      const totalEvents = await prisma.authLog.count({
-        where: {
-          timestamp: {
-            gte: startDate,
-            lte: endDate,
-          },
-        },
-      });
+      const [{ value: totalEvents }] = await db
+        .select({ value: count() })
+        .from(authLog)
+        .where(inRange);
 
       // Get events by type
-      const eventsByTypeRaw = await prisma.authLog.groupBy({
-        by: ['eventType'],
-        where: {
-          timestamp: {
-            gte: startDate,
-            lte: endDate,
-          },
-        },
-        _count: {
-          eventType: true,
-        },
-      });
+      const eventsByTypeRaw = await db
+        .select({ eventType: authLog.eventType, value: count() })
+        .from(authLog)
+        .where(inRange)
+        .groupBy(authLog.eventType);
 
       const eventsByType: Record<string, number> = {};
-      eventsByTypeRaw.forEach((item: any) => {
-        eventsByType[item.eventType] = item._count.eventType;
+      eventsByTypeRaw.forEach((item) => {
+        eventsByType[item.eventType] = item.value;
       });
 
       // Get events by severity
-      const eventsBySeverityRaw = await prisma.authLog.groupBy({
-        by: ['severity'],
-        where: {
-          timestamp: {
-            gte: startDate,
-            lte: endDate,
-          },
-        },
-        _count: {
-          severity: true,
-        },
-      });
+      const eventsBySeverityRaw = await db
+        .select({ severity: authLog.severity, value: count() })
+        .from(authLog)
+        .where(inRange)
+        .groupBy(authLog.severity);
 
       const eventsBySeverity: Record<string, number> = {};
-      eventsBySeverityRaw.forEach((item: any) => {
-        eventsBySeverity[item.severity] = item._count.severity;
+      eventsBySeverityRaw.forEach((item) => {
+        eventsBySeverity[item.severity] = item.value;
       });
 
       // Get unique users count
-      const uniqueUsers = await prisma.authLog.groupBy({
-        by: ['userId'],
-        where: {
-          timestamp: {
-            gte: startDate,
-            lte: endDate,
-          },
-          userId: {
-            not: null,
-          },
-        },
-      }).then((result: any) => result.length);
+      const uniqueUsersRows = await db
+        .selectDistinct({ userId: authLog.userId })
+        .from(authLog)
+        .where(and(inRange, isNotNull(authLog.userId)));
+      const uniqueUsers = uniqueUsersRows.length;
 
       // Get failed logins count
-      const failedLogins = await prisma.authLog.count({
-        where: {
-          timestamp: {
-            gte: startDate,
-            lte: endDate,
-          },
-          eventType: AuthEventType.LOGIN_FAILURE,
-        },
-      });
+      const [{ value: failedLogins }] = await db
+        .select({ value: count() })
+        .from(authLog)
+        .where(and(inRange, eq(authLog.eventType, AuthEventType.LOGIN_FAILURE)));
 
       // Get successful logins count
-      const successfulLogins = await prisma.authLog.count({
-        where: {
-          timestamp: {
-            gte: startDate,
-            lte: endDate,
-          },
-          eventType: AuthEventType.LOGIN_SUCCESS,
-        },
-      });
+      const [{ value: successfulLogins }] = await db
+        .select({ value: count() })
+        .from(authLog)
+        .where(and(inRange, eq(authLog.eventType, AuthEventType.LOGIN_SUCCESS)));
 
       // Get suspicious activities count
-      const suspiciousActivities = await prisma.authLog.count({
-        where: {
-          timestamp: {
-            gte: startDate,
-            lte: endDate,
-          },
-          eventType: AuthEventType.SUSPICIOUS_ACTIVITY,
-        },
-      });
+      const [{ value: suspiciousActivities }] = await db
+        .select({ value: count() })
+        .from(authLog)
+        .where(and(inRange, eq(authLog.eventType, AuthEventType.SUSPICIOUS_ACTIVITY)));
 
       return {
         totalEvents,
@@ -318,11 +280,11 @@ export class LoggingService {
         suspiciousActivities,
       };
     } catch (error) {
-      logError(error as Error, { 
-        service: 'logging',
-        operation: 'getAuthStats',
+      logError(error as Error, {
+        service: "logging",
+        operation: "getAuthStats",
       });
-      throw new Error('Failed to get authentication statistics');
+      throw new Error("Failed to get authentication statistics");
     }
   }
 
@@ -334,15 +296,16 @@ export class LoggingService {
     try {
       // Check for multiple failed login attempts from the same IP
       if (logEntry.eventType === AuthEventType.LOGIN_FAILURE && logEntry.ipAddress) {
-        const recentFailedLogins = await prisma.authLog.count({
-          where: {
-            eventType: AuthEventType.LOGIN_FAILURE,
-            ipAddress: logEntry.ipAddress,
-            timestamp: {
-              gte: new Date(Date.now() - 15 * 60 * 1000), // Last 15 minutes
-            },
-          },
-        });
+        const [{ value: recentFailedLogins }] = await db
+          .select({ value: count() })
+          .from(authLog)
+          .where(
+            and(
+              eq(authLog.eventType, AuthEventType.LOGIN_FAILURE),
+              eq(authLog.ipAddress, logEntry.ipAddress),
+              gte(authLog.timestamp, new Date(Date.now() - 15 * 60 * 1000)), // Last 15 minutes
+            ),
+          );
 
         // If more than 5 failed attempts in 15 minutes, log as suspicious
         if (recentFailedLogins >= 5) {
@@ -352,32 +315,33 @@ export class LoggingService {
             message: `Multiple failed login attempts detected from IP: ${logEntry.ipAddress}`,
             ipAddress: logEntry.ipAddress,
             metadata: {
-              reason: 'multiple_failed_logins',
+              reason: "multiple_failed_logins",
               failedAttempts: recentFailedLogins,
-              timeWindow: '15 minutes',
+              timeWindow: "15 minutes",
             },
           });
         }
       }
 
       // Check for logins from unusual locations (if location data is available)
-      if (logEntry.eventType === AuthEventType.LOGIN_SUCCESS && logEntry.userId && logEntry.location) {
+      if (
+        logEntry.eventType === AuthEventType.LOGIN_SUCCESS &&
+        logEntry.userId &&
+        logEntry.location
+      ) {
         // Get recent login locations for this user
-        const recentLogins = await prisma.authLog.findMany({
-          where: {
-            userId: logEntry.userId,
-            eventType: AuthEventType.LOGIN_SUCCESS,
-            timestamp: {
-              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
-            },
-          },
-          distinct: ['location'],
-          select: {
-            location: true,
-          },
-        });
+        const recentLogins = await db
+          .selectDistinct({ location: authLog.location })
+          .from(authLog)
+          .where(
+            and(
+              eq(authLog.userId, logEntry.userId),
+              eq(authLog.eventType, AuthEventType.LOGIN_SUCCESS),
+              gte(authLog.timestamp, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)), // Last 30 days
+            ),
+          );
 
-        const usualLocations = recentLogins.map((login: any) => login.location).filter(Boolean);
+        const usualLocations = recentLogins.map((login) => login.location).filter(Boolean);
 
         // If login is from a new location, log as suspicious
         if (usualLocations.length > 0 && !usualLocations.includes(logEntry.location)) {
@@ -389,7 +353,7 @@ export class LoggingService {
             ipAddress: logEntry.ipAddress,
             location: logEntry.location,
             metadata: {
-              reason: 'unusual_location',
+              reason: "unusual_location",
               usualLocations,
               newLocation: logEntry.location,
             },
@@ -399,15 +363,16 @@ export class LoggingService {
 
       // Check for rapid password reset requests
       if (logEntry.eventType === AuthEventType.PASSWORD_RESET_REQUEST && logEntry.ipAddress) {
-        const recentResetRequests = await prisma.authLog.count({
-          where: {
-            eventType: AuthEventType.PASSWORD_RESET_REQUEST,
-            ipAddress: logEntry.ipAddress,
-            timestamp: {
-              gte: new Date(Date.now() - 60 * 60 * 1000), // Last hour
-            },
-          },
-        });
+        const [{ value: recentResetRequests }] = await db
+          .select({ value: count() })
+          .from(authLog)
+          .where(
+            and(
+              eq(authLog.eventType, AuthEventType.PASSWORD_RESET_REQUEST),
+              eq(authLog.ipAddress, logEntry.ipAddress),
+              gte(authLog.timestamp, new Date(Date.now() - 60 * 60 * 1000)), // Last hour
+            ),
+          );
 
         // If more than 3 reset requests in an hour, log as suspicious
         if (recentResetRequests >= 3) {
@@ -417,16 +382,16 @@ export class LoggingService {
             message: `Multiple password reset requests detected from IP: ${logEntry.ipAddress}`,
             ipAddress: logEntry.ipAddress,
             metadata: {
-              reason: 'multiple_password_resets',
+              reason: "multiple_password_resets",
               resetRequests: recentResetRequests,
-              timeWindow: '1 hour',
+              timeWindow: "1 hour",
             },
           });
         }
       }
     } catch (error) {
       // Don't use logError here to avoid infinite recursion
-      console.error('Failed to detect suspicious activity:', error);
+      console.error("Failed to detect suspicious activity:", error);
     }
   }
 
@@ -440,21 +405,18 @@ export class LoggingService {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-      const result = await prisma.authLog.deleteMany({
-        where: {
-          timestamp: {
-            lt: cutoffDate,
-          },
-        },
-      });
+      const deleted = await db
+        .delete(authLog)
+        .where(lt(authLog.timestamp, cutoffDate))
+        .returning({ id: authLog.id });
 
-      return result.count;
+      return deleted.length;
     } catch (error) {
-      logError(error as Error, { 
-        service: 'logging',
-        operation: 'cleanupOldLogs',
+      logError(error as Error, {
+        service: "logging",
+        operation: "cleanupOldLogs",
       });
-      throw new Error('Failed to clean up old authentication logs');
+      throw new Error("Failed to clean up old authentication logs");
     }
   }
 }

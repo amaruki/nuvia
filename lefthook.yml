@@ -1,0 +1,30 @@
+# Local git hooks — the enforcement layer for docs/adr/0010-ai-agent-commit-guard.md.
+# Applies identically to human and AI-agent commits: nothing bypasses these
+# checks by running fast. Installed automatically by `bun install` (see
+# package.json's `prepare` script) — no separate setup step for contributors.
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: lint
+      glob: "*.{js,jsx,ts,tsx}"
+      run: bunx oxlint {staged_files}
+    - name: format
+      glob: "*.{js,jsx,ts,tsx,json,css,md}"
+      run: bunx oxfmt --check {staged_files}
+
+commit-msg:
+  jobs:
+    - name: conventional-commit
+      run: bunx commitlint --edit {1}
+    - name: no-ai-coauthor-trailer
+      # Conventional Commits + this repo's convention: no Co-Authored-By
+      # trailers, human or AI. See CONTRIBUTING.md.
+      run: '! grep -qi "^co-authored-by:" {1}'
+
+pre-push:
+  jobs:
+    - name: typecheck
+      run: bun run typecheck
+    - name: test
+      run: bun test

@@ -5,12 +5,14 @@
  * to reduce database load and improve response times for authenticated users.
  */
 
-import { Redis } from 'ioredis';
-import { prisma } from './prisma';
+import { Redis } from "ioredis";
+import { eq } from "drizzle-orm";
+import { db } from "@/db/client";
+import { session as sessionTable } from "@/db/schema";
 
 // Cache configuration
 const CACHE_TTL = 60; // 60 seconds cache TTL
-const CACHE_PREFIX = 'nuvia:session:';
+const CACHE_PREFIX = "nuvia:session:";
 
 // Redis client instance (singleton)
 let redisClient: Redis | null = null;
@@ -20,7 +22,7 @@ let redisInitialized = false;
 let redisAvailable = false;
 
 // Session cache configuration
-const ENABLE_REDIS_CACHE = process.env.ENABLE_REDIS_CACHE === 'true' && process.env.REDIS_URL;
+const ENABLE_REDIS_CACHE = process.env.ENABLE_REDIS_CACHE === "true" && process.env.REDIS_URL;
 
 /**
  * Initialize Redis connection
@@ -38,27 +40,29 @@ function getRedisClient(): Redis | null {
       redisClient = new Redis(process.env.REDIS_URL!, {
         maxRetriesPerRequest: 3,
         lazyConnect: true,
-        enableOfflineQueue: false, 
+        enableOfflineQueue: false,
       });
 
-      redisClient.on('error', (err) => {
+      redisClient.on("error", (err) => {
         if (redisAvailable) {
-          console.warn('Redis connection lost:', err.message);
+          console.warn("Redis connection lost:", err.message);
           redisAvailable = false;
         }
       });
 
-      redisClient.on('connect', () => {
-        console.log('✅ Redis connected for session caching');
+      redisClient.on("connect", () => {
+        console.log("✅ Redis connected for session caching");
         redisAvailable = true;
       });
 
-      redisClient.on('close', () => {
+      redisClient.on("close", () => {
         redisAvailable = false;
       });
-
     } catch (error) {
-      console.warn('Redis not available - session caching disabled:', error instanceof Error ? error.message : 'Unknown error');
+      console.warn(
+        "Redis not available - session caching disabled:",
+        error instanceof Error ? error.message : "Unknown error",
+      );
       redisAvailable = false;
     }
   }
@@ -106,16 +110,15 @@ export async function cacheSession(sessionToken: string, sessionData: any): Prom
       lastValidated: Date.now(),
     };
 
-    await redis.setex(
-      getCacheKey(sessionToken),
-      CACHE_TTL,
-      JSON.stringify(cacheData)
-    );
+    await redis.setex(getCacheKey(sessionToken), CACHE_TTL, JSON.stringify(cacheData));
   } catch (error) {
     // Silent fail - session caching is optional
     // Only log in development
-    if (process.env.NODE_ENV === 'development') {
-      console.debug('Redis cache failed (session caching disabled):', error instanceof Error ? error.message : error);
+    if (process.env.NODE_ENV === "development") {
+      console.debug(
+        "Redis cache failed (session caching disabled):",
+        error instanceof Error ? error.message : error,
+      );
     }
   }
 }
@@ -141,7 +144,7 @@ export async function getCachedSession(sessionToken: string): Promise<CachedSess
 
     return sessionData;
   } catch (error) {
-    console.warn('Failed to get cached session:', error);
+    console.warn("Failed to get cached session:", error);
     return null;
   }
 }
@@ -156,7 +159,7 @@ export async function invalidateSessionCache(sessionToken: string): Promise<void
   try {
     await redis.del(getCacheKey(sessionToken));
   } catch (error) {
-    console.warn('Failed to invalidate session cache:', error);
+    console.warn("Failed to invalidate session cache:", error);
   }
 }
 
@@ -186,7 +189,7 @@ export async function invalidateUserSessionCaches(userId: string): Promise<void>
       }
     }
   } catch (error) {
-    console.warn('Failed to invalidate user session caches:', error);
+    console.warn("Failed to invalidate user session caches:", error);
   }
 }
 
@@ -199,7 +202,7 @@ export function getCacheStatus() {
     redis: {
       configured: !!process.env.REDIS_URL,
       available: redisAvailable,
-    }
+    },
   };
 }
 
@@ -226,15 +229,16 @@ export async function validateSessionWithCache(sessionToken: string) {
 
   // Cache miss - fetch from database
   try {
-    const session = await prisma.session.findUnique({
-      where: { token: sessionToken },
-      include: {
+    const session = await db.query.session.findFirst({
+      where: eq(sessionTable.token, sessionToken),
+      with: {
         user: {
-          select: {
+          columns: {
             id: true,
             email: true,
             username: true,
             name: true,
+            displayName: true,
             image: true,
             profilePhoto: true,
             bio: true,
@@ -248,9 +252,7 @@ export async function validateSessionWithCache(sessionToken: string) {
     if (!session || new Date(session.expiresAt) < new Date()) {
       // Clean up invalid session if it exists
       if (session) {
-        await prisma.session.delete({
-          where: { id: session.id },
-        });
+        await db.delete(sessionTable).where(eq(sessionTable.id, session.id));
       }
       return null;
     }
@@ -288,7 +290,7 @@ export async function validateSessionWithCache(sessionToken: string) {
       fromCache: false,
     };
   } catch (error) {
-    console.error('Session validation error:', error);
+    console.error("Session validation error:", error);
     return null;
   }
 }
@@ -302,7 +304,7 @@ export async function closeRedisConnection(): Promise<void> {
       await redisClient.quit();
       redisClient = null;
     } catch (error) {
-      console.warn('Error closing Redis connection:', error);
+      console.warn("Error closing Redis connection:", error);
     }
   }
 }

@@ -5,9 +5,11 @@
  * for the Nuvia AMS platform.
  */
 
-import { auth } from './auth';
-import { prisma } from './prisma';
-import { headers } from 'next/headers';
+import { count, eq } from "drizzle-orm";
+import { db } from "@/db/client";
+import { authLog, user } from "@/db/schema";
+import { auth } from "./auth";
+import { headers } from "next/headers";
 import {
   Role,
   PredefinedRole,
@@ -15,9 +17,9 @@ import {
   ROLE_PERMISSIONS,
   isPredefinedRole,
   canManageRole,
-  getRoleLevel
-} from '@/types/role.types';
-import { AuthError, AuthErrorType } from './auth/common';
+  getRoleLevel,
+} from "@/types/role.types";
+import { AuthError, AuthErrorType } from "./auth/common";
 
 // Enhanced user type with role information
 export interface UserWithRole {
@@ -59,17 +61,17 @@ export interface RoleAssignmentChange {
 export async function getCurrentUser(): Promise<UserWithRole | null> {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: await headers(),
     });
 
     if (!session?.user) {
       return null;
     }
 
-    const user = session.user as any;
+    const sessionUser = session.user as any;
 
     // Get user role from database (in case it's not in session)
-    let role = user.role || 'user';
+    let role = sessionUser.role || "user";
 
     // Get permissions for the user's role
     let permissions: Permission[] = [];
@@ -78,15 +80,17 @@ export async function getCurrentUser(): Promise<UserWithRole | null> {
       permissions = ROLE_PERMISSIONS[role as PredefinedRole];
     } else {
       // For custom roles, get permissions from database
-      // TODO: Implement customRole model in Prisma schema
+      // TODO: Implement customRole lookup here — the custom_roles table
+      // exists (src/db/schema/auth.ts: customRole) and a full admin UI
+      // ships on top of it, but nothing reads it yet. Tracked in TODO.md.
       /*
-      const customRole = await prisma.customRole.findUnique({
-        where: { name: role },
-        select: { permissions: true }
+      const role = await db.query.customRole.findFirst({
+        where: (customRole, { eq }) => eq(customRole.name, role),
+        columns: { permissions: true },
       });
 
-      if (customRole) {
-        permissions = customRole.permissions as Permission[];
+      if (role) {
+        permissions = role.permissions as Permission[];
       }
       */
 
@@ -95,16 +99,16 @@ export async function getCurrentUser(): Promise<UserWithRole | null> {
     }
 
     return {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      name: user.name,
-      displayName: user.displayName,
+      id: sessionUser.id,
+      email: sessionUser.email,
+      username: sessionUser.username,
+      name: sessionUser.name,
+      displayName: sessionUser.displayName,
       role,
-      permissions
+      permissions,
     };
   } catch (error) {
-    console.error('Error getting current user:', error);
+    console.error("Error getting current user:", error);
     return null;
   }
 }
@@ -113,77 +117,73 @@ export async function getCurrentUser(): Promise<UserWithRole | null> {
  * Check if current user has specific permission
  */
 export async function hasPermission(permission: Permission): Promise<boolean> {
-  const user = await getCurrentUser();
+  const currentUser = await getCurrentUser();
 
-  if (!user) {
+  if (!currentUser) {
     return false;
   }
 
   // Superadmin has all permissions
-  if (user.role === 'superadmin') {
+  if (currentUser.role === "superadmin") {
     return true;
   }
 
   // Check if user has the specific permission
-  return user.permissions?.includes(permission) || false;
+  return currentUser.permissions?.includes(permission) || false;
 }
 
 /**
  * Check if current user has any of the specified permissions
  */
 export async function hasAnyPermission(permissions: Permission[]): Promise<boolean> {
-  const user = await getCurrentUser();
+  const currentUser = await getCurrentUser();
 
-  if (!user) {
+  if (!currentUser) {
     return false;
   }
 
   // Superadmin has all permissions
-  if (user.role === 'superadmin') {
+  if (currentUser.role === "superadmin") {
     return true;
   }
 
-  return permissions.some(permission =>
-    user.permissions?.includes(permission) || false
-  );
+  return permissions.some((permission) => currentUser.permissions?.includes(permission) || false);
 }
 
 /**
  * Check if current user has all of the specified permissions
  */
 export async function hasAllPermissions(permissions: Permission[]): Promise<boolean> {
-  const user = await getCurrentUser();
+  const currentUser = await getCurrentUser();
 
-  if (!user) {
+  if (!currentUser) {
     return false;
   }
 
   // Superadmin has all permissions
-  if (user.role === 'superadmin') {
+  if (currentUser.role === "superadmin") {
     return true;
   }
 
-  return permissions.every(permission =>
-    user.permissions?.includes(permission) || false
-  );
+  return permissions.every((permission) => currentUser.permissions?.includes(permission) || false);
 }
 
 /**
  * Check if current user has specific role or higher privilege level
  */
 export async function hasRole(minRole: PredefinedRole): Promise<boolean> {
-  const user = await getCurrentUser();
+  const currentUser = await getCurrentUser();
 
-  if (!user) {
+  if (!currentUser) {
     return false;
   }
 
   // Superadmin always has access
-  if (user.role === 'superadmin') {
+  if (currentUser.role === "superadmin") {
     return true;
   }
 
-  const userLevel = getRoleLevel(user.role);
+  const userLevel = getRoleLevel(currentUser.role);
   const requiredLevel = getRoleLevel(minRole);
 
   return userLevel >= requiredLevel;
@@ -198,12 +198,12 @@ export async function requirePermission(permission: Permission): Promise<{
   error?: string;
 }> {
   try {
-    const user = await getCurrentUser();
+    const currentUser = await getCurrentUser();
 
-    if (!user) {
+    if (!currentUser) {
       return {
         success: false,
-        error: 'UNAUTHORIZED'
+        error: "UNAUTHORIZED",
       };
     }
 
@@ -212,19 +212,19 @@ export async function requirePermission(permission: Permission): Promise<{
     if (!hasRequiredPermission) {
       return {
         success: false,
-        error: 'FORBIDDEN'
+        error: "FORBIDDEN",
       };
     }
 
     return {
       success: true,
-      user
+      user: currentUser,
     };
   } catch (error) {
-    console.error('Error in requirePermission:', error);
+    console.error("Error in requirePermission:", error);
     return {
       success: false,
-      error: 'INTERNAL_ERROR'
+      error: "INTERNAL_ERROR",
     };
   }
 }
@@ -238,12 +238,12 @@ export async function requireRole(minRole: PredefinedRole): Promise<{
   error?: string;
 }> {
   try {
-    const user = await getCurrentUser();
+    const currentUser = await getCurrentUser();
 
-    if (!user) {
+    if (!currentUser) {
       return {
         success: false,
-        error: 'UNAUTHORIZED'
+        error: "UNAUTHORIZED",
       };
     }
 
@@ -252,19 +252,19 @@ export async function requireRole(minRole: PredefinedRole): Promise<{
     if (!hasRequiredRole) {
       return {
         success: false,
-        error: 'FORBIDDEN'
+        error: "FORBIDDEN",
       };
     }
 
     return {
       success: true,
-      user
+      user: currentUser,
     };
   } catch (error) {
-    console.error('Error in requireRole:', error);
+    console.error("Error in requireRole:", error);
     return {
       success: false,
-      error: 'INTERNAL_ERROR'
+      error: "INTERNAL_ERROR",
     };
   }
 }
@@ -272,21 +272,18 @@ export async function requireRole(minRole: PredefinedRole): Promise<{
 /**
  * Check if a user can manage another user's role
  */
-export async function canManageUserRole(
-  managerId: string,
-  targetUserId: string
-): Promise<boolean> {
+export async function canManageUserRole(managerId: string, targetUserId: string): Promise<boolean> {
   try {
     // Get both users
     const [manager, target] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: managerId },
-        select: { role: true }
+      db.query.user.findFirst({
+        where: eq(user.id, managerId),
+        columns: { role: true },
       }),
-      prisma.user.findUnique({
-        where: { id: targetUserId },
-        select: { role: true }
-      })
+      db.query.user.findFirst({
+        where: eq(user.id, targetUserId),
+        columns: { role: true },
+      }),
     ]);
 
     if (!manager || !target) {
@@ -300,7 +297,7 @@ export async function canManageUserRole(
 
     return canManageRole(manager.role as Role, target.role as Role);
   } catch (error) {
-    console.error('Error checking role management permission:', error);
+    console.error("Error checking role management permission:", error);
     return false;
   }
 }
@@ -316,7 +313,7 @@ export async function changeUserRole(
   metadata?: {
     ipAddress?: string;
     userAgent?: string;
-  }
+  },
 ): Promise<{
   success: boolean;
   error?: string;
@@ -328,84 +325,62 @@ export async function changeUserRole(
     if (!canManage) {
       return {
         success: false,
-        error: 'INSUFFICIENT_PERMISSIONS'
+        error: "INSUFFICIENT_PERMISSIONS",
       };
     }
 
     // Get current role for audit
-    const targetUser = await prisma.user.findUnique({
-      where: { id: targetUserId },
-      select: { role: true }
+    const targetUser = await db.query.user.findFirst({
+      where: eq(user.id, targetUserId),
+      columns: { role: true },
     });
 
     if (!targetUser) {
       return {
         success: false,
-        error: 'USER_NOT_FOUND'
+        error: "USER_NOT_FOUND",
       };
     }
 
     // If role is the same, no change needed
     if (targetUser.role === newRole) {
       return {
-        success: true
+        success: true,
       };
     }
 
-    // Update user role
-    await prisma.user.update({
-      where: { id: targetUserId },
-      data: { role: newRole }
-    });
+    // Update the role and write the audit entry in one transaction — the
+    // original Prisma version ran these as two separate, un-transacted
+    // statements, so a failure between them could silently drop the audit
+    // trail. See docs/adr/0009-security-hardening-p0.md.
+    await db.transaction(async (tx) => {
+      await tx.update(user).set({ role: newRole }).where(eq(user.id, targetUserId));
 
-    // Log the role change for audit
-    await logRoleAssignmentChange({
-      userId: targetUserId,
-      previousRole: targetUser.role as Role,
-      newRole,
-      changedBy,
-      changedAt: new Date(),
-      reason,
-      ipAddress: metadata?.ipAddress,
-      userAgent: metadata?.userAgent
+      await tx.insert(authLog).values({
+        userId: targetUserId,
+        eventType: "ROLE_CHANGE",
+        severity: "INFO",
+        message: `Role changed from ${targetUser.role} to ${newRole}`,
+        ipAddress: metadata?.ipAddress,
+        userAgent: metadata?.userAgent,
+        metadata: {
+          previousRole: targetUser.role,
+          newRole,
+          changedBy,
+          reason,
+        },
+      });
     });
 
     return {
-      success: true
+      success: true,
     };
   } catch (error) {
-    console.error('Error changing user role:', error);
+    console.error("Error changing user role:", error);
     return {
       success: false,
-      error: 'INTERNAL_ERROR'
+      error: "INTERNAL_ERROR",
     };
-  }
-}
-
-/**
- * Log role assignment changes for audit trail
- */
-async function logRoleAssignmentChange(change: RoleAssignmentChange): Promise<void> {
-  try {
-    await prisma.authLog.create({
-      data: {
-        userId: change.userId,
-        eventType: 'ROLE_CHANGE',
-        severity: 'INFO',
-        message: `Role changed from ${change.previousRole} to ${change.newRole}`,
-        ipAddress: change.ipAddress,
-        userAgent: change.userAgent,
-        metadata: {
-          previousRole: change.previousRole,
-          newRole: change.newRole,
-          changedBy: change.changedBy,
-          reason: change.reason
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error logging role assignment change:', error);
-    // Don't fail the operation if logging fails
   }
 }
 
@@ -426,50 +401,48 @@ export async function getRoleStatistics(): Promise<{
 }> {
   try {
     // Get role distribution
-    const roleStats = await prisma.user.groupBy({
-      by: ['role'],
-      _count: {
-        role: true
-      }
-    });
+    const roleStats = await db
+      .select({ role: user.role, count: count() })
+      .from(user)
+      .groupBy(user.role);
 
     const roleDistribution: Record<string, number> = {};
     let totalUsers = 0;
 
-    roleStats.forEach(stat => {
-      roleDistribution[stat.role] = stat._count.role;
-      totalUsers += stat._count.role;
+    roleStats.forEach((stat) => {
+      roleDistribution[stat.role] = stat.count;
+      totalUsers += stat.count;
     });
 
     // Get role display info for breakdown
-    const { ROLE_DISPLAY_INFO, PREDEFINED_ROLES } = await import('@/types/role.types');
+    const { ROLE_DISPLAY_INFO, PREDEFINED_ROLES } = await import("@/types/role.types");
 
-    const roleBreakdown = PREDEFINED_ROLES.map(role => {
-      const count = roleDistribution[role] || 0;
-      const percentage = totalUsers > 0 ? Math.round((count / totalUsers) * 100) : 0;
+    const roleBreakdown = PREDEFINED_ROLES.map((role) => {
+      const roleCount = roleDistribution[role] || 0;
+      const percentage = totalUsers > 0 ? Math.round((roleCount / totalUsers) * 100) : 0;
       const roleInfo = ROLE_DISPLAY_INFO[role];
 
       return {
         role,
-        count,
+        count: roleCount,
         percentage,
         displayName: roleInfo.name,
         description: roleInfo.description,
-        category: roleInfo.category
+        category: roleInfo.category,
       };
-    }).filter(item => item.count > 0); // Only include roles with users
+    }).filter((item) => item.count > 0); // Only include roles with users
 
     return {
       totalUsers,
       roleDistribution,
-      roleBreakdown
+      roleBreakdown,
     };
   } catch (error) {
-    console.error('Error getting role statistics:', error);
+    console.error("Error getting role statistics:", error);
     return {
       totalUsers: 0,
       roleDistribution: {},
-      roleBreakdown: []
+      roleBreakdown: [],
     };
   }
 }
@@ -477,36 +450,36 @@ export async function getRoleStatistics(): Promise<{
 /**
  * Get all roles (predefined + custom) for UI display
  */
-export async function getAllRoles(): Promise<Array<{
-  role: Role;
-  name: string;
-  description?: string;
-  isPredefined: boolean;
-  userCount: number;
-}>> {
+export async function getAllRoles(): Promise<
+  Array<{
+    role: Role;
+    name: string;
+    description?: string;
+    isPredefined: boolean;
+    userCount: number;
+  }>
+> {
   try {
     // Get predefined roles with user counts
-    const predefinedRoleStats = await prisma.user.groupBy({
-      by: ['role'],
-      _count: {
-        role: true
-      }
-    });
+    const predefinedRoleStats = await db
+      .select({ role: user.role, count: count() })
+      .from(user)
+      .groupBy(user.role);
 
     const roleUserCounts: Record<string, number> = {};
-    predefinedRoleStats.forEach(stat => {
-      roleUserCounts[stat.role] = stat._count.role;
+    predefinedRoleStats.forEach((stat) => {
+      roleUserCounts[stat.role] = stat.count;
     });
 
     // Get predefined roles info
-    const { ROLE_DISPLAY_INFO, PREDEFINED_ROLES } = await import('@/types/role.types');
+    const { ROLE_DISPLAY_INFO, PREDEFINED_ROLES } = await import("@/types/role.types");
 
-    const roles = PREDEFINED_ROLES.map(role => ({
+    const roles = PREDEFINED_ROLES.map((role) => ({
       role,
       name: ROLE_DISPLAY_INFO[role].name,
       description: ROLE_DISPLAY_INFO[role].description,
       isPredefined: true,
-      userCount: roleUserCounts[role] || 0
+      userCount: roleUserCounts[role] || 0,
     }));
 
     // TODO: Add custom roles when we implement the CustomRole model
@@ -514,7 +487,7 @@ export async function getAllRoles(): Promise<Array<{
 
     return roles;
   } catch (error) {
-    console.error('Error getting all roles:', error);
+    console.error("Error getting all roles:", error);
     return [];
   }
 }
@@ -525,16 +498,16 @@ export async function getAllRoles(): Promise<Array<{
 export function validateRoleAssignment(
   currentRole: Role,
   newRole: Role,
-  assignerRole: Role
+  assignerRole: Role,
 ): {
   valid: boolean;
   reason?: string;
 } {
   // Cannot assign superadmin role unless you are superadmin
-  if (newRole === 'superadmin' && assignerRole !== 'superadmin') {
+  if (newRole === "superadmin" && assignerRole !== "superadmin") {
     return {
       valid: false,
-      reason: 'Only Super Admin can assign Super Admin role'
+      reason: "Only Super Admin can assign Super Admin role",
     };
   }
 
@@ -542,7 +515,7 @@ export function validateRoleAssignment(
   if (!canManageRole(assignerRole, newRole)) {
     return {
       valid: false,
-      reason: 'Cannot assign role higher than or equal to your own'
+      reason: "Cannot assign role higher than or equal to your own",
     };
   }
 
@@ -550,12 +523,12 @@ export function validateRoleAssignment(
   if (getRoleLevel(newRole) > getRoleLevel(assignerRole)) {
     return {
       valid: false,
-      reason: 'Cannot assign role with higher privilege level than your own'
+      reason: "Cannot assign role with higher privilege level than your own",
     };
   }
 
   return {
-    valid: true
+    valid: true,
   };
 }
 
@@ -567,33 +540,33 @@ export async function getUserPermissions(userId: string): Promise<{
   permissions: Permission[];
 }> {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { role: true }
+    const targetUser = await db.query.user.findFirst({
+      where: eq(user.id, userId),
+      columns: { role: true },
     });
 
-    if (!user) {
-      throw new Error('User not found');
+    if (!targetUser) {
+      throw new Error("User not found");
     }
 
     let permissions: Permission[] = [];
 
-    if (isPredefinedRole(user.role as Role)) {
-      permissions = ROLE_PERMISSIONS[user.role as PredefinedRole];
+    if (isPredefinedRole(targetUser.role as Role)) {
+      permissions = ROLE_PERMISSIONS[targetUser.role as PredefinedRole];
     } else {
       // TODO: Get custom role permissions from database
       // For now, return empty permissions for custom roles
     }
 
     return {
-      role: user.role as Role,
-      permissions
+      role: targetUser.role as Role,
+      permissions,
     };
   } catch (error) {
-    console.error('Error getting user permissions:', error);
+    console.error("Error getting user permissions:", error);
     return {
-      role: 'user',
-      permissions: []
+      role: "user",
+      permissions: [],
     };
   }
 }

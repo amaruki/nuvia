@@ -480,6 +480,18 @@ export function useAnnouncements(): UseAnnouncementsReturn {
         readTime: Math.ceil(data.content.split(" ").length / 200), // Rough estimate
         wordCount: data.content.split(" ").length,
         estimatedReadingSpeed: 200,
+        metrics: {
+          views: 0,
+          reads: 0,
+          shares: 0,
+          comments: 0,
+          likes: 0,
+          bookmarks: 0,
+          averageReadTime: 0,
+          completionRate: 0,
+          engagementScore: 0,
+          bounceRate: 0,
+        },
         seo: data.seo || {
           title: data.title,
           description: data.excerpt,

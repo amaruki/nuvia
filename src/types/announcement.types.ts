@@ -13,6 +13,8 @@ import {
   ArticleAuthor,
   ArticleTag,
   ArticleSEO,
+  ArticleMetrics,
+  ArticleStatistics,
 } from "./article.types";
 
 // Announcement-specific types
@@ -70,6 +72,7 @@ export interface Announcement {
   wordCount: number;
   estimatedReadingSpeed?: number;
   seo: ArticleSEO;
+  metrics: ArticleMetrics;
   series?: any; // Not typically used for announcements
   visibility: "public" | "members_only" | "premium_only" | "chapter_only" | "committee_only";
   allowedRoles?: string[];
@@ -105,6 +108,14 @@ export interface Announcement {
 export interface AnnouncementStatistics {
   // Basic announcement statistics
   totalAnnouncements: number;
+  // Carried over from the underlying article statistics this is derived
+  // from (convertArticleStatisticsToAnnouncementStatistics in use-announcements.ts)
+  totalArticles: number;
+  publishedArticles: number;
+  draftArticles: number;
+  scheduledArticles: number;
+  archivedArticles: number;
+  topPerformingArticles: ArticleStatistics["topPerformingArticles"];
   announcementsByType: {
     type: AnnouncementType;
     count: number;

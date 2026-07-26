@@ -208,25 +208,29 @@ landed as an isolated, revertible commit.
   `proxy.ts`, `AuthUtils`, the OAuth server action). `utils/response-utils.ts`
   deleted (zero importers). See [ADR-0002](docs/adr/0002-rfc9457-error-contract.md)
   and `docs/api/conventions.md`.
-- ◐ **`bun test` coverage, starting from zero.** 3 of the original ten
-  landed directly: (6) RFC 9457 error shape (`tests/rfc9457.test.ts`); (7)
-  rate limiter 429 + survives a simulated process restart
-  (`tests/rate-limit.test.ts`); (8) delete-account removes the row
-  (`tests/delete-account.test.ts`). Two more added along the way, not on
-  the original list: `tests/dashboard-access.test.ts` (the new
-  role-authorization gate) and `tests/custom-roles.test.ts`. Still open:
-  (1) `db.query.user` role read matches the session; (2) `requirePermission`
-  denies without a session — both blocked by the same issue: `rbac.ts`'s
-  functions call `next/headers`'s `headers()` ambiently, which throws
-  "called outside a request scope" when the exported function is called
-  directly in bare `bun:test` (no live Next request lifecycle). Either give
-  `getCurrentUser`/`requirePermission` an explicit-headers overload (like
-  `AuthUtils.getSession(request)` already has) or find another way to seed
-  the request-scope AsyncLocalStorage in tests. (3) `changeUserRole`'s
-  transaction rollback; (4) `seed.ts` exits non-zero without
-  `SEED_ADMIN_PASSWORD`; (5) `env.ts` throws on a placeholder
-  `BETTER_AUTH_SECRET` in production; (9) nav-link-resolves-to-page check;
-  (10) auth-route-has-authorization-call check.
+- ☑ **`bun test` coverage — all ten landed.** (1) `db.query.user` role read
+  matches the session, (2) `requirePermission` denies without a session —
+  `tests/rbac.test.ts`, after giving `getCurrentUser` (and everything that
+  calls it) an optional `headersOverride` param, same pattern
+  `AuthUtils.getSession(request)` already had — without it, none of
+  `rbac.ts`'s functions were callable from bare `bun:test`, since
+  `next/headers`'s ambient `headers()` throws "called outside a request
+  scope" with no live Next request lifecycle. (3) `changeUserRole`'s
+  transaction rollback — `tests/change-user-role-transaction.test.ts`. (4)
+  `seed.ts` exits non-zero without `SEED_ADMIN_PASSWORD`, (5) `env.ts`
+  throws on a placeholder `BETTER_AUTH_SECRET`/missing `REDIS_URL` in
+  production — `tests/seed-script.test.ts`, `tests/env.test.ts`, both
+  spawned as real subprocesses since both scripts throw/exit at module
+  import time. (6) RFC 9457 error shape — `tests/rfc9457.test.ts`. (7) rate
+  limiter 429 + survives a simulated process restart —
+  `tests/rate-limit.test.ts`. (8) delete-account removes the row —
+  `tests/delete-account.test.ts`. (9) nav-link-resolves-to-page —
+  `tests/nav-links.test.ts`. (10) auth-route-has-authorization-call —
+  `tests/auth-route-coverage.test.ts`, with one named exception
+  (verify-email, see the placeholder note above) rather than a silent gap.
+  Two more added along the way, not on the original list:
+  `tests/dashboard-access.test.ts` (the new role-authorization gate) and
+  `tests/custom-roles.test.ts`.
 - ☐ **One structured logger**, `no-console` enforced via oxlint once it
   lands (300 bare `console.*` calls today, replacing
   `services/logging.service.ts` and `errors.ts:logError` —

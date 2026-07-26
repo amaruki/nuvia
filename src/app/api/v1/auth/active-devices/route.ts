@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
+import { problem, problemResponse, problems, successResponse } from "@/lib/http";
 
 // GET /api/v1/auth/active-devices - Get user's active devices
 export async function GET(request: NextRequest) {
@@ -9,33 +11,11 @@ export async function GET(request: NextRequest) {
       headers: request.headers,
     });
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        devices: sessions,
-      },
-      message: "Active devices retrieved successfully",
-      errors: undefined,
-      meta: {
-        timestamp: new Date(),
-        version: "v1",
-      },
-    });
+    return successResponse({ devices: sessions });
   } catch (error) {
-    // Return a generic error response
-    return NextResponse.json(
-      {
-        success: false,
-        message: "An unexpected error occurred while retrieving active devices",
-        errors: {
-          server: ["Please try again later"],
-        },
-        meta: {
-          timestamp: new Date(),
-          version: "v1",
-        },
-      },
-      { status: 500 },
+    console.error("List active devices error:", error);
+    return problemResponse(
+      problems.internalError("An unexpected error occurred while retrieving active devices"),
     );
   }
 }
@@ -48,20 +28,7 @@ export async function DELETE(request: NextRequest) {
     const token = searchParams.get("token");
 
     if (!token) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Device token is required",
-          errors: {
-            token: ["Device token is required"],
-          },
-          meta: {
-            timestamp: new Date(),
-            version: "v1",
-          },
-        },
-        { status: 400 },
-      );
+      return problemResponse(problems.businessLogicError("Device token is required"));
     }
 
     // Deactivate device using Better Auth API
@@ -72,28 +39,22 @@ export async function DELETE(request: NextRequest) {
       headers: request.headers,
     });
 
-    // Create a standardized response
-    const response = {
-      success: true,
-      message: "Device deactivated successfully",
-    };
-
-    return NextResponse.json(response);
+    return successResponse(null, { message: "Device deactivated successfully" });
   } catch (error) {
-    // Return a generic error response
-    return NextResponse.json(
-      {
-        success: false,
-        message: "An unexpected error occurred while deactivating device",
-        errors: {
-          server: ["Please try again later"],
-        },
-        meta: {
-          timestamp: new Date(),
-          version: "v1",
-        },
-      },
-      { status: 500 },
+    if (error instanceof APIError) {
+      return problemResponse(
+        problem(
+          "device-deactivation-failed",
+          error.statusCode ?? 400,
+          "Device deactivation failed",
+          error.message,
+        ),
+      );
+    }
+
+    console.error("Deactivate device error:", error);
+    return problemResponse(
+      problems.internalError("An unexpected error occurred while deactivating device"),
     );
   }
 }

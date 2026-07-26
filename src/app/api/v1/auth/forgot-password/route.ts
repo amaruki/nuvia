@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
+import { problemResponse, problems, successResponse } from "@/lib/http";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,27 +18,11 @@ export async function POST(request: NextRequest) {
     });
 
     // Always return success for security (don't reveal if email exists)
-    const response = {
-      success: true,
-      message: "Password reset email sent if account exists",
-    };
-
-    return NextResponse.json(response);
+    return successResponse(null, { message: "Password reset email sent if account exists" });
   } catch (error) {
-    // Return a generic error response
-    return NextResponse.json(
-      {
-        success: false,
-        message: "An unexpected error occurred during forgot password",
-        errors: {
-          server: ["Please try again later"],
-        },
-        meta: {
-          timestamp: new Date(),
-          version: "v1",
-        },
-      },
-      { status: 500 },
+    console.error("Forgot password error:", error);
+    return problemResponse(
+      problems.internalError("An unexpected error occurred during forgot password"),
     );
   }
 }

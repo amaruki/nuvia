@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
 import { logError } from "@/lib/errors";
+import { problem, problemResponse, problems, successResponse } from "@/lib/http";
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -10,20 +11,7 @@ export async function DELETE(request: NextRequest) {
     });
 
     if (!session || !session.user) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Authentication required",
-          errors: {
-            authentication: ["You must be logged in to access this resource"],
-          },
-          meta: {
-            timestamp: new Date(),
-            version: "v1",
-          },
-        },
-        { status: 401 },
-      );
+      return problemResponse(problems.authenticationRequired());
     }
 
     const body = await request.json().catch(() => ({}));
@@ -39,29 +27,11 @@ export async function DELETE(request: NextRequest) {
       body: password ? { password } : {},
     });
 
-    return NextResponse.json({
-      success: true,
-      data: null,
-      message: "Account deleted successfully",
-      errors: undefined,
-      meta: {
-        timestamp: new Date(),
-        version: "v1",
-      },
-    });
+    return successResponse(null, { message: "Account deleted successfully" });
   } catch (error) {
     if (error instanceof APIError) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: error.message,
-          errors: { account: [error.message] },
-          meta: {
-            timestamp: new Date(),
-            version: "v1",
-          },
-        },
-        { status: error.statusCode ?? 400 },
+      return problemResponse(
+        problem("account-deletion-failed", error.statusCode ?? 400, error.message, error.message),
       );
     }
 
@@ -72,19 +42,8 @@ export async function DELETE(request: NextRequest) {
       userAgent: request.headers.get("user-agent") || "unknown",
     });
 
-    return NextResponse.json(
-      {
-        success: false,
-        message: "An unexpected error occurred while deleting account",
-        errors: {
-          server: ["Please try again later"],
-        },
-        meta: {
-          timestamp: new Date(),
-          version: "v1",
-        },
-      },
-      { status: 500 },
+    return problemResponse(
+      problems.internalError("An unexpected error occurred while deleting account"),
     );
   }
 }

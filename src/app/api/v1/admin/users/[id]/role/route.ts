@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
-import { fromZodError } from "zod-validation-error";
 import { requirePermission } from "@/lib/rbac";
-import { changeUserRole, getCurrentUser } from "@/lib/rbac";
-import { AuthResponseFactory, AuthErrorType } from "@/lib/auth/common";
+import { changeUserRole } from "@/lib/rbac";
+import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 
 /**
  * PATCH /api/v1/admin/users/[id]/role - Update user role
@@ -16,19 +15,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const auth = await requirePermission("users:update");
 
     if (!auth.success) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHORIZATION, auth.error || "UNAUTHORIZED");
+      return problemResponse(auth.error!);
     }
 
-    // targetUserId is already extracted from params above
-    const currentUser = auth.user;
-
-    if (!currentUser) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHENTICATION, "Unauthorized");
-    }
+    const currentUser = auth.user!;
 
     // Cannot change your own role
     if (targetUserId === currentUser.id) {
-      return AuthResponseFactory.error(AuthErrorType.BUSINESS_LOGIC, "Cannot change your own role");
+      return problemResponse(problems.businessLogicError("Cannot change your own role"));
     }
 
     // Parse and validate request body
@@ -42,8 +36,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const validationResult = updateRoleSchema.safeParse(body);
 
     if (!validationResult.success) {
-      const validationError = fromZodError(validationResult.error);
-      return AuthResponseFactory.validationError(validationResult.error);
+      return problemResponse(validationProblem(validationResult.error));
     }
 
     const { role, reason } = validationResult.data;
@@ -61,44 +54,38 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     });
 
     if (!result.success) {
-      const errorMap: Record<string, { status: number; message: string }> = {
+      const errorMap: Record<string, { status: number; title: string; message: string }> = {
         INSUFFICIENT_PERMISSIONS: {
           status: 403,
+          title: "Insufficient permission",
           message: "You do not have permission to manage this user's role",
         },
-        USER_NOT_FOUND: { status: 404, message: "User not found" },
-        INTERNAL_ERROR: { status: 500, message: "An unexpected error occurred" },
+        USER_NOT_FOUND: { status: 404, title: "Not found", message: "User not found" },
+        INTERNAL_ERROR: {
+          status: 500,
+          title: "Internal server error",
+          message: "An unexpected error occurred",
+        },
       };
 
       const error = errorMap[result.error || "INTERNAL_ERROR"] || errorMap["INTERNAL_ERROR"];
 
-      return NextResponse.json(
-        {
-          success: false,
-          data: null,
-          message: error.message,
+      return problemResponse(
+        problem("role-change-failed", error.status, error.title, error.message, {
           errors: [{ field: "role", message: error.message }],
-          meta: {
-            timestamp: new Date().toISOString(),
-            version: "v1",
-          },
-        },
-        { status: error.status },
+        }),
       );
     }
 
-    return AuthResponseFactory.success(
-      {
-        userId: targetUserId,
-        newRole: role,
-        changedBy: currentUser.id,
-        changedAt: new Date(),
-      },
-      "User role updated successfully",
-    );
+    return successResponse({
+      userId: targetUserId,
+      newRole: role,
+      changedBy: currentUser.id,
+      changedAt: new Date(),
+    });
   } catch (error) {
     console.error("Error updating user role:", error);
-    return AuthResponseFactory.internalError("Failed to update user role");
+    return problemResponse(problems.internalError("Failed to update user role"));
   }
 }
 
@@ -113,10 +100,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const auth = await requirePermission("users:read");
 
     if (!auth.success) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHORIZATION, auth.error || "UNAUTHORIZED");
+      return problemResponse(auth.error!);
     }
-
-    // targetUserId is already extracted from params above
 
     // Get user permissions
     const { getUserPermissions } = await import("@/lib/rbac");
@@ -140,20 +125,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
 
     if (!targetUser) {
-      return AuthResponseFactory.error(AuthErrorType.NOT_FOUND, "User not found");
+      return problemResponse(problems.notFound("User not found"));
     }
 
-    return AuthResponseFactory.success(
-      {
-        user: {
-          ...targetUser,
-          permissions: userPermissions.permissions,
-        },
+    return successResponse({
+      user: {
+        ...targetUser,
+        permissions: userPermissions.permissions,
       },
-      "User role and permissions retrieved successfully",
-    );
+    });
   } catch (error) {
     console.error("Error getting user role:", error);
-    return AuthResponseFactory.internalError("Failed to retrieve user role");
+    return problemResponse(problems.internalError("Failed to retrieve user role"));
   }
 }

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requirePermission } from "@/lib/rbac";
-import { AuthResponseFactory, AuthErrorType } from "@/lib/auth/common";
+import { problemResponse, problems, successResponse } from "@/lib/http";
 import { AVAILABLE_PERMISSIONS, PERMISSION_CATEGORIES, formatPermission } from "@/types/role.types";
 
 /**
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const auth = await requirePermission("users:read");
 
     if (!auth.success) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHORIZATION, auth.error || "UNAUTHORIZED");
+      return problemResponse(auth.error!);
     }
 
     // Get search parameters
@@ -41,19 +41,16 @@ export async function GET(request: NextRequest) {
         break;
     }
 
-    return AuthResponseFactory.success(
-      {
-        permissions,
-        categories: Object.entries(PERMISSION_CATEGORIES).map(([key, value]) => ({
-          module: key,
-          ...value,
-        })),
-      },
-      "Permissions retrieved successfully",
-    );
+    return successResponse({
+      permissions,
+      categories: Object.entries(PERMISSION_CATEGORIES).map(([key, value]) => ({
+        module: key,
+        ...value,
+      })),
+    });
   } catch (error) {
     console.error("Error getting permissions:", error);
-    return AuthResponseFactory.internalError("Failed to retrieve permissions");
+    return problemResponse(problems.internalError("Failed to retrieve permissions"));
   }
 }
 

@@ -1,10 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
-import { fromZodError } from "zod-validation-error";
 import { and, count, desc, asc, eq, ilike, or } from "drizzle-orm";
 import { hashPassword } from "better-auth/crypto";
 import { requirePermission } from "@/lib/rbac";
-import { AuthResponseFactory, AuthErrorType } from "@/lib/auth/common";
+import { problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 import { db } from "@/db/client";
 import { user } from "@/db/schema";
 import { ROLE_PERMISSIONS, isPredefinedRole } from "@/types/role.types";
@@ -19,7 +18,7 @@ export async function GET(request: NextRequest) {
     const auth = await requirePermission("users:read");
 
     if (!auth.success) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHORIZATION, auth.error || "UNAUTHORIZED");
+      return problemResponse(auth.error!);
     }
 
     // Get search parameters
@@ -91,26 +90,18 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        users: usersWithPermissions,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
-      },
-      message: "Users retrieved successfully",
-      meta: {
-        timestamp: new Date().toISOString(),
-        version: "v1",
+    return successResponse({
+      users: usersWithPermissions,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
     });
   } catch (error) {
     console.error("Error getting users:", error);
-    return AuthResponseFactory.internalError("Failed to retrieve users");
+    return problemResponse(problems.internalError("Failed to retrieve users"));
   }
 }
 
@@ -124,7 +115,7 @@ export async function POST(request: NextRequest) {
     const auth = await requirePermission("users:create");
 
     if (!auth.success) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHORIZATION, auth.error || "UNAUTHORIZED");
+      return problemResponse(auth.error!);
     }
 
     // Parse and validate request body
@@ -141,8 +132,7 @@ export async function POST(request: NextRequest) {
     const validationResult = createUserSchema.safeParse(body);
 
     if (!validationResult.success) {
-      const validationError = fromZodError(validationResult.error);
-      return AuthResponseFactory.validationError(validationResult.error);
+      return problemResponse(validationProblem(validationResult.error));
     }
 
     const { username, email, name, role, password } = validationResult.data;
@@ -153,10 +143,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser) {
-      return AuthResponseFactory.error(
-        AuthErrorType.BUSINESS_LOGIC,
-        "Username or email already exists",
-      );
+      return problemResponse(problems.businessLogicError("Username or email already exists"));
     }
 
     // Create user
@@ -182,14 +169,9 @@ export async function POST(request: NextRequest) {
         updatedAt: user.updatedAt,
       });
 
-    return AuthResponseFactory.success(
-      {
-        user: newUser,
-      },
-      "User created successfully",
-    );
+    return successResponse({ user: newUser });
   } catch (error) {
     console.error("Error creating user:", error);
-    return AuthResponseFactory.internalError("Failed to create user");
+    return problemResponse(problems.internalError("Failed to create user"));
   }
 }

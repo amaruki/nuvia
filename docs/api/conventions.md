@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return problemResponse(validationProblem(parsed.error));
 
   const result = await someService(parsed.data, auth.user.id);
-  return NextResponse.json(result); // success envelope, see below
+  return successResponse(result); // success envelope, see below
 }
 ```
 
@@ -41,10 +41,14 @@ Every error response is `application/problem+json`:
 
 Validation failures add an `errors` extension member:
 `errors: [{ field: "email", message: "Invalid email address" }]`. The
-`problemResponse()` helper (`src/lib/http.ts`, `TODO.md` M2) is the only
-sanctioned way to build one of these — not `NextResponse.json` with an
-error-shaped literal inline, which is what 19 of 23 routes do today and is
-exactly the drift this convention replaces.
+`problemResponse()` helper (`src/lib/http.ts`) is the only sanctioned way
+to build one of these — not `NextResponse.json` with an error-shaped
+literal inline. Every route under `/api/v1/**` uses it as of the RFC 9457
+migration; `AuthResponseFactory` and the ad-hoc inline shapes it replaced
+are gone from that surface (server actions like `event.actions.ts` are a
+separate lane — RFC 9457 is an HTTP response-shape standard, and actions
+don't return HTTP responses — and keep using `errors.ts`'s
+`createSuccessResponse`/`createErrorResponse`).
 
 ## Success envelope
 

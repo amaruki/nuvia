@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
-import { fromZodError } from "zod-validation-error";
 import { requirePermission } from "@/lib/rbac";
 import { getAllRoles, getRoleStatistics } from "@/lib/rbac";
-import { AuthResponseFactory, AuthErrorType } from "@/lib/auth/common";
+import { problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 
 /**
  * GET /api/v1/admin/roles - Get all roles with statistics
@@ -15,7 +14,7 @@ export async function GET(request: NextRequest) {
     const auth = await requirePermission("users:read");
 
     if (!auth.success) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHORIZATION, auth.error || "UNAUTHORIZED");
+      return problemResponse(auth.error!);
     }
 
     // Get search parameters
@@ -25,24 +24,20 @@ export async function GET(request: NextRequest) {
     // Get all roles
     const roles = await getAllRoles();
 
-    let response: any = {
-      success: true,
-      data: {
-        roles,
-      },
-      message: "Roles retrieved successfully",
-    };
+    const data: {
+      roles: typeof roles;
+      statistics?: Awaited<ReturnType<typeof getRoleStatistics>>;
+    } = { roles };
 
     // Include statistics if requested
     if (includeStats) {
-      const stats = await getRoleStatistics();
-      response.data.statistics = stats;
+      data.statistics = await getRoleStatistics();
     }
 
-    return NextResponse.json(response);
+    return successResponse(data);
   } catch (error) {
     console.error("Error getting roles:", error);
-    return AuthResponseFactory.internalError("Failed to retrieve roles");
+    return problemResponse(problems.internalError("Failed to retrieve roles"));
   }
 }
 
@@ -56,7 +51,7 @@ export async function POST(request: NextRequest) {
     const auth = await requirePermission("users:create");
 
     if (!auth.success) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHORIZATION, auth.error || "UNAUTHORIZED");
+      return problemResponse(auth.error!);
     }
 
     // Parse and validate request body
@@ -74,7 +69,7 @@ export async function POST(request: NextRequest) {
     const validationResult = createRoleSchema.safeParse(body);
 
     if (!validationResult.success) {
-      return AuthResponseFactory.validationError(validationResult.error);
+      return problemResponse(validationProblem(validationResult.error));
     }
 
     const { name, description, permissions } = validationResult.data;
@@ -91,14 +86,9 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date(),
     };
 
-    return AuthResponseFactory.success(
-      {
-        role: newRole,
-      },
-      "Custom role created successfully",
-    );
+    return successResponse({ role: newRole });
   } catch (error) {
     console.error("Error creating role:", error);
-    return AuthResponseFactory.internalError("Failed to create role");
+    return problemResponse(problems.internalError("Failed to create role"));
   }
 }

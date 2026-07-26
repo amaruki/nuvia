@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
-import { fromZodError } from "zod-validation-error";
 import { requirePermission } from "@/lib/rbac";
 import { changeUserRole, getCurrentUser } from "@/lib/rbac";
-import { AuthResponseFactory, AuthErrorType } from "@/lib/auth/common";
+import { problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 
 /**
  * POST /api/v1/admin/users/bulk-role-update - Update multiple users' roles
@@ -15,14 +14,10 @@ export async function POST(request: NextRequest) {
     const auth = await requirePermission("users:update");
 
     if (!auth.success) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHORIZATION, auth.error || "UNAUTHORIZED");
+      return problemResponse(auth.error!);
     }
 
-    const currentUser = auth.user;
-
-    if (!currentUser) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHENTICATION, "Unauthorized");
-    }
+    const currentUser = auth.user!;
 
     // Parse and validate request body
     const body = await request.json();
@@ -42,17 +37,15 @@ export async function POST(request: NextRequest) {
     const validationResult = bulkUpdateSchema.safeParse(body);
 
     if (!validationResult.success) {
-      const validationError = fromZodError(validationResult.error);
-      return AuthResponseFactory.validationError(validationResult.error);
+      return problemResponse(validationProblem(validationResult.error));
     }
 
     const { userIds, role, reason } = validationResult.data;
 
     // Check if current user ID is in the list (cannot update own role)
     if (userIds.includes(currentUser.id)) {
-      return AuthResponseFactory.error(
-        AuthErrorType.BUSINESS_LOGIC,
-        "Cannot update your own role in bulk operations",
+      return problemResponse(
+        problems.businessLogicError("Cannot update your own role in bulk operations"),
       );
     }
 
@@ -91,9 +84,8 @@ export async function POST(request: NextRequest) {
       }))
       .filter((item) => !item.success);
 
-    return NextResponse.json({
-      success: true,
-      data: {
+    return successResponse(
+      {
         total: userIds.length,
         successful: successful.length,
         failed: failed.length,
@@ -102,15 +94,13 @@ export async function POST(request: NextRequest) {
         changedBy: currentUser.id,
         changedAt: new Date(),
       },
-      message: `Bulk role update completed. ${successful.length} successful, ${failed.length} failed.`,
-      meta: {
-        timestamp: new Date().toISOString(),
-        version: "v1",
+      {
+        message: `Bulk role update completed. ${successful.length} successful, ${failed.length} failed.`,
       },
-    });
+    );
   } catch (error) {
     console.error("Error in bulk role update:", error);
-    return AuthResponseFactory.internalError("Failed to process bulk role update");
+    return problemResponse(problems.internalError("Failed to process bulk role update"));
   }
 }
 
@@ -124,7 +114,7 @@ export async function GET(request: NextRequest) {
     const auth = await requirePermission("users:read");
 
     if (!auth.success) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHORIZATION, auth.error || "UNAUTHORIZED");
+      return problemResponse(auth.error!);
     }
 
     // Get search parameters
@@ -133,9 +123,8 @@ export async function GET(request: NextRequest) {
     const newRole = searchParams.get("role");
 
     if (!userIdsParam || !newRole) {
-      return AuthResponseFactory.error(
-        AuthErrorType.VALIDATION,
-        "userIds and role parameters are required",
+      return problemResponse(
+        problems.businessLogicError("userIds and role parameters are required"),
       );
     }
 
@@ -162,7 +151,7 @@ export async function GET(request: NextRequest) {
     const currentUser = await getCurrentUser();
 
     if (!currentUser) {
-      return AuthResponseFactory.error(AuthErrorType.AUTHENTICATION, "Unauthorized");
+      return problemResponse(problems.authenticationRequired());
     }
 
     // Check if the current user can manage these roles
@@ -171,19 +160,16 @@ export async function GET(request: NextRequest) {
       (user) => !canManageRole(currentUser.role, user.role as any) || user.id === currentUser.id,
     );
 
-    return AuthResponseFactory.success(
-      {
-        users,
-        totalRequested: userIds.length,
-        totalFound: users.length,
-        cannotManage: cannotManage.length,
-        newRole,
-        canProceed: cannotManage.length === 0 && users.length > 0,
-      },
-      "Bulk role update preview generated",
-    );
+    return successResponse({
+      users,
+      totalRequested: userIds.length,
+      totalFound: users.length,
+      cannotManage: cannotManage.length,
+      newRole,
+      canProceed: cannotManage.length === 0 && users.length > 0,
+    });
   } catch (error) {
     console.error("Error generating bulk role update preview:", error);
-    return AuthResponseFactory.internalError("Failed to generate preview");
+    return problemResponse(problems.internalError("Failed to generate preview"));
   }
 }

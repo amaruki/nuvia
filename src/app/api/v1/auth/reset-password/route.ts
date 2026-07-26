@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
+import { problem, problemResponse, problems, successResponse } from "@/lib/http";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,28 +17,22 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create a standardized response
-    const response = {
-      success: true,
-      message: "Password reset successful",
-    };
-
-    return NextResponse.json(response);
+    return successResponse(null, { message: "Password reset successful" });
   } catch (error) {
-    // Return a generic error response
-    return NextResponse.json(
-      {
-        success: false,
-        message: "An unexpected error occurred during password reset",
-        errors: {
-          server: ["Please try again later"],
-        },
-        meta: {
-          timestamp: new Date(),
-          version: "v1",
-        },
-      },
-      { status: 500 },
+    if (error instanceof APIError) {
+      return problemResponse(
+        problem(
+          "password-reset-failed",
+          error.statusCode ?? 400,
+          "Password reset failed",
+          error.message,
+        ),
+      );
+    }
+
+    console.error("Reset password error:", error);
+    return problemResponse(
+      problems.internalError("An unexpected error occurred during password reset"),
     );
   }
 }

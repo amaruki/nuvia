@@ -20,6 +20,7 @@ import {
   getRoleLevel,
 } from "@/types/role.types";
 import { AuthError, AuthErrorType } from "./auth/common";
+import { problems, type ProblemDetails } from "@/lib/http";
 
 // Enhanced user type with role information
 export interface UserWithRole {
@@ -195,7 +196,7 @@ export async function hasRole(minRole: PredefinedRole): Promise<boolean> {
 export async function requirePermission(permission: Permission): Promise<{
   success: boolean;
   user?: UserWithRole;
-  error?: string;
+  error?: ProblemDetails;
 }> {
   try {
     const currentUser = await getCurrentUser();
@@ -203,7 +204,7 @@ export async function requirePermission(permission: Permission): Promise<{
     if (!currentUser) {
       return {
         success: false,
-        error: "UNAUTHORIZED",
+        error: problems.authenticationRequired(),
       };
     }
 
@@ -212,7 +213,7 @@ export async function requirePermission(permission: Permission): Promise<{
     if (!hasRequiredPermission) {
       return {
         success: false,
-        error: "FORBIDDEN",
+        error: problems.insufficientPermission(`Requires ${permission}`),
       };
     }
 
@@ -224,7 +225,7 @@ export async function requirePermission(permission: Permission): Promise<{
     console.error("Error in requirePermission:", error);
     return {
       success: false,
-      error: "INTERNAL_ERROR",
+      error: problems.internalError(),
     };
   }
 }
@@ -235,7 +236,7 @@ export async function requirePermission(permission: Permission): Promise<{
 export async function requireRole(minRole: PredefinedRole): Promise<{
   success: boolean;
   user?: UserWithRole;
-  error?: string;
+  error?: ProblemDetails;
 }> {
   try {
     const currentUser = await getCurrentUser();
@@ -243,7 +244,7 @@ export async function requireRole(minRole: PredefinedRole): Promise<{
     if (!currentUser) {
       return {
         success: false,
-        error: "UNAUTHORIZED",
+        error: problems.authenticationRequired(),
       };
     }
 
@@ -252,7 +253,7 @@ export async function requireRole(minRole: PredefinedRole): Promise<{
     if (!hasRequiredRole) {
       return {
         success: false,
-        error: "FORBIDDEN",
+        error: problems.insufficientPermission(`Requires role ${minRole} or higher`),
       };
     }
 
@@ -264,7 +265,7 @@ export async function requireRole(minRole: PredefinedRole): Promise<{
     console.error("Error in requireRole:", error);
     return {
       success: false,
-      error: "INTERNAL_ERROR",
+      error: problems.internalError(),
     };
   }
 }

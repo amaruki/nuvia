@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { NextRequest } from "next/server";
 import { logError } from "@/lib/errors";
+import { problemResponse, problems, successResponse } from "@/lib/http";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,40 +9,13 @@ export async function POST(request: NextRequest) {
     const { token } = body;
 
     if (!token) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Verification token is required",
-          errors: {
-            token: ["Verification token is required"],
-          },
-          meta: {
-            timestamp: new Date(),
-            version: "v1",
-          },
-        },
-        { status: 400 },
-      );
+      return problemResponse(problems.businessLogicError("Verification token is required"));
     }
 
-    // Note: better-auth doesn't have a direct verifyEmail API method
-    // This is a placeholder implementation
-    // In a real application, you would implement this functionality separately
-    // or use a different approach
-
-    // For now, we'll just return a success response
-    return NextResponse.json({
-      success: true,
-      data: {
-        user: null,
-      },
-      message: "Email verified successfully",
-      errors: undefined,
-      meta: {
-        timestamp: new Date(),
-        version: "v1",
-      },
-    });
+    // TODO: this is a placeholder — better-auth does have a real
+    // verifyEmail endpoint (auth.api.verifyEmail({ query: { token } })),
+    // this route just never calls it. See TODO.md.
+    return successResponse({ user: null }, { message: "Email verified successfully" });
   } catch (error) {
     // Log the error for debugging
     logError(error as Error, {
@@ -52,20 +25,8 @@ export async function POST(request: NextRequest) {
       userAgent: request.headers.get("user-agent") || "unknown",
     });
 
-    // Return a generic error response
-    return NextResponse.json(
-      {
-        success: false,
-        message: "An unexpected error occurred while verifying email",
-        errors: {
-          server: ["Please try again later"],
-        },
-        meta: {
-          timestamp: new Date(),
-          version: "v1",
-        },
-      },
-      { status: 500 },
+    return problemResponse(
+      problems.internalError("An unexpected error occurred while verifying email"),
     );
   }
 }

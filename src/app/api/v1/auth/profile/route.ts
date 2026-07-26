@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
 import { AuthUtils } from "@/lib/auth/utils";
+import { problem, problemResponse, problems, successResponse } from "@/lib/http";
 
 // GET /api/v1/auth/profile - Get user profile
 export async function GET(request: NextRequest) {
@@ -9,49 +11,14 @@ export async function GET(request: NextRequest) {
     const user = await AuthUtils.getCurrentUser(request);
 
     if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Authentication required",
-          errors: {
-            authentication: ["You must be logged in to access this resource"],
-          },
-          meta: {
-            timestamp: new Date(),
-            version: "v1",
-          },
-        },
-        { status: 401 },
-      );
+      return problemResponse(problems.authenticationRequired());
     }
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        user,
-      },
-      message: "Profile retrieved successfully",
-      errors: undefined,
-      meta: {
-        timestamp: new Date(),
-        version: "v1",
-      },
-    });
+    return successResponse({ user });
   } catch (error) {
-    // Return a generic error response
-    return NextResponse.json(
-      {
-        success: false,
-        message: "An unexpected error occurred while retrieving profile",
-        errors: {
-          server: ["Please try again later"],
-        },
-        meta: {
-          timestamp: new Date(),
-          version: "v1",
-        },
-      },
-      { status: 500 },
+    console.error("Get profile error:", error);
+    return problemResponse(
+      problems.internalError("An unexpected error occurred while retrieving profile"),
     );
   }
 }
@@ -68,33 +35,22 @@ export async function PUT(request: NextRequest) {
       headers: request.headers,
     });
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        user: updatedUser,
-      },
-      message: "Profile updated successfully",
-      errors: undefined,
-      meta: {
-        timestamp: new Date(),
-        version: "v1",
-      },
-    });
+    return successResponse({ user: updatedUser });
   } catch (error) {
-    // Return a generic error response
-    return NextResponse.json(
-      {
-        success: false,
-        message: "An unexpected error occurred while updating profile",
-        errors: {
-          server: ["Please try again later"],
-        },
-        meta: {
-          timestamp: new Date(),
-          version: "v1",
-        },
-      },
-      { status: 500 },
+    if (error instanceof APIError) {
+      return problemResponse(
+        problem(
+          "profile-update-failed",
+          error.statusCode ?? 400,
+          "Profile update failed",
+          error.message,
+        ),
+      );
+    }
+
+    console.error("Update profile error:", error);
+    return problemResponse(
+      problems.internalError("An unexpected error occurred while updating profile"),
     );
   }
 }

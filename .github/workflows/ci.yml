@@ -9,6 +9,12 @@
 # only enforces what the codebase can currently pass (oxlint's baseline is
 # warnings-only for now on pre-existing `any`/`console` usage; see
 # docs/adr/0004 and docs/adr/0013 for the ratchet this will tighten into).
+#
+# The redis service (and REDIS_URL below) is required even though this job
+# only builds and tests, not deploys: `next build` always forces
+# NODE_ENV=production internally regardless of the NODE_ENV env var passed
+# in, and src/lib/env.ts refuses to boot in production without REDIS_URL
+# set (docs/adr/0003-single-rate-limiter.md).
 
 name: CI
 
@@ -53,8 +59,18 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       DATABASE_URL: postgresql://nuvia:nuvia@localhost:5432/nuvia
+      REDIS_URL: redis://localhost:6379
       BETTER_AUTH_SECRET: ci-only-secret-not-for-production-use-0000000000
       APP_URL: http://localhost:3000
       NODE_ENV: test

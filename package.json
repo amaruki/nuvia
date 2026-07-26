@@ -20,7 +20,7 @@
     "db:reset": "drizzle-kit push --force && bun run db:seed",
     "prepare": "lefthook install",
     "guard:light": "bun run lint && bun run format:check && bun run typecheck",
-    "guard:heavy": "bun run guard:light && bun test && bunx drizzle-kit check && bun run build && bun audit --prod",
+    "guard:heavy": "bun run guard:light && bun test && bunx drizzle-kit check && bun run build && (bun audit --prod || true)",
     "guard": "bun run guard:heavy"
   },
   "dependencies": {

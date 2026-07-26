@@ -27,13 +27,9 @@ interface RealtimeUpdateConfig {
  */
 export function useRealtimeUpdates<T>(
   fetchFunction: () => Promise<T>,
-  config: RealtimeUpdateConfig = {}
+  config: RealtimeUpdateConfig = {},
 ) {
-  const {
-    enabled = true,
-    interval = 30000,
-    pauseWhenHidden = true,
-  } = config;
+  const { enabled = true, interval = 30000, pauseWhenHidden = true } = config;
 
   const [data, setData] = React.useState<T | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -124,7 +120,7 @@ export function useRealtimeUpdates<T>(
  * Hook for managing real-time updates for multiple widgets
  */
 export function useWidgetRealtimeUpdates<WidgetId extends string, T>(
-  widgets: Record<WidgetId, { fetchFunction: () => Promise<T>; config?: RealtimeUpdateConfig }>
+  widgets: Record<WidgetId, { fetchFunction: () => Promise<T>; config?: RealtimeUpdateConfig }>,
 ) {
   const [updates, setUpdates] = React.useState<Partial<Record<WidgetId, T>>>({});
   const [loadingStates, setLoadingStates] = React.useState<Partial<Record<WidgetId, boolean>>>({});
@@ -134,22 +130,22 @@ export function useWidgetRealtimeUpdates<WidgetId extends string, T>(
   React.useEffect(() => {
     const widgetIds = Object.keys(widgets) as WidgetId[];
 
-    widgetIds.forEach(widgetId => {
+    widgetIds.forEach((widgetId) => {
       const { fetchFunction, config } = widgets[widgetId];
 
       const updateWidget = async () => {
         try {
-          setLoadingStates(prev => ({ ...prev, [widgetId]: true }));
-          setErrors(prev => ({ ...prev, [widgetId]: undefined }));
+          setLoadingStates((prev) => ({ ...prev, [widgetId]: true }));
+          setErrors((prev) => ({ ...prev, [widgetId]: undefined }));
           const data = await fetchFunction();
-          setUpdates(prev => ({ ...prev, [widgetId]: data }));
+          setUpdates((prev) => ({ ...prev, [widgetId]: data }));
         } catch (err) {
-          setErrors(prev => ({
+          setErrors((prev) => ({
             ...prev,
-            [widgetId]: err instanceof Error ? err.message : "Failed to fetch data"
+            [widgetId]: err instanceof Error ? err.message : "Failed to fetch data",
           }));
         } finally {
-          setLoadingStates(prev => ({ ...prev, [widgetId]: false }));
+          setLoadingStates((prev) => ({ ...prev, [widgetId]: false }));
         }
       };
 
@@ -164,30 +160,33 @@ export function useWidgetRealtimeUpdates<WidgetId extends string, T>(
     });
   }, [widgets]);
 
-  const refetchWidget = React.useCallback((widgetId: WidgetId) => {
-    const { fetchFunction } = widgets[widgetId];
+  const refetchWidget = React.useCallback(
+    (widgetId: WidgetId) => {
+      const { fetchFunction } = widgets[widgetId];
 
-    const updateWidget = async () => {
-      try {
-        setLoadingStates(prev => ({ ...prev, [widgetId]: true }));
-        setErrors(prev => ({ ...prev, [widgetId]: undefined }));
-        const data = await fetchFunction();
-        setUpdates(prev => ({ ...prev, [widgetId]: data }));
-      } catch (err) {
-        setErrors(prev => ({
-          ...prev,
-          [widgetId]: err instanceof Error ? err.message : "Failed to fetch data"
-        }));
-      } finally {
-        setLoadingStates(prev => ({ ...prev, [widgetId]: false }));
-      }
-    };
+      const updateWidget = async () => {
+        try {
+          setLoadingStates((prev) => ({ ...prev, [widgetId]: true }));
+          setErrors((prev) => ({ ...prev, [widgetId]: undefined }));
+          const data = await fetchFunction();
+          setUpdates((prev) => ({ ...prev, [widgetId]: data }));
+        } catch (err) {
+          setErrors((prev) => ({
+            ...prev,
+            [widgetId]: err instanceof Error ? err.message : "Failed to fetch data",
+          }));
+        } finally {
+          setLoadingStates((prev) => ({ ...prev, [widgetId]: false }));
+        }
+      };
 
-    updateWidget();
-  }, [widgets]);
+      updateWidget();
+    },
+    [widgets],
+  );
 
   const refetchAll = React.useCallback(() => {
-    Object.keys(widgets).forEach(widgetId => {
+    Object.keys(widgets).forEach((widgetId) => {
       refetchWidget(widgetId as WidgetId);
     });
   }, [widgets, refetchWidget]);

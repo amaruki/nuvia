@@ -1,3 +1,3 @@
 export default function EventsRegistration() {
-  return <h1>Events registration page</h1>
+  return <h1>Events registration page</h1>;
 }

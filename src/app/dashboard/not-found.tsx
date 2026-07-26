@@ -8,7 +8,7 @@ import { useEffect } from "react";
 
 export default function DashboardNotFound() {
   // Set the header for this page
-  const { setHeader, clearHeader} = useHeader();
+  const { setHeader, clearHeader } = useHeader();
   useEffect(() => {
     setHeader({
       title: "Page Not Found",
@@ -16,8 +16,8 @@ export default function DashboardNotFound() {
     });
 
     return () => {
-        clearHeader();
-    }
+      clearHeader();
+    };
   }, [setHeader, clearHeader]);
 
   return (

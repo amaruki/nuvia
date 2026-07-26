@@ -5,8 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X } from "lucide-react";
 import { BudgetFormData, BudgetCategory } from "@/types/finance.types";
@@ -20,41 +33,42 @@ interface BudgetFormProps {
 }
 
 const categoryColors = [
-  { name: 'Primary', value: 'var(--primary)' },
-  { name: 'Secondary', value: 'var(--secondary)' },
-  { name: 'Destructive', value: 'var(--destructive)' },
-  { name: 'Muted', value: 'var(--muted)' },
-  { name: 'Accent', value: 'var(--accent)' },
-  { name: 'Chart 1', value: 'var(--chart-1)' },
-  { name: 'Chart 2', value: 'var(--chart-2)' },
-  { name: 'Chart 3', value: 'var(--chart-3)' },
-  { name: 'Chart 4', value: 'var(--chart-4)' },
-  { name: 'Chart 5', value: 'var(--chart-5)' },
+  { name: "Primary", value: "var(--primary)" },
+  { name: "Secondary", value: "var(--secondary)" },
+  { name: "Destructive", value: "var(--destructive)" },
+  { name: "Muted", value: "var(--muted)" },
+  { name: "Accent", value: "var(--accent)" },
+  { name: "Chart 1", value: "var(--chart-1)" },
+  { name: "Chart 2", value: "var(--chart-2)" },
+  { name: "Chart 3", value: "var(--chart-3)" },
+  { name: "Chart 4", value: "var(--chart-4)" },
+  { name: "Chart 5", value: "var(--chart-5)" },
 ];
 
-export function BudgetForm({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
+export function BudgetForm({
+  isOpen,
+  onClose,
+  onSubmit,
   editingCategory,
-  periods 
+  periods,
 }: BudgetFormProps) {
   const [formData, setFormData] = useState<BudgetFormData>({
     categoryId: editingCategory?.id,
-    name: editingCategory?.name || '',
-    description: editingCategory?.description || '',
+    name: editingCategory?.name || "",
+    description: editingCategory?.description || "",
     allocatedAmount: editingCategory?.allocatedAmount || 0,
-    period: '',
-    color: editingCategory?.color || 'hsl(var(--primary))',
-    subcategories: editingCategory?.subcategories?.map(sub => ({
-      name: sub.name,
-      allocatedAmount: sub.allocatedAmount
-    })) || []
+    period: "",
+    color: editingCategory?.color || "hsl(var(--primary))",
+    subcategories:
+      editingCategory?.subcategories?.map((sub) => ({
+        name: sub.name,
+        allocatedAmount: sub.allocatedAmount,
+      })) || [],
   });
 
   const [newSubcategory, setNewSubcategory] = useState({
-    name: '',
-    allocatedAmount: 0
+    name: "",
+    allocatedAmount: 0,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -67,37 +81,37 @@ export function BudgetForm({
   const resetForm = () => {
     setFormData({
       categoryId: undefined,
-      name: '',
-      description: '',
+      name: "",
+      description: "",
       allocatedAmount: 0,
-      period: '',
-      color: 'var(--primary)',
-      subcategories: []
+      period: "",
+      color: "var(--primary)",
+      subcategories: [],
     });
-    setNewSubcategory({ name: '', allocatedAmount: 0 });
+    setNewSubcategory({ name: "", allocatedAmount: 0 });
   };
 
   const addSubcategory = () => {
     if (newSubcategory.name && newSubcategory.allocatedAmount > 0) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        subcategories: [...(prev.subcategories || []), { ...newSubcategory }]
+        subcategories: [...(prev.subcategories || []), { ...newSubcategory }],
       }));
-      setNewSubcategory({ name: '', allocatedAmount: 0 });
+      setNewSubcategory({ name: "", allocatedAmount: 0 });
     }
   };
 
   const removeSubcategory = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      subcategories: (prev.subcategories || []).filter((_, i) => i !== index)
+      subcategories: (prev.subcategories || []).filter((_, i) => i !== index),
     }));
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
@@ -108,13 +122,12 @@ export function BudgetForm({
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>
-            {editingCategory ? 'Edit Budget Category' : 'Create Budget Category'}
+            {editingCategory ? "Edit Budget Category" : "Create Budget Category"}
           </DialogTitle>
           <DialogDescription>
-            {editingCategory 
-              ? 'Update the budget category details and allocation.'
-              : 'Create a new budget category and set its allocation.'
-            }
+            {editingCategory
+              ? "Update the budget category details and allocation."
+              : "Create a new budget category and set its allocation."}
           </DialogDescription>
         </DialogHeader>
 
@@ -125,7 +138,7 @@ export function BudgetForm({
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="Enter category name"
                 required
               />
@@ -133,9 +146,9 @@ export function BudgetForm({
 
             <div className="space-y-2">
               <Label htmlFor="period">Budget Period</Label>
-              <Select 
-                value={formData.period} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, period: value }))}
+              <Select
+                value={formData.period}
+                onValueChange={(value) => setFormData((prev) => ({ ...prev, period: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select period" />
@@ -156,7 +169,7 @@ export function BudgetForm({
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
               placeholder="Enter category description"
               rows={3}
             />
@@ -169,10 +182,12 @@ export function BudgetForm({
                 id="allocatedAmount"
                 type="number"
                 value={formData.allocatedAmount}
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  allocatedAmount: parseFloat(e.target.value) || 0 
-                }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    allocatedAmount: parseFloat(e.target.value) || 0,
+                  }))
+                }
                 placeholder="0.00"
                 min="0"
                 step="0.01"
@@ -188,10 +203,10 @@ export function BudgetForm({
                     key={color.value}
                     type="button"
                     className={`w-8 h-8 rounded-full border-2 ${
-                      formData.color === color.value ? 'border-gray-900' : 'border-gray-300'
+                      formData.color === color.value ? "border-gray-900" : "border-gray-300"
                     }`}
                     style={{ backgroundColor: color.value }}
-                    onClick={() => setFormData(prev => ({ ...prev, color: color.value }))}
+                    onClick={() => setFormData((prev) => ({ ...prev, color: color.value }))}
                     title={color.name}
                   />
                 ))}
@@ -202,9 +217,7 @@ export function BudgetForm({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label>Subcategories</Label>
-              <Badge variant="secondary">
-                {formData.subcategories?.length || 0} subcategories
-              </Badge>
+              <Badge variant="secondary">{formData.subcategories?.length || 0} subcategories</Badge>
             </div>
 
             <div className="space-y-2">
@@ -230,19 +243,23 @@ export function BudgetForm({
               <Input
                 placeholder="Subcategory name"
                 value={newSubcategory.name}
-                onChange={(e) => setNewSubcategory(prev => ({ 
-                  ...prev, 
-                  name: e.target.value 
-                }))}
+                onChange={(e) =>
+                  setNewSubcategory((prev) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }))
+                }
               />
               <Input
                 type="number"
                 placeholder="Amount"
-                value={newSubcategory.allocatedAmount || ''}
-                onChange={(e) => setNewSubcategory(prev => ({ 
-                  ...prev, 
-                  allocatedAmount: parseFloat(e.target.value) || 0 
-                }))}
+                value={newSubcategory.allocatedAmount || ""}
+                onChange={(e) =>
+                  setNewSubcategory((prev) => ({
+                    ...prev,
+                    allocatedAmount: parseFloat(e.target.value) || 0,
+                  }))
+                }
                 min="0"
                 step="0.01"
               />
@@ -261,9 +278,7 @@ export function BudgetForm({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">
-              {editingCategory ? 'Update Category' : 'Create Category'}
-            </Button>
+            <Button type="submit">{editingCategory ? "Update Category" : "Create Category"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

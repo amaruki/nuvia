@@ -1,15 +1,23 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { WidgetContainer } from "../../ui/widget-container"
-import { Card, CardContent } from "../../ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "../../ui/badge"
-import { Search, FileText, Users, Calendar, MessageSquare, ExternalLink, TrendingUp } from "lucide-react"
+import * as React from "react";
+import { WidgetContainer } from "../../ui/widget-container";
+import { Card, CardContent } from "../../ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "../../ui/badge";
+import {
+  Search,
+  FileText,
+  Users,
+  Calendar,
+  MessageSquare,
+  ExternalLink,
+  TrendingUp,
+} from "lucide-react";
 
 interface GlobalSearchWidgetProps {
-  onSearch?: (query: string) => void
-  onAdvancedSearch?: () => void
+  onSearch?: (query: string) => void;
+  onAdvancedSearch?: () => void;
 }
 
 // Mock search results data - in a real app, this would come from an API
@@ -18,7 +26,8 @@ const mockSearchResults = [
     id: "1",
     type: "article",
     title: "Getting Started with React Hooks",
-    description: "Learn the fundamentals of React Hooks and how to use them effectively in your applications.",
+    description:
+      "Learn the fundamentals of React Hooks and how to use them effectively in your applications.",
     author: "Jane Smith",
     date: new Date("2023-10-01T10:30:00"),
   },
@@ -42,90 +51,89 @@ const mockSearchResults = [
     id: "4",
     type: "discussion",
     title: "Best practices for responsive web design",
-    description: "Discussion about the latest techniques and approaches for creating responsive web designs.",
+    description:
+      "Discussion about the latest techniques and approaches for creating responsive web designs.",
     author: "Sarah Williams",
     date: new Date("2023-09-28T16:20:00"),
   },
-]
+];
 
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(date)
-}
+  }).format(date);
+};
 
 const getItemTypeIcon = (type: string) => {
   switch (type) {
     case "article":
-      return <FileText className="h-4 w-4 text-chart-1" />
+      return <FileText className="h-4 w-4 text-chart-1" />;
     case "event":
-      return <Calendar className="h-4 w-4 text-chart-3" />
+      return <Calendar className="h-4 w-4 text-chart-3" />;
     case "user":
-      return <Users className="h-4 w-4 text-chart-2" />
+      return <Users className="h-4 w-4 text-chart-2" />;
     case "discussion":
-      return <MessageSquare className="h-4 w-4 text-chart-4" />
+      return <MessageSquare className="h-4 w-4 text-chart-4" />;
     default:
-      return <Search className="h-4 w-4 text-foreground/50" />
+      return <Search className="h-4 w-4 text-foreground/50" />;
   }
-}
+};
 
 const getItemTypeColor = (type: string) => {
   switch (type) {
     case "article":
-      return "bg-chart-1/20 text-chart-1"
+      return "bg-chart-1/20 text-chart-1";
     case "event":
-      return "bg-chart-3/20 text-chart-3"
+      return "bg-chart-3/20 text-chart-3";
     case "user":
-      return "bg-chart-2/20 text-chart-2"
+      return "bg-chart-2/20 text-chart-2";
     case "discussion":
-      return "bg-chart-4/20 text-chart-4"
+      return "bg-chart-4/20 text-chart-4";
     default:
-      return "bg-secondary text-secondary-foreground"
+      return "bg-secondary text-secondary-foreground";
   }
-}
+};
 
 const getItemTypeLabel = (type: string) => {
   switch (type) {
     case "article":
-      return "Article"
+      return "Article";
     case "event":
-      return "Event"
+      return "Event";
     case "user":
-      return "User"
+      return "User";
     case "discussion":
-      return "Discussion"
+      return "Discussion";
     default:
-      return "Result"
+      return "Result";
   }
-}
+};
 
-export function GlobalSearchWidget({
-  onSearch,
-  onAdvancedSearch,
-}: GlobalSearchWidgetProps) {
-  const [searchQuery, setSearchQuery] = React.useState("")
-  const [searchResults, setSearchResults] = React.useState(mockSearchResults)
-  
+export function GlobalSearchWidget({ onSearch, onAdvancedSearch }: GlobalSearchWidgetProps) {
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [searchResults, setSearchResults] = React.useState(mockSearchResults);
+
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (onSearch) {
-      onSearch(searchQuery)
+      onSearch(searchQuery);
     }
     // In a real app, this would trigger an API call
     // For now, we'll just filter the mock results
     if (searchQuery.trim() === "") {
-      setSearchResults(mockSearchResults)
+      setSearchResults(mockSearchResults);
     } else {
-      const filteredResults = mockSearchResults.filter(item =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      setSearchResults(filteredResults)
+      const filteredResults = mockSearchResults.filter(
+        (item) =>
+          item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setSearchResults(filteredResults);
     }
-  }
-  
+  };
+
   return (
     <WidgetContainer
       type="global-search"
@@ -148,13 +156,11 @@ export function GlobalSearchWidget({
                   className="w-full pl-10 pr-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <Badge variant="secondary">
-                    {searchResults.length} results
-                  </Badge>
-                  
+                  <Badge variant="secondary">{searchResults.length} results</Badge>
+
                   {searchQuery && (
                     <Badge className="bg-chart-1/20 text-chart-1">
                       <TrendingUp className="h-3 w-3 mr-1" />
@@ -162,7 +168,7 @@ export function GlobalSearchWidget({
                     </Badge>
                   )}
                 </div>
-                
+
                 <Button
                   type="button"
                   variant="ghost"
@@ -174,7 +180,7 @@ export function GlobalSearchWidget({
                 </Button>
               </div>
             </form>
-            
+
             {/* Search results */}
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {searchResults.length === 0 ? (
@@ -190,9 +196,7 @@ export function GlobalSearchWidget({
                     className="p-4 rounded-lg border bg-card border-border hover:bg-background transition-colors cursor-pointer"
                   >
                     <div className="flex items-start space-x-3">
-                      <div className="mt-0.5">
-                        {getItemTypeIcon(result.type)}
-                      </div>
+                      <div className="mt-0.5">{getItemTypeIcon(result.type)}</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-1">
                           <h3 className="text-sm font-semibold text-foreground/90 line-clamp-1">
@@ -202,27 +206,23 @@ export function GlobalSearchWidget({
                             {getItemTypeLabel(result.type)}
                           </Badge>
                         </div>
-                        
+
                         <p className="text-sm text-foreground/60 mb-2 line-clamp-2">
                           {result.description}
                         </p>
-                        
+
                         <div className="flex items-center justify-between text-xs text-foreground/50">
                           <div className="flex items-center space-x-1">
                             <span>By {result.author}</span>
                           </div>
-                          
+
                           <div className="flex items-center space-x-1">
                             <span>{formatDate(result.date)}</span>
                           </div>
                         </div>
                       </div>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                      >
+
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                         <ExternalLink className="h-4 w-4" />
                       </Button>
                     </div>
@@ -230,27 +230,29 @@ export function GlobalSearchWidget({
                 ))
               )}
             </div>
-            
+
             {/* Popular searches */}
             <div className="pt-2 border-t border-border">
               <div className="text-xs text-foreground/50 mb-2">Popular searches:</div>
               <div className="flex flex-wrap gap-2">
-                {["React Hooks", "Web Development", "TypeScript", "Responsive Design"].map((term) => (
-                  <Button
-                    key={term}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSearchQuery(term)}
-                    className="text-xs h-7 px-2"
-                  >
-                    {term}
-                  </Button>
-                ))}
+                {["React Hooks", "Web Development", "TypeScript", "Responsive Design"].map(
+                  (term) => (
+                    <Button
+                      key={term}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSearchQuery(term)}
+                      className="text-xs h-7 px-2"
+                    >
+                      {term}
+                    </Button>
+                  ),
+                )}
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
     </WidgetContainer>
-  )
+  );
 }

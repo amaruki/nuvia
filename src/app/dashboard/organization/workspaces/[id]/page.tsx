@@ -9,16 +9,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
+import {
   CommitteeWorkspace,
   WorkspaceMember,
   WorkspaceDocument,
   WorkspaceTask,
   WorkspaceDiscussion,
   WorkspaceMeeting,
-  WorkspaceActivity
+  WorkspaceActivity,
 } from "@/types/committee.types";
-import { 
+import {
   ArrowLeft,
   Mail,
   Phone,
@@ -79,9 +79,9 @@ export default function WorkspaceDetailPage() {
       setLoading(true);
       try {
         // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        const foundWorkspace = mockWorkspaces.find(w => w.id === workspaceId);
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        const foundWorkspace = mockWorkspaces.find((w) => w.id === workspaceId);
         setWorkspace(foundWorkspace || null);
       } catch (error) {
         console.error("Error fetching workspace:", error);
@@ -99,7 +99,7 @@ export default function WorkspaceDetailPage() {
       archived: "secondary" as const,
       locked: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -115,9 +115,14 @@ export default function WorkspaceDetailPage() {
       discussion: "bg-orange-100 text-orange-800 border-orange-200",
       meeting: "bg-indigo-100 text-indigo-800 border-indigo-200",
     };
-    
+
     return (
-      <Badge variant="outline" className={colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"}>
+      <Badge
+        variant="outline"
+        className={
+          colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"
+        }
+      >
         {type.charAt(0).toUpperCase() + type.slice(1)}
       </Badge>
     );
@@ -131,10 +136,10 @@ export default function WorkspaceDetailPage() {
       completed: "default" as const,
       cancelled: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
-        {status.replace('_', ' ').charAt(0).toUpperCase() + status.replace('_', ' ').slice(1)}
+        {status.replace("_", " ").charAt(0).toUpperCase() + status.replace("_", " ").slice(1)}
       </Badge>
     );
   };
@@ -146,9 +151,14 @@ export default function WorkspaceDetailPage() {
       high: "bg-orange-100 text-orange-800 border-orange-200",
       urgent: "bg-red-100 text-red-800 border-red-200",
     };
-    
+
     return (
-      <Badge variant="outline" className={colors[priority as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"}>
+      <Badge
+        variant="outline"
+        className={
+          colors[priority as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"
+        }
+      >
         {priority.charAt(0).toUpperCase() + priority.slice(1)}
       </Badge>
     );
@@ -161,7 +171,7 @@ export default function WorkspaceDetailPage() {
       approved: "default" as const,
       archived: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -175,7 +185,7 @@ export default function WorkspaceDetailPage() {
       closed: "secondary" as const,
       archived: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -190,20 +200,20 @@ export default function WorkspaceDetailPage() {
       completed: "secondary" as const,
       cancelled: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
-        {status.replace('_', ' ').charAt(0).toUpperCase() + status.replace('_', ' ').slice(1)}
+        {status.replace("_", " ").charAt(0).toUpperCase() + status.replace("_", " ").slice(1)}
       </Badge>
     );
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const formatPercentage = (value: number) => {
@@ -271,7 +281,7 @@ export default function WorkspaceDetailPage() {
             <p className="text-sm text-muted-foreground">Total Members</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6 text-center">
             <FileText className="h-8 w-8 mx-auto mb-2 text-emerald-500" />
@@ -279,7 +289,7 @@ export default function WorkspaceDetailPage() {
             <p className="text-sm text-muted-foreground">Documents</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6 text-center">
             <CheckSquare className="h-8 w-8 mx-auto mb-2 text-purple-500" />
@@ -287,7 +297,7 @@ export default function WorkspaceDetailPage() {
             <p className="text-sm text-muted-foreground">Tasks</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6 text-center">
             <MessageSquare className="h-8 w-8 mx-auto mb-2 text-orange-500" />
@@ -320,26 +330,26 @@ export default function WorkspaceDetailPage() {
                   <span className="text-sm font-medium">Status</span>
                   {getStatusBadge(workspace.status)}
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Type</span>
                   {getTypeBadge(workspace.type)}
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Visibility</span>
                   <Badge variant={workspace.settings.isPublic ? "default" : "secondary"}>
                     {workspace.settings.isPublic ? "Public" : "Private"}
                   </Badge>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Created</span>
                   <span className="text-sm text-muted-foreground">
                     {formatDistanceToNow(workspace.createdAt, { addSuffix: true })}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Last Updated</span>
                   <span className="text-sm text-muted-foreground">
@@ -364,7 +374,7 @@ export default function WorkspaceDetailPage() {
                     {workspace.settings.allowGuestAccess ? "Allowed" : "Not Allowed"}
                   </Badge>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <CheckSquare className="h-4 w-4 text-green-500" />
@@ -374,7 +384,7 @@ export default function WorkspaceDetailPage() {
                     {workspace.settings.requireApproval ? "Required" : "Not Required"}
                   </Badge>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Activity className="h-4 w-4 text-purple-500" />
@@ -384,13 +394,15 @@ export default function WorkspaceDetailPage() {
                     {workspace.settings.enableNotifications ? "Enabled" : "Disabled"}
                   </Badge>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-orange-500" />
                     <span className="text-sm font-medium">Auto Archive</span>
                   </div>
-                  <span className="text-sm font-medium">{workspace.settings.autoArchiveDays} days</span>
+                  <span className="text-sm font-medium">
+                    {workspace.settings.autoArchiveDays} days
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -404,7 +416,10 @@ export default function WorkspaceDetailPage() {
             <CardContent>
               <div className="space-y-4">
                 {workspace.activity.slice(0, 5).map((activity) => (
-                  <div key={activity.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={activity.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
                         <Activity className="h-4 w-4 text-primary" />
@@ -412,7 +427,7 @@ export default function WorkspaceDetailPage() {
                       <div>
                         <p className="font-medium">{activity.description}</p>
                         <p className="text-sm text-muted-foreground">
-                          {activity.type.replace('_', ' ')} • {activity.targetType}
+                          {activity.type.replace("_", " ")} • {activity.targetType}
                         </p>
                       </div>
                     </div>
@@ -436,19 +451,23 @@ export default function WorkspaceDetailPage() {
             <CardContent>
               <div className="space-y-4">
                 {workspace.members.map((member) => (
-                  <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={member.avatar} alt={member.name} />
                         <AvatarFallback>
-                          {member.name.split(' ').map(n => n[0]).join('')}
+                          {member.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="font-medium">{member.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {member.email}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{member.email}</p>
                         <p className="text-xs text-muted-foreground">
                           Joined {formatDistanceToNow(member.joinedAt, { addSuffix: true })}
                         </p>
@@ -460,7 +479,7 @@ export default function WorkspaceDetailPage() {
                           {member.isActive ? "Active" : "Inactive"}
                         </Badge>
                         <Badge variant="outline" className="text-xs">
-                          {member.role.replace('_', ' ')}
+                          {member.role.replace("_", " ")}
                         </Badge>
                       </div>
                     </div>
@@ -485,7 +504,10 @@ export default function WorkspaceDetailPage() {
             <CardContent>
               <div className="space-y-4">
                 {workspace.documents.map((document) => (
-                  <div key={document.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    key={document.id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
                         <FileText className="h-4 w-4 text-primary" />
@@ -529,7 +551,10 @@ export default function WorkspaceDetailPage() {
             <CardContent>
               <div className="space-y-4">
                 {workspace.tasks.map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    key={task.id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
                         <CheckSquare className="h-4 w-4 text-primary" />
@@ -571,7 +596,10 @@ export default function WorkspaceDetailPage() {
             <CardContent>
               <div className="space-y-4">
                 {workspace.discussions.map((discussion) => (
-                  <div key={discussion.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    key={discussion.id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
                         <MessageSquare className="h-4 w-4 text-primary" />
@@ -617,7 +645,10 @@ export default function WorkspaceDetailPage() {
             <CardContent>
               <div className="space-y-4">
                 {workspace.meetings.map((meeting) => (
-                  <div key={meeting.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    key={meeting.id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
                         <Calendar className="h-4 w-4 text-primary" />
@@ -625,7 +656,8 @@ export default function WorkspaceDetailPage() {
                       <div>
                         <p className="font-medium">{meeting.title}</p>
                         <p className="text-sm text-muted-foreground">
-                          {meeting.attendees.length} attendees • {meeting.agenda.length} agenda items
+                          {meeting.attendees.length} attendees • {meeting.agenda.length} agenda
+                          items
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {meeting.startTime.toLocaleDateString()}

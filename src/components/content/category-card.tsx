@@ -4,18 +4,18 @@ import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Copy, 
+import {
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Copy,
   Eye,
   Archive,
   Power,
@@ -25,9 +25,14 @@ import {
   Calendar,
   TrendingUp,
   TrendingDown,
-  Minus
+  Minus,
 } from "lucide-react";
-import { Category, CATEGORY_TYPE_DISPLAY, CATEGORY_STATUS_DISPLAY, CATEGORY_SCOPE_DISPLAY } from "@/types/category.types";
+import {
+  Category,
+  CATEGORY_TYPE_DISPLAY,
+  CATEGORY_STATUS_DISPLAY,
+  CATEGORY_SCOPE_DISPLAY,
+} from "@/types/category.types";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +42,7 @@ interface CategoryCardProps {
   onEdit?: (category: Category) => void;
   onDelete?: (category: Category) => void;
   onDuplicate?: (category: Category) => void;
-  onStatusChange?: (category: Category, status: 'active' | 'inactive' | 'archived') => void;
+  onStatusChange?: (category: Category, status: "active" | "inactive" | "archived") => void;
   selected?: boolean;
   onSelect?: (category: Category, selected: boolean) => void;
 }
@@ -50,7 +55,7 @@ export function CategoryCard({
   onDuplicate,
   onStatusChange,
   selected = false,
-  onSelect
+  onSelect,
 }: CategoryCardProps) {
   const [imageError, setImageError] = useState(false);
 
@@ -60,62 +65,71 @@ export function CategoryCard({
 
   const getScopeIcon = (scope: string) => {
     switch (scope) {
-      case 'global': return Globe;
-      case 'chapter': return Building;
-      case 'committee': return Users;
-      default: return Globe;
+      case "global":
+        return Globe;
+      case "chapter":
+        return Building;
+      case "committee":
+        return Users;
+      default:
+        return Globe;
     }
   };
 
   const getUsageTrend = () => {
     // Mock trend calculation - in real app this would come from analytics
-    const trends = ['up', 'down', 'stable'] as const;
+    const trends = ["up", "down", "stable"] as const;
     const trend = trends[Math.floor(Math.random() * trends.length)];
     const percentage = Math.floor(Math.random() * 20) + 1;
-    
+
     return { trend, percentage };
   };
 
   const usageTrend = getUsageTrend();
-  const TrendIcon = usageTrend.trend === 'up' ? TrendingUp : 
-                   usageTrend.trend === 'down' ? TrendingDown : Minus;
+  const TrendIcon =
+    usageTrend.trend === "up" ? TrendingUp : usageTrend.trend === "down" ? TrendingDown : Minus;
 
   const handleStatusToggle = () => {
-    const newStatus = category.status === 'active' ? 'inactive' : 'active';
+    const newStatus = category.status === "active" ? "inactive" : "active";
     onStatusChange?.(category, newStatus);
   };
 
   return (
-    <Card className={cn(
-      "relative transition-all duration-200 hover:shadow-md",
-      selected && "ring-2 ring-primary ring-offset-2",
-      category.status === 'inactive' && "opacity-75"
-    )}>
+    <Card
+      className={cn(
+        "relative transition-all duration-200 hover:shadow-md",
+        selected && "ring-2 ring-primary ring-offset-2",
+        category.status === "inactive" && "opacity-75",
+      )}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             {/* Category Icon/Color */}
             <div className="flex-shrink-0">
-              <div 
+              <div
                 className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-semibold"
                 style={{ backgroundColor: category.color }}
               >
                 {category.emoji || (
                   <div className="w-6 h-6 rounded bg-white/20 flex items-center justify-center">
                     {typeDisplay.icon && (
-                      <div className="w-4 h-4 text-current" dangerouslySetInnerHTML={{ 
-                        __html: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <div
+                        className="w-4 h-4 text-current"
+                        dangerouslySetInnerHTML={{
+                          __html: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                           <path d="M2 17l10 5 10-5"/>
                           <path d="M2 12l10 5 10-5"/>
-                        </svg>` 
-                      }} />
+                        </svg>`,
+                        }}
+                      />
                     )}
                   </div>
                 )}
               </div>
             </div>
-            
+
             {/* Category Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -126,7 +140,7 @@ export function CategoryCard({
                   </Badge>
                 )}
               </div>
-              
+
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Badge variant="outline" className="text-xs">
                   {typeDisplay.name}
@@ -149,7 +163,7 @@ export function CategoryCard({
                 className="rounded border-gray-300 mr-2"
               />
             )}
-            
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -173,16 +187,16 @@ export function CategoryCard({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleStatusToggle}>
                   <Power className="mr-2 h-4 w-4" />
-                  {category.status === 'active' ? 'Deactivate' : 'Activate'}
+                  {category.status === "active" ? "Deactivate" : "Activate"}
                 </DropdownMenuItem>
-                {category.status !== 'archived' && (
-                  <DropdownMenuItem onClick={() => onStatusChange?.(category, 'archived')}>
+                {category.status !== "archived" && (
+                  <DropdownMenuItem onClick={() => onStatusChange?.(category, "archived")}>
                     <Archive className="mr-2 h-4 w-4" />
                     Archive
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => onDelete?.(category)}
                   className="text-destructive focus:text-destructive"
                 >
@@ -197,34 +211,33 @@ export function CategoryCard({
 
       <CardContent className="pt-0">
         {category.description && (
-          <CardDescription className="mb-3 line-clamp-2">
-            {category.description}
-          </CardDescription>
+          <CardDescription className="mb-3 line-clamp-2">{category.description}</CardDescription>
         )}
 
         {/* Status and Stats */}
         <div className="flex items-center justify-between mb-3">
-          <Badge 
-            variant={statusDisplay.badgeVariant}
-            className="flex items-center gap-1"
-          >
+          <Badge variant={statusDisplay.badgeVariant} className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full bg-current" />
             {statusDisplay.name}
           </Badge>
-          
+
           {category.contentCount !== undefined && (
             <div className="flex items-center gap-1 text-sm">
-              <TrendIcon className={cn(
-                "h-3 w-3",
-                usageTrend.trend === 'up' && "text-green-600",
-                usageTrend.trend === 'down' && "text-red-600",
-                usageTrend.trend === 'stable' && "text-muted-foreground"
-              )} />
-              <span className={cn(
-                usageTrend.trend === 'up' && "text-green-600",
-                usageTrend.trend === 'down' && "text-red-600",
-                usageTrend.trend === 'stable' && "text-muted-foreground"
-              )}>
+              <TrendIcon
+                className={cn(
+                  "h-3 w-3",
+                  usageTrend.trend === "up" && "text-green-600",
+                  usageTrend.trend === "down" && "text-red-600",
+                  usageTrend.trend === "stable" && "text-muted-foreground",
+                )}
+              />
+              <span
+                className={cn(
+                  usageTrend.trend === "up" && "text-green-600",
+                  usageTrend.trend === "down" && "text-red-600",
+                  usageTrend.trend === "stable" && "text-muted-foreground",
+                )}
+              >
                 {usageTrend.percentage}%
               </span>
             </div>
@@ -242,15 +255,14 @@ export function CategoryCard({
               <p className="text-xs text-muted-foreground">Items</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
             <div>
               <p className="font-medium">
-                {category.lastUsed 
+                {category.lastUsed
                   ? formatDistanceToNow(category.lastUsed, { addSuffix: true })
-                  : 'Never'
-                }
+                  : "Never"}
               </p>
               <p className="text-xs text-muted-foreground">Last used</p>
             </div>
@@ -263,9 +275,11 @@ export function CategoryCard({
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Users className="h-3 w-3" />
               <span>
-                Limited access 
-                {category.allowedChapters?.length && ` (${category.allowedChapters.length} chapters)`}
-                {category.allowedCommittees?.length && ` (${category.allowedCommittees.length} committees)`}
+                Limited access
+                {category.allowedChapters?.length &&
+                  ` (${category.allowedChapters.length} chapters)`}
+                {category.allowedCommittees?.length &&
+                  ` (${category.allowedCommittees.length} committees)`}
               </span>
             </div>
           </div>

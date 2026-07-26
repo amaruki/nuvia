@@ -5,10 +5,10 @@
  * authorization, and access control without the complexity and redundancy of the original.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { AuthUtils } from './utils';
-import { AuthResponseFactory, AuthErrorType } from './common';
-import { RateLimiter, RATE_LIMIT_CONFIGS } from './rate-limiting';
+import { NextRequest, NextResponse } from "next/server";
+import { AuthUtils } from "./utils";
+import { AuthResponseFactory, AuthErrorType } from "./common";
+import { RateLimiter, RATE_LIMIT_CONFIGS } from "./rate-limiting";
 
 // TODO: Add support for role-based access control (RBAC) system
 // TODO: Add support for resource-based permissions
@@ -51,18 +51,18 @@ export async function authenticate(request: NextRequest): Promise<AuthResult> {
     if (!user) {
       return {
         success: false,
-        error: AuthResponseFactory.authError()
+        error: AuthResponseFactory.authError(),
       };
     }
 
     return {
       success: true,
-      user
+      user,
     };
   } catch (error) {
     return {
       success: false,
-      error: AuthResponseFactory.authError('Authentication failed')
+      error: AuthResponseFactory.authError("Authentication failed"),
     };
   }
 }
@@ -73,7 +73,7 @@ export async function authenticate(request: NextRequest): Promise<AuthResult> {
 export async function authorize(
   request: NextRequest,
   user: any,
-  roles?: string | string[]
+  roles?: string | string[],
 ): Promise<AuthResult> {
   if (!roles || roles.length === 0) {
     return { success: true, user };
@@ -87,8 +87,8 @@ export async function authorize(
       return {
         success: false,
         error: AuthResponseFactory.authorizationError(
-          `Access denied. Required roles: ${requiredRoles.join(', ')}`
-        )
+          `Access denied. Required roles: ${requiredRoles.join(", ")}`,
+        ),
       };
     }
 
@@ -96,7 +96,7 @@ export async function authorize(
   } catch (error) {
     return {
       success: false,
-      error: AuthResponseFactory.authorizationError('Authorization failed')
+      error: AuthResponseFactory.authorizationError("Authorization failed"),
     };
   }
 }
@@ -106,7 +106,7 @@ export async function authorize(
  */
 export function withAuth<T extends any[]>(
   handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>,
-  options: MiddlewareOptions = {}
+  options: MiddlewareOptions = {},
 ) {
   return async (request: NextRequest, ...args: T): Promise<NextResponse> => {
     // Check if should skip authentication
@@ -136,7 +136,7 @@ export function withAuth<T extends any[]>(
       if (options.customAuth) {
         const isAuthorized = await options.customAuth(request);
         if (!isAuthorized) {
-          return AuthResponseFactory.authError('Custom authentication failed');
+          return AuthResponseFactory.authError("Custom authentication failed");
         }
       }
 
@@ -158,7 +158,7 @@ export function withAuth<T extends any[]>(
       if (options.customAuthz) {
         const isAuthorized = await options.customAuthz(request, authResult.user.id);
         if (!isAuthorized) {
-          return AuthResponseFactory.authorizationError('Custom authorization failed');
+          return AuthResponseFactory.authorizationError("Custom authorization failed");
         }
       }
 
@@ -174,7 +174,7 @@ export function withAuth<T extends any[]>(
 export function withRole<T extends any[]>(
   roles: string | string[],
   handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>,
-  options: Omit<MiddlewareOptions, 'roles'> = {}
+  options: Omit<MiddlewareOptions, "roles"> = {},
 ) {
   return withAuth(handler, { ...options, roles });
 }
@@ -186,24 +186,22 @@ export function withResourceAuth<T extends any[]>(
   resourceIdParam: string,
   checkAccess: (userId: string, resourceId: string) => Promise<boolean>,
   handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>,
-  options: MiddlewareOptions = {}
+  options: MiddlewareOptions = {},
 ) {
   return withAuth(async (request: NextRequest, user: any, ...args: T) => {
     const url = new URL(request.url);
-    const resourceId = url.searchParams.get(resourceIdParam) ||
-                     request.nextUrl.pathname.split('/').pop();
+    const resourceId =
+      url.searchParams.get(resourceIdParam) || request.nextUrl.pathname.split("/").pop();
 
     if (!resourceId) {
       return AuthResponseFactory.businessLogicError(
-        `Resource identifier '${resourceIdParam}' is required`
+        `Resource identifier '${resourceIdParam}' is required`,
       );
     }
 
     const hasAccess = await checkAccess(user.id, resourceId);
     if (!hasAccess) {
-      return AuthResponseFactory.authorizationError(
-        'Access denied to this resource'
-      );
+      return AuthResponseFactory.authorizationError("Access denied to this resource");
     }
 
     return handler(request, user, ...args);
@@ -217,7 +215,7 @@ function shouldSkipAuth(request: NextRequest, options: MiddlewareOptions): boole
   const pathname = new URL(request.url).pathname;
 
   // Skip based on paths
-  if (options.skipPaths?.some(path => pathname.includes(path))) {
+  if (options.skipPaths?.some((path) => pathname.includes(path))) {
     return true;
   }
 
@@ -252,7 +250,7 @@ export function createAuthMiddleware(options: MiddlewareOptions = {}) {
     if (options.customAuth) {
       const isAuthorized = await options.customAuth(request);
       if (!isAuthorized) {
-        return AuthResponseFactory.authError('Authentication required');
+        return AuthResponseFactory.authError("Authentication required");
       }
     } else {
       const authResult = await authenticate(request);
@@ -270,26 +268,32 @@ export function createAuthMiddleware(options: MiddlewareOptions = {}) {
  */
 export const authMiddleware = {
   /** Standard authentication middleware */
-  auth: <T extends any[]>(handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>) =>
-    withAuth(handler),
+  auth: <T extends any[]>(
+    handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>,
+  ) => withAuth(handler),
 
   /** Admin-only middleware */
-  admin: <T extends any[]>(handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>) =>
-    withRole('admin', handler),
+  admin: <T extends any[]>(
+    handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>,
+  ) => withRole("admin", handler),
 
   /** User-only middleware */
-  user: <T extends any[]>(handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>) =>
-    withRole('user', handler),
+  user: <T extends any[]>(
+    handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>,
+  ) => withRole("user", handler),
 
   /** Rate-limited authentication endpoints */
-  authEndpoint: <T extends any[]>(handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>) =>
-    withAuth(handler, { rateLimit: 'AUTH' }),
+  authEndpoint: <T extends any[]>(
+    handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>,
+  ) => withAuth(handler, { rateLimit: "AUTH" }),
 
   /** Rate-limited password reset endpoints */
-  passwordResetEndpoint: <T extends any[]>(handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>) =>
-    withAuth(handler, { rateLimit: 'PASSWORD_RESET' }),
+  passwordResetEndpoint: <T extends any[]>(
+    handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>,
+  ) => withAuth(handler, { rateLimit: "PASSWORD_RESET" }),
 
   /** Rate-limited registration endpoints */
-  registrationEndpoint: <T extends any[]>(handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>) =>
-    withAuth(handler, { rateLimit: 'REGISTRATION' })
+  registrationEndpoint: <T extends any[]>(
+    handler: (request: NextRequest, user: any, ...args: T) => Promise<NextResponse>,
+  ) => withAuth(handler, { rateLimit: "REGISTRATION" }),
 };

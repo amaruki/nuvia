@@ -1,3 +1,3 @@
 export default function ToolsLogs() {
-  return <h1>ToolsLogs page</h1>
+  return <h1>ToolsLogs page</h1>;
 }

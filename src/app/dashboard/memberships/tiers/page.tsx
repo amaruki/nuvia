@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { WidgetContainer } from "@/components/ui/widget-container"
-import { useHeader } from "@/contexts/dashboard-context"
-import { MembershipTier } from "@/types/membership.types"
-import { TierDetailModal } from "@/components/memberships/tier-detail-modal"
-import { TierEditModal } from "@/components/memberships/tier-edit-modal"
-import { MembershipConfigModal } from "@/components/memberships/membership-config-modal"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { WidgetContainer } from "@/components/ui/widget-container";
+import { useHeader } from "@/contexts/dashboard-context";
+import { MembershipTier } from "@/types/membership.types";
+import { TierDetailModal } from "@/components/memberships/tier-detail-modal";
+import { TierEditModal } from "@/components/memberships/tier-edit-modal";
+import { MembershipConfigModal } from "@/components/memberships/membership-config-modal";
 import {
   Users,
   TrendingUp,
@@ -19,49 +19,49 @@ import {
   GraduationCap,
   Award,
   Briefcase,
-  Crown
-} from "lucide-react"
-import { useEffect, useState } from "react"
-import type { ReactNode } from "react"
+  Crown,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 
 interface TierData {
-  tier: MembershipTier
-  name: string
-  description: string
-  price: string
-  period: string
-  features: string[]
-  benefits: string[]
-  memberCount: number
-  status: "active" | "inactive" | "popular"
-  icon: ReactNode
-  color: string
-  visibility?: boolean
-  upgradeFrom?: string[]
-  upgradeTo?: string[]
-  restrictions?: string[]
+  tier: MembershipTier;
+  name: string;
+  description: string;
+  price: string;
+  period: string;
+  features: string[];
+  benefits: string[];
+  memberCount: number;
+  status: "active" | "inactive" | "popular";
+  icon: ReactNode;
+  color: string;
+  visibility?: boolean;
+  upgradeFrom?: string[];
+  upgradeTo?: string[];
+  restrictions?: string[];
 }
 
 interface MembershipConfig {
-  defaultTier?: string
-  trialPeriodDays: number
-  autoRenewal: boolean
-  cancellationPolicy: string
-  paymentGateway: string
-  currency: string
-  welcomeEmail: boolean
-  upgradeReminders: boolean
-  renewalReminders: boolean
-  defaultPermissions: string[]
+  defaultTier?: string;
+  trialPeriodDays: number;
+  autoRenewal: boolean;
+  cancellationPolicy: string;
+  paymentGateway: string;
+  currency: string;
+  welcomeEmail: boolean;
+  upgradeReminders: boolean;
+  renewalReminders: boolean;
+  defaultPermissions: string[];
 }
 
 export default function MembershipTiers() {
-  const { setHeader, clearHeader } = useHeader()
-  const [isLoading, setIsLoading] = useState(true)
-  const [selectedTier, setSelectedTier] = useState<TierData | null>(null)
-  const [detailModalOpen, setDetailModalOpen] = useState(false)
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [configModalOpen, setConfigModalOpen] = useState(false)
+  const { setHeader, clearHeader } = useHeader();
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedTier, setSelectedTier] = useState<TierData | null>(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [configModalOpen, setConfigModalOpen] = useState(false);
 
   // Mock data - replace with actual API call
   const tiersData: TierData[] = [
@@ -76,13 +76,9 @@ export default function MembershipTiers() {
         "Basic networking",
         "Monthly newsletter",
         "Event attendance",
-        "Profile directory listing"
+        "Profile directory listing",
       ],
-      benefits: [
-        "Connect with 500+ members",
-        "Attend 2 events per month",
-        "Access to resources"
-      ],
+      benefits: ["Connect with 500+ members", "Attend 2 events per month", "Access to resources"],
       memberCount: 1247,
       status: "active",
       icon: <User className="w-5 h-5" />,
@@ -90,7 +86,7 @@ export default function MembershipTiers() {
       visibility: true,
       upgradeFrom: [],
       upgradeTo: ["Student Member", "Professional Member"],
-      restrictions: []
+      restrictions: [],
     },
     {
       tier: MembershipTier.STUDENT,
@@ -103,13 +99,9 @@ export default function MembershipTiers() {
         "Student-only events",
         "Mentorship program",
         "Career resources",
-        "Academic discounts"
+        "Academic discounts",
       ],
-      benefits: [
-        "50% discount on events",
-        "Free mentorship matching",
-        "Career coaching sessions"
-      ],
+      benefits: ["50% discount on events", "Free mentorship matching", "Career coaching sessions"],
       memberCount: 523,
       status: "active",
       icon: <GraduationCap className="w-5 h-5" />,
@@ -117,7 +109,7 @@ export default function MembershipTiers() {
       visibility: true,
       upgradeFrom: ["Basic Member"],
       upgradeTo: ["Professional Member", "VIP Member"],
-      restrictions: ["Valid student ID required"]
+      restrictions: ["Valid student ID required"],
     },
     {
       tier: MembershipTier.PROFESSIONAL,
@@ -131,13 +123,13 @@ export default function MembershipTiers() {
         "Advanced analytics",
         "Lead generation tools",
         "Priority support",
-        "Webinar hosting"
+        "Webinar hosting",
       ],
       benefits: [
         "Unlimited event access",
         "Featured profile placement",
         "Advanced member directory",
-        "Business development resources"
+        "Business development resources",
       ],
       memberCount: 892,
       status: "popular",
@@ -146,7 +138,7 @@ export default function MembershipTiers() {
       visibility: true,
       upgradeFrom: ["Basic Member", "Student Member"],
       upgradeTo: ["VIP Member", "Premium Member"],
-      restrictions: []
+      restrictions: [],
     },
     {
       tier: MembershipTier.CORPORATE,
@@ -160,13 +152,13 @@ export default function MembershipTiers() {
         "Corporate branding",
         "Bulk event tickets",
         "Dedicated support",
-        "Custom integrations"
+        "Custom integrations",
       ],
       benefits: [
         "Up to 10 team members",
         "Company branding opportunities",
         "Exclusive corporate events",
-        "Volume discounts"
+        "Volume discounts",
       ],
       memberCount: 156,
       status: "active",
@@ -175,7 +167,7 @@ export default function MembershipTiers() {
       visibility: true,
       upgradeFrom: ["Professional Member"],
       upgradeTo: ["Premium Member"],
-      restrictions: ["Minimum 5 team members"]
+      restrictions: ["Minimum 5 team members"],
     },
     {
       tier: MembershipTier.VIP,
@@ -189,13 +181,13 @@ export default function MembershipTiers() {
         "Executive networking",
         "Personal concierge",
         "Exclusive content",
-        "One-on-one coaching"
+        "One-on-one coaching",
       ],
       benefits: [
         "Invitation-only events",
         "Personal brand consulting",
         "Priority speaking opportunities",
-        "Elite networking circles"
+        "Elite networking circles",
       ],
       memberCount: 89,
       status: "active",
@@ -204,7 +196,7 @@ export default function MembershipTiers() {
       visibility: true,
       upgradeFrom: ["Professional Member", "Student Member"],
       upgradeTo: ["Premium Member"],
-      restrictions: ["Invitation only", "Industry leader status required"]
+      restrictions: ["Invitation only", "Industry leader status required"],
     },
     {
       tier: MembershipTier.PREMIUM,
@@ -218,13 +210,13 @@ export default function MembershipTiers() {
         "Content creation tools",
         "Advanced analytics",
         "API access",
-        "White-label opportunities"
+        "White-label opportunities",
       ],
       benefits: [
         "Lifetime membership option",
         "Revenue sharing program",
         "Board nomination eligibility",
-        "Premium advertising placement"
+        "Premium advertising placement",
       ],
       memberCount: 47,
       status: "active",
@@ -233,29 +225,29 @@ export default function MembershipTiers() {
       visibility: true,
       upgradeFrom: ["VIP Member", "Corporate Member"],
       upgradeTo: [],
-      restrictions: ["Board approval required"]
-    }
-  ]
+      restrictions: ["Board approval required"],
+    },
+  ];
 
-  const totalMembers = tiersData.reduce((sum, tier) => sum + tier.memberCount, 0)
-  const activeTiers = tiersData.filter(tier => tier.status !== "inactive").length
+  const totalMembers = tiersData.reduce((sum, tier) => sum + tier.memberCount, 0);
+  const activeTiers = tiersData.filter((tier) => tier.status !== "inactive").length;
 
   // Modal event handlers
   const handleViewDetails = (tier: TierData) => {
-    setSelectedTier(tier)
-    setDetailModalOpen(true)
-  }
+    setSelectedTier(tier);
+    setDetailModalOpen(true);
+  };
 
   const handleEditTier = (tier: TierData) => {
-    setSelectedTier(tier)
-    setEditModalOpen(true)
-  }
+    setSelectedTier(tier);
+    setEditModalOpen(true);
+  };
 
   const handleSaveTier = (updatedTier: any) => {
     // TODO: Implement API call to save tier
-    console.log("Saving tier:", updatedTier)
+    console.log("Saving tier:", updatedTier);
     // You would typically call an API here
-  }
+  };
 
   const handleAddTier = () => {
     const newTier: TierData = {
@@ -273,37 +265,37 @@ export default function MembershipTiers() {
       visibility: true,
       upgradeFrom: [],
       upgradeTo: [],
-      restrictions: []
-    }
-    setSelectedTier(newTier)
-    setEditModalOpen(true)
-  }
+      restrictions: [],
+    };
+    setSelectedTier(newTier);
+    setEditModalOpen(true);
+  };
 
   const handleConfigure = () => {
-    setConfigModalOpen(true)
-  }
+    setConfigModalOpen(true);
+  };
 
   const handleSaveConfig = (config: MembershipConfig) => {
     // TODO: Implement API call to save configuration
-    console.log("Saving configuration:", config)
+    console.log("Saving configuration:", config);
     // You would typically call an API here
-    setConfigModalOpen(false)
-  }
+    setConfigModalOpen(false);
+  };
 
   useEffect(() => {
     setHeader({
       title: "Membership Tiers",
-      description: "Manage and configure membership tiers, pricing, and benefits for your community"
-    })
+      description:
+        "Manage and configure membership tiers, pricing, and benefits for your community",
+    });
 
-    setIsLoading(false)
+    setIsLoading(false);
 
     return () => {
-      clearHeader()
-    }
-  }, [setHeader, clearHeader])
+      clearHeader();
+    };
+  }, [setHeader, clearHeader]);
 
-  
   if (isLoading) {
     return (
       <div className="container mx-auto py-8">
@@ -316,7 +308,7 @@ export default function MembershipTiers() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -343,7 +335,9 @@ export default function MembershipTiers() {
         <WidgetContainer
           title="Active Tiers"
           description="Currently available membership options"
-          size="small" type={"user-profile"}>
+          size="small"
+          type={"user-profile"}
+        >
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
               <TrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
@@ -358,7 +352,9 @@ export default function MembershipTiers() {
         <WidgetContainer
           title="Most Popular"
           description="Highest member count"
-          size="small" type={"user-profile"}>
+          size="small"
+          type={"user-profile"}
+        >
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
               <Star className="w-6 h-6 text-purple-600 dark:text-purple-400" />
@@ -390,10 +386,7 @@ export default function MembershipTiers() {
       {/* Membership Tiers Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {tiersData.map((tier) => (
-          <Card
-            key={tier.tier}
-            className="border bg-card transition-shadow hover:shadow-md"
-          >
+          <Card key={tier.tier} className="border bg-card transition-shadow hover:shadow-md">
             <CardHeader className="pb-4">
               <div className="flex items-start justify-between">
                 <div>
@@ -425,9 +418,7 @@ export default function MembershipTiers() {
                 <span className="font-medium">{tier.memberCount.toLocaleString()}</span>
               </div>
 
-              <div className="text-sm text-muted-foreground line-clamp-2">
-                {tier.description}
-              </div>
+              <div className="text-sm text-muted-foreground line-clamp-2">{tier.description}</div>
 
               <div className="flex gap-2 pt-2">
                 <Button
@@ -438,11 +429,7 @@ export default function MembershipTiers() {
                 >
                   Manage
                 </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handleViewDetails(tier)}
-                >
+                <Button size="sm" variant="ghost" onClick={() => handleViewDetails(tier)}>
                   <Settings className="w-4 h-4" />
                 </Button>
               </div>
@@ -490,5 +477,5 @@ export default function MembershipTiers() {
         onSave={handleSaveConfig}
       />
     </div>
-  )
+  );
 }

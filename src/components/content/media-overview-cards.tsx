@@ -3,11 +3,11 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  HardDrive, 
-  Eye, 
-  Download, 
-  TrendingUp, 
+import {
+  HardDrive,
+  Eye,
+  Download,
+  TrendingUp,
   Image as ImageIcon,
   Video,
   FileText,
@@ -15,7 +15,7 @@ import {
   Archive,
   Users,
   Clock,
-  BarChart3
+  BarChart3,
 } from "lucide-react";
 import { MediaStatistics } from "@/types/media.types";
 
@@ -58,11 +58,11 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
     return new Intl.NumberFormat("en-US").format(num);
   };
 
-  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
+  const getTrendIcon = (trend: "up" | "down" | "stable") => {
     switch (trend) {
-      case 'up':
+      case "up":
         return <TrendingUp className="h-4 w-4 text-green-600" />;
-      case 'down':
+      case "down":
         return <TrendingUp className="h-4 w-4 text-red-600 rotate-180" />;
       default:
         return <div className="h-4 w-4 bg-gray-400 rounded-full" />;
@@ -76,36 +76,28 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
         {/* Total Media */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Media
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Media</CardTitle>
             <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center">
               <HardDrive className="h-4 w-4 text-blue-600" />
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatNumber(statistics.totalMedia)}</div>
-            <p className="text-xs text-muted-foreground">
-              {statistics.totalSizeFormatted} stored
-            </p>
+            <p className="text-xs text-muted-foreground">{statistics.totalSizeFormatted} stored</p>
           </CardContent>
         </Card>
 
         {/* Total Views */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Views
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Views</CardTitle>
             <div className="h-8 w-8 rounded-full bg-green-50 flex items-center justify-center">
               <Eye className="h-4 w-4 text-green-600" />
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatNumber(statistics.totalViews)}</div>
-            <p className="text-xs text-muted-foreground">
-              Across all media items
-            </p>
+            <p className="text-xs text-muted-foreground">Across all media items</p>
           </CardContent>
         </Card>
 
@@ -122,7 +114,8 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
           <CardContent>
             <div className="text-2xl font-bold">{formatNumber(statistics.totalDownloads)}</div>
             <p className="text-xs text-muted-foreground">
-              {formatNumber(Math.round((statistics.totalDownloads / statistics.totalViews) * 100))}% download rate
+              {formatNumber(Math.round((statistics.totalDownloads / statistics.totalViews) * 100))}%
+              download rate
             </p>
           </CardContent>
         </Card>
@@ -156,16 +149,16 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
             {statistics.mediaByType.map((type) => {
               const getIcon = (mediaType: string) => {
                 switch (mediaType) {
-                  case 'image':
+                  case "image":
                     return <ImageIcon className="h-4 w-4" />;
-                  case 'video':
+                  case "video":
                     return <Video className="h-4 w-4" />;
-                  case 'audio':
+                  case "audio":
                     return <Music className="h-4 w-4" />;
-                  case 'document':
-                  case 'pdf':
+                  case "document":
+                  case "pdf":
                     return <FileText className="h-4 w-4" />;
-                  case 'archive':
+                  case "archive":
                     return <Archive className="h-4 w-4" />;
                   default:
                     return <FileText className="h-4 w-4" />;
@@ -173,11 +166,12 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
               };
 
               return (
-                <div key={type.type} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={type.type}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div className="flex items-center gap-3">
-                    <div className="text-blue-600">
-                      {getIcon(type.type)}
-                    </div>
+                    <div className="text-blue-600">{getIcon(type.type)}</div>
                     <div>
                       <p className="font-medium capitalize">{type.type}</p>
                       <p className="text-sm text-muted-foreground">
@@ -204,15 +198,15 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
             {Object.entries(statistics.storageUsage).map(([location, size]) => {
               const getLocationIcon = (loc: string) => {
                 switch (loc) {
-                  case 's3':
+                  case "s3":
                     return <div className="h-4 w-4 bg-orange-500 rounded" />;
-                  case 'local':
+                  case "local":
                     return <div className="h-4 w-4 bg-blue-500 rounded" />;
-                  case 'cloudinary':
+                  case "cloudinary":
                     return <div className="h-4 w-4 bg-purple-500 rounded" />;
-                  case 'azure':
+                  case "azure":
                     return <div className="h-4 w-4 bg-cyan-500 rounded" />;
-                  case 'gcs':
+                  case "gcs":
                     return <div className="h-4 w-4 bg-red-500 rounded" />;
                   default:
                     return <div className="h-4 w-4 bg-gray-500 rounded" />;
@@ -221,35 +215,37 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
 
               const getLocationName = (loc: string) => {
                 switch (loc) {
-                  case 's3':
-                    return 'AWS S3';
-                  case 'local':
-                    return 'Local Storage';
-                  case 'cloudinary':
-                    return 'Cloudinary';
-                  case 'azure':
-                    return 'Azure Blob';
-                  case 'gcs':
-                    return 'Google Cloud';
+                  case "s3":
+                    return "AWS S3";
+                  case "local":
+                    return "Local Storage";
+                  case "cloudinary":
+                    return "Cloudinary";
+                  case "azure":
+                    return "Azure Blob";
+                  case "gcs":
+                    return "Google Cloud";
                   default:
                     return loc;
                 }
               };
 
-              const totalStorage = Object.values(statistics.storageUsage).reduce((sum, val) => sum + val, 0);
+              const totalStorage = Object.values(statistics.storageUsage).reduce(
+                (sum, val) => sum + val,
+                0,
+              );
               const percentage = Math.round((size / totalStorage) * 100);
 
               return (
-                <div key={location} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={location}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div className="flex items-center gap-3">
-                    <div>
-                      {getLocationIcon(location)}
-                    </div>
+                    <div>{getLocationIcon(location)}</div>
                     <div>
                       <p className="font-medium">{getLocationName(location)}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatNumber(size)} bytes
-                      </p>
+                      <p className="text-sm text-muted-foreground">{formatNumber(size)} bytes</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -273,16 +269,16 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
             {statistics.recentUploads.slice(0, 5).map((upload) => {
               const getUploadIcon = (type: string) => {
                 switch (type) {
-                  case 'image':
+                  case "image":
                     return <ImageIcon className="h-4 w-4" />;
-                  case 'video':
+                  case "video":
                     return <Video className="h-4 w-4" />;
-                  case 'audio':
+                  case "audio":
                     return <Music className="h-4 w-4" />;
-                  case 'document':
-                  case 'pdf':
+                  case "document":
+                  case "pdf":
                     return <FileText className="h-4 w-4" />;
-                  case 'archive':
+                  case "archive":
                     return <Archive className="h-4 w-4" />;
                   default:
                     return <FileText className="h-4 w-4" />;
@@ -290,11 +286,12 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
               };
 
               return (
-                <div key={upload.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={upload.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div className="flex items-center gap-3">
-                    <div className="text-blue-600">
-                      {getUploadIcon(upload.type)}
-                    </div>
+                    <div className="text-blue-600">{getUploadIcon(upload.type)}</div>
                     <div className="min-w-0 flex-1">
                       <p className="font-medium truncate">{upload.title}</p>
                       <p className="text-sm text-muted-foreground">
@@ -321,16 +318,16 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
             {statistics.topPerforming.slice(0, 5).map((item) => {
               const getPerformIcon = (type: string) => {
                 switch (type) {
-                  case 'image':
+                  case "image":
                     return <ImageIcon className="h-4 w-4" />;
-                  case 'video':
+                  case "video":
                     return <Video className="h-4 w-4" />;
-                  case 'audio':
+                  case "audio":
                     return <Music className="h-4 w-4" />;
-                  case 'document':
-                  case 'pdf':
+                  case "document":
+                  case "pdf":
                     return <FileText className="h-4 w-4" />;
-                  case 'archive':
+                  case "archive":
                     return <Archive className="h-4 w-4" />;
                   default:
                     return <FileText className="h-4 w-4" />;
@@ -338,11 +335,12 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
               };
 
               return (
-                <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div className="flex items-center gap-3">
-                    <div className="text-blue-600">
-                      {getPerformIcon(item.type)}
-                    </div>
+                    <div className="text-blue-600">{getPerformIcon(item.type)}</div>
                     <div className="min-w-0 flex-1">
                       <p className="font-medium truncate">{item.title}</p>
                       <p className="text-sm text-muted-foreground">
@@ -369,10 +367,13 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
           </CardHeader>
           <CardContent className="space-y-3">
             {statistics.mediaByStatus.map((status) => (
-              <div key={status.status} className="flex items-center justify-between p-3 border rounded-lg">
+              <div
+                key={status.status}
+                className="flex items-center justify-between p-3 border rounded-lg"
+              >
                 <div className="flex items-center gap-3">
-                  <Badge 
-                    variant={status.status === 'ready' ? 'default' : 'secondary'}
+                  <Badge
+                    variant={status.status === "ready" ? "default" : "secondary"}
                     className="text-xs"
                   >
                     {status.status}
@@ -401,13 +402,13 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
             {statistics.mediaByVisibility.map((visibility) => {
               const getVisibilityIcon = (vis: string) => {
                 switch (vis) {
-                  case 'public':
+                  case "public":
                     return <Users className="h-4 w-4 text-blue-600" />;
-                  case 'private':
+                  case "private":
                     return <div className="h-4 w-4 bg-red-600 rounded-full" />;
-                  case 'restricted':
+                  case "restricted":
                     return <Users className="h-4 w-4 text-amber-600" />;
-                  case 'draft':
+                  case "draft":
                     return <div className="h-4 w-4 bg-gray-600 rounded-full" />;
                   default:
                     return <div className="h-4 w-4 bg-gray-600 rounded-full" />;
@@ -415,11 +416,12 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
               };
 
               return (
-                <div key={visibility.visibility} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={visibility.visibility}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div className="flex items-center gap-3">
-                    <div>
-                      {getVisibilityIcon(visibility.visibility)}
-                    </div>
+                    <div>{getVisibilityIcon(visibility.visibility)}</div>
                     <div>
                       <p className="font-medium capitalize">{visibility.visibility}</p>
                       <p className="text-sm text-muted-foreground">

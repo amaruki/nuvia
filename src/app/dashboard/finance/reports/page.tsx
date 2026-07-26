@@ -94,7 +94,7 @@ export default function FinanceReports() {
     }
   };
 
-  const handleUpdateStatus = (report: FinancialReport, status: FinancialReport['status']) => {
+  const handleUpdateStatus = (report: FinancialReport, status: FinancialReport["status"]) => {
     updateReportStatus(report.id, status);
   };
 
@@ -194,16 +194,20 @@ export default function FinanceReports() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="reports" className="text-xs sm:text-sm py-2 px-2">All Reports</TabsTrigger>
-          <TabsTrigger value="templates" className="text-xs sm:text-sm py-2 px-2">Templates</TabsTrigger>
-          <TabsTrigger value="schedule" className="text-xs sm:text-sm py-2 px-2">Schedule</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="text-xs sm:text-sm py-2 px-2">
+            All Reports
+          </TabsTrigger>
+          <TabsTrigger value="templates" className="text-xs sm:text-sm py-2 px-2">
+            Templates
+          </TabsTrigger>
+          <TabsTrigger value="schedule" className="text-xs sm:text-sm py-2 px-2">
+            Schedule
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -212,7 +216,9 @@ export default function FinanceReports() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base sm:text-lg">Recent Reports</CardTitle>
-                <CardDescription className="text-sm">Latest financial reports generated</CardDescription>
+                <CardDescription className="text-sm">
+                  Latest financial reports generated
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -225,7 +231,7 @@ export default function FinanceReports() {
                       <div className="min-w-0 flex-1 mr-2">
                         <p className="text-sm font-medium truncate">{report.title}</p>
                         <p className="text-xs text-muted-foreground truncate">
-                          {report.type.replace('_', ' ')} • {report.period}
+                          {report.type.replace("_", " ")} • {report.period}
                         </p>
                       </div>
                       <div className="text-right shrink-0">
@@ -234,12 +240,12 @@ export default function FinanceReports() {
                             report.status === "published"
                               ? "default"
                               : report.status === "pending_review"
-                              ? "secondary"
-                              : "outline"
+                                ? "secondary"
+                                : "outline"
                           }
                           className="text-xs"
                         >
-                          {report.status.replace('_', ' ')}
+                          {report.status.replace("_", " ")}
                         </Badge>
                       </div>
                     </div>
@@ -252,7 +258,9 @@ export default function FinanceReports() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base sm:text-lg">Report Types</CardTitle>
-                <CardDescription className="text-sm">Available financial report categories</CardDescription>
+                <CardDescription className="text-sm">
+                  Available financial report categories
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -273,7 +281,7 @@ export default function FinanceReports() {
                         <span className="text-sm font-medium">{item.label}</span>
                       </div>
                       <Badge variant="outline" className="text-xs">
-                        {reports.filter(r => r.type === item.type).length}
+                        {reports.filter((r) => r.type === item.type).length}
                       </Badge>
                     </div>
                   ))}
@@ -287,7 +295,9 @@ export default function FinanceReports() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base sm:text-lg">Monthly Trend</CardTitle>
-                <CardDescription className="text-sm">Report generation and download trends</CardDescription>
+                <CardDescription className="text-sm">
+                  Report generation and download trends
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -298,9 +308,7 @@ export default function FinanceReports() {
                         <TrendingUp className="h-4 w-4 text-muted-foreground shrink-0" />
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-medium">
-                          {month.generated} generated
-                        </p>
+                        <p className="text-sm font-medium">{month.generated} generated</p>
                         <p className="text-xs text-muted-foreground">
                           {month.downloaded} downloads
                         </p>
@@ -341,7 +349,8 @@ export default function FinanceReports() {
               },
               {
                 title: "Cash Flow Template",
-                description: "Detailed cash flow statement with operating, investing, and financing activities",
+                description:
+                  "Detailed cash flow statement with operating, investing, and financing activities",
                 icon: DollarSign,
                 type: "cash_flow",
               },
@@ -376,7 +385,11 @@ export default function FinanceReports() {
                   <CardDescription className="text-sm">{template.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full" onClick={() => console.log("Use template:", template.type)}>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => console.log("Use template:", template.type)}
+                  >
                     Use Template
                   </Button>
                 </CardContent>
@@ -389,7 +402,9 @@ export default function FinanceReports() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base sm:text-lg">Scheduled Reports</CardTitle>
-              <CardDescription className="text-sm">Automated report generation schedule</CardDescription>
+              <CardDescription className="text-sm">
+                Automated report generation schedule
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">

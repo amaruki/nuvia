@@ -10,13 +10,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Event, RegistrationStatus } from "@/types/event.types";
-import { eventRegistrationSchema, type EventRegistrationInput } from "@/lib/validation/event.validation";
+import {
+  eventRegistrationSchema,
+  type EventRegistrationInput,
+} from "@/lib/validation/event.validation";
 import {
   formatDateLong,
   formatTime,
   isRegistrationOpen,
   isEventFull,
-  formatEventTimeRange
+  formatEventTimeRange,
 } from "@/lib/utils/event-utils";
 
 interface EventRegistrationFormProps {
@@ -60,20 +63,24 @@ export function EventRegistrationForm({
         <div className="space-y-6">
           {/* Event Information */}
           <div className="bg-background p-4 rounded-lg">
-            <h3 className="font-medium mb-2" style={{ color: 'var(--foreground)' }}>Event Details</h3>
-            <div className="space-y-2 text-sm" style={{ color: 'var(--muted-foreground)' }}>
+            <h3 className="font-medium mb-2" style={{ color: "var(--foreground)" }}>
+              Event Details
+            </h3>
+            <div className="space-y-2 text-sm" style={{ color: "var(--muted-foreground)" }}>
               <p>
                 <span className="font-medium">Date:</span> {formatDateLong(event.startDate)}
               </p>
               <p>
-                <span className="font-medium">Time:</span> {formatEventTimeRange(event.startDate, event.endDate)}
+                <span className="font-medium">Time:</span>{" "}
+                {formatEventTimeRange(event.startDate, event.endDate)}
               </p>
               <p>
                 <span className="font-medium">Location:</span> {event.location}
               </p>
               {event.maxAttendees && (
                 <p>
-                  <span className="font-medium">Availability:</span> {event.currentAttendees} of {event.maxAttendees} spots filled
+                  <span className="font-medium">Availability:</span> {event.currentAttendees} of{" "}
+                  {event.maxAttendees} spots filled
                 </p>
               )}
             </div>
@@ -81,19 +88,35 @@ export function EventRegistrationForm({
 
           {/* Registration Status Messages */}
           {!registrationOpen && (
-            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--destructive)', color: 'var(--destructive-foreground)', opacity: '0.1' }}>
+            <div
+              className="p-4 rounded-lg"
+              style={{
+                backgroundColor: "var(--destructive)",
+                color: "var(--destructive-foreground)",
+                opacity: "0.1",
+              }}
+            >
               <p className="font-medium">Registration Closed</p>
               <p className="text-sm">
-                Registration for this event has closed. Please contact the event organizer for more information.
+                Registration for this event has closed. Please contact the event organizer for more
+                information.
               </p>
             </div>
           )}
 
           {eventFull && registrationOpen && (
-            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--destructive)', color: 'var(--chart-5-foreground)', opacity: '0.1' }}>
+            <div
+              className="p-4 rounded-lg"
+              style={{
+                backgroundColor: "var(--destructive)",
+                color: "var(--chart-5-foreground)",
+                opacity: "0.1",
+              }}
+            >
               <p className="font-medium">Event Full</p>
               <p className="text-sm">
-                This event has reached maximum capacity. You can still register to be added to the waitlist.
+                This event has reached maximum capacity. You can still register to be added to the
+                waitlist.
               </p>
             </div>
           )}
@@ -125,23 +148,31 @@ export function EventRegistrationForm({
                     id="terms"
                     type="checkbox"
                     className="mt-1 h-4 w-4 border-input rounded"
-                    style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }}
+                    style={{
+                      backgroundColor: "var(--primary)",
+                      color: "var(--primary-foreground)",
+                    }}
                     required
                   />
-                  <label htmlFor="terms" className="ml-2 block text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                    I agree to the event terms and conditions and understand that my information will be shared with the event organizer.
+                  <label
+                    htmlFor="terms"
+                    className="ml-2 block text-sm"
+                    style={{ color: "var(--muted-foreground)" }}
+                  >
+                    I agree to the event terms and conditions and understand that my information
+                    will be shared with the event organizer.
                   </label>
                 </div>
               </div>
 
               {/* Submit Button */}
               <div className="pt-4">
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Submitting..." : eventFull ? "Join Waitlist" : "Register for Event"}
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting
+                    ? "Submitting..."
+                    : eventFull
+                      ? "Join Waitlist"
+                      : "Register for Event"}
                 </Button>
               </div>
             </form>

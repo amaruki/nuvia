@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   RefreshCw,
   AlertTriangle,
   Download,
@@ -26,7 +26,7 @@ import {
   Mail,
   Smartphone,
   Home,
-  Layout
+  Layout,
 } from "lucide-react";
 
 import { AnnouncementsOverviewCards } from "@/components/content/announcements-overview-cards";
@@ -76,7 +76,8 @@ export default function ContentAnnouncements() {
   useEffect(() => {
     setHeader({
       title: "Announcements Management",
-      description: "Manage announcements, notifications, and important updates with comprehensive targeting",
+      description:
+        "Manage announcements, notifications, and important updates with comprehensive targeting",
     });
 
     return () => {
@@ -97,7 +98,11 @@ export default function ContentAnnouncements() {
   };
 
   const handleDelete = async (announcement: Announcement) => {
-    if (confirm(`Are you sure you want to delete "${announcement.title}"? This action cannot be undone.`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete "${announcement.title}"? This action cannot be undone.`,
+      )
+    ) {
       try {
         await deleteAnnouncement(announcement.id);
       } catch (error) {
@@ -148,8 +153,12 @@ export default function ContentAnnouncements() {
 
   const handleBulkPublish = async () => {
     if (selectedAnnouncements.length === 0) return;
-    
-    if (confirm(`Are you sure you want to publish ${selectedAnnouncements.length} selected announcements?`)) {
+
+    if (
+      confirm(
+        `Are you sure you want to publish ${selectedAnnouncements.length} selected announcements?`,
+      )
+    ) {
       try {
         await bulkPublish(selectedAnnouncements);
         setSelectedAnnouncements([]);
@@ -161,8 +170,12 @@ export default function ContentAnnouncements() {
 
   const handleBulkArchive = async () => {
     if (selectedAnnouncements.length === 0) return;
-    
-    if (confirm(`Are you sure you want to archive ${selectedAnnouncements.length} selected announcements?`)) {
+
+    if (
+      confirm(
+        `Are you sure you want to archive ${selectedAnnouncements.length} selected announcements?`,
+      )
+    ) {
       try {
         await bulkArchive(selectedAnnouncements);
         setSelectedAnnouncements([]);
@@ -174,8 +187,12 @@ export default function ContentAnnouncements() {
 
   const handleBulkDelete = async () => {
     if (selectedAnnouncements.length === 0) return;
-    
-    if (confirm(`Are you sure you want to delete ${selectedAnnouncements.length} selected announcements? This action cannot be undone.`)) {
+
+    if (
+      confirm(
+        `Are you sure you want to delete ${selectedAnnouncements.length} selected announcements? This action cannot be undone.`,
+      )
+    ) {
       try {
         await bulkDelete(selectedAnnouncements);
         setSelectedAnnouncements([]);
@@ -185,7 +202,7 @@ export default function ContentAnnouncements() {
     }
   };
 
-  const handleExport = (format: 'csv' | 'json' | 'pdf') => {
+  const handleExport = (format: "csv" | "json" | "pdf") => {
     exportAnnouncements(format);
   };
 
@@ -266,7 +283,6 @@ export default function ContentAnnouncements() {
 
   return (
     <div className="space-y-6">
-
       {/* Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
@@ -339,16 +355,20 @@ export default function ContentAnnouncements() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="announcements" className="text-xs sm:text-sm py-2 px-2">Announcements</TabsTrigger>
-          <TabsTrigger value="drafts" className="text-xs sm:text-sm py-2 px-2">Drafts</TabsTrigger>
-          <TabsTrigger value="acknowledgments" className="text-xs sm:text-sm py-2 px-2">Acknowledgments</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="announcements" className="text-xs sm:text-sm py-2 px-2">
+            Announcements
+          </TabsTrigger>
+          <TabsTrigger value="drafts" className="text-xs sm:text-sm py-2 px-2">
+            Drafts
+          </TabsTrigger>
+          <TabsTrigger value="acknowledgments" className="text-xs sm:text-sm py-2 px-2">
+            Acknowledgments
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -365,7 +385,9 @@ export default function ContentAnnouncements() {
                     <span className="text-sm font-medium">Total Acknowledgments</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold">{formatNumber(statistics?.totalAcknowledgments || 0)}</p>
+                    <p className="text-lg font-bold">
+                      {formatNumber(statistics?.totalAcknowledgments || 0)}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -376,7 +398,9 @@ export default function ContentAnnouncements() {
                     <span className="text-sm font-medium">Acknowledgment Rate</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold">{statistics?.averageAcknowledgmentRate.toFixed(1) || 0}%</p>
+                    <p className="text-lg font-bold">
+                      {statistics?.averageAcknowledgmentRate.toFixed(1) || 0}%
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -412,15 +436,13 @@ export default function ContentAnnouncements() {
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="min-w-0 flex-1 mr-2">
                   <p className="font-medium">Total Announcements</p>
-                  <p className="text-xs text-muted-foreground">
-                    All announcements in the system
-                  </p>
+                  <p className="text-xs text-muted-foreground">All announcements in the system</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-lg font-bold">{formatNumber(statistics?.totalAnnouncements || 0)}</p>
-                  <p className="text-xs text-muted-foreground">
-                    total
+                  <p className="text-lg font-bold">
+                    {formatNumber(statistics?.totalAnnouncements || 0)}
                   </p>
+                  <p className="text-xs text-muted-foreground">total</p>
                 </div>
               </div>
             </div>
@@ -442,28 +464,34 @@ export default function ContentAnnouncements() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Draft Announcements</h3>
             <div className="space-y-3">
-              {announcements.filter(a => a.status === 'draft').slice(0, 10).map((announcement) => (
-                <div key={announcement.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="min-w-0 flex-1 mr-2">
-                    <p className="font-medium">{announcement.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Last modified: {announcement.lastModified.toLocaleDateString()}
-                    </p>
+              {announcements
+                .filter((a) => a.status === "draft")
+                .slice(0, 10)
+                .map((announcement) => (
+                  <div
+                    key={announcement.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div className="min-w-0 flex-1 mr-2">
+                      <p className="font-medium">{announcement.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Last modified: {announcement.lastModified.toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleEdit(announcement)}>
+                        <Settings className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
+                      <Button size="sm" onClick={() => handlePublish(announcement)}>
+                        <Megaphone className="mr-2 h-4 w-4" />
+                        Publish
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEdit(announcement)}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
-                    <Button size="sm" onClick={() => handlePublish(announcement)}>
-                      <Megaphone className="mr-2 h-4 w-4" />
-                      Publish
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
-            {announcements.filter(a => a.status === 'draft').length === 0 && (
+            {announcements.filter((a) => a.status === "draft").length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 <Megaphone className="h-12 w-12 mx-auto mb-4 opacity-40" />
                 <h3 className="text-lg font-medium mb-2">No draft announcements</h3>
@@ -479,7 +507,9 @@ export default function ContentAnnouncements() {
           <div className="text-center py-8 text-muted-foreground">
             <Megaphone className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>No acknowledgment analytics to display</p>
-            <p className="text-sm mt-2">Acknowledgment statistics will appear here once announcements are created</p>
+            <p className="text-sm mt-2">
+              Acknowledgment statistics will appear here once announcements are created
+            </p>
           </div>
         </TabsContent>
       </Tabs>
@@ -501,17 +531,16 @@ export default function ContentAnnouncements() {
               Import
             </label>
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
+          <Button variant="outline" size="sm" onClick={() => handleExport("csv")}>
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('json')}>
+          <Button variant="outline" size="sm" onClick={() => handleExport("json")}>
             <Download className="mr-2 h-4 w-4" />
             Export JSON
           </Button>
         </div>
       </div>
-
     </div>
   );
 }

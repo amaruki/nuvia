@@ -1,12 +1,19 @@
-"use client"
+"use client";
 
-import { useState, useMemo, useEffect } from "react"
-import { UserDirectory } from "@/components/users/user-directory"
-import { UserFilter, UserSort, UserProfile, UserStats, UserStatus, AuthStatus } from "@/types/user-management.types"
-import { UserRole } from "@/types/dashboard.types"
+import { useState, useMemo, useEffect } from "react";
+import { UserDirectory } from "@/components/users/user-directory";
+import {
+  UserFilter,
+  UserSort,
+  UserProfile,
+  UserStats,
+  UserStatus,
+  AuthStatus,
+} from "@/types/user-management.types";
+import { UserRole } from "@/types/dashboard.types";
 import { useHeader } from "@/contexts/dashboard-context";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useSession } from "@/lib/client"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useSession } from "@/lib/client";
 
 // Mock data - replace with actual API call
 const mockUsers: UserProfile[] = [
@@ -31,7 +38,7 @@ const mockUsers: UserProfile[] = [
     phoneVerified: true,
     lastLoginAt: new Date("2024-01-15T10:30:00Z"),
     createdAt: new Date("2023-01-01T00:00:00Z"),
-    updatedAt: new Date("2024-01-15T10:30:00Z")
+    updatedAt: new Date("2024-01-15T10:30:00Z"),
   },
   {
     id: "2",
@@ -54,7 +61,7 @@ const mockUsers: UserProfile[] = [
     phoneVerified: false,
     lastLoginAt: new Date("2024-01-14T15:45:00Z"),
     createdAt: new Date("2023-03-15T00:00:00Z"),
-    updatedAt: new Date("2024-01-14T15:45:00Z")
+    updatedAt: new Date("2024-01-14T15:45:00Z"),
   },
   {
     id: "3",
@@ -76,9 +83,9 @@ const mockUsers: UserProfile[] = [
     phoneVerified: true,
     lastLoginAt: new Date("2023-12-20T09:15:00Z"),
     createdAt: new Date("2023-06-01T00:00:00Z"),
-    updatedAt: new Date("2023-12-20T09:15:00Z")
-  }
-]
+    updatedAt: new Date("2023-12-20T09:15:00Z"),
+  },
+];
 
 const mockStats: UserStats = {
   totalUsers: 1247,
@@ -102,25 +109,25 @@ const mockStats: UserStats = {
     member_student: 320,
     member: 680,
     moderator: 12,
-    user: 230
+    user: 230,
   },
   newUsersThisMonth: 47,
-  usersLastLogin30Days: 756
-}
+  usersLastLogin30Days: 756,
+};
 
 export default function UserDirectoryPage() {
-  const { data: session } = useSession()
-  const [filters, setFilters] = useState<UserFilter>({})
+  const { data: session } = useSession();
+  const [filters, setFilters] = useState<UserFilter>({});
   const { setHeader, clearHeader } = useHeader();
-  const [sort, setSort] = useState<UserSort>({ field: "createdAt", direction: "desc" })
-  const [isLoading, setIsLoading] = useState(false)
+  const [sort, setSort] = useState<UserSort>({ field: "createdAt", direction: "desc" });
+  const [isLoading, setIsLoading] = useState(false);
 
   // Set header and active tab from URL parameter if available
   useEffect(() => {
     // Set the header
     setHeader({
       title: "User Directory",
-      description: "Manage and monitor platform users"
+      description: "Manage and monitor platform users",
     });
     setIsLoading(false);
 
@@ -129,103 +136,106 @@ export default function UserDirectoryPage() {
       clearHeader();
     };
   }, [setHeader, clearHeader]);
-  
+
   // Filter and sort users
   const filteredUsers = useMemo(() => {
-    let filtered = [...mockUsers]
+    let filtered = [...mockUsers];
 
     // Apply search filter
     if (filters.search) {
-      const searchLower = filters.search.toLowerCase()
-      filtered = filtered.filter(user =>
-        user.firstName?.toLowerCase().includes(searchLower) ||
-        user.lastName?.toLowerCase().includes(searchLower) ||
-        user.email?.toLowerCase().includes(searchLower) ||
-        user.username?.toLowerCase().includes(searchLower)
-      )
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(
+        (user) =>
+          user.firstName?.toLowerCase().includes(searchLower) ||
+          user.lastName?.toLowerCase().includes(searchLower) ||
+          user.email?.toLowerCase().includes(searchLower) ||
+          user.username?.toLowerCase().includes(searchLower),
+      );
     }
 
     // Apply role filter
     if (filters.roles?.length) {
-      filtered = filtered.filter(user => filters.roles!.includes(user.userRole))
+      filtered = filtered.filter((user) => filters.roles!.includes(user.userRole));
     }
 
     // Apply status filter
     if (filters.statuses?.length) {
-      filtered = filtered.filter(user => filters.statuses!.includes(user.status))
+      filtered = filtered.filter((user) => filters.statuses!.includes(user.status));
     }
 
     // Apply auth status filter
     if (filters.authStatuses?.length) {
-      filtered = filtered.filter(user => filters.authStatuses!.includes(user.authStatus))
+      filtered = filtered.filter((user) => filters.authStatuses!.includes(user.authStatus));
     }
 
     // Apply email verification filter
     if (filters.emailVerified !== undefined) {
-      filtered = filtered.filter(user => user.emailVerified === filters.emailVerified)
+      filtered = filtered.filter((user) => user.emailVerified === filters.emailVerified);
     }
 
     // Apply phone verification filter
     if (filters.phoneVerified !== undefined) {
-      filtered = filtered.filter(user => user.phoneVerified === filters.phoneVerified)
+      filtered = filtered.filter((user) => user.phoneVerified === filters.phoneVerified);
     }
 
     // Apply location filter
     if (filters.locations?.length) {
-      filtered = filtered.filter(user =>
-        user.location && filters.locations!.some(location =>
-          user.location!.toLowerCase().includes(location.toLowerCase())
-        )
-      )
+      filtered = filtered.filter(
+        (user) =>
+          user.location &&
+          filters.locations!.some((location) =>
+            user.location!.toLowerCase().includes(location.toLowerCase()),
+          ),
+      );
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
-      const { field, direction } = sort
-      let aValue: any
-      let bValue: any
+      const { field, direction } = sort;
+      let aValue: any;
+      let bValue: any;
 
       // Handle name field specially
       if (field === "name") {
-        aValue = `${a.firstName} ${a.lastName}`
-        bValue = `${b.firstName} ${b.lastName}`
+        aValue = `${a.firstName} ${a.lastName}`;
+        bValue = `${b.firstName} ${b.lastName}`;
       } else {
-        aValue = a[field as keyof UserProfile]
-        bValue = b[field as keyof UserProfile]
+        aValue = a[field as keyof UserProfile];
+        bValue = b[field as keyof UserProfile];
       }
 
       // Handle dates
       if (aValue instanceof Date && bValue instanceof Date) {
-        aValue = aValue.getTime()
-        bValue = bValue.getTime()
+        aValue = aValue.getTime();
+        bValue = bValue.getTime();
       }
 
       // Handle null/undefined values
-      if (aValue === undefined || aValue === null) aValue = ""
-      if (bValue === undefined || bValue === null) bValue = ""
+      if (aValue === undefined || aValue === null) aValue = "";
+      if (bValue === undefined || bValue === null) bValue = "";
 
       // Compare
-      let result = 0
-      if (aValue < bValue) result = -1
-      else if (aValue > bValue) result = 1
+      let result = 0;
+      if (aValue < bValue) result = -1;
+      else if (aValue > bValue) result = 1;
 
-      return direction === "asc" ? result : -result
-    })
+      return direction === "asc" ? result : -result;
+    });
 
-    return filtered
-  }, [mockUsers, filters, sort])
+    return filtered;
+  }, [mockUsers, filters, sort]);
 
   const handleFilterChange = (newFilters: UserFilter) => {
-    setFilters(newFilters)
-  }
+    setFilters(newFilters);
+  };
 
   const handleSortChange = (newSort: UserSort) => {
-    setSort(newSort)
-  }
+    setSort(newSort);
+  };
 
   const handleClearFilters = () => {
-    setFilters({})
-  }
+    setFilters({});
+  };
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -242,5 +252,5 @@ export default function UserDirectoryPage() {
         currentUserRole="admin"
       />
     </div>
-  )
+  );
 }

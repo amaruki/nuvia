@@ -5,17 +5,17 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Calendar, 
-  MapPin, 
-  Users, 
-  Clock, 
-  User, 
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Clock,
+  User,
   ExternalLink,
   Share2,
   QrCode,
   CheckCircle,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import { Event, EventStatus, EventType, RegistrationStatus } from "@/types/event.types";
 
@@ -142,20 +142,14 @@ export function EventDetails({
             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
               <div className="flex flex-wrap gap-2 mb-3">
                 <Badge className={getEventTypeColor(event.eventType)}>
-                  {event.eventType.replace('_', ' ')}
+                  {event.eventType.replace("_", " ")}
                 </Badge>
                 <Badge className={getEventStatusColor(event.status)}>
-                  {event.status.replace('_', ' ')}
+                  {event.status.replace("_", " ")}
                 </Badge>
-                {today && (
-                  <Badge className="bg-chart-1/20 text-chart-1">
-                    Today
-                  </Badge>
-                )}
+                {today && <Badge className="bg-chart-1/20 text-chart-1">Today</Badge>}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                {event.title}
-              </h1>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">{event.title}</h1>
               <div className="flex items-center text-white/90">
                 <User className="h-5 w-5 mr-2" />
                 <span>Organized by {organizerName}</span>
@@ -175,9 +169,7 @@ export function EventDetails({
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm max-w-none">
-                <p className="text-foreground/70 whitespace-pre-line">
-                  {event.description}
-                </p>
+                <p className="text-foreground/70 whitespace-pre-line">{event.description}</p>
               </div>
             </CardContent>
           </Card>
@@ -192,9 +184,7 @@ export function EventDetails({
                 <Calendar className="h-5 w-5 text-foreground/50 mt-0.5 mr-3 flex-shrink-0" />
                 <div>
                   <p className="font-medium">Date & Time</p>
-                  <p className="text-foreground/60">
-                    {formatDate(event.startDate)}
-                  </p>
+                  <p className="text-foreground/60">{formatDate(event.startDate)}</p>
                   <p className="text-foreground/60">
                     {formatTime(event.startDate)} - {formatTime(event.endDate)}
                   </p>
@@ -207,9 +197,9 @@ export function EventDetails({
                   <p className="font-medium">Location</p>
                   <p className="text-foreground/60">{event.location}</p>
                   {event.isVirtual && event.virtualEventUrl && (
-                    <a 
-                      href={event.virtualEventUrl} 
-                      target="_blank" 
+                    <a
+                      href={event.virtualEventUrl}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary hover:text-primary/80 text-sm flex items-center mt-1"
                     >
@@ -231,8 +221,8 @@ export function EventDetails({
                     <div className="w-full bg-muted rounded-full h-2 mt-2">
                       <div
                         className="bg-chart-1 h-2 rounded-full"
-                        style={{ 
-                          width: `${(event.currentAttendees / event.maxAttendees) * 100}%` 
+                        style={{
+                          width: `${(event.currentAttendees / event.maxAttendees) * 100}%`,
                         }}
                       ></div>
                     </div>
@@ -245,9 +235,7 @@ export function EventDetails({
                   <Clock className="h-5 w-5 text-foreground/50 mt-0.5 mr-3 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Registration Deadline</p>
-                    <p className="text-foreground/60">
-                      {formatDate(event.registrationDeadline)}
-                    </p>
+                    <p className="text-foreground/60">{formatDate(event.registrationDeadline)}</p>
                   </div>
                 </div>
               )}
@@ -285,7 +273,7 @@ export function EventDetails({
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Your Status:</span>
                   <Badge className={getRegistrationStatusColor(registrationStatus)}>
-                    {registrationStatus.replace('_', ' ')}
+                    {registrationStatus.replace("_", " ")}
                   </Badge>
                 </div>
               )}
@@ -294,17 +282,20 @@ export function EventDetails({
                 {upcoming && event.status === EventStatus.PUBLISHED && (
                   <>
                     {!isRegistered ? (
-                      <Button 
+                      <Button
                         onClick={() => onRegister?.(event.id)}
                         className="w-full"
-                        disabled={event.maxAttendees !== undefined && event.currentAttendees >= event.maxAttendees}
+                        disabled={
+                          event.maxAttendees !== undefined &&
+                          event.currentAttendees >= event.maxAttendees
+                        }
                       >
                         Register for this event
                       </Button>
                     ) : (
                       <>
                         {registrationStatus === RegistrationStatus.CONFIRMED && today && (
-                          <Button 
+                          <Button
                             onClick={() => onCheckIn?.(event.id)}
                             variant="outline"
                             className="w-full"
@@ -313,7 +304,7 @@ export function EventDetails({
                             Check In
                           </Button>
                         )}
-                        <Button 
+                        <Button
                           onClick={() => onCancelRegistration?.(event.id)}
                           variant="outline"
                           className="w-full"
@@ -326,14 +317,16 @@ export function EventDetails({
                   </>
                 )}
 
-                {!upcoming && isRegistered && registrationStatus === RegistrationStatus.CONFIRMED && (
-                  <div className="flex items-center justify-center p-3 bg-chart-3/10 rounded-lg">
-                    <CheckCircle className="h-5 w-5 text-chart-3 mr-2" />
-                    <span className="text-chart-3 text-sm font-medium">
-                      You attended this event
-                    </span>
-                  </div>
-                )}
+                {!upcoming &&
+                  isRegistered &&
+                  registrationStatus === RegistrationStatus.CONFIRMED && (
+                    <div className="flex items-center justify-center p-3 bg-chart-3/10 rounded-lg">
+                      <CheckCircle className="h-5 w-5 text-chart-3 mr-2" />
+                      <span className="text-chart-3 text-sm font-medium">
+                        You attended this event
+                      </span>
+                    </div>
+                  )}
               </div>
             </CardContent>
           </Card>
@@ -344,21 +337,13 @@ export function EventDetails({
               <CardTitle>Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button 
-                onClick={() => onShare?.(event.id)}
-                variant="outline"
-                className="w-full"
-              >
+              <Button onClick={() => onShare?.(event.id)} variant="outline" className="w-full">
                 <Share2 className="h-4 w-4 mr-2" />
                 Share Event
               </Button>
-              
+
               {onEdit && (
-                <Button 
-                  onClick={() => onEdit?.(event.id)}
-                  variant="outline"
-                  className="w-full"
-                >
+                <Button onClick={() => onEdit?.(event.id)} variant="outline" className="w-full">
                   Edit Event
                 </Button>
               )}

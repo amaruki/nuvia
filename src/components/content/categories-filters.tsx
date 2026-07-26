@@ -7,10 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  CATEGORY_TYPES, 
-  CATEGORY_STATUSES, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  CATEGORY_TYPES,
+  CATEGORY_STATUSES,
   CATEGORY_SCOPES,
   CATEGORY_TYPE_DISPLAY,
   CATEGORY_STATUS_DISPLAY,
@@ -18,7 +24,7 @@ import {
   CategoryFilters,
   CategoryType,
   CategoryStatus,
-  CategoryScope
+  CategoryScope,
 } from "@/types/category.types";
 import { X, Search, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -29,11 +35,7 @@ interface CategoriesFiltersProps {
   onReset: () => void;
 }
 
-export function CategoriesFilters({
-  filters,
-  onFiltersChange,
-  onReset
-}: CategoriesFiltersProps) {
+export function CategoriesFilters({ filters, onFiltersChange, onReset }: CategoriesFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const hasActiveFilters = !!(
@@ -45,16 +47,14 @@ export function CategoriesFilters({
 
   const activeFilterCount = [
     !!filters.search,
-    (filters.type && filters.type.length > 0),
-    (filters.status && filters.status.length > 0),
-    (filters.scope && filters.scope.length > 0)
+    filters.type && filters.type.length > 0,
+    filters.status && filters.status.length > 0,
+    filters.scope && filters.scope.length > 0,
   ].filter(Boolean).length;
 
   const handleTypeChange = (type: CategoryType, checked: boolean) => {
     const currentTypes = filters.type || [];
-    const newTypes = checked
-      ? [...currentTypes, type]
-      : currentTypes.filter(t => t !== type);
+    const newTypes = checked ? [...currentTypes, type] : currentTypes.filter((t) => t !== type);
     onFiltersChange({ type: newTypes });
   };
 
@@ -62,7 +62,7 @@ export function CategoriesFilters({
     const currentStatuses = filters.status || [];
     const newStatuses = checked
       ? [...currentStatuses, status]
-      : currentStatuses.filter(s => s !== status);
+      : currentStatuses.filter((s) => s !== status);
     onFiltersChange({ status: newStatuses });
   };
 
@@ -70,22 +70,22 @@ export function CategoriesFilters({
     const currentScopes = filters.scope || [];
     const newScopes = checked
       ? [...currentScopes, scope]
-      : currentScopes.filter(s => s !== scope);
+      : currentScopes.filter((s) => s !== scope);
     onFiltersChange({ scope: newScopes });
   };
 
-  const removeFilter = (filterType: 'search' | 'type' | 'status' | 'scope') => {
+  const removeFilter = (filterType: "search" | "type" | "status" | "scope") => {
     switch (filterType) {
-      case 'search':
+      case "search":
         onFiltersChange({ search: undefined });
         break;
-      case 'type':
+      case "type":
         onFiltersChange({ type: [] });
         break;
-      case 'status':
+      case "status":
         onFiltersChange({ status: [] });
         break;
-      case 'scope':
+      case "scope":
         onFiltersChange({ scope: [] });
         break;
     }
@@ -109,24 +109,16 @@ export function CategoriesFilters({
               </Badge>
             )}
           </CardTitle>
-          
+
           <div className="flex items-center gap-2">
             {hasActiveFilters && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearAllFilters}
-              >
+              <Button variant="outline" size="sm" onClick={clearAllFilters}>
                 Clear All
               </Button>
             )}
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? 'Collapse' : 'Expand'}
+
+            <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
+              {isExpanded ? "Collapse" : "Expand"}
             </Button>
           </div>
         </div>
@@ -142,7 +134,7 @@ export function CategoriesFilters({
               <Input
                 id="search"
                 placeholder="Search categories by name, description, or slug..."
-                value={filters.search || ''}
+                value={filters.search || ""}
                 onChange={(e) => onFiltersChange({ search: e.target.value })}
                 className="pl-10"
               />
@@ -164,9 +156,12 @@ export function CategoriesFilters({
                     htmlFor={`type-${type}`}
                     className="text-sm font-normal cursor-pointer flex items-center gap-2"
                   >
-                    <span className="w-3 h-3 rounded" style={{ 
-                      backgroundColor: CATEGORY_TYPE_DISPLAY[type].color 
-                    }} />
+                    <span
+                      className="w-3 h-3 rounded"
+                      style={{
+                        backgroundColor: CATEGORY_TYPE_DISPLAY[type].color,
+                      }}
+                    />
                     {CATEGORY_TYPE_DISPLAY[type].name}
                   </Label>
                 </div>
@@ -189,7 +184,7 @@ export function CategoriesFilters({
                     htmlFor={`status-${status}`}
                     className="text-sm font-normal cursor-pointer flex items-center gap-2"
                   >
-                    <Badge 
+                    <Badge
                       variant={CATEGORY_STATUS_DISPLAY[status].badgeVariant}
                       className="text-xs"
                     >
@@ -216,9 +211,12 @@ export function CategoriesFilters({
                     htmlFor={`scope-${scope}`}
                     className="text-sm font-normal cursor-pointer flex items-center gap-2"
                   >
-                    <span className="w-3 h-3 rounded" style={{ 
-                      backgroundColor: CATEGORY_SCOPE_DISPLAY[scope].color 
-                    }} />
+                    <span
+                      className="w-3 h-3 rounded"
+                      style={{
+                        backgroundColor: CATEGORY_SCOPE_DISPLAY[scope].color,
+                      }}
+                    />
                     {CATEGORY_SCOPE_DISPLAY[scope].name}
                   </Label>
                 </div>
@@ -231,7 +229,7 @@ export function CategoriesFilters({
             <div className="space-y-2">
               <Label>Sort By</Label>
               <Select
-                value={filters.sortBy || 'order'}
+                value={filters.sortBy || "order"}
                 onValueChange={(value) => onFiltersChange({ sortBy: value as any })}
               >
                 <SelectTrigger>
@@ -251,7 +249,7 @@ export function CategoriesFilters({
             <div className="space-y-2">
               <Label>Sort Order</Label>
               <Select
-                value={filters.sortOrder || 'asc'}
+                value={filters.sortOrder || "asc"}
                 onValueChange={(value) => onFiltersChange({ sortOrder: value as any })}
               >
                 <SelectTrigger>
@@ -275,43 +273,43 @@ export function CategoriesFilters({
               <Badge variant="secondary" className="gap-1">
                 Search: "{filters.search}"
                 <button
-                  onClick={() => removeFilter('search')}
+                  onClick={() => removeFilter("search")}
                   className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
                 >
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
             )}
-            
+
             {filters.type && filters.type.length > 0 && (
               <Badge variant="secondary" className="gap-1">
                 Type ({filters.type.length})
                 <button
-                  onClick={() => removeFilter('type')}
+                  onClick={() => removeFilter("type")}
                   className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
                 >
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
             )}
-            
+
             {filters.status && filters.status.length > 0 && (
               <Badge variant="secondary" className="gap-1">
                 Status ({filters.status.length})
                 <button
-                  onClick={() => removeFilter('status')}
+                  onClick={() => removeFilter("status")}
                   className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
                 >
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
             )}
-            
+
             {filters.scope && filters.scope.length > 0 && (
               <Badge variant="secondary" className="gap-1">
                 Scope ({filters.scope.length})
                 <button
-                  onClick={() => removeFilter('scope')}
+                  onClick={() => removeFilter("scope")}
                   className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
                 >
                   <X className="h-3 w-3" />

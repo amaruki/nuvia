@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   RefreshCw,
   AlertTriangle,
   Download,
@@ -20,16 +20,16 @@ import {
   Trash2,
   Grid3X3,
   List,
-  Search
+  Search,
 } from "lucide-react";
 
 import { CategoryCard } from "@/components/content/category-card";
 import { CategoriesFilters } from "@/components/content/categories-filters";
-import { 
-  CategoriesOverviewCards, 
-  CategoriesBreakdown, 
-  CategoriesStatusBreakdown, 
-  MostUsedCategories 
+import {
+  CategoriesOverviewCards,
+  CategoriesBreakdown,
+  CategoriesStatusBreakdown,
+  MostUsedCategories,
 } from "@/components/content/categories-overview-cards";
 import { AddCategoryForm } from "@/components/content/add-category-form";
 import { useCategories } from "@/lib/hooks/use-categories";
@@ -89,7 +89,9 @@ export default function ContentCategories() {
   };
 
   const handleDelete = async (category: Category) => {
-    if (confirm(`Are you sure you want to delete "${category.name}"? This action cannot be undone.`)) {
+    if (
+      confirm(`Are you sure you want to delete "${category.name}"? This action cannot be undone.`)
+    ) {
       try {
         await deleteCategory(category.id);
       } catch (error) {
@@ -146,7 +148,7 @@ export default function ContentCategories() {
 
   const handleUpdateCategory = async (data: CategoryFormData) => {
     if (!editingCategory) return;
-    
+
     try {
       await updateCategory(editingCategory.id, data);
       setShowAddForm(false);
@@ -158,10 +160,12 @@ export default function ContentCategories() {
 
   const handleBulkPublish = async () => {
     if (selectedCategories.length === 0) return;
-    
-    if (confirm(`Are you sure you want to activate ${selectedCategories.length} selected categories?`)) {
+
+    if (
+      confirm(`Are you sure you want to activate ${selectedCategories.length} selected categories?`)
+    ) {
       try {
-        await bulkUpdateStatus(selectedCategories, 'active');
+        await bulkUpdateStatus(selectedCategories, "active");
         setSelectedCategories([]);
       } catch (error) {
         console.error("Error bulk activating categories:", error);
@@ -171,10 +175,12 @@ export default function ContentCategories() {
 
   const handleBulkArchive = async () => {
     if (selectedCategories.length === 0) return;
-    
-    if (confirm(`Are you sure you want to archive ${selectedCategories.length} selected categories?`)) {
+
+    if (
+      confirm(`Are you sure you want to archive ${selectedCategories.length} selected categories?`)
+    ) {
       try {
-        await bulkUpdateStatus(selectedCategories, 'archived');
+        await bulkUpdateStatus(selectedCategories, "archived");
         setSelectedCategories([]);
       } catch (error) {
         console.error("Error bulk archiving categories:", error);
@@ -184,8 +190,12 @@ export default function ContentCategories() {
 
   const handleBulkDelete = async () => {
     if (selectedCategories.length === 0) return;
-    
-    if (confirm(`Are you sure you want to delete ${selectedCategories.length} selected categories? This action cannot be undone.`)) {
+
+    if (
+      confirm(
+        `Are you sure you want to delete ${selectedCategories.length} selected categories? This action cannot be undone.`,
+      )
+    ) {
       try {
         await bulkDelete(selectedCategories);
         setSelectedCategories([]);
@@ -195,7 +205,7 @@ export default function ContentCategories() {
     }
   };
 
-  const handleExport = (format: 'csv' | 'json') => {
+  const handleExport = (format: "csv" | "json") => {
     exportCategories(format);
   };
 
@@ -244,10 +254,13 @@ export default function ContentCategories() {
           <h2 className="text-2xl font-bold">
             {editingCategory ? "Edit Category" : "Create New Category"}
           </h2>
-          <Button variant="outline" onClick={() => {
-            setShowAddForm(false);
-            setEditingCategory(null);
-          }}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowAddForm(false);
+              setEditingCategory(null);
+            }}
+          >
             Cancel
           </Button>
         </div>
@@ -266,7 +279,6 @@ export default function ContentCategories() {
 
   return (
     <div className="space-y-6">
-
       {/* Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
@@ -339,16 +351,20 @@ export default function ContentCategories() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="categories" className="text-xs sm:text-sm py-2 px-2">Categories</TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">Analytics</TabsTrigger>
-          <TabsTrigger value="settings" className="text-xs sm:text-sm py-2 px-2">Settings</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="categories" className="text-xs sm:text-sm py-2 px-2">
+            Categories
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">
+            Analytics
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="text-xs sm:text-sm py-2 px-2">
+            Settings
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -382,7 +398,7 @@ export default function ContentCategories() {
                   if (selected) {
                     setSelectedCategories([...selectedCategories, category.id]);
                   } else {
-                    setSelectedCategories(selectedCategories.filter(id => id !== category.id));
+                    setSelectedCategories(selectedCategories.filter((id) => id !== category.id));
                   }
                 }}
               />
@@ -421,17 +437,16 @@ export default function ContentCategories() {
       <div className="flex items-center gap-2 p-3 bg-muted/20 rounded-lg border">
         <span className="text-sm font-medium">Import/Export:</span>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
+          <Button variant="outline" size="sm" onClick={() => handleExport("csv")}>
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('json')}>
+          <Button variant="outline" size="sm" onClick={() => handleExport("json")}>
             <Download className="mr-2 h-4 w-4" />
             Export JSON
           </Button>
         </div>
       </div>
-
     </div>
   );
 }

@@ -5,12 +5,12 @@
  * and analytics for the role management system.
  */
 
-'use client';
+"use client";
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Users,
   Shield,
@@ -22,8 +22,8 @@ import {
   Crown,
   Building,
   Briefcase,
-  GraduationCap
-} from 'lucide-react';
+  GraduationCap,
+} from "lucide-react";
 // Chart components (requires recharts dependency)
 // import {
 //   BarChart,
@@ -38,7 +38,7 @@ import {
 //   Cell,
 //   Legend
 // } from 'recharts';
-import { Role, ROLE_DISPLAY_INFO } from '@/types/role.types';
+import { Role, ROLE_DISPLAY_INFO } from "@/types/role.types";
 
 // Statistics data interface
 export interface RoleStatisticsData {
@@ -62,20 +62,20 @@ interface RoleStatisticsProps {
 
 // Color palette for charts
 const CHART_COLORS = [
-  '#3b82f6', // blue
-  '#ef4444', // red
-  '#10b981', // green
-  '#f59e0b', // amber
-  '#8b5cf6', // violet
-  '#ec4899', // pink
-  '#06b6d4', // cyan
-  '#f97316', // orange
-  '#6366f1', // indigo
-  '#84cc16', // lime
-  '#14b8a6', // teal
-  '#a855f7', // purple
-  '#64748b', // slate
-  '#0ea5e9', // sky
+  "#3b82f6", // blue
+  "#ef4444", // red
+  "#10b981", // green
+  "#f59e0b", // amber
+  "#8b5cf6", // violet
+  "#ec4899", // pink
+  "#06b6d4", // cyan
+  "#f97316", // orange
+  "#6366f1", // indigo
+  "#84cc16", // lime
+  "#14b8a6", // teal
+  "#a855f7", // purple
+  "#64748b", // slate
+  "#0ea5e9", // sky
 ];
 
 export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
@@ -113,39 +113,44 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
   const { totalUsers, roleDistribution, roleBreakdown } = data;
 
   // Prepare data for charts
-  const barChartData = roleBreakdown.map(item => ({
+  const barChartData = roleBreakdown.map((item) => ({
     role: item.displayName,
     count: item.count,
     percentage: item.percentage,
-    category: item.category
+    category: item.category,
   }));
 
   const pieChartData = roleBreakdown
-    .filter(item => item.count > 0)
+    .filter((item) => item.count > 0)
     .map((item, index) => ({
       name: item.displayName,
       value: item.count,
-      color: CHART_COLORS[index % CHART_COLORS.length]
+      color: CHART_COLORS[index % CHART_COLORS.length],
     }));
 
   // Calculate key metrics
   const adminUsers = (roleDistribution.admin || 0) + (roleDistribution.superadmin || 0);
   const staffUsers = (roleDistribution.staff || 0) + (roleDistribution.treasurer || 0);
-  const leadershipUsers = (roleDistribution.chapter_president || 0) +
-                          (roleDistribution.chapter_admin || 0) +
-                          (roleDistribution.committee_chair || 0);
-  const memberUsers = totalUsers - adminUsers - staffUsers - leadershipUsers - (roleDistribution.user || 0);
+  const leadershipUsers =
+    (roleDistribution.chapter_president || 0) +
+    (roleDistribution.chapter_admin || 0) +
+    (roleDistribution.committee_chair || 0);
+  const memberUsers =
+    totalUsers - adminUsers - staffUsers - leadershipUsers - (roleDistribution.user || 0);
   const regularUsers = roleDistribution.user || 0;
 
   // Get category-wise breakdown
-  const categoryBreakdown = roleBreakdown.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = { count: 0, roles: [] };
-    }
-    acc[item.category].count += item.count;
-    acc[item.category].roles.push(item);
-    return acc;
-  }, {} as Record<string, { count: number; roles: any[] }>);
+  const categoryBreakdown = roleBreakdown.reduce(
+    (acc, item) => {
+      if (!acc[item.category]) {
+        acc[item.category] = { count: 0, roles: [] };
+      }
+      acc[item.category].count += item.count;
+      acc[item.category].roles.push(item);
+      return acc;
+    },
+    {} as Record<string, { count: number; roles: any[] }>,
+  );
 
   return (
     <div className="space-y-6">
@@ -158,9 +163,7 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalUsers.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Registered users in system
-            </p>
+            <p className="text-xs text-muted-foreground">Registered users in system</p>
           </CardContent>
         </Card>
 
@@ -184,9 +187,7 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">{leadershipUsers}</div>
-            <p className="text-xs text-muted-foreground">
-              Chapter and committee leaders
-            </p>
+            <p className="text-xs text-muted-foreground">Chapter and committee leaders</p>
           </CardContent>
         </Card>
 
@@ -197,9 +198,7 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{roleBreakdown.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Roles with assigned users
-            </p>
+            <p className="text-xs text-muted-foreground">Roles with assigned users</p>
           </CardContent>
         </Card>
       </div>
@@ -208,9 +207,7 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
       <Card>
         <CardHeader>
           <CardTitle>Role Distribution</CardTitle>
-          <CardDescription>
-            Number of users per role
-          </CardDescription>
+          <CardDescription>Number of users per role</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -231,9 +228,7 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
       <Card>
         <CardHeader>
           <CardTitle>Category Breakdown</CardTitle>
-          <CardDescription>
-            User distribution by role category
-          </CardDescription>
+          <CardDescription>User distribution by role category</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -241,21 +236,31 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
               const percentage = Math.round((data.count / totalUsers) * 100);
               const getCategoryIcon = (cat: string) => {
                 switch (cat) {
-                  case 'administrative': return <Shield className="h-4 w-4" />;
-                  case 'leadership': return <Crown className="h-4 w-4" />;
-                  case 'staff': return <Users className="h-4 w-4" />;
-                  case 'membership': return <UserCheck className="h-4 w-4" />;
-                  default: return <Users className="h-4 w-4" />;
+                  case "administrative":
+                    return <Shield className="h-4 w-4" />;
+                  case "leadership":
+                    return <Crown className="h-4 w-4" />;
+                  case "staff":
+                    return <Users className="h-4 w-4" />;
+                  case "membership":
+                    return <UserCheck className="h-4 w-4" />;
+                  default:
+                    return <Users className="h-4 w-4" />;
                 }
               };
 
               const getCategoryColor = (cat: string) => {
                 switch (cat) {
-                  case 'administrative': return 'text-red-600';
-                  case 'leadership': return 'text-purple-600';
-                  case 'staff': return 'text-blue-600';
-                  case 'membership': return 'text-green-600';
-                  default: return 'text-gray-600';
+                  case "administrative":
+                    return "text-red-600";
+                  case "leadership":
+                    return "text-purple-600";
+                  case "staff":
+                    return "text-blue-600";
+                  case "membership":
+                    return "text-green-600";
+                  default:
+                    return "text-gray-600";
                 }
               };
 
@@ -274,16 +279,13 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
                   <Progress value={percentage} className="h-2" />
                   <div className="flex flex-wrap gap-1">
                     {data.roles.map((role, index) => (
-                      <Badge
-                        key={role.role}
-                        variant="outline"
-                        className="text-xs"
-                      >
+                      <Badge key={role.role} variant="outline" className="text-xs">
                         {role.displayName} ({role.count})
                       </Badge>
                     ))}
                   </div>
-                  {category !== Object.keys(categoryBreakdown)[Object.keys(categoryBreakdown).length - 1] && (
+                  {category !==
+                    Object.keys(categoryBreakdown)[Object.keys(categoryBreakdown).length - 1] && (
                     <div className="border-t pt-2" />
                   )}
                 </div>
@@ -297,9 +299,7 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
       <Card>
         <CardHeader>
           <CardTitle>Role Details</CardTitle>
-          <CardDescription>
-            Complete breakdown of all roles and their user counts
-          </CardDescription>
+          <CardDescription>Complete breakdown of all roles and their user counts</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -313,9 +313,7 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
-                          <Badge variant={isCustom ? 'secondary' : 'outline'}>
-                            {item.role}
-                          </Badge>
+                          <Badge variant={isCustom ? "secondary" : "outline"}>{item.role}</Badge>
                           {isCustom && (
                             <Badge variant="outline" className="text-xs">
                               Custom
@@ -323,11 +321,9 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
                           )}
                         </div>
                         <div>
-                          <div className="font-medium">
-                            {roleInfo?.name || item.role}
-                          </div>
+                          <div className="font-medium">{roleInfo?.name || item.role}</div>
                           <div className="text-sm text-muted-foreground">
-                            {roleInfo?.description || 'Custom role'}
+                            {roleInfo?.description || "Custom role"}
                           </div>
                         </div>
                       </div>

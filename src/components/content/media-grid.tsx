@@ -5,12 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Eye, 
-  Download, 
-  Edit, 
-  Copy, 
-  Trash2, 
+import {
+  Eye,
+  Download,
+  Edit,
+  Copy,
+  Trash2,
   MoreHorizontal,
   Image as ImageIcon,
   Video,
@@ -21,14 +21,9 @@ import {
   Users,
   Globe,
   Grid3X3,
-  List
+  List,
 } from "lucide-react";
-import { 
-  Media, 
-  MediaType, 
-  MediaStatus, 
-  MediaVisibility 
-} from "@/types/media.types";
+import { Media, MediaType, MediaStatus, MediaVisibility } from "@/types/media.types";
 import { cn } from "@/lib/utils";
 
 interface MediaGridProps {
@@ -40,8 +35,8 @@ interface MediaGridProps {
   onDelete: (media: Media) => void;
   onDuplicate: (media: Media) => void;
   loading?: boolean;
-  viewMode?: 'grid' | 'table';
-  onViewModeChange?: (mode: 'grid' | 'table') => void;
+  viewMode?: "grid" | "table";
+  onViewModeChange?: (mode: "grid" | "table") => void;
 }
 
 export function MediaGrid({
@@ -53,8 +48,8 @@ export function MediaGrid({
   onDelete,
   onDuplicate,
   loading = false,
-  viewMode = 'grid',
-  onViewModeChange
+  viewMode = "grid",
+  onViewModeChange,
 }: MediaGridProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const selectAllRef = useRef<HTMLButtonElement>(null);
@@ -70,7 +65,7 @@ export function MediaGrid({
       presentation: FileText,
       pdf: FileText,
       vector: ImageIcon,
-      font: FileText
+      font: FileText,
     };
     return iconMap[type] || FileText;
   };
@@ -81,7 +76,7 @@ export function MediaGrid({
       processing: "amber",
       ready: "emerald",
       failed: "red",
-      archived: "slate"
+      archived: "slate",
     };
     return colorMap[status] || "slate";
   };
@@ -91,25 +86,25 @@ export function MediaGrid({
       public: Globe,
       private: Lock,
       restricted: Users,
-      draft: Eye
+      draft: Eye,
     };
     return iconMap[visibility] || Lock;
   };
 
   const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) return "0 B";
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const sizes = ["B", "KB", "MB", "GB", "TB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     const idx = Math.min(i, sizes.length - 1);
     return `${parseFloat((bytes / Math.pow(k, idx)).toFixed(2))} ${sizes[idx]}`;
   };
 
   const formatDate = (date: Date): string => {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     }).format(date);
   };
 
@@ -117,13 +112,13 @@ export function MediaGrid({
     if (checked) {
       onSelectionChange([...selectedMedia, mediaId]);
     } else {
-      onSelectionChange(selectedMedia.filter(id => id !== mediaId));
+      onSelectionChange(selectedMedia.filter((id) => id !== mediaId));
     }
   };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      onSelectionChange(media.map(item => item.id));
+      onSelectionChange(media.map((item) => item.id));
     } else {
       onSelectionChange([]);
     }
@@ -131,7 +126,7 @@ export function MediaGrid({
 
   const isAllSelected = media.length > 0 && selectedMedia.length === media.length;
   const isIndeterminate = selectedMedia.length > 0 && selectedMedia.length < media.length;
-  
+
   // Set indeterminate state on the checkbox
   useEffect(() => {
     if (selectAllRef.current) {
@@ -159,9 +154,7 @@ export function MediaGrid({
         <div className="text-muted-foreground">
           <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <p className="text-lg font-medium mb-2">No media found</p>
-          <p className="text-sm">
-            Try adjusting your filters or upload new media files
-          </p>
+          <p className="text-sm">Try adjusting your filters or upload new media files</p>
         </div>
       </div>
     );
@@ -173,30 +166,30 @@ export function MediaGrid({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button
-            variant={viewMode === 'grid' ? 'default' : 'outline'}
+            variant={viewMode === "grid" ? "default" : "outline"}
             size="sm"
-            onClick={() => onViewModeChange?.('grid')}
+            onClick={() => onViewModeChange?.("grid")}
           >
             <Grid3X3 className="h-4 w-4 mr-2" />
             Grid
           </Button>
           <Button
-            variant={viewMode === 'table' ? 'default' : 'outline'}
+            variant={viewMode === "table" ? "default" : "outline"}
             size="sm"
-            onClick={() => onViewModeChange?.('table')}
+            onClick={() => onViewModeChange?.("table")}
           >
             <List className="h-4 w-4 mr-2" />
             Table
           </Button>
         </div>
-        
+
         <div className="text-sm text-muted-foreground">
           {media.length} items • {selectedMedia.length} selected
         </div>
       </div>
 
       {/* Grid View */}
-      {viewMode === 'grid' && (
+      {viewMode === "grid" && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {media.map((item) => {
             const isSelected = selectedMedia.includes(item.id);
@@ -208,7 +201,7 @@ export function MediaGrid({
                 className={cn(
                   "group cursor-pointer overflow-hidden transition-all hover:shadow-lg",
                   isSelected && "ring-2 ring-primary",
-                  isHovered && "shadow-md"
+                  isHovered && "shadow-md",
                 )}
                 onMouseEnter={() => setHoveredItem(item.id)}
                 onMouseLeave={() => setHoveredItem(null)}
@@ -235,18 +228,18 @@ export function MediaGrid({
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         {React.createElement(getMediaIcon(item.type), {
-                          className: "h-8 w-8 text-muted-foreground"
+                          className: "h-8 w-8 text-muted-foreground",
                         })}
                       </div>
                     )}
-                    
+
                     {/* Status Badge */}
                     <div className="absolute top-2 right-2">
                       <Badge
                         variant="outline"
                         className={cn(
                           "text-xs bg-white/90 backdrop-blur",
-                          `border-${getStatusColor(item.status)}`
+                          `border-${getStatusColor(item.status)}`,
                         )}
                       >
                         {item.status}
@@ -257,7 +250,7 @@ export function MediaGrid({
                     <div className="absolute bottom-2 right-2">
                       <div className="h-6 w-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center">
                         {React.createElement(getVisibilityIcon(item.visibility), {
-                          className: "h-3 w-3"
+                          className: "h-3 w-3",
                         })}
                       </div>
                     </div>
@@ -269,12 +262,14 @@ export function MediaGrid({
                     <p className="text-xs text-muted-foreground mb-2">
                       {item.type} • {formatFileSize(item.metadata.size)}
                     </p>
-                    
+
                     {/* Actions */}
-                    <div className={cn(
-                      "flex items-center gap-1 opacity-0 transition-opacity",
-                      "group-hover:opacity-100"
-                    )}>
+                    <div
+                      className={cn(
+                        "flex items-center gap-1 opacity-0 transition-opacity",
+                        "group-hover:opacity-100",
+                      )}
+                    >
                       <Button
                         variant="ghost"
                         size="sm"
@@ -325,7 +320,7 @@ export function MediaGrid({
       )}
 
       {/* Table View */}
-      {viewMode === 'table' && (
+      {viewMode === "table" && (
         <div className="border rounded-lg overflow-hidden">
           <table className="w-full">
             <thead className="bg-muted">
@@ -354,10 +349,7 @@ export function MediaGrid({
                 return (
                   <tr
                     key={item.id}
-                    className={cn(
-                      "border-t hover:bg-muted/50",
-                      isSelected && "bg-muted/30"
-                    )}
+                    className={cn("border-t hover:bg-muted/50", isSelected && "bg-muted/30")}
                   >
                     <td className="p-3">
                       <Checkbox
@@ -369,22 +361,17 @@ export function MediaGrid({
                     <td className="p-3">
                       <div className="flex items-center gap-2">
                         {React.createElement(getMediaIcon(item.type), {
-                          className: "h-4 w-4"
+                          className: "h-4 w-4",
                         })}
                         <span className="font-medium">{item.title}</span>
                       </div>
                     </td>
                     <td className="p-3 text-sm">{item.type}</td>
-                    <td className="p-3 text-sm">
-                      {formatFileSize(item.metadata.size)}
-                    </td>
+                    <td className="p-3 text-sm">{formatFileSize(item.metadata.size)}</td>
                     <td className="p-3">
                       <Badge
                         variant="outline"
-                        className={cn(
-                          "text-xs",
-                          `border-${getStatusColor(item.status)}`
-                        )}
+                        className={cn("text-xs", `border-${getStatusColor(item.status)}`)}
                       >
                         {item.status}
                       </Badge>
@@ -392,42 +379,24 @@ export function MediaGrid({
                     <td className="p-3">
                       <div className="flex items-center gap-1">
                         {React.createElement(getVisibilityIcon(item.visibility), {
-                          className: "h-3 w-3"
+                          className: "h-3 w-3",
                         })}
                         <span className="text-xs">{item.visibility}</span>
                       </div>
                     </td>
-                    <td className="p-3 text-sm">
-                      {formatDate(item.createdAt)}
-                    </td>
+                    <td className="p-3 text-sm">{formatDate(item.createdAt)}</td>
                     <td className="p-3">
                       <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onViewDetails(item)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => onViewDetails(item)}>
                           <Eye className="h-3 w-3" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onEdit(item)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => onEdit(item)}>
                           <Edit className="h-3 w-3" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onDuplicate(item)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => onDuplicate(item)}>
                           <Copy className="h-3 w-3" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onDelete(item)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => onDelete(item)}>
                           <Trash2 className="h-3 w-3" />
                         </Button>
                       </div>

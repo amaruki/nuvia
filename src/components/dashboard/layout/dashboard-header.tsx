@@ -115,7 +115,7 @@ export function DashboardHeader({
     <header
       className={cn(
         "sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-200",
-        className
+        className,
       )}
     >
       <div className="flex w-full items-center gap-2 px-4">
@@ -132,9 +132,7 @@ export function DashboardHeader({
                   <React.Fragment key={index}>
                     <BreadcrumbItem className="hidden md:block">
                       {index === breadcrumbs.length - 1 ? (
-                        <BreadcrumbPage className="font-semibold">
-                          {item.label}
-                        </BreadcrumbPage>
+                        <BreadcrumbPage className="font-semibold">{item.label}</BreadcrumbPage>
                       ) : (
                         <BreadcrumbLink
                           href={item.href || "#"}
@@ -153,13 +151,9 @@ export function DashboardHeader({
             </Breadcrumb>
           ) : title ? (
             <div className="flex flex-col">
-              <h1 className="text-lg font-semibold text-foreground truncate">
-                {title}
-              </h1>
+              <h1 className="text-lg font-semibold text-foreground truncate">{title}</h1>
               {description && (
-                <p className="text-xs text-muted-foreground truncate">
-                  {description}
-                </p>
+                <p className="text-xs text-muted-foreground truncate">{description}</p>
               )}
             </div>
           ) : null}
@@ -204,11 +198,7 @@ export function DashboardHeader({
 
           {/* Command Menu - Mobile Search */}
           {showSearch && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 md:hidden"
-            >
+            <Button variant="ghost" size="icon" className="h-9 w-9 md:hidden">
               <Command className="h-4 w-4" />
               <span className="sr-only">Open command menu</span>
             </Button>
@@ -231,13 +221,13 @@ export function DashboardHeader({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-96 p-0">
-                <NotificationsWidget
-                  notifications={notifications}
-                  onMarkAsRead={onMarkAsRead}
-                  onMarkAllAsRead={onMarkAllAsRead}
-                  onDismiss={onDismiss}
-                  onViewAll={onViewAllNotifications}
-                />
+              <NotificationsWidget
+                notifications={notifications}
+                onMarkAsRead={onMarkAsRead}
+                onMarkAllAsRead={onMarkAllAsRead}
+                onDismiss={onDismiss}
+                onViewAll={onViewAllNotifications}
+              />
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -255,7 +245,7 @@ export function DashboardHeader({
                 Quick Settings
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              
+
               {/* Theme Toggle */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>

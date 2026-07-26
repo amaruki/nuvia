@@ -4,36 +4,37 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   ChapterFormData,
   ChapterStatus,
   ChapterLocation,
   ChapterContactInfo,
   ChapterSocialMedia,
-  ChapterSettings
+  ChapterSettings,
 } from "@/types/chapter.types";
-import { 
+import {
   Building2,
   MapPin,
   Phone,
@@ -50,8 +51,14 @@ import {
 } from "lucide-react";
 
 const chapterFormSchema = z.object({
-  name: z.string().min(3, "Chapter name must be at least 3 characters").max(50, "Chapter name must be less than 50 characters"),
-  displayName: z.string().min(3, "Display name must be at least 3 characters").max(100, "Display name must be less than 100 characters"),
+  name: z
+    .string()
+    .min(3, "Chapter name must be at least 3 characters")
+    .max(50, "Chapter name must be less than 50 characters"),
+  displayName: z
+    .string()
+    .min(3, "Display name must be at least 3 characters")
+    .max(100, "Display name must be less than 100 characters"),
   description: z.string().optional(),
   status: z.enum(["active", "inactive", "pending", "suspended"]),
   location: z.object({
@@ -246,7 +253,9 @@ export function AddChapterForm({
                     {...form.register("displayName")}
                   />
                   {form.formState.errors.displayName && (
-                    <p className="text-sm text-destructive">{form.formState.errors.displayName.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.displayName.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -297,31 +306,29 @@ export function AddChapterForm({
                     {...form.register("location.address")}
                   />
                   {form.formState.errors.location?.address && (
-                    <p className="text-sm text-destructive">{form.formState.errors.location.address.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.location.address.message}
+                    </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="city">City *</Label>
-                  <Input
-                    id="city"
-                    placeholder="New York"
-                    {...form.register("location.city")}
-                  />
+                  <Input id="city" placeholder="New York" {...form.register("location.city")} />
                   {form.formState.errors.location?.city && (
-                    <p className="text-sm text-destructive">{form.formState.errors.location.city.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.location.city.message}
+                    </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="state">State/Province *</Label>
-                  <Input
-                    id="state"
-                    placeholder="NY"
-                    {...form.register("location.state")}
-                  />
+                  <Input id="state" placeholder="NY" {...form.register("location.state")} />
                   {form.formState.errors.location?.state && (
-                    <p className="text-sm text-destructive">{form.formState.errors.location.state.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.location.state.message}
+                    </p>
                   )}
                 </div>
 
@@ -333,7 +340,9 @@ export function AddChapterForm({
                     {...form.register("location.country")}
                   />
                   {form.formState.errors.location?.country && (
-                    <p className="text-sm text-destructive">{form.formState.errors.location.country.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.location.country.message}
+                    </p>
                   )}
                 </div>
 
@@ -345,7 +354,9 @@ export function AddChapterForm({
                     {...form.register("location.postalCode")}
                   />
                   {form.formState.errors.location?.postalCode && (
-                    <p className="text-sm text-destructive">{form.formState.errors.location.postalCode.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.location.postalCode.message}
+                    </p>
                   )}
                 </div>
 
@@ -357,7 +368,9 @@ export function AddChapterForm({
                     {...form.register("location.region")}
                   />
                   {form.formState.errors.location?.region && (
-                    <p className="text-sm text-destructive">{form.formState.errors.location.region.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.location.region.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -380,7 +393,9 @@ export function AddChapterForm({
                   </SelectContent>
                 </Select>
                 {form.formState.errors.location?.timezone && (
-                  <p className="text-sm text-destructive">{form.formState.errors.location.timezone.message}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.location.timezone.message}
+                  </p>
                 )}
               </div>
             </TabsContent>
@@ -389,12 +404,7 @@ export function AddChapterForm({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-medium">Contact Information</h3>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={copyAddressToContact}
-                  >
+                  <Button type="button" variant="outline" size="sm" onClick={copyAddressToContact}>
                     <MapPin className="mr-2 h-4 w-4" />
                     Copy from Location
                   </Button>
@@ -410,7 +420,9 @@ export function AddChapterForm({
                       {...form.register("contactInfo.email")}
                     />
                     {form.formState.errors.contactInfo?.email && (
-                      <p className="text-sm text-destructive">{form.formState.errors.contactInfo.email.message}</p>
+                      <p className="text-sm text-destructive">
+                        {form.formState.errors.contactInfo.email.message}
+                      </p>
                     )}
                   </div>
 
@@ -431,7 +443,9 @@ export function AddChapterForm({
                       {...form.register("contactInfo.website")}
                     />
                     {form.formState.errors.contactInfo?.website && (
-                      <p className="text-sm text-destructive">{form.formState.errors.contactInfo.website.message}</p>
+                      <p className="text-sm text-destructive">
+                        {form.formState.errors.contactInfo.website.message}
+                      </p>
                     )}
                   </div>
 
@@ -514,7 +528,9 @@ export function AddChapterForm({
                       {...form.register("settings.membershipDues", { valueAsNumber: true })}
                     />
                     {form.formState.errors.settings?.membershipDues && (
-                      <p className="text-sm text-destructive">{form.formState.errors.settings.membershipDues.message}</p>
+                      <p className="text-sm text-destructive">
+                        {form.formState.errors.settings.membershipDues.message}
+                      </p>
                     )}
                   </div>
 
@@ -522,7 +538,9 @@ export function AddChapterForm({
                     <Label htmlFor="meetingFrequency">Meeting Frequency *</Label>
                     <Select
                       value={form.watch("settings.meetingFrequency")}
-                      onValueChange={(value) => form.setValue("settings.meetingFrequency", value as any)}
+                      onValueChange={(value) =>
+                        form.setValue("settings.meetingFrequency", value as any)
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select frequency" />
@@ -572,7 +590,9 @@ export function AddChapterForm({
                     <Switch
                       id="allowOnlineRegistration"
                       checked={form.watch("settings.allowOnlineRegistration")}
-                      onCheckedChange={(checked) => form.setValue("settings.allowOnlineRegistration", checked)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("settings.allowOnlineRegistration", checked)
+                      }
                     />
                   </div>
 
@@ -586,7 +606,9 @@ export function AddChapterForm({
                     <Switch
                       id="requireApproval"
                       checked={form.watch("settings.requireApproval")}
-                      onCheckedChange={(checked) => form.setValue("settings.requireApproval", checked)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("settings.requireApproval", checked)
+                      }
                     />
                   </div>
 
@@ -600,7 +622,9 @@ export function AddChapterForm({
                     <Switch
                       id="autoRenewMembership"
                       checked={form.watch("settings.autoRenewMembership")}
-                      onCheckedChange={(checked) => form.setValue("settings.autoRenewMembership", checked)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("settings.autoRenewMembership", checked)
+                      }
                     />
                   </div>
 
@@ -614,7 +638,9 @@ export function AddChapterForm({
                     <Switch
                       id="sendReminders"
                       checked={form.watch("settings.sendReminders")}
-                      onCheckedChange={(checked) => form.setValue("settings.sendReminders", checked)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("settings.sendReminders", checked)
+                      }
                     />
                   </div>
 
@@ -628,7 +654,9 @@ export function AddChapterForm({
                     <Switch
                       id="publicDirectory"
                       checked={form.watch("settings.publicDirectory")}
-                      onCheckedChange={(checked) => form.setValue("settings.publicDirectory", checked)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("settings.publicDirectory", checked)
+                      }
                     />
                   </div>
                 </div>
@@ -652,9 +680,7 @@ export function AddChapterForm({
                   {isEditing ? "Updating..." : "Creating..."}
                 </>
               ) : (
-                <>
-                  {isEditing ? "Update Chapter" : "Create Chapter"}
-                </>
+                <>{isEditing ? "Update Chapter" : "Create Chapter"}</>
               )}
             </Button>
           </DialogFooter>

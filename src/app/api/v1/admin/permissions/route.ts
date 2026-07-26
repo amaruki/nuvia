@@ -1,11 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { requirePermission } from '@/lib/rbac';
-import { AuthResponseFactory, AuthErrorType } from '@/lib/auth/common';
-import {
-  AVAILABLE_PERMISSIONS,
-  PERMISSION_CATEGORIES,
-  formatPermission
-} from '@/types/role.types';
+import { NextRequest, NextResponse } from "next/server";
+import { requirePermission } from "@/lib/rbac";
+import { AuthResponseFactory, AuthErrorType } from "@/lib/auth/common";
+import { AVAILABLE_PERMISSIONS, PERMISSION_CATEGORIES, formatPermission } from "@/types/role.types";
 
 /**
  * GET /api/v1/admin/permissions - Get all available permissions
@@ -14,51 +10,50 @@ import {
 export async function GET(request: NextRequest) {
   try {
     // Authorization check
-    const auth = await requirePermission('users:read');
+    const auth = await requirePermission("users:read");
 
     if (!auth.success) {
-      return AuthResponseFactory.error(
-      AuthErrorType.AUTHORIZATION,
-      auth.error || 'UNAUTHORIZED'
-    );
+      return AuthResponseFactory.error(AuthErrorType.AUTHORIZATION, auth.error || "UNAUTHORIZED");
     }
 
     // Get search parameters
     const { searchParams } = new URL(request.url);
-    const groupBy = searchParams.get('groupBy') as 'module' | 'category' | 'flat' || 'category';
+    const groupBy = (searchParams.get("groupBy") as "module" | "category" | "flat") || "category";
 
     // Format permissions based on grouping preference
     let permissions: any;
 
     switch (groupBy) {
-      case 'module':
+      case "module":
         permissions = groupPermissionsByModule();
         break;
-      case 'category':
+      case "category":
         permissions = groupPermissionsByCategory();
         break;
-      case 'flat':
+      case "flat":
       default:
-        permissions = AVAILABLE_PERMISSIONS.map(permission => ({
+        permissions = AVAILABLE_PERMISSIONS.map((permission) => ({
           id: permission,
           name: formatPermission(permission),
-          module: permission.split(':')[0],
-          action: permission.split(':')[1]
+          module: permission.split(":")[0],
+          action: permission.split(":")[1],
         }));
         break;
     }
 
-    return AuthResponseFactory.success({
-      permissions,
-      categories: Object.entries(PERMISSION_CATEGORIES).map(([key, value]) => ({
-        module: key,
-        ...value
-      }))
-    }, 'Permissions retrieved successfully');
-
+    return AuthResponseFactory.success(
+      {
+        permissions,
+        categories: Object.entries(PERMISSION_CATEGORIES).map(([key, value]) => ({
+          module: key,
+          ...value,
+        })),
+      },
+      "Permissions retrieved successfully",
+    );
   } catch (error) {
-    console.error('Error getting permissions:', error);
-    return AuthResponseFactory.internalError('Failed to retrieve permissions');
+    console.error("Error getting permissions:", error);
+    return AuthResponseFactory.internalError("Failed to retrieve permissions");
   }
 }
 
@@ -66,14 +61,17 @@ export async function GET(request: NextRequest) {
  * Group permissions by module (e.g., users, events, etc.)
  */
 function groupPermissionsByModule() {
-  const grouped: Record<string, Array<{
-    id: string;
-    name: string;
-    action: string;
-  }>> = {};
+  const grouped: Record<
+    string,
+    Array<{
+      id: string;
+      name: string;
+      action: string;
+    }>
+  > = {};
 
-  AVAILABLE_PERMISSIONS.forEach(permission => {
-    const [module, action] = permission.split(':');
+  AVAILABLE_PERMISSIONS.forEach((permission) => {
+    const [module, action] = permission.split(":");
 
     if (!grouped[module]) {
       grouped[module] = [];
@@ -82,14 +80,14 @@ function groupPermissionsByModule() {
     grouped[module].push({
       id: permission,
       name: formatPermission(permission),
-      action: action.charAt(0).toUpperCase() + action.slice(1)
+      action: action.charAt(0).toUpperCase() + action.slice(1),
     });
   });
 
   return Object.entries(grouped).map(([module, permissions]) => ({
     module,
     category: PERMISSION_CATEGORIES[module as keyof typeof PERMISSION_CATEGORIES],
-    permissions
+    permissions,
   }));
 }
 
@@ -97,36 +95,39 @@ function groupPermissionsByModule() {
  * Group permissions by category for UI organization
  */
 function groupPermissionsByCategory() {
-  const grouped: Record<string, {
-    name: string;
-    description: string;
-    icon: string;
-    color: string;
-    permissions: Array<{
-      id: string;
+  const grouped: Record<
+    string,
+    {
       name: string;
-      action: string;
-    }>;
-  }> = {};
+      description: string;
+      icon: string;
+      color: string;
+      permissions: Array<{
+        id: string;
+        name: string;
+        action: string;
+      }>;
+    }
+  > = {};
 
-  AVAILABLE_PERMISSIONS.forEach(permission => {
-    const [module, action] = permission.split(':');
+  AVAILABLE_PERMISSIONS.forEach((permission) => {
+    const [module, action] = permission.split(":");
     const category = PERMISSION_CATEGORIES[module as keyof typeof PERMISSION_CATEGORIES];
 
     if (!grouped[module]) {
       grouped[module] = {
         name: category?.name || module,
         description: category?.description || `Manage ${module}`,
-        icon: category?.icon || 'settings',
-        color: category?.color || 'gray',
-        permissions: []
+        icon: category?.icon || "settings",
+        color: category?.color || "gray",
+        permissions: [],
       };
     }
 
     grouped[module].permissions.push({
       id: permission,
       name: formatPermission(permission),
-      action: action.charAt(0).toUpperCase() + action.slice(1)
+      action: action.charAt(0).toUpperCase() + action.slice(1),
     });
   });
 

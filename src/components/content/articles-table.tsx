@@ -1,25 +1,25 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
+import {
   MoreHorizontal,
   Eye,
   Edit,
@@ -46,14 +46,14 @@ import {
   ChevronUp,
   ChevronDown,
   Timer,
-  Zap
+  Zap,
 } from "lucide-react";
-import { 
-  Article, 
-  ARTICLE_TYPE_DISPLAY, 
-  ARTICLE_STATUS_DISPLAY, 
+import {
+  Article,
+  ARTICLE_TYPE_DISPLAY,
+  ARTICLE_STATUS_DISPLAY,
   ARTICLE_CATEGORY_DISPLAY,
-  ARTICLE_DIFFICULTY_DISPLAY 
+  ARTICLE_DIFFICULTY_DISPLAY,
 } from "@/types/article.types";
 import { cn } from "@/lib/utils";
 
@@ -80,7 +80,7 @@ export function ArticlesTable({
   onArchive,
   onSchedule,
   selectedArticles = [],
-  onSelectionChange
+  onSelectionChange,
 }: ArticlesTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
@@ -92,7 +92,7 @@ export function ArticlesTable({
       case_study: Briefcase,
       research_summary: Microscope,
       news: Megaphone,
-      interview: User
+      interview: User,
     };
     return iconMap[type as keyof typeof iconMap] || FileText;
   };
@@ -108,7 +108,7 @@ export function ArticlesTable({
       member_stories: Star,
       chapter_news: Building,
       announcements: Megaphone,
-      career_development: TrendingUp
+      career_development: TrendingUp,
     };
     return iconMap[category as keyof typeof iconMap] || FileText;
   };
@@ -117,7 +117,7 @@ export function ArticlesTable({
     const iconMap = {
       beginner: Star,
       intermediate: Timer,
-      advanced: Zap
+      advanced: Zap,
     };
     return iconMap[difficulty as keyof typeof iconMap] || Star;
   };
@@ -128,7 +128,7 @@ export function ArticlesTable({
       review: Clock,
       published: CheckCircle2,
       archived: Archive,
-      scheduled: Calendar
+      scheduled: Calendar,
     };
     return iconMap[status as keyof typeof iconMap] || Clock;
   };
@@ -138,7 +138,7 @@ export function ArticlesTable({
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "short",
-      day: "numeric"
+      day: "numeric",
     }).format(date);
   };
 
@@ -164,15 +164,15 @@ export function ArticlesTable({
 
   const handleSelectAll = (checked: boolean) => {
     if (onSelectionChange) {
-      onSelectionChange(checked ? articles.map(a => a.id) : []);
+      onSelectionChange(checked ? articles.map((a) => a.id) : []);
     }
   };
 
   const handleSelectRow = (id: string, checked: boolean) => {
     if (onSelectionChange) {
-      const newSelection = checked 
+      const newSelection = checked
         ? [...selectedArticles, id]
-        : selectedArticles.filter(selectedId => selectedId !== id);
+        : selectedArticles.filter((selectedId) => selectedId !== id);
       onSelectionChange(newSelection);
     }
   };
@@ -230,9 +230,7 @@ export function ArticlesTable({
                         {article.isFeatured && (
                           <Star className="h-3 w-3 text-yellow-500 fill-current" />
                         )}
-                        {article.isPinned && (
-                          <div className="h-3 w-3 bg-primary rounded-full" />
-                        )}
+                        {article.isPinned && <div className="h-3 w-3 bg-primary rounded-full" />}
                         <button
                           onClick={() => toggleRowExpansion(article.id)}
                           className="text-left hover:text-primary transition-colors flex items-center gap-1"
@@ -259,7 +257,7 @@ export function ArticlesTable({
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <StatusIcon className="h-4 w-4 text-muted-foreground" />
-                        <Badge 
+                        <Badge
                           variant={ARTICLE_STATUS_DISPLAY[article.status].badgeVariant}
                           className="text-xs"
                         >
@@ -272,7 +270,10 @@ export function ArticlesTable({
                         <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
                           <User className="h-3 w-3 text-muted-foreground" />
                         </div>
-                        <span className="text-sm truncate max-w-[100px]" title={article.author.name}>
+                        <span
+                          className="text-sm truncate max-w-[100px]"
+                          title={article.author.name}
+                        >
                           {article.author.name}
                         </span>
                       </div>
@@ -293,15 +294,18 @@ export function ArticlesTable({
                         </Badge>
                       </div>
                     </TableCell>
-                    <TableCell className="text-sm">
-                      {formatDate(article.publishedAt)}
-                    </TableCell>
+                    <TableCell className="text-sm">{formatDate(article.publishedAt)}</TableCell>
                     <TableCell className="text-right text-sm">
                       {formatNumber(article.metrics.views)}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <span className={cn("text-sm font-medium", getEngagementColor(article.metrics.engagementScore))}>
+                        <span
+                          className={cn(
+                            "text-sm font-medium",
+                            getEngagementColor(article.metrics.engagementScore),
+                          )}
+                        >
                           {article.metrics.engagementScore}
                         </span>
                         <TrendingUp className="h-3 w-3 text-muted-foreground" />
@@ -329,21 +333,21 @@ export function ArticlesTable({
                             Duplicate
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          {article.status === 'draft' && (
+                          {article.status === "draft" && (
                             <DropdownMenuItem onClick={() => onPublish(article)}>
                               <CheckCircle2 className="mr-2 h-4 w-4" />
                               Publish
                             </DropdownMenuItem>
                           )}
-                          {article.status === 'published' && (
+                          {article.status === "published" && (
                             <DropdownMenuItem onClick={() => onArchive(article)}>
                               <Archive className="mr-2 h-4 w-4" />
                               Archive
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            onClick={() => window.open(`/articles/${article.slug}`, '_blank')}
+                          <DropdownMenuItem
+                            onClick={() => window.open(`/articles/${article.slug}`, "_blank")}
                           >
                             <Share2 className="mr-2 h-4 w-4" />
                             Share
@@ -355,7 +359,7 @@ export function ArticlesTable({
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => onDelete(article)}
                             className="text-destructive focus:text-destructive"
                           >
@@ -366,7 +370,7 @@ export function ArticlesTable({
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                  
+
                   {/* Expanded Row - Quick Preview */}
                   {isExpanded && (
                     <TableRow>
@@ -409,12 +413,15 @@ export function ArticlesTable({
                               <div className="mt-3">
                                 <h5 className="text-xs font-medium mb-2">Tags</h5>
                                 <div className="flex flex-wrap gap-1">
-                                  {article.tags.map(tag => (
-                                    <Badge 
-                                      key={tag.id} 
-                                      variant="secondary" 
+                                  {article.tags.map((tag) => (
+                                    <Badge
+                                      key={tag.id}
+                                      variant="secondary"
                                       className="text-xs"
-                                      style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                                      style={{
+                                        backgroundColor: `${tag.color}20`,
+                                        color: tag.color,
+                                      }}
                                     >
                                       {tag.name}
                                     </Badge>

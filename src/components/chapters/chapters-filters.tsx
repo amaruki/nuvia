@@ -7,24 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { 
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  ChapterFilterOptions,
-  ChapterStatus,
-  ChapterRole
-} from "@/types/chapter.types";
-import { 
+import { ChapterFilterOptions, ChapterStatus, ChapterRole } from "@/types/chapter.types";
+import {
   Filter,
   X,
   ChevronDown,
@@ -33,7 +25,7 @@ import {
   Users,
   MapPin,
   Shield,
-  UserCheck
+  UserCheck,
 } from "lucide-react";
 
 interface ChaptersFiltersProps {
@@ -93,8 +85,8 @@ export function ChaptersFilters({
     const currentStatuses = filters.status || [];
     const newStatuses = checked
       ? [...currentStatuses, status]
-      : currentStatuses.filter(s => s !== status);
-    
+      : currentStatuses.filter((s) => s !== status);
+
     onFiltersChange({ status: newStatuses.length > 0 ? newStatuses : undefined });
   };
 
@@ -102,8 +94,8 @@ export function ChaptersFilters({
     const currentRegions = filters.region || [];
     const newRegions = checked
       ? [...currentRegions, region]
-      : currentRegions.filter(r => r !== region);
-    
+      : currentRegions.filter((r) => r !== region);
+
     onFiltersChange({ region: newRegions.length > 0 ? newRegions : undefined });
   };
 
@@ -111,17 +103,15 @@ export function ChaptersFilters({
     const currentCountries = filters.country || [];
     const newCountries = checked
       ? [...currentCountries, country]
-      : currentCountries.filter(c => c !== country);
-    
+      : currentCountries.filter((c) => c !== country);
+
     onFiltersChange({ country: newCountries.length > 0 ? newCountries : undefined });
   };
 
   const handleLeadershipRoleChange = (role: ChapterRole, checked: boolean) => {
     const currentRoles = filters.leadershipRole || [];
-    const newRoles = checked
-      ? [...currentRoles, role]
-      : currentRoles.filter(r => r !== role);
-    
+    const newRoles = checked ? [...currentRoles, role] : currentRoles.filter((r) => r !== role);
+
     onFiltersChange({ leadershipRole: newRoles.length > 0 ? newRoles : undefined });
   };
 
@@ -162,12 +152,16 @@ export function ChaptersFilters({
                 )}
               </CardTitle>
               <Button variant="ghost" size="sm">
-                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {isExpanded ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </CardHeader>
         </CollapsibleTrigger>
-        
+
         <CollapsibleContent>
           <CardContent className="space-y-6 pt-0">
             {/* Search */}
@@ -198,7 +192,9 @@ export function ChaptersFilters({
                       <Checkbox
                         id={`status-${option.value}`}
                         checked={filters.status?.includes(option.value) || false}
-                        onCheckedChange={(checked) => handleStatusChange(option.value, checked as boolean)}
+                        onCheckedChange={(checked) =>
+                          handleStatusChange(option.value, checked as boolean)
+                        }
                       />
                       <Label htmlFor={`status-${option.value}`} className="text-sm font-normal">
                         {option.label}
@@ -220,7 +216,9 @@ export function ChaptersFilters({
                       <Checkbox
                         id={`region-${option.value}`}
                         checked={filters.region?.includes(option.value) || false}
-                        onCheckedChange={(checked) => handleRegionChange(option.value, checked as boolean)}
+                        onCheckedChange={(checked) =>
+                          handleRegionChange(option.value, checked as boolean)
+                        }
                       />
                       <Label htmlFor={`region-${option.value}`} className="text-sm font-normal">
                         {option.label}
@@ -242,7 +240,9 @@ export function ChaptersFilters({
                       <Checkbox
                         id={`country-${option.value}`}
                         checked={filters.country?.includes(option.value) || false}
-                        onCheckedChange={(checked) => handleCountryChange(option.value, checked as boolean)}
+                        onCheckedChange={(checked) =>
+                          handleCountryChange(option.value, checked as boolean)
+                        }
                       />
                       <Label htmlFor={`country-${option.value}`} className="text-sm font-normal">
                         {option.label}
@@ -264,7 +264,9 @@ export function ChaptersFilters({
                       <Checkbox
                         id={`role-${option.value}`}
                         checked={filters.leadershipRole?.includes(option.value) || false}
-                        onCheckedChange={(checked) => handleLeadershipRoleChange(option.value, checked as boolean)}
+                        onCheckedChange={(checked) =>
+                          handleLeadershipRoleChange(option.value, checked as boolean)
+                        }
                       />
                       <Label htmlFor={`role-${option.value}`} className="text-sm font-normal">
                         {option.label}
@@ -281,9 +283,13 @@ export function ChaptersFilters({
                   Member Count
                 </Label>
                 <Select
-                  value={filters.memberCountRange ? `${filters.memberCountRange.min}-${filters.memberCountRange.max}` : ""}
+                  value={
+                    filters.memberCountRange
+                      ? `${filters.memberCountRange.min}-${filters.memberCountRange.max}`
+                      : ""
+                  }
                   onValueChange={(value) => {
-                    const [min, max] = value.split('-').map(Number);
+                    const [min, max] = value.split("-").map(Number);
                     handleMemberCountRangeChange({ min, max });
                   }}
                 >
@@ -292,7 +298,10 @@ export function ChaptersFilters({
                   </SelectTrigger>
                   <SelectContent>
                     {memberCountRanges.map((option) => (
-                      <SelectItem key={`${option.value.min}-${option.value.max}`} value={`${option.value.min}-${option.value.max}`}>
+                      <SelectItem
+                        key={`${option.value.min}-${option.value.max}`}
+                        value={`${option.value.min}-${option.value.max}`}
+                      >
                         {option.label}
                       </SelectItem>
                     ))}
@@ -305,7 +314,10 @@ export function ChaptersFilters({
             <div className="flex items-center justify-between pt-4 border-t">
               <div className="text-sm text-muted-foreground">
                 {hasActiveFilters && (
-                  <span>{getActiveFiltersCount()} filter{getActiveFiltersCount() !== 1 ? 's' : ''} applied</span>
+                  <span>
+                    {getActiveFiltersCount()} filter{getActiveFiltersCount() !== 1 ? "s" : ""}{" "}
+                    applied
+                  </span>
                 )}
               </div>
               <div className="flex gap-2">

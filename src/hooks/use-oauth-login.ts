@@ -24,59 +24,52 @@ export function useOAuthLogin(options: UseOAuthLoginOptions = {}) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<OAuthError | null>(null);
 
-  const {
-    onSuccess,
-    onError,
-    defaultCallbackUrl = "/dashboard"
-  } = options;
+  const { onSuccess, onError, defaultCallbackUrl = "/dashboard" } = options;
 
-  const signInWithOAuth = useCallback(async (
-    provider: OAuthProvider,
-    callbackUrl?: string
-  ): Promise<void> => {
-    setIsLoading(true);
-    setError(null);
+  const signInWithOAuth = useCallback(
+    async (provider: OAuthProvider, callbackUrl?: string): Promise<void> => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const targetCallbackUrl = callbackUrl || defaultCallbackUrl;
-      const result = await signInWithOAuthAction(provider, targetCallbackUrl);
+      try {
+        const targetCallbackUrl = callbackUrl || defaultCallbackUrl;
+        const result = await signInWithOAuthAction(provider, targetCallbackUrl);
 
-      if (result.success && result.data?.url) {
-        onSuccess?.(provider, result.data.url);
-        window.location.href = result.data.url;
-      } else {
+        if (result.success && result.data?.url) {
+          onSuccess?.(provider, result.data.url);
+          window.location.href = result.data.url;
+        } else {
+          const oauthError: OAuthError = {
+            code: "OAUTH_FAILED",
+            message: result.message || `Failed to initialize ${provider} authentication`,
+            provider,
+          };
+          setError(oauthError);
+          onError?.(oauthError);
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
         const oauthError: OAuthError = {
-          code: "OAUTH_FAILED",
-          message: result.message || `Failed to initialize ${provider} authentication`,
+          code: "OAUTH_ERROR",
+          message: `An unexpected error occurred with ${provider}. Please try again.`,
           provider,
         };
+
+        console.error(`OAuth error for ${provider}:`, err);
         setError(oauthError);
         onError?.(oauthError);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
-      const oauthError: OAuthError = {
-        code: "OAUTH_ERROR",
-        message: `An unexpected error occurred with ${provider}. Please try again.`,
-        provider,
-      };
+    },
+    [onSuccess, onError, defaultCallbackUrl],
+  );
 
-      console.error(`OAuth error for ${provider}:`, err);
-      setError(oauthError);
-      onError?.(oauthError);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [onSuccess, onError, defaultCallbackUrl]);
+  const signInWithGoogle = useCallback(() => signInWithOAuth("google"), [signInWithOAuth]);
 
-  const signInWithGoogle = useCallback(() =>
-    signInWithOAuth("google"), [signInWithOAuth]);
+  const signInWithGitHub = useCallback(() => signInWithOAuth("github"), [signInWithOAuth]);
 
-  const signInWithGitHub = useCallback(() =>
-    signInWithOAuth("github"), [signInWithOAuth]);
-
-  const signInWithLinkedIn = useCallback(() =>
-    signInWithOAuth("linkedin"), [signInWithOAuth]);
+  const signInWithLinkedIn = useCallback(() => signInWithOAuth("linkedin"), [signInWithOAuth]);
 
   const clearError = useCallback(() => {
     setError(null);

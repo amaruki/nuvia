@@ -9,16 +9,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Search, 
-  Filter, 
-  Calendar, 
-  MapPin, 
-  Users, 
+import {
+  Search,
+  Filter,
+  Calendar,
+  MapPin,
+  Users,
   X,
   Check,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from "lucide-react";
 import { EventFilter, EventStatus, EventType } from "@/types/event.types";
 
@@ -61,11 +61,27 @@ const eventTypeOptions = [
 ];
 
 const tagOptions = [
-  "web development", "workshop", "coding", "javascript",
-  "community", "networking", "meetup", "technology",
-  "react", "conference", "ui", "ux", "design", "masterclass",
-  "javascript", "webinar", "online", "programming",
-  "social", "team building", "fun"
+  "web development",
+  "workshop",
+  "coding",
+  "javascript",
+  "community",
+  "networking",
+  "meetup",
+  "technology",
+  "react",
+  "conference",
+  "ui",
+  "ux",
+  "design",
+  "masterclass",
+  "javascript",
+  "webinar",
+  "online",
+  "programming",
+  "social",
+  "team building",
+  "fun",
 ];
 
 export function EventFilterComponent({
@@ -117,7 +133,7 @@ export function EventFilterComponent({
   const handleStatusToggle = (status: string) => {
     const currentStatus = watchedStatus || [];
     const newStatus = currentStatus.includes(status)
-      ? currentStatus.filter(s => s !== status)
+      ? currentStatus.filter((s) => s !== status)
       : [...currentStatus, status];
     setValue("status", newStatus);
   };
@@ -125,14 +141,14 @@ export function EventFilterComponent({
   const handleEventTypeToggle = (eventType: string) => {
     const currentEventType = watchedEventType || [];
     const newEventType = currentEventType.includes(eventType)
-      ? currentEventType.filter(e => e !== eventType)
+      ? currentEventType.filter((e) => e !== eventType)
       : [...currentEventType, eventType];
     setValue("eventType", newEventType);
   };
 
   const handleTagToggle = (tag: string) => {
     if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter(t => t !== tag));
+      setSelectedTags(selectedTags.filter((t) => t !== tag));
     } else {
       setSelectedTags([...selectedTags, tag]);
     }
@@ -151,7 +167,7 @@ export function EventFilterComponent({
     onClearFilters();
   };
 
-  const hasActiveFilters = 
+  const hasActiveFilters =
     watchedStatus.length > 0 ||
     watchedEventType.length > 0 ||
     selectedTags.length > 0 ||
@@ -166,13 +182,16 @@ export function EventFilterComponent({
             <Filter className="h-5 w-5 mr-2 text-primary" aria-hidden="true" />
             <span>Filter Events</span>
             {hasActiveFilters && (
-              <Badge className="ml-2 bg-primary/10 text-primary" aria-label={`${[
-                watchedStatus.length,
-                watchedEventType.length,
-                selectedTags.length,
-                watchedIsVirtual !== undefined ? 1 : 0,
-                watchedIsInPerson !== undefined ? 1 : 0,
-              ].reduce((a, b) => a + b, 0)} active filters`}>
+              <Badge
+                className="ml-2 bg-primary/10 text-primary"
+                aria-label={`${[
+                  watchedStatus.length,
+                  watchedEventType.length,
+                  selectedTags.length,
+                  watchedIsVirtual !== undefined ? 1 : 0,
+                  watchedIsInPerson !== undefined ? 1 : 0,
+                ].reduce((a, b) => a + b, 0)} active filters`}
+              >
                 {[
                   watchedStatus.length,
                   watchedEventType.length,
@@ -196,14 +215,19 @@ export function EventFilterComponent({
           </Button>
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent className="pt-0">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Search Input */}
           <div>
-            <Label htmlFor="searchQuery" className="text-sm font-medium">Search</Label>
+            <Label htmlFor="searchQuery" className="text-sm font-medium">
+              Search
+            </Label>
             <div className="relative mt-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                aria-hidden="true"
+              />
               <Input
                 id="searchQuery"
                 {...register("searchQuery")}
@@ -223,7 +247,11 @@ export function EventFilterComponent({
               {/* Status Filter */}
               <div>
                 <Label className="text-sm font-medium mb-3 text-muted-foreground">Status</Label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="group" aria-label="Filter by status">
+                <div
+                  className="grid grid-cols-2 sm:grid-cols-4 gap-2"
+                  role="group"
+                  aria-label="Filter by status"
+                >
                   {statusOptions.map((option) => (
                     <Button
                       key={option.value}
@@ -234,9 +262,7 @@ export function EventFilterComponent({
                       className="text-xs justify-start"
                       aria-pressed={watchedStatus.includes(option.value)}
                     >
-                      {watchedStatus.includes(option.value) && (
-                        <Check className="h-3 w-3 mr-1" />
-                      )}
+                      {watchedStatus.includes(option.value) && <Check className="h-3 w-3 mr-1" />}
                       {option.label}
                     </Button>
                   ))}
@@ -246,7 +272,11 @@ export function EventFilterComponent({
               {/* Event Type Filter */}
               <div>
                 <Label className="text-sm font-medium mb-3 text-muted-foreground">Event Type</Label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2" role="group" aria-label="Filter by event type">
+                <div
+                  className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"
+                  role="group"
+                  aria-label="Filter by event type"
+                >
                   {eventTypeOptions.map((option) => (
                     <Button
                       key={option.value}
@@ -269,7 +299,9 @@ export function EventFilterComponent({
               {/* Date Range */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="startDate" className="text-sm font-medium">Start Date</Label>
+                  <Label htmlFor="startDate" className="text-sm font-medium">
+                    Start Date
+                  </Label>
                   <Input
                     id="startDate"
                     type="date"
@@ -282,7 +314,9 @@ export function EventFilterComponent({
                   </span>
                 </div>
                 <div>
-                  <Label htmlFor="endDate" className="text-sm font-medium">End Date</Label>
+                  <Label htmlFor="endDate" className="text-sm font-medium">
+                    End Date
+                  </Label>
                   <Input
                     id="endDate"
                     type="date"

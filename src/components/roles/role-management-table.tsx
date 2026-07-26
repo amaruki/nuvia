@@ -5,11 +5,11 @@
  * bulk operations, and role assignment features.
  */
 
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -17,14 +17,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -32,23 +32,23 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, MoreHorizontal, User, Shield, Settings, Search, Users } from 'lucide-react';
-import { Role, ROLE_DISPLAY_INFO } from '@/types/role.types';
-import { UserWithRoleInfo } from '@/lib/services/role.service';
+} from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, MoreHorizontal, User, Shield, Settings, Search, Users } from "lucide-react";
+import { Role, ROLE_DISPLAY_INFO } from "@/types/role.types";
+import { UserWithRoleInfo } from "@/lib/services/role.service";
 
 // Props interface
 interface RoleManagementTableProps {
@@ -66,9 +66,9 @@ export function RoleManagementTable({
   onRefresh,
   onRoleChange,
   onBulkRoleChange,
-  currentUserRole = 'user'
+  currentUserRole = "user",
 }: RoleManagementTableProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [roleUpdateDialog, setRoleUpdateDialog] = useState<{
     open: boolean;
@@ -80,15 +80,16 @@ export function RoleManagementTable({
     open: boolean;
     newRole?: Role;
   }>({ open: false });
-  const [reason, setReason] = useState('');
+  const [reason, setReason] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Filter users based on search term
-  const filteredUsers = users.filter(user =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.name?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Handle individual role change
@@ -99,10 +100,10 @@ export function RoleManagementTable({
     try {
       await onRoleChange(userId, newRole, reason);
       setRoleUpdateDialog({ open: false });
-      setReason('');
+      setReason("");
       onRefresh?.();
     } catch (error) {
-      console.error('Failed to update role:', error);
+      console.error("Failed to update role:", error);
     } finally {
       setIsUpdating(false);
     }
@@ -117,10 +118,10 @@ export function RoleManagementTable({
       await onBulkRoleChange(selectedUsers, bulkRoleDialog.newRole, reason);
       setBulkRoleDialog({ open: false });
       setSelectedUsers([]);
-      setReason('');
+      setReason("");
       onRefresh?.();
     } catch (error) {
-      console.error('Failed to update roles:', error);
+      console.error("Failed to update roles:", error);
     } finally {
       setIsUpdating(false);
     }
@@ -132,7 +133,7 @@ export function RoleManagementTable({
       open: true,
       userId: user.id,
       currentRole: user.role,
-      newRole: user.role
+      newRole: user.role,
     });
   };
 
@@ -150,10 +151,10 @@ export function RoleManagementTable({
   };
 
   const getRoleBadgeVariant = (role: Role): "default" | "secondary" | "destructive" | "outline" => {
-    if (role === 'superadmin') return 'destructive';
-    if (role === 'admin') return 'default';
-    if (['staff', 'treasurer', 'chapter_president'].includes(role)) return 'default';
-    return 'outline';
+    if (role === "superadmin") return "destructive";
+    if (role === "admin") return "default";
+    if (["staff", "treasurer", "chapter_president"].includes(role)) return "default";
+    return "outline";
   };
 
   if (loading) {
@@ -201,7 +202,7 @@ export function RoleManagementTable({
             <Alert>
               <Users className="h-4 w-4" />
               <AlertDescription>
-                {selectedUsers.length} user{selectedUsers.length !== 1 ? 's' : ''} selected
+                {selectedUsers.length} user{selectedUsers.length !== 1 ? "s" : ""} selected
                 <Button
                   size="sm"
                   variant="outline"
@@ -232,10 +233,12 @@ export function RoleManagementTable({
               <TableRow>
                 <TableHead className="w-12">
                   <Checkbox
-                    checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
+                    checked={
+                      selectedUsers.length === filteredUsers.length && filteredUsers.length > 0
+                    }
                     onCheckedChange={(checked) => {
                       if (checked) {
-                        setSelectedUsers(filteredUsers.map(u => u.id));
+                        setSelectedUsers(filteredUsers.map((u) => u.id));
                       } else {
                         setSelectedUsers([]);
                       }
@@ -259,7 +262,7 @@ export function RoleManagementTable({
                         if (checked) {
                           setSelectedUsers([...selectedUsers, user.id]);
                         } else {
-                          setSelectedUsers(selectedUsers.filter(id => id !== user.id));
+                          setSelectedUsers(selectedUsers.filter((id) => id !== user.id));
                         }
                       }}
                     />
@@ -269,15 +272,11 @@ export function RoleManagementTable({
                       <div className="font-medium">
                         {user.displayName || user.name || user.username}
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        {user.email}
-                      </div>
+                      <div className="text-sm text-muted-foreground">{user.email}</div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getRoleBadgeVariant(user.role)}>
-                      {user.role}
-                    </Badge>
+                    <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm text-muted-foreground">
@@ -320,7 +319,10 @@ export function RoleManagementTable({
       </Card>
 
       {/* Individual Role Change Dialog */}
-      <Dialog open={roleUpdateDialog.open} onOpenChange={(open) => setRoleUpdateDialog({ ...roleUpdateDialog, open })}>
+      <Dialog
+        open={roleUpdateDialog.open}
+        onOpenChange={(open) => setRoleUpdateDialog({ ...roleUpdateDialog, open })}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Change User Role</DialogTitle>
@@ -333,7 +335,9 @@ export function RoleManagementTable({
               <Label htmlFor="newRole">New Role</Label>
               <Select
                 value={roleUpdateDialog.newRole}
-                onValueChange={(value) => setRoleUpdateDialog({ ...roleUpdateDialog, newRole: value as Role })}
+                onValueChange={(value) =>
+                  setRoleUpdateDialog({ ...roleUpdateDialog, newRole: value as Role })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a role" />
@@ -372,8 +376,16 @@ export function RoleManagementTable({
               Cancel
             </Button>
             <Button
-              onClick={() => roleUpdateDialog.userId && roleUpdateDialog.newRole && handleRoleChange(roleUpdateDialog.userId, roleUpdateDialog.newRole)}
-              disabled={isUpdating || !roleUpdateDialog.newRole || roleUpdateDialog.newRole === roleUpdateDialog.currentRole}
+              onClick={() =>
+                roleUpdateDialog.userId &&
+                roleUpdateDialog.newRole &&
+                handleRoleChange(roleUpdateDialog.userId, roleUpdateDialog.newRole)
+              }
+              disabled={
+                isUpdating ||
+                !roleUpdateDialog.newRole ||
+                roleUpdateDialog.newRole === roleUpdateDialog.currentRole
+              }
             >
               {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Update Role
@@ -383,13 +395,17 @@ export function RoleManagementTable({
       </Dialog>
 
       {/* Bulk Role Change Dialog */}
-      <Dialog open={bulkRoleDialog.open} onOpenChange={(open) => setBulkRoleDialog({ ...bulkRoleDialog, open })}>
+      <Dialog
+        open={bulkRoleDialog.open}
+        onOpenChange={(open) => setBulkRoleDialog({ ...bulkRoleDialog, open })}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Bulk Role Update</DialogTitle>
             <DialogDescription>
-              Change the role for {selectedUsers.length} selected user{selectedUsers.length !== 1 ? 's' : ''}.
-              This action will be logged for audit purposes.
+              Change the role for {selectedUsers.length} selected user
+              {selectedUsers.length !== 1 ? "s" : ""}. This action will be logged for audit
+              purposes.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -397,7 +413,9 @@ export function RoleManagementTable({
               <Label htmlFor="bulkNewRole">New Role</Label>
               <Select
                 value={bulkRoleDialog.newRole}
-                onValueChange={(value) => setBulkRoleDialog({ ...bulkRoleDialog, newRole: value as Role })}
+                onValueChange={(value) =>
+                  setBulkRoleDialog({ ...bulkRoleDialog, newRole: value as Role })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a role" />
@@ -440,7 +458,7 @@ export function RoleManagementTable({
               disabled={isUpdating || !bulkRoleDialog.newRole || selectedUsers.length === 0}
             >
               {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Update {selectedUsers.length} Role{selectedUsers.length !== 1 ? 's' : ''}
+              Update {selectedUsers.length} Role{selectedUsers.length !== 1 ? "s" : ""}
             </Button>
           </DialogFooter>
         </DialogContent>

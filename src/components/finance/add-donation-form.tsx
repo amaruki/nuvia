@@ -49,12 +49,7 @@ interface AddDonationFormProps {
   campaigns: DonationCampaign[];
 }
 
-export function AddDonationForm({
-  open,
-  onOpenChange,
-  onSubmit,
-  campaigns
-}: AddDonationFormProps) {
+export function AddDonationForm({ open, onOpenChange, onSubmit, campaigns }: AddDonationFormProps) {
   const [formData, setFormData] = useState<DonationFormData>({
     donorId: "",
     donorType: "individual",
@@ -94,9 +89,9 @@ export function AddDonationForm({
   }, [open]);
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
@@ -104,12 +99,12 @@ export function AddDonationForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Generate a simple donor ID based on email or name
     const donorId = donorInfo.email || donorInfo.name || `donor-${Date.now()}`;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       await onSubmit({
         ...formData,
@@ -117,7 +112,7 @@ export function AddDonationForm({
         sendReceipt,
         sendThankYou,
       });
-      
+
       // Reset form
       setFormData({
         donorId: "",
@@ -139,11 +134,11 @@ export function AddDonationForm({
 
   const getDonorTypeIcon = (donorType: string) => {
     switch (donorType) {
-      case 'individual':
+      case "individual":
         return User;
-      case 'organization':
+      case "organization":
         return Building;
-      case 'anonymous':
+      case "anonymous":
         return UserX;
       default:
         return User;
@@ -152,11 +147,11 @@ export function AddDonationForm({
 
   const getDonationTypeIcon = (donationType: string) => {
     switch (donationType) {
-      case 'one_time':
+      case "one_time":
         return Gift;
-      case 'recurring':
+      case "recurring":
         return Repeat;
-      case 'pledge':
+      case "pledge":
         return HandHeart;
       default:
         return Gift;
@@ -171,25 +166,23 @@ export function AddDonationForm({
             <Plus className="h-5 w-5 shrink-0" />
             Add New Donation
           </DialogTitle>
-          <DialogDescription>
-            Record a new donation or pledge
-          </DialogDescription>
+          <DialogDescription>Record a new donation or pledge</DialogDescription>
         </DialogHeader>
-        
+
         <Separator />
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Donor Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Donor Information</h3>
-            
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="donorType">Donor Type</Label>
                 <Select
                   value={formData.donorType}
-                  onValueChange={(value: "individual" | "organization" | "anonymous") => 
-                    setFormData(prev => ({ ...prev, donorType: value }))
+                  onValueChange={(value: "individual" | "organization" | "anonymous") =>
+                    setFormData((prev) => ({ ...prev, donorType: value }))
                   }
                 >
                   <SelectTrigger>
@@ -226,7 +219,7 @@ export function AddDonationForm({
                       id="donorName"
                       placeholder="Enter donor name"
                       value={donorInfo.name}
-                      onChange={(e) => setDonorInfo(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e) => setDonorInfo((prev) => ({ ...prev, name: e.target.value }))}
                       required
                     />
                   </div>
@@ -238,7 +231,7 @@ export function AddDonationForm({
                       type="email"
                       placeholder="Enter email address"
                       value={donorInfo.email}
-                      onChange={(e) => setDonorInfo(prev => ({ ...prev, email: e.target.value }))}
+                      onChange={(e) => setDonorInfo((prev) => ({ ...prev, email: e.target.value }))}
                       required
                     />
                   </div>
@@ -253,7 +246,7 @@ export function AddDonationForm({
                     type="email"
                     placeholder="anonymous@example.com"
                     value={donorInfo.email}
-                    onChange={(e) => setDonorInfo(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) => setDonorInfo((prev) => ({ ...prev, email: e.target.value }))}
                   />
                 </div>
               )}
@@ -265,14 +258,14 @@ export function AddDonationForm({
           {/* Donation Details */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Donation Details</h3>
-            
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="donationType">Donation Type</Label>
                 <Select
                   value={formData.donationType}
-                  onValueChange={(value: "one_time" | "recurring" | "pledge") => 
-                    setFormData(prev => ({ ...prev, donationType: value }))
+                  onValueChange={(value: "one_time" | "recurring" | "pledge") =>
+                    setFormData((prev) => ({ ...prev, donationType: value }))
                   }
                 >
                   <SelectTrigger>
@@ -305,7 +298,7 @@ export function AddDonationForm({
                 <Label htmlFor="campaign">Campaign (Optional)</Label>
                 <Select
                   value={formData.campaign}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, campaign: value }))}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, campaign: value }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select campaign" />
@@ -333,7 +326,9 @@ export function AddDonationForm({
                     type="number"
                     placeholder="0.00"
                     value={formData.amount || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))
+                    }
                     className="pl-10"
                     min="0"
                     step="0.01"
@@ -353,7 +348,7 @@ export function AddDonationForm({
                   id="notes"
                   placeholder="Add any additional notes about this donation..."
                   value={formData.notes}
-                  onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
                   rows={3}
                 />
               </div>
@@ -376,7 +371,7 @@ export function AddDonationForm({
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Donation Type:</span>
                     <Badge variant="outline" className="capitalize">
-                      {formData.donationType.replace('_', ' ')}
+                      {formData.donationType.replace("_", " ")}
                     </Badge>
                   </div>
                   {formData.campaign && (
@@ -400,16 +395,18 @@ export function AddDonationForm({
               <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
               <div className="space-y-1">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  <strong>Important:</strong> All donations are processed securely and receipts are automatically generated.
+                  <strong>Important:</strong> All donations are processed securely and receipts are
+                  automatically generated.
                 </p>
-                {formData.donationType === 'recurring' && (
+                {formData.donationType === "recurring" && (
                   <p className="text-sm text-blue-800 dark:text-blue-200">
                     Recurring donations will be processed monthly and can be cancelled at any time.
                   </p>
                 )}
-                {formData.donationType === 'pledge' && (
+                {formData.donationType === "pledge" && (
                   <p className="text-sm text-blue-800 dark:text-blue-200">
-                    Pledges are commitments to donate and will be marked as pending until payment is received.
+                    Pledges are commitments to donate and will be marked as pending until payment is
+                    received.
                   </p>
                 )}
               </div>

@@ -37,7 +37,9 @@ export function EventCheckIn({
   searchResults = [],
   className = "",
 }: EventCheckInProps) {
-  const [selectedRegistration, setSelectedRegistration] = React.useState<EventRegistration | null>(null);
+  const [selectedRegistration, setSelectedRegistration] = React.useState<EventRegistration | null>(
+    null,
+  );
   const [searchTerm, setSearchTerm] = React.useState("");
   const [checkInMethod, setCheckInMethod] = React.useState<"qr" | "manual">("qr");
 
@@ -110,12 +112,11 @@ export function EventCheckIn({
             <div className="text-center">
               <div className="bg-muted border-2 border-dashed border-border rounded-lg p-8 mb-4">
                 <QrCode className="h-16 w-16 mx-auto text-foreground/40" />
-                <p className="mt-2 text-sm text-foreground/50">
-                  Scan QR codes from event tickets
-                </p>
+                <p className="mt-2 text-sm text-foreground/50">Scan QR codes from event tickets</p>
               </div>
               <p className="text-sm text-foreground/60">
-                Attendees can show their QR code in the event confirmation email or in their event registration.
+                Attendees can show their QR code in the event confirmation email or in their event
+                registration.
               </p>
             </div>
 
@@ -154,11 +155,7 @@ export function EventCheckIn({
                 </Button>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isSubmitting}
-              >
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Checking in..." : "Check In Attendee"}
               </Button>
             </form>
@@ -206,19 +203,19 @@ export function EventCheckIn({
                     <div className="flex justify-between items-start">
                       <div>
                         <p className="font-medium text-foreground/90">
-                          {registration.user?.displayName || registration.user?.username || "Attendee"}
+                          {registration.user?.displayName ||
+                            registration.user?.username ||
+                            "Attendee"}
                         </p>
-                        <p className="text-sm text-foreground/60">
-                          {registration.user?.email}
-                        </p>
+                        <p className="text-sm text-foreground/60">{registration.user?.email}</p>
                         <div className="flex items-center mt-1">
                           <Badge
                             className={
                               registration.status === "confirmed"
                                 ? "bg-chart-2/20 text-success"
                                 : registration.status === "pending"
-                                ? "bg-warning/20 text-warning"
-                                : "bg-muted text-muted-foreground"
+                                  ? "bg-warning/20 text-warning"
+                                  : "bg-muted text-muted-foreground"
                             }
                           >
                             {registration.status}
@@ -250,7 +247,9 @@ export function EventCheckIn({
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <p className="font-medium text-foreground/90">
-                        {selectedRegistration.user?.displayName || selectedRegistration.user?.username || "Attendee"}
+                        {selectedRegistration.user?.displayName ||
+                          selectedRegistration.user?.username ||
+                          "Attendee"}
                       </p>
                       <p className="text-sm text-foreground/60">
                         {selectedRegistration.user?.email}
@@ -261,8 +260,8 @@ export function EventCheckIn({
                         selectedRegistration.status === "confirmed"
                           ? "bg-chart-2/20 text-success"
                           : selectedRegistration.status === "pending"
-                          ? "bg-warning/20 text-warning"
-                          : "bg-muted text-muted-foreground"
+                            ? "bg-warning/20 text-warning"
+                            : "bg-muted text-muted-foreground"
                       }
                     >
                       {selectedRegistration.status}
@@ -304,15 +303,11 @@ export function EventCheckIn({
                 <AlertCircle className="h-5 w-5 text-blue-400 mr-2 flex-shrink-0" />
                 <div>
                   <p className="font-medium">Event Information</p>
-                  <p className="text-sm mt-1">
-                    {event.title}
-                  </p>
+                  <p className="text-sm mt-1">{event.title}</p>
                   <p className="text-sm">
                     {formatDate(event.startDate)} at {formatTime(event.startDate)}
                   </p>
-                  <p className="text-sm">
-                    {event.location}
-                  </p>
+                  <p className="text-sm">{event.location}</p>
                 </div>
               </div>
             </div>

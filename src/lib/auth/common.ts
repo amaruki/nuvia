@@ -5,8 +5,8 @@
  * error handling patterns, and response formatting to eliminate code duplication.
  */
 
-import { NextResponse } from 'next/server';
-import { ZodError } from 'zod';
+import { NextResponse } from "next/server";
+import { ZodError } from "zod";
 
 /**
  * Standard API response format for all authentication operations
@@ -26,13 +26,13 @@ export interface ApiResponse<T = any> {
  * Standard authentication error types
  */
 export enum AuthErrorType {
-  VALIDATION = 'VALIDATION_ERROR',
-  AUTHENTICATION = 'AUTHENTICATION_ERROR',
-  AUTHORIZATION = 'AUTHORIZATION_ERROR',
-  NOT_FOUND = 'NOT_FOUND_ERROR',
-  BUSINESS_LOGIC = 'BUSINESS_LOGIC_ERROR',
-  RATE_LIMIT = 'RATE_LIMIT_ERROR',
-  INTERNAL = 'INTERNAL_ERROR'
+  VALIDATION = "VALIDATION_ERROR",
+  AUTHENTICATION = "AUTHENTICATION_ERROR",
+  AUTHORIZATION = "AUTHORIZATION_ERROR",
+  NOT_FOUND = "NOT_FOUND_ERROR",
+  BUSINESS_LOGIC = "BUSINESS_LOGIC_ERROR",
+  RATE_LIMIT = "RATE_LIMIT_ERROR",
+  INTERNAL = "INTERNAL_ERROR",
 }
 
 /**
@@ -42,10 +42,10 @@ export class AuthError extends Error {
   constructor(
     public type: AuthErrorType,
     message: string,
-    public fields?: Record<string, string[]>
+    public fields?: Record<string, string[]>,
   ) {
     super(message);
-    this.name = 'AuthError';
+    this.name = "AuthError";
   }
 }
 
@@ -53,20 +53,20 @@ export class AuthError extends Error {
  * Centralized response factory for consistent API responses
  */
 export class AuthResponseFactory {
-  private static readonly VERSION = 'v1';
+  private static readonly VERSION = "v1";
 
   /**
    * Create a successful response
    */
-  static success<T>(data: T, message = 'Operation successful'): NextResponse<ApiResponse<T>> {
+  static success<T>(data: T, message = "Operation successful"): NextResponse<ApiResponse<T>> {
     return NextResponse.json({
       success: true,
       data,
       message,
       meta: {
         timestamp: new Date(),
-        version: this.VERSION
-      }
+        version: this.VERSION,
+      },
     });
   }
 
@@ -77,7 +77,7 @@ export class AuthResponseFactory {
     type: AuthErrorType,
     message: string,
     fields?: Record<string, string[]>,
-    status = 400
+    status = 400,
   ): NextResponse<ApiResponse> {
     const response = {
       success: false,
@@ -86,8 +86,8 @@ export class AuthResponseFactory {
       errors: fields,
       meta: {
         timestamp: new Date(),
-        version: this.VERSION
-      }
+        version: this.VERSION,
+      },
     };
 
     return NextResponse.json(response, { status });
@@ -97,32 +97,30 @@ export class AuthResponseFactory {
    * Create a validation error response from ZodError
    */
   static validationError(error: ZodError): NextResponse<ApiResponse> {
-    const fields = error.issues.reduce((acc, err) => {
-      const field = err.path.join('.');
-      if (!acc[field]) acc[field] = [];
-      acc[field].push(err.message);
-      return acc;
-    }, {} as Record<string, string[]>);
-
-    return this.error(
-      AuthErrorType.VALIDATION,
-      'Validation failed',
-      fields,
-      400
+    const fields = error.issues.reduce(
+      (acc, err) => {
+        const field = err.path.join(".");
+        if (!acc[field]) acc[field] = [];
+        acc[field].push(err.message);
+        return acc;
+      },
+      {} as Record<string, string[]>,
     );
+
+    return this.error(AuthErrorType.VALIDATION, "Validation failed", fields, 400);
   }
 
   /**
    * Create an authentication error response
    */
-  static authError(message = 'Authentication failed'): NextResponse<ApiResponse> {
+  static authError(message = "Authentication failed"): NextResponse<ApiResponse> {
     return this.error(AuthErrorType.AUTHENTICATION, message, undefined, 401);
   }
 
   /**
    * Create an authorization error response
    */
-  static authorizationError(message = 'Access denied'): NextResponse<ApiResponse> {
+  static authorizationError(message = "Access denied"): NextResponse<ApiResponse> {
     return this.error(AuthErrorType.AUTHORIZATION, message, undefined, 403);
   }
 
@@ -143,14 +141,14 @@ export class AuthResponseFactory {
   static rateLimitError(resetTime?: Date): NextResponse<ApiResponse> {
     const response = this.error(
       AuthErrorType.RATE_LIMIT,
-      'Too many requests. Please try again later.',
+      "Too many requests. Please try again later.",
       undefined,
-      429
+      429,
     );
 
     if (resetTime) {
       const retryAfter = Math.ceil((resetTime.getTime() - Date.now()) / 1000);
-      response.headers.set('Retry-After', retryAfter.toString());
+      response.headers.set("Retry-After", retryAfter.toString());
     }
 
     return response;
@@ -166,7 +164,7 @@ export class AuthResponseFactory {
   /**
    * Create an internal server error response
    */
-  static internalError(message = 'Internal server error'): NextResponse<ApiResponse> {
+  static internalError(message = "Internal server error"): NextResponse<ApiResponse> {
     return this.error(AuthErrorType.INTERNAL, message, undefined, 500);
   }
 }
@@ -185,35 +183,38 @@ export function normalizeAuthError(error: unknown): AuthError {
   if (isAuthError(error)) return error;
 
   if (error instanceof ZodError) {
-    const fields = error.issues.reduce((acc, err) => {
-      const field = err.path.join('.');
-      if (!acc[field]) acc[field] = [];
-      acc[field].push(err.message);
-      return acc;
-    }, {} as Record<string, string[]>);
+    const fields = error.issues.reduce(
+      (acc, err) => {
+        const field = err.path.join(".");
+        if (!acc[field]) acc[field] = [];
+        acc[field].push(err.message);
+        return acc;
+      },
+      {} as Record<string, string[]>,
+    );
 
-    return new AuthError(AuthErrorType.VALIDATION, 'Validation failed', fields);
+    return new AuthError(AuthErrorType.VALIDATION, "Validation failed", fields);
   }
 
   if (error instanceof Error) {
     // Map common error patterns to AuthError types
-    if (error.message.includes('Unauthorized') || error.message.includes('Authentication')) {
+    if (error.message.includes("Unauthorized") || error.message.includes("Authentication")) {
       return new AuthError(AuthErrorType.AUTHENTICATION, error.message);
     }
-    if (error.message.includes('Forbidden') || error.message.includes('Access denied')) {
+    if (error.message.includes("Forbidden") || error.message.includes("Access denied")) {
       return new AuthError(AuthErrorType.AUTHORIZATION, error.message);
     }
-    if (error.message.includes('not found')) {
+    if (error.message.includes("not found")) {
       return new AuthError(AuthErrorType.NOT_FOUND, error.message);
     }
-    if (error.message.includes('rate limit') || error.message.includes('too many requests')) {
+    if (error.message.includes("rate limit") || error.message.includes("too many requests")) {
       return new AuthError(AuthErrorType.RATE_LIMIT, error.message);
     }
 
     return new AuthError(AuthErrorType.INTERNAL, error.message);
   }
 
-  return new AuthError(AuthErrorType.INTERNAL, 'Unknown error occurred');
+  return new AuthError(AuthErrorType.INTERNAL, "Unknown error occurred");
 }
 
 /**
@@ -224,7 +225,7 @@ export async function withAuthErrorHandling<T>(
   options?: {
     successMessage?: string;
     customErrorHandling?: (error: unknown) => NextResponse<ApiResponse>;
-  }
+  },
 ): Promise<NextResponse<ApiResponse<T>>> {
   try {
     const result = await operation();

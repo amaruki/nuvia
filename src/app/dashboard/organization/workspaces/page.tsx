@@ -58,7 +58,8 @@ export default function OrganizationWorkspaces() {
   useEffect(() => {
     setHeader({
       title: "Committee Workspaces",
-      description: "Manage collaborative workspaces for document sharing, task management, discussions, and meetings",
+      description:
+        "Manage collaborative workspaces for document sharing, task management, discussions, and meetings",
     });
 
     return () => {
@@ -95,7 +96,9 @@ export default function OrganizationWorkspaces() {
   };
 
   const handleDelete = async (workspace: CommitteeWorkspace) => {
-    if (confirm(`Are you sure you want to delete "${workspace.name}"? This action cannot be undone.`)) {
+    if (
+      confirm(`Are you sure you want to delete "${workspace.name}"? This action cannot be undone.`)
+    ) {
       try {
         await deleteWorkspace(workspace.id);
       } catch (error) {
@@ -104,7 +107,10 @@ export default function OrganizationWorkspaces() {
     }
   };
 
-  const handleToggleStatus = async (workspace: CommitteeWorkspace, status: "active" | "archived") => {
+  const handleToggleStatus = async (
+    workspace: CommitteeWorkspace,
+    status: "active" | "archived",
+  ) => {
     try {
       await toggleWorkspaceStatus(workspace.id, status);
     } catch (error) {
@@ -199,17 +205,23 @@ export default function OrganizationWorkspaces() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="workspaces" className="text-xs sm:text-sm py-2 px-2">Workspaces</TabsTrigger>
-          <TabsTrigger value="documents" className="text-xs sm:text-sm py-2 px-2">Documents</TabsTrigger>
-          <TabsTrigger value="tasks" className="text-xs sm:text-sm py-2 px-2">Tasks</TabsTrigger>
-          <TabsTrigger value="activity" className="text-xs sm:text-sm py-2 px-2">Activity</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="workspaces" className="text-xs sm:text-sm py-2 px-2">
+            Workspaces
+          </TabsTrigger>
+          <TabsTrigger value="documents" className="text-xs sm:text-sm py-2 px-2">
+            Documents
+          </TabsTrigger>
+          <TabsTrigger value="tasks" className="text-xs sm:text-sm py-2 px-2">
+            Tasks
+          </TabsTrigger>
+          <TabsTrigger value="activity" className="text-xs sm:text-sm py-2 px-2">
+            Activity
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -219,7 +231,10 @@ export default function OrganizationWorkspaces() {
               <h3 className="text-lg font-semibold">Workspace Status Summary</h3>
               <div className="space-y-3">
                 {workspaces.map((workspace) => (
-                  <div key={workspace.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={workspace.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
                         <FolderOpen className="h-4 w-4 text-primary" />
@@ -227,16 +242,20 @@ export default function OrganizationWorkspaces() {
                       <div>
                         <p className="font-medium">{workspace.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {workspace.type.replace('_', ' ')}
+                          {workspace.type.replace("_", " ")}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge variant={
-                        workspace.status === "active" ? "default" :
-                        workspace.status === "archived" ? "secondary" :
-                        "destructive"
-                      }>
+                      <Badge
+                        variant={
+                          workspace.status === "active"
+                            ? "default"
+                            : workspace.status === "archived"
+                              ? "secondary"
+                              : "destructive"
+                        }
+                      >
                         {workspace.status}
                       </Badge>
                     </div>
@@ -250,7 +269,10 @@ export default function OrganizationWorkspaces() {
               <h3 className="text-lg font-semibold">Recent Activity</h3>
               <div className="space-y-3">
                 {workspaces.slice(0, 3).map((workspace) => (
-                  <div key={workspace.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={workspace.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
                         <Activity className="h-4 w-4 text-primary" />
@@ -258,15 +280,14 @@ export default function OrganizationWorkspaces() {
                       <div>
                         <p className="font-medium">{workspace.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {workspace.members.length} members • {workspace.documents.length} documents
+                          {workspace.members.length} members • {workspace.documents.length}{" "}
+                          documents
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold">{workspace.activity.length}</p>
-                      <p className="text-xs text-muted-foreground">
-                        activities
-                      </p>
+                      <p className="text-xs text-muted-foreground">activities</p>
                     </div>
                   </div>
                 ))}
@@ -280,7 +301,10 @@ export default function OrganizationWorkspaces() {
               <h3 className="text-lg font-semibold">Document Management</h3>
               <div className="space-y-3">
                 {workspaces.slice(0, 3).map((workspace) => (
-                  <div key={workspace.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={workspace.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <p className="font-medium">{workspace.name}</p>
                       <p className="text-sm text-muted-foreground">
@@ -299,11 +323,15 @@ export default function OrganizationWorkspaces() {
               <h3 className="text-lg font-semibold">Task Management</h3>
               <div className="space-y-3">
                 {workspaces.slice(0, 3).map((workspace) => (
-                  <div key={workspace.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={workspace.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <p className="font-medium">{workspace.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {workspace.tasks.length} tasks • {workspace.tasks.filter(t => t.status === "completed").length} completed
+                        {workspace.tasks.length} tasks •{" "}
+                        {workspace.tasks.filter((t) => t.status === "completed").length} completed
                       </p>
                     </div>
                     <div className="text-right shrink-0">
@@ -400,31 +428,37 @@ export default function OrganizationWorkspaces() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Recent Activity</h3>
             <div className="space-y-3">
-              {workspaces.flatMap(workspace => 
-                workspace.activity.slice(0, 2).map(activity => ({
-                  ...activity,
-                  workspaceName: workspace.name
-                }))
-              ).slice(0, 10).map((activity, index) => (
-                <div key={`${activity.workspaceName}-${activity.id}-${index}`} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                      <Activity className="h-4 w-4 text-primary" />
+              {workspaces
+                .flatMap((workspace) =>
+                  workspace.activity.slice(0, 2).map((activity) => ({
+                    ...activity,
+                    workspaceName: workspace.name,
+                  })),
+                )
+                .slice(0, 10)
+                .map((activity, index) => (
+                  <div
+                    key={`${activity.workspaceName}-${activity.id}-${index}`}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                        <Activity className="h-4 w-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{activity.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {activity.workspaceName} • {activity.type.replace("_", " ")}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{activity.description}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {activity.workspaceName} • {activity.type.replace('_', ' ')}
+                    <div className="text-right">
+                      <p className="text-xs text-muted-foreground">
+                        {activity.createdAt.toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-muted-foreground">
-                      {activity.createdAt.toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </TabsContent>
@@ -438,7 +472,6 @@ export default function OrganizationWorkspaces() {
         initialData={editingWorkspace || undefined}
         isEditing={!!editingWorkspace}
       />
-
     </div>
   );
 }

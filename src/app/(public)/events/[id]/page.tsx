@@ -15,7 +15,7 @@ export default function EventDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const eventId = params.id as string;
-  
+
   const { event, data, isRegistered, isLoading, error, refetch } = useEvent(eventId);
   const registration = data?.registration || null;
 
@@ -100,12 +100,16 @@ export default function EventDetailsPage() {
                 <div className="flex items-center">
                   <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mr-4">
                     <span className="text-foreground/70 font-medium">
-                      {(event.organizer?.displayName || event.organizer?.username || "O").charAt(0).toUpperCase()}
+                      {(event.organizer?.displayName || event.organizer?.username || "O")
+                        .charAt(0)
+                        .toUpperCase()}
                     </span>
                   </div>
                   <div>
                     <p className="font-medium">
-                      {event.organizer?.displayName || event.organizer?.username || "Event Organizer"}
+                      {event.organizer?.displayName ||
+                        event.organizer?.username ||
+                        "Event Organizer"}
                     </p>
                     <p className="text-sm text-foreground/60">Event Organizer</p>
                   </div>
@@ -126,7 +130,7 @@ export default function EventDetailsPage() {
                     <Share2 className="h-4 w-4 mr-2" />
                     Share Event
                   </Button>
-                  
+
                   {isRegistered && registration?.status === RegistrationStatus.CONFIRMED && (
                     <Button
                       variant="outline"
@@ -137,7 +141,7 @@ export default function EventDetailsPage() {
                       Check In
                     </Button>
                   )}
-                  
+
                   {event.organizerId === "current-user-id" && ( // This should be replaced with actual user ID
                     <Button
                       variant="outline"

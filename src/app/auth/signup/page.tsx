@@ -28,17 +28,11 @@ const signupSchema = z
       .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
       .regex(/[a-z]/, "Password must contain at least one lowercase letter")
       .regex(/[0-9]/, "Password must contain at least one number")
-      .regex(
-        /[^A-Za-z0-9]/,
-        "Password must contain at least one special character"
-      ),
+      .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
     agreeToTerms: z
       .boolean()
-      .refine(
-        (val) => val === true,
-        "You must agree to the terms and conditions"
-      ),
+      .refine((val) => val === true, "You must agree to the terms and conditions"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -64,10 +58,7 @@ function SignupPage() {
     },
   });
 
-  const {
-    signInWithGoogle,
-    isLoading: isOAuthLoading,
-  } = useOAuthLogin({
+  const { signInWithGoogle, isLoading: isOAuthLoading } = useOAuthLogin({
     onError: (error) => {
       toast.error(error.message || "OAuth sign-in failed");
     },
@@ -78,15 +69,15 @@ function SignupPage() {
     if (!isPending && user) {
       // Clear any potential errors before redirecting
       // Import cleanOAuthUrlParams if needed or use simple URL cleanup
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const url = new URL(window.location.href);
         const params = url.searchParams;
-        params.delete('error');
-        params.delete('error_description');
-        params.delete('code');
-        params.delete('state');
-        const newUrl = `${url.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
-        window.history.replaceState({}, '', newUrl);
+        params.delete("error");
+        params.delete("error_description");
+        params.delete("code");
+        params.delete("state");
+        const newUrl = `${url.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+        window.history.replaceState({}, "", newUrl);
       }
       window.location.href = "/dashboard";
       return; // Prevent any further rendering
@@ -135,7 +126,7 @@ function SignupPage() {
 
       if (result.success) {
         toast.success(
-          "Account created successfully! Please check your email to verify your account, then sign in."
+          "Account created successfully! Please check your email to verify your account, then sign in.",
         );
         setTimeout(() => {
           window.location.href = "/auth/login";
@@ -151,7 +142,6 @@ function SignupPage() {
     }
   };
 
-  
   return (
     <AuthLayoutWrapper
       title="Create your account"
@@ -179,10 +169,7 @@ function SignupPage() {
         {/* Signup Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 my-6">
           <div className="space-y-3">
-            <Label
-              htmlFor="fullName"
-              className="text-sm font-medium"
-            >
+            <Label htmlFor="fullName" className="text-sm font-medium">
               Full Name
             </Label>
             <Input
@@ -193,17 +180,12 @@ function SignupPage() {
               className="h-10"
             />
             {errors.fullName && (
-              <p className="text-sm text-destructive">
-                {errors.fullName.message}
-              </p>
+              <p className="text-sm text-destructive">{errors.fullName.message}</p>
             )}
           </div>
 
           <div className="space-y-3">
-            <Label
-              htmlFor="email"
-              className="text-sm font-medium"
-            >
+            <Label htmlFor="email" className="text-sm font-medium">
               Email Address
             </Label>
             <Input
@@ -213,18 +195,11 @@ function SignupPage() {
               {...register("email")}
               className="h-10"
             />
-            {errors.email && (
-              <p className="text-sm text-destructive">
-                {errors.email.message}
-              </p>
-            )}
+            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-3">
-            <Label
-              htmlFor="username"
-              className="text-sm font-medium"
-            >
+            <Label htmlFor="username" className="text-sm font-medium">
               Username
             </Label>
             <Input
@@ -235,17 +210,12 @@ function SignupPage() {
               className="h-10"
             />
             {errors.username && (
-              <p className="text-sm text-destructive">
-                {errors.username.message}
-              </p>
+              <p className="text-sm text-destructive">{errors.username.message}</p>
             )}
           </div>
 
           <div className="space-y-3">
-            <Label
-              htmlFor="password"
-              className="text-sm font-medium"
-            >
+            <Label htmlFor="password" className="text-sm font-medium">
               Password
             </Label>
             <Input
@@ -256,17 +226,12 @@ function SignupPage() {
               className="h-10"
             />
             {errors.password && (
-              <p className="text-sm text-destructive">
-                {errors.password.message}
-              </p>
+              <p className="text-sm text-destructive">{errors.password.message}</p>
             )}
           </div>
 
           <div className="space-y-3">
-            <Label
-              htmlFor="confirmPassword"
-              className="text-sm font-medium"
-            >
+            <Label htmlFor="confirmPassword" className="text-sm font-medium">
               Confirm Password
             </Label>
             <Input
@@ -277,9 +242,7 @@ function SignupPage() {
               className="h-10"
             />
             {errors.confirmPassword && (
-              <p className="text-sm text-destructive">
-                {errors.confirmPassword.message}
-              </p>
+              <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
             )}
           </div>
 
@@ -295,37 +258,22 @@ function SignupPage() {
                 />
               )}
             />
-            <Label
-              htmlFor="agreeToTerms"
-              className="text-sm font-normal leading-relaxed"
-            >
+            <Label htmlFor="agreeToTerms" className="text-sm font-normal leading-relaxed">
               I agree to the{" "}
-              <a
-                href="/terms"
-                className="text-primary hover:underline"
-              >
+              <a href="/terms" className="text-primary hover:underline">
                 Terms of Service
               </a>{" "}
               and{" "}
-              <a
-                href="/privacy"
-                className="text-primary hover:underline"
-              >
+              <a href="/privacy" className="text-primary hover:underline">
                 Privacy Policy
               </a>
             </Label>
           </div>
           {errors.agreeToTerms && (
-            <p className="text-sm text-destructive">
-              {errors.agreeToTerms.message}
-            </p>
+            <p className="text-sm text-destructive">{errors.agreeToTerms.message}</p>
           )}
 
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="w-full h-10"
-          >
+          <Button type="submit" disabled={isLoading} className="w-full h-10">
             {isLoading ? "Creating Account..." : "Create Account"}
           </Button>
         </form>

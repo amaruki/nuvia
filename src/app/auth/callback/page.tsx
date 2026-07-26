@@ -15,30 +15,33 @@ export default function OAuthCallbackPage() {
     const handleOAuthCallback = async () => {
       // Check for OAuth conflict error in URL parameters
       const urlParams = new URLSearchParams(window.location.search);
-      const error = urlParams.get('error');
-      const errorDescription = urlParams.get('error_description');
-      const provider = urlParams.get('provider');
+      const error = urlParams.get("error");
+      const errorDescription = urlParams.get("error_description");
+      const provider = urlParams.get("provider");
 
       // If there's an OAuth conflict error, show it immediately
-      if (error === 'oauth_conflict') {
+      if (error === "oauth_conflict") {
         setStatus("error");
-        setMessage(errorDescription || "This email is already registered with a different authentication method.");
-        
+        setMessage(
+          errorDescription ||
+            "This email is already registered with a different authentication method.",
+        );
+
         // Redirect to login page after showing error
         setTimeout(() => {
-          router.push(`/auth/login?error=oauth_conflict&provider=${provider || ''}`);
+          router.push(`/auth/login?error=oauth_conflict&provider=${provider || ""}`);
         }, 5000);
         return;
       }
 
       // Handle other OAuth errors
-      if (error && error !== 'oauth_conflict') {
+      if (error && error !== "oauth_conflict") {
         setStatus("error");
         setMessage(errorDescription || "Authentication failed. Please try again.");
-        
+
         // Redirect to login page after showing error
         setTimeout(() => {
-          router.push(`/auth/login?error=${error}&provider=${provider || ''}`);
+          router.push(`/auth/login?error=${error}&provider=${provider || ""}`);
         }, 3000);
         return;
       }
@@ -69,19 +72,21 @@ export default function OAuthCallbackPage() {
         } else {
           // If no session, check if we have OAuth callback parameters
           const urlParams = new URLSearchParams(window.location.search);
-          const code = urlParams.get('code');
-          const state = urlParams.get('state');
-          const provider = urlParams.get('provider');
-          const error = urlParams.get('error');
+          const code = urlParams.get("code");
+          const state = urlParams.get("state");
+          const provider = urlParams.get("provider");
+          const error = urlParams.get("error");
 
           // If there's an error in the URL parameters, show it
           if (error) {
             setStatus("error");
-            setMessage(urlParams.get('error_description') || "Authentication failed. Please try again.");
+            setMessage(
+              urlParams.get("error_description") || "Authentication failed. Please try again.",
+            );
 
             // Redirect to login page after showing error
             setTimeout(() => {
-              router.push(`/auth/login?error=${error}&provider=${provider || ''}`);
+              router.push(`/auth/login?error=${error}&provider=${provider || ""}`);
             }, 3000);
             return;
           }
@@ -135,7 +140,10 @@ export default function OAuthCallbackPage() {
           }
         }
       } catch (error) {
-        console.error("OAuth callback error:", error instanceof Error ? error.message : String(error));
+        console.error(
+          "OAuth callback error:",
+          error instanceof Error ? error.message : String(error),
+        );
         setStatus("error");
         setMessage("An error occurred during authentication. Please try again.");
 
@@ -165,14 +173,34 @@ export default function OAuthCallbackPage() {
         );
       case "success":
         return (
-          <svg className="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+          <svg
+            className="w-12 h-12 text-primary"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M5 13l4 4L19 7"
+            ></path>
           </svg>
         );
       case "error":
         return (
-          <svg className="w-12 h-12 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+          <svg
+            className="w-12 h-12 text-destructive"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
           </svg>
         );
     }
@@ -184,35 +212,28 @@ export default function OAuthCallbackPage() {
         {/* Logo and title */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-foreground">
-            <Image
-              src="/logo.png"
-              alt="Nuvia Logo"
-              width={60}
-              height={60}
-              className="rounded-md"
-            />
+            <Image src="/logo.png" alt="Nuvia Logo" width={60} height={60} className="rounded-md" />
           </div>
           <h1 className="text-2xl font-semibold text-foreground">
             {status === "loading" && "Authentication in Progress"}
             {status === "success" && "Authentication Successful"}
             {status === "error" && "Authentication Failed"}
           </h1>
-          <p className="text-sm mt-1 text-muted-foreground">
-            {message}
-          </p>
+          <p className="text-sm mt-1 text-muted-foreground">{message}</p>
         </div>
 
         {/* Status card */}
         <div className="callback-card rounded-2xl border p-8 shadow-sm bg-card border-border">
           {/* Status Icon */}
-          <div className="flex justify-center mb-6">
-            {getStatusIcon()}
-          </div>
+          <div className="flex justify-center mb-6">{getStatusIcon()}</div>
 
           {/* Progress Bar for Loading State */}
           {status === "loading" && (
             <div className="w-full bg-muted rounded-full h-2 mb-6">
-              <div className="bg-primary h-2 rounded-full animate-pulse" style={{ width: "60%" }}></div>
+              <div
+                className="bg-primary h-2 rounded-full animate-pulse"
+                style={{ width: "60%" }}
+              ></div>
             </div>
           )}
 

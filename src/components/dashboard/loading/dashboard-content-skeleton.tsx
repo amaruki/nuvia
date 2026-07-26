@@ -13,7 +13,12 @@ interface DashboardContentSkeletonProps {
  */
 export function DashboardContentSkeleton({ className }: DashboardContentSkeletonProps) {
   return (
-    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6", className)}>
+    <div
+      className={cn(
+        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6",
+        className,
+      )}
+    >
       {/* User Profile Skeleton */}
       <div className="xl:col-span-1">
         <div className="bg-white dark:bg-gray-800 rounded-lg border p-6 shadow-sm animate-pulse">
@@ -62,7 +67,10 @@ export function DashboardContentSkeleton({ className }: DashboardContentSkeleton
           </div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+              <div
+                key={i}
+                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+              >
                 <div className="flex-1">
                   <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-1/3 mb-2"></div>
                   <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-1/2"></div>

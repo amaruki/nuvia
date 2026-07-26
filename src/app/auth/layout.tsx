@@ -3,11 +3,7 @@
 import { animate } from "animejs";
 import { useState, useEffect, useRef } from "react";
 
-export default function ForgotPasswordLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ForgotPasswordLayout({ children }: { children: React.ReactNode }) {
   const backgroundRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

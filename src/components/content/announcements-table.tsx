@@ -19,12 +19,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  MoreHorizontal, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Copy, 
+import {
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
+  Copy,
   ExternalLink,
   Calendar,
   Users,
@@ -38,7 +38,7 @@ import {
   Zap,
   Target,
   Shield,
-  Gift
+  Gift,
 } from "lucide-react";
 import { Announcement } from "@/types/announcement.types";
 import { ArticleStatus } from "@/types/article.types";
@@ -64,7 +64,10 @@ export function AnnouncementsTable({
   const [selectedAnnouncements, setSelectedAnnouncements] = useState<string[]>([]);
 
   const getStatusBadge = (status: ArticleStatus) => {
-    const statusConfig: Record<ArticleStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: any }> = {
+    const statusConfig: Record<
+      ArticleStatus,
+      { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: any }
+    > = {
       draft: { label: "Draft", variant: "secondary", icon: Clock },
       published: { label: "Published", variant: "default", icon: CheckCircle2 },
       scheduled: { label: "Scheduled", variant: "outline", icon: Calendar },
@@ -148,7 +151,7 @@ export function AnnouncementsTable({
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedAnnouncements(announcements.map(a => a.id));
+      setSelectedAnnouncements(announcements.map((a) => a.id));
     } else {
       setSelectedAnnouncements([]);
     }
@@ -158,7 +161,7 @@ export function AnnouncementsTable({
     if (checked) {
       setSelectedAnnouncements([...selectedAnnouncements, id]);
     } else {
-      setSelectedAnnouncements(selectedAnnouncements.filter(selectedId => selectedId !== id));
+      setSelectedAnnouncements(selectedAnnouncements.filter((selectedId) => selectedId !== id));
     }
   };
 
@@ -204,9 +207,7 @@ export function AnnouncementsTable({
                     {announcement.isPinned && (
                       <Pin className="h-3 w-3 text-primary" fill="currentColor" />
                     )}
-                    {announcement.isUrgent && (
-                      <Zap className="h-3 w-3 text-red-500" />
-                    )}
+                    {announcement.isUrgent && <Zap className="h-3 w-3 text-red-500" />}
                   </div>
                   {isExpired(announcement.expiresAt || null) && (
                     <p className="text-xs text-red-500 mt-1">Expired</p>
@@ -216,25 +217,19 @@ export function AnnouncementsTable({
               <TableCell>
                 <div className="flex items-center gap-2">
                   {getTypeIcon(announcement.type)}
-                  <span className="capitalize text-sm">
-                    {announcement.type?.replace('_', ' ')}
-                  </span>
+                  <span className="capitalize text-sm">{announcement.type?.replace("_", " ")}</span>
                 </div>
               </TableCell>
-              <TableCell>
-                {getPriorityBadge(announcement.priority)}
-              </TableCell>
+              <TableCell>{getPriorityBadge(announcement.priority)}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   {getTargetAudienceIcon(announcement.targetAudience)}
                   <span className="capitalize text-sm">
-                    {announcement.targetAudience?.replace('_', ' ')}
+                    {announcement.targetAudience?.replace("_", " ")}
                   </span>
                 </div>
               </TableCell>
-              <TableCell>
-                {getStatusBadge(announcement.status)}
-              </TableCell>
+              <TableCell>{getStatusBadge(announcement.status)}</TableCell>
               <TableCell>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{announcement.author.name}</span>
@@ -249,22 +244,26 @@ export function AnnouncementsTable({
                     {announcement.acknowledgmentCount || 0}
                   </span>
                   {announcement.requiresAcknowledgment && (
-                    <span className="text-xs text-muted-foreground">
-                      Required
-                    </span>
+                    <span className="text-xs text-muted-foreground">Required</span>
                   )}
                 </div>
               </TableCell>
               <TableCell>
                 <div className="flex flex-col">
-                  <span className={`text-sm ${
-                    isExpired(announcement.expiresAt || null) ? 'text-red-500 font-medium' : ''
-                  }`}>
+                  <span
+                    className={`text-sm ${
+                      isExpired(announcement.expiresAt || null) ? "text-red-500 font-medium" : ""
+                    }`}
+                  >
                     {formatDate(announcement.expiresAt || null)}
                   </span>
                   {announcement.expiresAt && !isExpired(announcement.expiresAt || null) && (
                     <span className="text-xs text-muted-foreground">
-                      {Math.ceil((new Date(announcement.expiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days left
+                      {Math.ceil(
+                        (new Date(announcement.expiresAt).getTime() - new Date().getTime()) /
+                          (1000 * 60 * 60 * 24),
+                      )}{" "}
+                      days left
                     </span>
                   )}
                 </div>
@@ -301,18 +300,18 @@ export function AnnouncementsTable({
                       Duplicate
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    {announcement.status === 'draft' && (
+                    {announcement.status === "draft" && (
                       <DropdownMenuItem
-                        onClick={() => onStatusChange?.(announcement, 'published')}
+                        onClick={() => onStatusChange?.(announcement, "published")}
                         className="flex items-center gap-2"
                       >
                         <CheckCircle2 className="h-4 w-4" />
                         Publish
                       </DropdownMenuItem>
                     )}
-                    {announcement.status === 'published' && (
+                    {announcement.status === "published" && (
                       <DropdownMenuItem
-                        onClick={() => onStatusChange?.(announcement, 'archived')}
+                        onClick={() => onStatusChange?.(announcement, "archived")}
                         className="flex items-center gap-2"
                       >
                         <Archive className="h-4 w-4" />

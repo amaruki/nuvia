@@ -13,7 +13,13 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Calendar,
   Mail,
@@ -36,7 +42,7 @@ import {
   Edit,
   Trash2,
   Printer,
-  Share2
+  Share2,
 } from "lucide-react";
 import { Donation, DonationPayment } from "@/types/finance.types";
 
@@ -47,7 +53,7 @@ interface DonationDetailsModalProps {
   onOpenChange: (open: boolean) => void;
   onRecordPayment: (donationId: string, amount: number, paymentMethod: string) => void;
   onSendReceipt: (donationId: string) => void;
-  onUpdateStatus: (donationId: string, status: Donation['status']) => void;
+  onUpdateStatus: (donationId: string, status: Donation["status"]) => void;
 }
 
 export function DonationDetailsModal({
@@ -57,16 +63,16 @@ export function DonationDetailsModal({
   onOpenChange,
   onRecordPayment,
   onSendReceipt,
-  onUpdateStatus
+  onUpdateStatus,
 }: DonationDetailsModalProps) {
   const [paymentAmount, setPaymentAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Credit Card");
   const [isRecordingPayment, setIsRecordingPayment] = useState(false);
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
@@ -74,7 +80,7 @@ export function DonationDetailsModal({
 
   const handleRecordPayment = async () => {
     if (!paymentAmount || parseFloat(paymentAmount) <= 0 || !donation) return;
-    
+
     setIsRecordingPayment(true);
     const success = await onRecordPayment(donation.id, parseFloat(paymentAmount), paymentMethod);
     if (success !== undefined && success) {
@@ -84,43 +90,68 @@ export function DonationDetailsModal({
     setIsRecordingPayment(false);
   };
 
-  const getStatusBadge = (status: Donation['status']) => {
+  const getStatusBadge = (status: Donation["status"]) => {
     switch (status) {
-      case 'completed':
-        return { variant: 'default' as const, icon: CheckCircle, text: 'Completed', color: 'text-green-600' };
-      case 'pending':
-        return { variant: 'secondary' as const, icon: Clock, text: 'Pending', color: 'text-yellow-600' };
-      case 'failed':
-        return { variant: 'destructive' as const, icon: XCircle, text: 'Failed', color: 'text-red-600' };
-      case 'refunded':
-        return { variant: 'outline' as const, icon: AlertCircle, text: 'Refunded', color: 'text-orange-600' };
-      case 'pledged':
-        return { variant: 'secondary' as const, icon: HandHeart, text: 'Pledged', color: 'text-blue-600' };
+      case "completed":
+        return {
+          variant: "default" as const,
+          icon: CheckCircle,
+          text: "Completed",
+          color: "text-green-600",
+        };
+      case "pending":
+        return {
+          variant: "secondary" as const,
+          icon: Clock,
+          text: "Pending",
+          color: "text-yellow-600",
+        };
+      case "failed":
+        return {
+          variant: "destructive" as const,
+          icon: XCircle,
+          text: "Failed",
+          color: "text-red-600",
+        };
+      case "refunded":
+        return {
+          variant: "outline" as const,
+          icon: AlertCircle,
+          text: "Refunded",
+          color: "text-orange-600",
+        };
+      case "pledged":
+        return {
+          variant: "secondary" as const,
+          icon: HandHeart,
+          text: "Pledged",
+          color: "text-blue-600",
+        };
       default:
-        return { variant: 'secondary' as const, icon: Clock, text: status, color: 'text-gray-600' };
+        return { variant: "secondary" as const, icon: Clock, text: status, color: "text-gray-600" };
     }
   };
 
-  const getDonorTypeIcon = (donorType: Donation['donorType']) => {
+  const getDonorTypeIcon = (donorType: Donation["donorType"]) => {
     switch (donorType) {
-      case 'individual':
+      case "individual":
         return User;
-      case 'organization':
+      case "organization":
         return Building;
-      case 'anonymous':
+      case "anonymous":
         return UserX;
       default:
         return User;
     }
   };
 
-  const getDonationTypeIcon = (donationType: Donation['donationType']) => {
+  const getDonationTypeIcon = (donationType: Donation["donationType"]) => {
     switch (donationType) {
-      case 'one_time':
+      case "one_time":
         return Gift;
-      case 'recurring':
+      case "recurring":
         return Repeat;
-      case 'pledge':
+      case "pledge":
         return HandHeart;
       default:
         return Gift;
@@ -142,12 +173,10 @@ export function DonationDetailsModal({
             <Gift className="h-5 w-5 shrink-0" />
             Donation Details
           </DialogTitle>
-          <DialogDescription>
-            View detailed information about this donation
-          </DialogDescription>
+          <DialogDescription>View detailed information about this donation</DialogDescription>
         </DialogHeader>
-        
-        <Separator/>
+
+        <Separator />
 
         <div className="space-y-6">
           {/* Donor Information */}
@@ -202,7 +231,7 @@ export function DonationDetailsModal({
                   <span className="text-sm font-medium">Donation Type</span>
                 </div>
                 <Badge variant="outline" className="w-fit capitalize">
-                  {donation.donationType.replace('_', ' ')}
+                  {donation.donationType.replace("_", " ")}
                 </Badge>
               </div>
               <div className="space-y-1 sm:space-y-2">
@@ -227,7 +256,7 @@ export function DonationDetailsModal({
                 <p className="text-sm">{new Date(donation.donationDate).toLocaleDateString()}</p>
               </div>
             </div>
-            
+
             {donation.paymentMethod && (
               <div className="space-y-1 sm:space-y-2">
                 <div className="flex items-center gap-2">
@@ -237,7 +266,7 @@ export function DonationDetailsModal({
                 <p className="text-sm break-words">{donation.paymentMethod}</p>
               </div>
             )}
-            
+
             {donation.transactionId && (
               <div className="space-y-1 sm:space-y-2">
                 <div className="flex items-center gap-2">
@@ -247,7 +276,7 @@ export function DonationDetailsModal({
                 <p className="text-sm font-mono break-all">{donation.transactionId}</p>
               </div>
             )}
-            
+
             {donation.notes && (
               <div className="space-y-1 sm:space-y-2">
                 <div className="flex items-center gap-2">
@@ -276,9 +305,7 @@ export function DonationDetailsModal({
                   ) : (
                     <Clock className="h-4 w-4 text-yellow-600" />
                   )}
-                  <span className="text-sm">
-                    {donation.receiptSent ? "Sent" : "Not Sent"}
-                  </span>
+                  <span className="text-sm">{donation.receiptSent ? "Sent" : "Not Sent"}</span>
                 </div>
               </div>
               <div className="space-y-1 sm:space-y-2">
@@ -294,12 +321,12 @@ export function DonationDetailsModal({
           <Separator />
 
           {/* Payment History */}
-          {payments.filter(payment => payment.donationId === donation.id).length > 0 && (
+          {payments.filter((payment) => payment.donationId === donation.id).length > 0 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Payment History</h3>
               <div className="space-y-3">
                 {payments
-                  .filter(payment => payment.donationId === donation.id)
+                  .filter((payment) => payment.donationId === donation.id)
                   .map((payment) => (
                     <div key={payment.id} className="border rounded-lg p-3 sm:p-4">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -317,7 +344,9 @@ export function DonationDetailsModal({
                         </div>
                       </div>
                       {payment.notes && (
-                        <p className="text-xs sm:text-sm text-muted-foreground mt-2 break-words">{payment.notes}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-2 break-words">
+                          {payment.notes}
+                        </p>
                       )}
                     </div>
                   ))}
@@ -327,20 +356,31 @@ export function DonationDetailsModal({
 
           {/* Actions */}
           <div className="flex flex-col flex-wrap sm:flex-row gap-3 pt-2 sm:pt-4">
-            {donation.status !== 'completed' && donation.status !== 'refunded' && (
+            {donation.status !== "completed" && donation.status !== "refunded" && (
               <>
-                <Button className="w-full sm:w-auto" onClick={() => onRecordPayment(donation.id, donation.amount, 'Credit Card')}>
+                <Button
+                  className="w-full sm:w-auto"
+                  onClick={() => onRecordPayment(donation.id, donation.amount, "Credit Card")}
+                >
                   <CreditCard className="h-4 w-4 mr-2" />
                   Record Payment
                 </Button>
-                <Button variant="outline" className="w-full sm:w-auto" onClick={() => onUpdateStatus(donation.id, 'completed')}>
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => onUpdateStatus(donation.id, "completed")}
+                >
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Mark as Completed
                 </Button>
               </>
             )}
             {!donation.receiptSent && (
-              <Button variant="outline" className="w-full sm:w-auto" onClick={() => onSendReceipt(donation.id)}>
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => onSendReceipt(donation.id)}
+              >
                 <Mail className="h-4 w-4 mr-2" />
                 Send Receipt
               </Button>
@@ -349,7 +389,11 @@ export function DonationDetailsModal({
               <Download className="h-4 w-4 mr-2" />
               Download Receipt
             </Button>
-            <Button variant="outline" className="w-full sm:w-auto sm:ml-auto" onClick={() => onOpenChange(false)}>
+            <Button
+              variant="outline"
+              className="w-full sm:w-auto sm:ml-auto"
+              onClick={() => onOpenChange(false)}
+            >
               Close
             </Button>
           </div>

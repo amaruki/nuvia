@@ -12,11 +12,8 @@ import { formatDate } from "@/lib/utils/date-utils";
 
 export default function EventsPage() {
   const router = useRouter();
-  const [showFilters, setShowFilters] = React.useState(false);  
-  
-  
+  const [showFilters, setShowFilters] = React.useState(false);
 
-  
   const handleRegister = (eventId: string) => {
     router.push(`/events/${eventId}/register`);
   };
@@ -25,9 +22,6 @@ export default function EventsPage() {
     router.push(`/events/${eventId}`);
   };
 
-
-
-  
   return (
     <EventListLayout
       title="Events"

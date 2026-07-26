@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
@@ -216,9 +210,7 @@ function CalendarView({ onDateClick }: { onDateClick: (date: Date) => void }) {
               <span className="sr-only">Previous</span>
             </CalendarPrevTrigger>
 
-            <CalendarTodayTrigger className="h-8 px-3 text-xs">
-              Today
-            </CalendarTodayTrigger>
+            <CalendarTodayTrigger className="h-8 px-3 text-xs">Today</CalendarTodayTrigger>
 
             <CalendarNextTrigger className="h-8 w-8">
               <ChevronRight className="h-4 w-4" />
@@ -255,7 +247,7 @@ export default function EventsCalendar() {
     // Set the header
     setHeader({
       title: "Events Calendar",
-      description: "Manage and monitor community events and activities"
+      description: "Manage and monitor community events and activities",
     });
     setIsLoading(false);
 
@@ -308,11 +300,7 @@ export default function EventsCalendar() {
               {calendarTabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
-                  <TabsTrigger
-                    key={tab.id}
-                    value={tab.id}
-                    className="flex items-center gap-2"
-                  >
+                  <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2">
                     <Icon className="h-4 w-4" />
                     <span className="hidden sm:inline">{tab.label}</span>
                     <span className="sm:hidden">{tab.label.split(" ")[0]}</span>
@@ -338,12 +326,10 @@ export default function EventsCalendar() {
             </div>
           </div>
 
-
           {/* Calendar Tab */}
           <TabsContent value="calendar" className="space-y-6 animate-in fade-in-50 duration-500">
             <CalendarView onDateClick={handleDateClick} />
           </TabsContent>
-
 
           {/* List View Tab */}
           <TabsContent value="list" className="space-y-6 animate-in fade-in-50 duration-500">
@@ -353,9 +339,7 @@ export default function EventsCalendar() {
                   <List className="h-5 w-5" />
                   All Events
                 </CardTitle>
-                <CardDescription>
-                  Comprehensive list of all community events
-                </CardDescription>
+                <CardDescription>Comprehensive list of all community events</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -453,16 +437,15 @@ export default function EventsCalendar() {
                   <Clock className="h-5 w-5" />
                   Event History
                 </CardTitle>
-                <CardDescription>
-                  Archive of previously held community events
-                </CardDescription>
+                <CardDescription>Archive of previously held community events</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-16 bg-muted/10 rounded-lg border border-dashed">
                   <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
                   <h3 className="text-lg font-semibold mb-2">No Past Events</h3>
                   <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                    Past events will appear here once they've occurred. Check back later for event archives.
+                    Past events will appear here once they've occurred. Check back later for event
+                    archives.
                   </p>
                 </div>
               </CardContent>
@@ -470,7 +453,6 @@ export default function EventsCalendar() {
           </TabsContent>
         </Tabs>
       </div>
-
     </div>
   );
 }

@@ -2,11 +2,11 @@
  * Server actions for event operations
  */
 
-'use server';
+"use server";
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
-import { AuthUtils } from '@/lib/auth/utils';
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { AuthUtils } from "@/lib/auth/utils";
 import {
   CreateEventRequest,
   UpdateEventRequest,
@@ -15,7 +15,7 @@ import {
   Event,
   EventRegistrationResponse,
   EventCheckInResponse,
-} from '@/types/event.types';
+} from "@/types/event.types";
 import {
   createEvent,
   updateEvent,
@@ -23,10 +23,15 @@ import {
   registerForEvent,
   cancelEventRegistration,
   checkInToEvent,
-} from '@/lib/services/event.service';
-import { createSuccessResponse, createErrorResponse, ValidationError } from '@/lib/errors';
-import { createEventSchema, updateEventSchema, eventRegistrationSchema, eventCheckInSchema } from '@/lib/validation/event.validation';
-import { z } from 'zod';
+} from "@/lib/services/event.service";
+import { createSuccessResponse, createErrorResponse, ValidationError } from "@/lib/errors";
+import {
+  createEventSchema,
+  updateEventSchema,
+  eventRegistrationSchema,
+  eventCheckInSchema,
+} from "@/lib/validation/event.validation";
+import { z } from "zod";
 
 /**
  * Create a new event
@@ -35,36 +40,36 @@ export async function createEventAction(eventData: CreateEventRequest) {
   try {
     // Validate input
     const validatedData = createEventSchema.parse(eventData);
-    
+
     // Check if user is authenticated
     const user = await AuthUtils.getCurrentUser();
     if (!user) {
-      throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
+      throw new ValidationError([{ field: "auth", message: "Authentication required" }]);
     }
-    
+
     // Create event
     const event = await createEvent(validatedData);
-    
+
     // Revalidate events page
-    revalidatePath('/events');
-    
-    return createSuccessResponse(event, 'Event created successfully');
+    revalidatePath("/events");
+
+    return createSuccessResponse(event, "Event created successfully");
   } catch (error) {
-    console.error('Error creating event:', error);
-    
+    console.error("Error creating event:", error);
+
     if (error instanceof z.ZodError) {
-      const fieldErrors = error.issues.map(err => ({
-        field: err.path.join('.'),
+      const fieldErrors = error.issues.map((err) => ({
+        field: err.path.join("."),
         message: err.message,
       }));
       return createErrorResponse(new ValidationError(fieldErrors));
     }
-    
+
     if (error instanceof ValidationError) {
       return createErrorResponse(error);
     }
-    
-    return createErrorResponse(new Error('Failed to create event'));
+
+    return createErrorResponse(new Error("Failed to create event"));
   }
 }
 
@@ -75,38 +80,38 @@ export async function updateEventAction(eventId: string, eventData: UpdateEventR
   try {
     // Validate input
     const validatedData = updateEventSchema.parse(eventData);
-    
+
     // Check if user is authenticated
     const user = await AuthUtils.getCurrentUser();
     if (!user) {
-      throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
+      throw new ValidationError([{ field: "auth", message: "Authentication required" }]);
     }
-    
+
     // Update event
     const event = await updateEvent(eventId, validatedData);
-    
+
     // Revalidate paths
-    revalidatePath('/events');
+    revalidatePath("/events");
     revalidatePath(`/events/${eventId}`);
     revalidatePath(`/events/${eventId}/edit`);
-    
-    return createSuccessResponse(event, 'Event updated successfully');
+
+    return createSuccessResponse(event, "Event updated successfully");
   } catch (error) {
-    console.error('Error updating event:', error);
-    
+    console.error("Error updating event:", error);
+
     if (error instanceof z.ZodError) {
-      const fieldErrors = error.issues.map(err => ({
-        field: err.path.join('.'),
+      const fieldErrors = error.issues.map((err) => ({
+        field: err.path.join("."),
         message: err.message,
       }));
       return createErrorResponse(new ValidationError(fieldErrors));
     }
-    
+
     if (error instanceof ValidationError) {
       return createErrorResponse(error);
     }
-    
-    return createErrorResponse(new Error('Failed to update event'));
+
+    return createErrorResponse(new Error("Failed to update event"));
   }
 }
 
@@ -118,25 +123,25 @@ export async function deleteEventAction(eventId: string) {
     // Check if user is authenticated
     const user = await AuthUtils.getCurrentUser();
     if (!user) {
-      throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
+      throw new ValidationError([{ field: "auth", message: "Authentication required" }]);
     }
-    
+
     // Delete event
     await deleteEvent(eventId);
-    
+
     // Revalidate paths
-    revalidatePath('/events');
-    
+    revalidatePath("/events");
+
     // Redirect to events page
-    redirect('/events');
+    redirect("/events");
   } catch (error) {
-    console.error('Error deleting event:', error);
-    
+    console.error("Error deleting event:", error);
+
     if (error instanceof ValidationError) {
       return createErrorResponse(error);
     }
-    
-    return createErrorResponse(new Error('Failed to delete event'));
+
+    return createErrorResponse(new Error("Failed to delete event"));
   }
 }
 
@@ -147,37 +152,37 @@ export async function registerForEventAction(registrationData: RegisterForEventR
   try {
     // Validate input
     const validatedData = eventRegistrationSchema.parse(registrationData);
-    
+
     // Check if user is authenticated
     const user = await AuthUtils.getCurrentUser();
     if (!user) {
-      throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
+      throw new ValidationError([{ field: "auth", message: "Authentication required" }]);
     }
-    
+
     // Register for event
     const result = await registerForEvent(validatedData);
-    
+
     // Revalidate paths
-    revalidatePath('/events');
+    revalidatePath("/events");
     revalidatePath(`/events/${registrationData.eventId}`);
-    
+
     return createSuccessResponse(result.data, result.message);
   } catch (error) {
-    console.error('Error registering for event:', error);
-    
+    console.error("Error registering for event:", error);
+
     if (error instanceof z.ZodError) {
-      const fieldErrors = error.issues.map(err => ({
-        field: err.path.join('.'),
+      const fieldErrors = error.issues.map((err) => ({
+        field: err.path.join("."),
         message: err.message,
       }));
       return createErrorResponse(new ValidationError(fieldErrors));
     }
-    
+
     if (error instanceof ValidationError) {
       return createErrorResponse(error);
     }
-    
-    return createErrorResponse(new Error('Failed to register for event'));
+
+    return createErrorResponse(new Error("Failed to register for event"));
   }
 }
 
@@ -189,25 +194,25 @@ export async function cancelEventRegistrationAction(eventId: string) {
     // Check if user is authenticated
     const user = await AuthUtils.getCurrentUser();
     if (!user) {
-      throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
+      throw new ValidationError([{ field: "auth", message: "Authentication required" }]);
     }
-    
+
     // Cancel registration
     const result = await cancelEventRegistration(eventId);
-    
+
     // Revalidate paths
-    revalidatePath('/events');
+    revalidatePath("/events");
     revalidatePath(`/events/${eventId}`);
-    
+
     return createSuccessResponse(result.data, result.message);
   } catch (error) {
-    console.error('Error cancelling event registration:', error);
-    
+    console.error("Error cancelling event registration:", error);
+
     if (error instanceof ValidationError) {
       return createErrorResponse(error);
     }
-    
-    return createErrorResponse(new Error('Failed to cancel event registration'));
+
+    return createErrorResponse(new Error("Failed to cancel event registration"));
   }
 }
 
@@ -218,37 +223,37 @@ export async function checkInToEventAction(checkInData: CheckInToEventRequest) {
   try {
     // Validate input
     const validatedData = eventCheckInSchema.parse(checkInData);
-    
+
     // Check if user is authenticated
     const user = await AuthUtils.getCurrentUser();
     if (!user) {
-      throw new ValidationError([{ field: 'auth', message: 'Authentication required' }]);
+      throw new ValidationError([{ field: "auth", message: "Authentication required" }]);
     }
-    
+
     // Check in to event
     const result = await checkInToEvent(validatedData);
-    
+
     // Revalidate paths
-    revalidatePath('/events');
+    revalidatePath("/events");
     revalidatePath(`/events/${checkInData.eventId}`);
     revalidatePath(`/events/${checkInData.eventId}/check-in`);
-    
+
     return createSuccessResponse(result.data, result.message);
   } catch (error) {
-    console.error('Error checking in to event:', error);
-    
+    console.error("Error checking in to event:", error);
+
     if (error instanceof z.ZodError) {
-      const fieldErrors = error.issues.map(err => ({
-        field: err.path.join('.'),
+      const fieldErrors = error.issues.map((err) => ({
+        field: err.path.join("."),
         message: err.message,
       }));
       return createErrorResponse(new ValidationError(fieldErrors));
     }
-    
+
     if (error instanceof ValidationError) {
       return createErrorResponse(error);
     }
-    
-    return createErrorResponse(new Error('Failed to check in to event'));
+
+    return createErrorResponse(new Error("Failed to check in to event"));
   }
 }

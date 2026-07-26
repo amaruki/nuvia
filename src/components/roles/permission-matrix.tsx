@@ -5,23 +5,23 @@
  * Shows all available permissions organized by category with role-based view.
  */
 
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import React, { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -29,9 +29,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 // import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from "@/components/ui/separator";
 import {
   Shield,
   Settings,
@@ -47,8 +47,8 @@ import {
   BookOpen,
   Search,
   Lock,
-  Unlock
-} from 'lucide-react';
+  Unlock,
+} from "lucide-react";
 import {
   Permission,
   Role,
@@ -56,8 +56,8 @@ import {
   AVAILABLE_PERMISSIONS,
   ROLE_PERMISSIONS,
   ROLE_DISPLAY_INFO,
-  isPredefinedRole
-} from '@/types/role.types';
+  isPredefinedRole,
+} from "@/types/role.types";
 
 // Permission item interface
 interface PermissionItem {
@@ -65,7 +65,7 @@ interface PermissionItem {
   name: string;
   action: string;
   module: string;
-  category: typeof PERMISSION_CATEGORIES[keyof typeof PERMISSION_CATEGORIES];
+  category: (typeof PERMISSION_CATEGORIES)[keyof typeof PERMISSION_CATEGORIES];
 }
 
 // Props interface
@@ -78,15 +78,15 @@ interface PermissionMatrixProps {
 }
 
 export function PermissionMatrix({
-  selectedRole = 'user',
+  selectedRole = "user",
   onRoleChange,
   onPermissionToggle,
   viewOnly = false,
-  showCustomRoles = false
+  showCustomRoles = false,
 }: PermissionMatrixProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [currentRole, setCurrentRole] = useState<Role>(selectedRole);
 
   // Get permission icon
@@ -110,8 +110,8 @@ export function PermissionMatrix({
 
   // Process permissions
   const processPermissions = (): PermissionItem[] => {
-    return AVAILABLE_PERMISSIONS.map(permission => {
-      const [module, action] = permission.split(':');
+    return AVAILABLE_PERMISSIONS.map((permission) => {
+      const [module, action] = permission.split(":");
       const category = PERMISSION_CATEGORIES[module as keyof typeof PERMISSION_CATEGORIES];
 
       return {
@@ -122,9 +122,9 @@ export function PermissionMatrix({
         category: category || {
           name: module,
           description: `Manage ${module}`,
-          icon: 'settings',
-          color: 'gray'
-        }
+          icon: "settings",
+          color: "gray",
+        },
       };
     });
   };
@@ -142,25 +142,29 @@ export function PermissionMatrix({
   const rolePermissions = getRolePermissions();
 
   // Filter permissions based on search and category
-  const filteredPermissions = allPermissions.filter(permission => {
-    const matchesSearch = searchTerm === '' ||
+  const filteredPermissions = allPermissions.filter((permission) => {
+    const matchesSearch =
+      searchTerm === "" ||
       permission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       permission.module.toLowerCase().includes(searchTerm.toLowerCase()) ||
       permission.action.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesCategory = selectedCategory === 'all' || permission.module === selectedCategory;
+    const matchesCategory = selectedCategory === "all" || permission.module === selectedCategory;
 
     return matchesSearch && matchesCategory;
   });
 
   // Group permissions by module
-  const groupedPermissions = filteredPermissions.reduce((groups, permission) => {
-    if (!groups[permission.module]) {
-      groups[permission.module] = [];
-    }
-    groups[permission.module].push(permission);
-    return groups;
-  }, {} as Record<string, PermissionItem[]>);
+  const groupedPermissions = filteredPermissions.reduce(
+    (groups, permission) => {
+      if (!groups[permission.module]) {
+        groups[permission.module] = [];
+      }
+      groups[permission.module].push(permission);
+      return groups;
+    },
+    {} as Record<string, PermissionItem[]>,
+  );
 
   // Check if permission is granted for current role
   const isPermissionGranted = (permission: Permission): boolean => {
@@ -181,10 +185,10 @@ export function PermissionMatrix({
 
   // Get role badge color
   const getRoleBadgeVariant = (role: Role): "default" | "secondary" | "destructive" | "outline" => {
-    if (role === 'superadmin') return 'destructive';
-    if (role === 'admin') return 'default';
-    if (['staff', 'treasurer', 'chapter_president'].includes(role)) return 'default';
-    return 'outline';
+    if (role === "superadmin") return "destructive";
+    if (role === "admin") return "default";
+    if (["staff", "treasurer", "chapter_president"].includes(role)) return "default";
+    return "outline";
   };
 
   return (
@@ -203,9 +207,7 @@ export function PermissionMatrix({
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant={getRoleBadgeVariant(currentRole)}>
-                {currentRole}
-              </Badge>
+              <Badge variant={getRoleBadgeVariant(currentRole)}>{currentRole}</Badge>
             </div>
           </div>
         </CardHeader>
@@ -237,7 +239,10 @@ export function PermissionMatrix({
             {/* View mode selector */}
             <div>
               <Label htmlFor="view-mode">View Mode</Label>
-              <Select value={viewMode} onValueChange={(value) => setViewMode(value as 'grid' | 'table')}>
+              <Select
+                value={viewMode}
+                onValueChange={(value) => setViewMode(value as "grid" | "table")}
+              >
                 <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
@@ -324,9 +329,7 @@ export function PermissionMatrix({
                             >
                               {permission.action}
                             </Label>
-                            <p className="text-xs text-muted-foreground">
-                              {permission.module}
-                            </p>
+                            <p className="text-xs text-muted-foreground">{permission.module}</p>
                           </div>
                           {isPermissionGranted(permission.id) ? (
                             <Unlock className="h-4 w-4 text-green-600" />
@@ -363,9 +366,7 @@ export function PermissionMatrix({
                           <div className="flex items-center gap-2">
                             {getPermissionIcon(permission.module)}
                             <div>
-                              <div className="font-medium">
-                                {permission.name}
-                              </div>
+                              <div className="font-medium">{permission.name}</div>
                               <div className="text-sm text-muted-foreground">
                                 {permission.category.description}
                               </div>
@@ -373,9 +374,7 @@ export function PermissionMatrix({
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline">
-                            {permission.module}
-                          </Badge>
+                          <Badge variant="outline">{permission.module}</Badge>
                         </TableCell>
                         <TableCell>{permission.action}</TableCell>
                         <TableCell className="text-center">
@@ -405,36 +404,24 @@ export function PermissionMatrix({
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <div className="text-2xl font-bold text-green-600">
-                {rolePermissions.length}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Granted Permissions
-              </div>
+              <div className="text-2xl font-bold text-green-600">{rolePermissions.length}</div>
+              <div className="text-sm text-muted-foreground">Granted Permissions</div>
             </div>
             <div className="space-y-2">
               <div className="text-2xl font-bold text-muted-foreground">
                 {AVAILABLE_PERMISSIONS.length - rolePermissions.length}
               </div>
-              <div className="text-sm text-muted-foreground">
-                Denied Permissions
-              </div>
+              <div className="text-sm text-muted-foreground">Denied Permissions</div>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl font-bold">
-                {AVAILABLE_PERMISSIONS.length}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Total Permissions
-              </div>
+              <div className="text-2xl font-bold">{AVAILABLE_PERMISSIONS.length}</div>
+              <div className="text-sm text-muted-foreground">Total Permissions</div>
             </div>
             <div className="space-y-2">
               <div className="text-2xl font-bold">
                 {Math.round((rolePermissions.length / AVAILABLE_PERMISSIONS.length) * 100)}%
               </div>
-              <div className="text-sm text-muted-foreground">
-                Access Level
-              </div>
+              <div className="text-sm text-muted-foreground">Access Level</div>
             </div>
           </div>
         </CardContent>

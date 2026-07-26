@@ -1,16 +1,16 @@
 "use client";
 
-import * as React from "react"
-import { Button } from "@/components/ui/button"
-import { Bell, Check, ExternalLink, X } from "lucide-react"
-import { Notification } from "@/types/dashboard.types"
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Bell, Check, ExternalLink, X } from "lucide-react";
+import { Notification } from "@/types/dashboard.types";
 
 interface NotificationsWidgetProps {
-  notifications?: Notification[]
-  onMarkAsRead?: (id: string) => void
-  onMarkAllAsRead?: () => void
-  onDismiss?: (id: string) => void
-  onViewAll?: () => void
+  notifications?: Notification[];
+  onMarkAsRead?: (id: string) => void;
+  onMarkAllAsRead?: () => void;
+  onDismiss?: (id: string) => void;
+  onViewAll?: () => void;
 }
 
 // Mock notifications data - in a real app, this would come from an API
@@ -51,27 +51,27 @@ const mockNotifications: Notification[] = [
     read: true,
     actionUrl: "/events/web-dev-workshop",
   },
-]
+];
 
 const getNotificationIcon = (type: string) => {
-  return <Bell className="h-4 w-4 text-muted-foreground" />
-}
+  return <Bell className="h-4 w-4 text-muted-foreground" />;
+};
 
 const formatDate = (date: Date) => {
-  const now = new Date()
-  const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-  
+  const now = new Date();
+  const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+
   if (diffInHours < 1) {
-    return "Just now"
+    return "Just now";
   } else if (diffInHours < 24) {
-    return `${diffInHours}h ago`
+    return `${diffInHours}h ago`;
   } else {
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
-    }).format(date)
+    }).format(date);
   }
-}
+};
 
 export function NotificationsWidget({
   notifications = mockNotifications,
@@ -80,16 +80,14 @@ export function NotificationsWidget({
   onDismiss,
   onViewAll,
 }: NotificationsWidgetProps) {
-  const unreadCount = notifications.filter(n => !n.read).length
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <div className="w-full">
       {/* Simple header */}
       {unreadCount > 0 && (
         <div className="flex items-center justify-between px-4 py-3 border-b">
-          <span className="text-sm font-medium text-muted-foreground">
-            {unreadCount} unread
-          </span>
+          <span className="text-sm font-medium text-muted-foreground">{unreadCount} unread</span>
           <Button
             variant="ghost"
             size="sm"
@@ -100,7 +98,7 @@ export function NotificationsWidget({
           </Button>
         </div>
       )}
-  
+
       {/* Notifications list */}
       <div className="max-h-96 overflow-y-auto">
         {notifications.length === 0 ? (
@@ -124,9 +122,11 @@ export function NotificationsWidget({
 
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-start justify-between gap-2">
-                      <h4 className={`text-sm font-medium text-foreground leading-tight ${
-                        !notification.read ? "font-semibold" : ""
-                      }`}>
+                      <h4
+                        className={`text-sm font-medium text-foreground leading-tight ${
+                          !notification.read ? "font-semibold" : ""
+                        }`}
+                      >
                         {notification.title}
                       </h4>
 
@@ -199,5 +199,5 @@ export function NotificationsWidget({
         </div>
       )}
     </div>
-  )
+  );
 }

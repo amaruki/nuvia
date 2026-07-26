@@ -5,12 +5,12 @@
  * consistent security and rate limiting across the application.
  */
 
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-import { createAuthMiddleware } from '@/lib/auth/middleware';
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { createAuthMiddleware } from "@/lib/auth/middleware";
 
-import { RATE_LIMIT_CONFIGS } from '@/lib/auth/rate-limiting';
-import { AuthResponseFactory } from '@/lib/auth/common';
+import { RATE_LIMIT_CONFIGS } from "@/lib/auth/rate-limiting";
+import { AuthResponseFactory } from "@/lib/auth/common";
 
 // TODO: Add support for API key authentication for external services
 // TODO: Add support for request logging and analytics
@@ -20,8 +20,8 @@ import { AuthResponseFactory } from '@/lib/auth/common';
  * Create middleware with authentication and rate limiting
  */
 const authMiddleware = createAuthMiddleware({
-  rateLimit: 'API',
-  skipPaths: ['/api/auth/callback'], // Skip auth for OAuth callbacks
+  rateLimit: "API",
+  skipPaths: ["/api/auth/callback"], // Skip auth for OAuth callbacks
 });
 
 /**
@@ -30,12 +30,12 @@ const authMiddleware = createAuthMiddleware({
 export async function proxy(request: NextRequest) {
   try {
     // Protect dashboard routes - require authentication
-    if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    if (request.nextUrl.pathname.startsWith("/dashboard")) {
       const authResult = await authenticate(request);
       if (!authResult.success) {
         // Redirect to login page with return URL
-        const loginUrl = new URL('/auth/login', request.url);
-        loginUrl.searchParams.set('redirectTo', request.nextUrl.pathname);
+        const loginUrl = new URL("/auth/login", request.url);
+        loginUrl.searchParams.set("redirectTo", request.nextUrl.pathname);
         return NextResponse.redirect(loginUrl);
       }
       // Continue to dashboard page if authenticated
@@ -43,7 +43,7 @@ export async function proxy(request: NextRequest) {
     }
 
     // Apply authentication middleware to API routes
-    if (request.nextUrl.pathname.startsWith('/api/')) {
+    if (request.nextUrl.pathname.startsWith("/api/")) {
       // Skip auth middleware for OAuth callbacks and public endpoints
       if (isPublicEndpoint(request.nextUrl.pathname)) {
         return NextResponse.next();
@@ -58,8 +58,8 @@ export async function proxy(request: NextRequest) {
     // Continue to the route handler
     return NextResponse.next();
   } catch (error) {
-    console.error('Middleware error:', error);
-    return AuthResponseFactory.internalError('Internal server error');
+    console.error("Middleware error:", error);
+    return AuthResponseFactory.internalError("Internal server error");
   }
 }
 
@@ -69,7 +69,7 @@ export async function proxy(request: NextRequest) {
 async function authenticate(request: NextRequest): Promise<{ success: boolean; user?: any }> {
   try {
     // Import auth utilities dynamically to avoid server-side issues
-    const { AuthUtils } = await import('@/lib/auth/utils');
+    const { AuthUtils } = await import("@/lib/auth/utils");
     const user = await AuthUtils.getCurrentUser(request);
 
     if (!user) {
@@ -78,7 +78,7 @@ async function authenticate(request: NextRequest): Promise<{ success: boolean; u
 
     return { success: true, user };
   } catch (error) {
-    console.error('Authentication error:', error);
+    console.error("Authentication error:", error);
     return { success: false };
   }
 }
@@ -88,15 +88,15 @@ async function authenticate(request: NextRequest): Promise<{ success: boolean; u
  */
 function isPublicEndpoint(pathname: string): boolean {
   const publicEndpoints = [
-    '/api/auth/callback', // OAuth callbacks
-    '/api/v1/auth/login',   // Login endpoints
-    '/api/v1/auth/register', // Registration endpoints
-    '/api/v1/auth/reset-password', // Password reset
-    '/api/v1/auth/verify-email', // Email verification
+    "/api/auth/callback", // OAuth callbacks
+    "/api/v1/auth/login", // Login endpoints
+    "/api/v1/auth/register", // Registration endpoints
+    "/api/v1/auth/reset-password", // Password reset
+    "/api/v1/auth/verify-email", // Email verification
     // TODO: Add other public endpoints as needed
   ];
 
-  return publicEndpoints.some(endpoint => pathname.startsWith(endpoint));
+  return publicEndpoints.some((endpoint) => pathname.startsWith(endpoint));
 }
 
 /**
@@ -105,12 +105,12 @@ function isPublicEndpoint(pathname: string): boolean {
 export const config = {
   matcher: [
     // Apply to all API routes
-    '/api/:path*',
+    "/api/:path*",
     // Apply to dashboard routes
-    '/dashboard/:path*',
+    "/dashboard/:path*",
     // Apply to authentication pages
-    '/auth/:path*',
+    "/auth/:path*",
     // Exclude static files and images
-    '/((?!_next/static|_next/image|favicon.ico|public).*)',
+    "/((?!_next/static|_next/image|favicon.ico|public).*)",
   ],
 };

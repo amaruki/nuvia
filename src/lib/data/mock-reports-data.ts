@@ -1,4 +1,13 @@
-import { FinancialReport, ReportStatistics, IncomeStatementData, BalanceSheetData, CashFlowData, BudgetVsActualData, TaxDocumentData, AuditTrailData } from "@/types/finance.types";
+import {
+  FinancialReport,
+  ReportStatistics,
+  IncomeStatementData,
+  BalanceSheetData,
+  CashFlowData,
+  BudgetVsActualData,
+  TaxDocumentData,
+  AuditTrailData,
+} from "@/types/finance.types";
 
 // Mock Financial Reports
 export const mockReports: FinancialReport[] = [
@@ -27,7 +36,8 @@ export const mockReports: FinancialReport[] = [
   {
     id: "2",
     title: "Annual Balance Sheet 2023",
-    description: "Complete balance sheet for fiscal year 2023 showing assets, liabilities, and equity",
+    description:
+      "Complete balance sheet for fiscal year 2023 showing assets, liabilities, and equity",
     type: "balance_sheet",
     period: "FY 2023",
     startDate: new Date("2023-01-01"),
@@ -357,8 +367,20 @@ export const mockBudgetVsActualData: BudgetVsActualData = {
       variancePercentage: -4.0,
       status: "over_budget",
       subcategories: [
-        { name: "Salaries", budgeted: 400000, actual: 410000, variance: -10000, variancePercentage: -2.5 },
-        { name: "Benefits", budgeted: 100000, actual: 110000, variance: -10000, variancePercentage: -10.0 },
+        {
+          name: "Salaries",
+          budgeted: 400000,
+          actual: 410000,
+          variance: -10000,
+          variancePercentage: -2.5,
+        },
+        {
+          name: "Benefits",
+          budgeted: 100000,
+          actual: 110000,
+          variance: -10000,
+          variancePercentage: -10.0,
+        },
       ],
     },
     {
@@ -370,8 +392,20 @@ export const mockBudgetVsActualData: BudgetVsActualData = {
       variancePercentage: 6.7,
       status: "under_budget",
       subcategories: [
-        { name: "Venue", budgeted: 150000, actual: 140000, variance: 10000, variancePercentage: 6.7 },
-        { name: "Catering", budgeted: 100000, actual: 90000, variance: 10000, variancePercentage: 10.0 },
+        {
+          name: "Venue",
+          budgeted: 150000,
+          actual: 140000,
+          variance: 10000,
+          variancePercentage: 6.7,
+        },
+        {
+          name: "Catering",
+          budgeted: 100000,
+          actual: 90000,
+          variance: 10000,
+          variancePercentage: 10.0,
+        },
         { name: "Marketing", budgeted: 50000, actual: 50000, variance: 0, variancePercentage: 0.0 },
       ],
     },
@@ -415,9 +449,21 @@ export const mockTaxDocumentData: TaxDocumentData = {
   taxPaid: 70000,
   taxDue: 5000,
   deductions: [
-    { category: "Business Expenses", amount: 50000, description: "Ordinary and necessary business expenses" },
-    { category: "Depreciation", amount: 25000, description: "Depreciation on equipment and property" },
-    { category: "Charitable Contributions", amount: 15000, description: "Qualified charitable contributions" },
+    {
+      category: "Business Expenses",
+      amount: 50000,
+      description: "Ordinary and necessary business expenses",
+    },
+    {
+      category: "Depreciation",
+      amount: 25000,
+      description: "Depreciation on equipment and property",
+    },
+    {
+      category: "Charitable Contributions",
+      amount: 15000,
+      description: "Qualified charitable contributions",
+    },
   ],
   credits: [
     { category: "Research Credit", amount: 5000, description: "Qualified research activities" },

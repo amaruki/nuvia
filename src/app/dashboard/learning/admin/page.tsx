@@ -13,7 +13,7 @@ import {
   MoreHorizontal,
   FileText,
   Users,
-  BarChart3
+  BarChart3,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -55,8 +55,8 @@ export default function CourseManagementPage() {
     };
   }, [setHeader, clearHeader]);
 
-  const filteredCourses = courses.filter(course =>
-    course.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCourses = courses.filter((course) =>
+    course.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -72,7 +72,9 @@ export default function CourseManagementPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Courses</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Courses
+            </CardTitle>
             <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center">
               <FileText className="h-4 w-4 text-blue-600" />
             </div>
@@ -84,7 +86,9 @@ export default function CourseManagementPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Students</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Students
+            </CardTitle>
             <div className="h-8 w-8 rounded-full bg-green-50 flex items-center justify-center">
               <Users className="h-4 w-4 text-green-600" />
             </div>
@@ -143,7 +147,12 @@ export default function CourseManagementPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">Published</Badge>
+                    <Badge
+                      variant="outline"
+                      className="bg-green-500/10 text-green-600 border-green-500/20"
+                    >
+                      Published
+                    </Badge>
                   </TableCell>
                   <TableCell>{course.level}</TableCell>
                   <TableCell className="text-right">{course.students.toLocaleString()}</TableCell>
@@ -158,10 +167,14 @@ export default function CourseManagementPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/learning/courses/${course.id}`)}>
+                        <DropdownMenuItem
+                          onClick={() => router.push(`/dashboard/learning/courses/${course.id}`)}
+                        >
                           <Eye className="mr-2 h-4 w-4" /> View
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push(`/dashboard/learning/admin/${course.id}/edit`)}>
+                        <DropdownMenuItem
+                          onClick={() => router.push(`/dashboard/learning/admin/${course.id}/edit`)}
+                        >
                           <Edit className="mr-2 h-4 w-4" /> Edit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />

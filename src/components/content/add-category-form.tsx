@@ -9,12 +9,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   CATEGORY_TYPES,
-  CATEGORY_STATUSES, 
+  CATEGORY_STATUSES,
   CATEGORY_SCOPES,
   CATEGORY_COLORS,
   CATEGORY_TYPE_DISPLAY,
@@ -24,12 +30,15 @@ import {
   Category,
   CategoryType,
   CategoryStatus,
-  CategoryScope
+  CategoryScope,
 } from "@/types/category.types";
 import { cn } from "@/lib/utils";
 
 const categoryFormSchema = z.object({
-  name: z.string().min(1, "Category name is required").max(100, "Name must be less than 100 characters"),
+  name: z
+    .string()
+    .min(1, "Category name is required")
+    .max(100, "Name must be less than 100 characters"),
   slug: z.string().optional(),
   description: z.string().max(500, "Description must be less than 500 characters").optional(),
   type: z.enum(CATEGORY_TYPES),
@@ -57,44 +66,48 @@ export function AddCategoryForm({
   onSubmit,
   onCancel,
   editingCategory,
-  isLoading = false
+  isLoading = false,
 }: AddCategoryFormProps) {
-  const [selectedColor, setSelectedColor] = useState(editingCategory?.color || CATEGORY_COLORS[0].value);
+  const [selectedColor, setSelectedColor] = useState(
+    editingCategory?.color || CATEGORY_COLORS[0].value,
+  );
   const [useEmoji, setUseEmoji] = useState(!!editingCategory?.emoji);
 
   const form = useForm<CategoryFormData>({
     resolver: zodResolver(categoryFormSchema),
-    defaultValues: editingCategory ? {
-      name: editingCategory.name,
-      slug: editingCategory.slug,
-      description: editingCategory.description,
-      type: editingCategory.type,
-      status: editingCategory.status,
-      scope: editingCategory.scope,
-      color: editingCategory.color,
-      icon: editingCategory.icon,
-      emoji: editingCategory.emoji,
-      parentId: editingCategory.parentId,
-      order: editingCategory.order,
-      allowedRoles: editingCategory.allowedRoles,
-      allowedChapters: editingCategory.allowedChapters,
-      allowedCommittees: editingCategory.allowedCommittees,
-      metadata: editingCategory.metadata,
-    } : {
-      name: "",
-      description: "",
-      type: "article",
-      status: "active",
-      scope: "global",
-      color: CATEGORY_COLORS[0].value,
-      icon: "",
-      emoji: "",
-      order: 0,
-      allowedRoles: [],
-      allowedChapters: [],
-      allowedCommittees: [],
-      metadata: {},
-    }
+    defaultValues: editingCategory
+      ? {
+          name: editingCategory.name,
+          slug: editingCategory.slug,
+          description: editingCategory.description,
+          type: editingCategory.type,
+          status: editingCategory.status,
+          scope: editingCategory.scope,
+          color: editingCategory.color,
+          icon: editingCategory.icon,
+          emoji: editingCategory.emoji,
+          parentId: editingCategory.parentId,
+          order: editingCategory.order,
+          allowedRoles: editingCategory.allowedRoles,
+          allowedChapters: editingCategory.allowedChapters,
+          allowedCommittees: editingCategory.allowedCommittees,
+          metadata: editingCategory.metadata,
+        }
+      : {
+          name: "",
+          description: "",
+          type: "article",
+          status: "active",
+          scope: "global",
+          color: CATEGORY_COLORS[0].value,
+          icon: "",
+          emoji: "",
+          order: 0,
+          allowedRoles: [],
+          allowedChapters: [],
+          allowedCommittees: [],
+          metadata: {},
+        },
   });
 
   const watchedType = form.watch("type");
@@ -118,7 +131,7 @@ export function AddCategoryForm({
     try {
       await onSubmit({
         ...data,
-        slug: data.slug || data.name.toLowerCase().replace(/\s+/g, '-'),
+        slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
         color: selectedColor,
       });
     } catch (error) {
@@ -146,14 +159,11 @@ export function AddCategoryForm({
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>
-            {editingCategory ? "Edit Category" : "Create New Category"}
-          </CardTitle>
+          <CardTitle>{editingCategory ? "Edit Category" : "Create New Category"}</CardTitle>
           <CardDescription>
             {editingCategory
               ? "Update the category details and settings."
-              : "Create a new category to organize your content."
-            }
+              : "Create a new category to organize your content."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -216,8 +226,8 @@ export function AddCategoryForm({
                     {CATEGORY_TYPES.map((type) => (
                       <SelectItem key={type} value={type}>
                         <div className="flex items-center gap-2">
-                          <div 
-                            className="w-3 h-3 rounded" 
+                          <div
+                            className="w-3 h-3 rounded"
                             style={{ backgroundColor: CATEGORY_TYPE_DISPLAY[type].color }}
                           />
                           {CATEGORY_TYPE_DISPLAY[type].name}
@@ -244,7 +254,7 @@ export function AddCategoryForm({
                     {CATEGORY_STATUSES.map((status) => (
                       <SelectItem key={status} value={status}>
                         <div className="flex items-center gap-2">
-                          <Badge 
+                          <Badge
                             variant={CATEGORY_STATUS_DISPLAY[status].badgeVariant}
                             className="text-xs"
                           >
@@ -276,8 +286,8 @@ export function AddCategoryForm({
                     {CATEGORY_SCOPES.map((scope) => (
                       <SelectItem key={scope} value={scope}>
                         <div className="flex items-center gap-2">
-                          <div 
-                            className="w-3 h-3 rounded" 
+                          <div
+                            className="w-3 h-3 rounded"
                             style={{ backgroundColor: CATEGORY_SCOPE_DISPLAY[scope].color }}
                           />
                           {CATEGORY_SCOPE_DISPLAY[scope].name}
@@ -309,7 +319,7 @@ export function AddCategoryForm({
             {/* Visual Settings */}
             <div className="space-y-4">
               <Label>Visual Appearance</Label>
-              
+
               {/* Color Selection */}
               <div className="space-y-2">
                 <Label>Color</Label>
@@ -323,7 +333,7 @@ export function AddCategoryForm({
                         "w-8 h-8 rounded-lg border-2 transition-all",
                         selectedColor === color.value
                           ? "border-primary scale-110"
-                          : "border-muted hover:border-muted-foreground"
+                          : "border-muted hover:border-muted-foreground",
                       )}
                       style={{ backgroundColor: color.value }}
                       title={color.name}
@@ -336,16 +346,11 @@ export function AddCategoryForm({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Icon Type</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={toggleEmojiMode}
-                  >
+                  <Button type="button" variant="outline" size="sm" onClick={toggleEmojiMode}>
                     {useEmoji ? "Use Icon" : "Use Emoji"}
                   </Button>
                 </div>
-                
+
                 {useEmoji ? (
                   <div className="space-y-2">
                     <Label htmlFor="emoji">Emoji</Label>
@@ -381,11 +386,11 @@ export function AddCategoryForm({
             </div>
 
             {/* Access Control */}
-            {watchedScope !== 'global' && (
+            {watchedScope !== "global" && (
               <div className="space-y-4">
                 <Label>Access Control</Label>
-                
-                {watchedScope === 'chapter' && (
+
+                {watchedScope === "chapter" && (
                   <div className="space-y-2">
                     <Label>Allowed Chapters</Label>
                     <Input
@@ -394,12 +399,14 @@ export function AddCategoryForm({
                       className={cn(form.formState.errors.allowedChapters && "border-red-500")}
                     />
                     {form.formState.errors.allowedChapters && (
-                      <p className="text-sm text-red-500">{form.formState.errors.allowedChapters.message}</p>
+                      <p className="text-sm text-red-500">
+                        {form.formState.errors.allowedChapters.message}
+                      </p>
                     )}
                   </div>
                 )}
 
-                {watchedScope === 'committee' && (
+                {watchedScope === "committee" && (
                   <div className="space-y-2">
                     <Label>Allowed Committees</Label>
                     <Input
@@ -408,7 +415,9 @@ export function AddCategoryForm({
                       className={cn(form.formState.errors.allowedCommittees && "border-red-500")}
                     />
                     {form.formState.errors.allowedCommittees && (
-                      <p className="text-sm text-red-500">{form.formState.errors.allowedCommittees.message}</p>
+                      <p className="text-sm text-red-500">
+                        {form.formState.errors.allowedCommittees.message}
+                      </p>
                     )}
                   </div>
                 )}
@@ -417,19 +426,10 @@ export function AddCategoryForm({
 
             {/* Form Actions */}
             <div className="flex items-center gap-3 pt-4">
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="flex-1"
-              >
-                {isLoading ? "Saving..." : (editingCategory ? "Update Category" : "Create Category")}
+              <Button type="submit" disabled={isLoading} className="flex-1">
+                {isLoading ? "Saving..." : editingCategory ? "Update Category" : "Create Category"}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isLoading}
-              >
+              <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
                 Cancel
               </Button>
             </div>

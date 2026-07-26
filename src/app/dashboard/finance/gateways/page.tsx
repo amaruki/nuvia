@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   RefreshCw,
   AlertTriangle,
   Download,
@@ -92,7 +92,11 @@ export default function FinanceGateways() {
   };
 
   const handleDelete = async (gateway: PaymentGateway) => {
-    if (confirm(`Are you sure you want to delete "${gateway.displayName}"? This action cannot be undone.`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete "${gateway.displayName}"? This action cannot be undone.`,
+      )
+    ) {
       try {
         await deleteGateway(gateway.id);
       } catch (error) {
@@ -221,16 +225,20 @@ export default function FinanceGateways() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="gateways" className="text-xs sm:text-sm py-2 px-2">Gateways</TabsTrigger>
-          <TabsTrigger value="transactions" className="text-xs sm:text-sm py-2 px-2">Transactions</TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">Analytics</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="gateways" className="text-xs sm:text-sm py-2 px-2">
+            Gateways
+          </TabsTrigger>
+          <TabsTrigger value="transactions" className="text-xs sm:text-sm py-2 px-2">
+            Transactions
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">
+            Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -240,7 +248,10 @@ export default function FinanceGateways() {
               <h3 className="text-lg font-semibold">Gateway Status Summary</h3>
               <div className="space-y-3">
                 {gateways.map((gateway) => (
-                  <div key={gateway.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={gateway.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
                         <CreditCard className="h-4 w-4 text-primary" />
@@ -253,10 +264,15 @@ export default function FinanceGateways() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge variant={
-                        gateway.status === "active" ? "default" :
-                        gateway.status === "error" ? "destructive" : "secondary"
-                      }>
+                      <Badge
+                        variant={
+                          gateway.status === "active"
+                            ? "default"
+                            : gateway.status === "error"
+                              ? "destructive"
+                              : "secondary"
+                        }
+                      >
                         {gateway.status}
                       </Badge>
                     </div>
@@ -270,7 +286,10 @@ export default function FinanceGateways() {
               <h3 className="text-lg font-semibold">Recent Activity</h3>
               <div className="space-y-3">
                 {transactions.slice(0, 5).map((transaction) => (
-                  <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={transaction.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <div>
                         <p className="text-sm font-medium">{transaction.transactionId}</p>
@@ -280,13 +299,16 @@ export default function FinanceGateways() {
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-sm font-bold">
-                        {formatCurrency(transaction.amount)}
-                      </p>
-                      <Badge variant={
-                        transaction.status === "completed" ? "default" :
-                        transaction.status === "failed" ? "destructive" : "secondary"
-                      }>
+                      <p className="text-sm font-bold">{formatCurrency(transaction.amount)}</p>
+                      <Badge
+                        variant={
+                          transaction.status === "completed"
+                            ? "default"
+                            : transaction.status === "failed"
+                              ? "destructive"
+                              : "secondary"
+                        }
+                      >
                         {transaction.status}
                       </Badge>
                     </div>
@@ -306,7 +328,10 @@ export default function FinanceGateways() {
                     .sort((a, b) => b.statistics.successRate - a.statistics.successRate)
                     .slice(0, 3)
                     .map((gateway) => (
-                      <div key={gateway.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={gateway.id}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div className="min-w-0 flex-1 mr-2">
                           <p className="font-medium">{gateway.displayName}</p>
                           <p className="text-sm text-muted-foreground">
@@ -314,10 +339,15 @@ export default function FinanceGateways() {
                           </p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className={`text-lg font-bold ${
-                            gateway.statistics.successRate >= 95 ? "text-green-600" :
-                            gateway.statistics.successRate >= 90 ? "text-yellow-600" : "text-red-600"
-                          }`}>
+                          <p
+                            className={`text-lg font-bold ${
+                              gateway.statistics.successRate >= 95
+                                ? "text-green-600"
+                                : gateway.statistics.successRate >= 90
+                                  ? "text-yellow-600"
+                                  : "text-red-600"
+                            }`}
+                          >
                             {gateway.statistics.successRate.toFixed(1)}%
                           </p>
                         </div>
@@ -333,7 +363,10 @@ export default function FinanceGateways() {
                     .sort((a, b) => b.statistics.totalVolume - a.statistics.totalVolume)
                     .slice(0, 3)
                     .map((gateway) => (
-                      <div key={gateway.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={gateway.id}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div className="min-w-0 flex-1 mr-2">
                           <p className="font-medium">{gateway.displayName}</p>
                           <p className="text-sm text-muted-foreground">
@@ -345,7 +378,11 @@ export default function FinanceGateways() {
                             {formatCurrency(gateway.statistics.totalVolume)}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {((gateway.statistics.totalVolume / statistics.totalVolume) * 100).toFixed(1)}% of total
+                            {(
+                              (gateway.statistics.totalVolume / statistics.totalVolume) *
+                              100
+                            ).toFixed(1)}
+                            % of total
                           </p>
                         </div>
                       </div>
@@ -373,23 +410,30 @@ export default function FinanceGateways() {
             <h3 className="text-lg font-semibold">Recent Transactions</h3>
             <div className="space-y-3">
               {transactions.slice(0, 10).map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div className="min-w-0 flex-1 mr-2">
                     <div>
                       <p className="text-sm font-medium">{transaction.transactionId}</p>
                       <p className="text-xs text-muted-foreground">
-                        {transaction.gatewayName} • {transaction.customerName} • {transaction.paymentMethod}
+                        {transaction.gatewayName} • {transaction.customerName} •{" "}
+                        {transaction.paymentMethod}
                       </p>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-bold">
-                      {formatCurrency(transaction.amount)}
-                    </p>
-                    <Badge variant={
-                      transaction.status === "completed" ? "default" :
-                      transaction.status === "failed" ? "destructive" : "secondary"
-                    }>
+                    <p className="text-sm font-bold">{formatCurrency(transaction.amount)}</p>
+                    <Badge
+                      variant={
+                        transaction.status === "completed"
+                          ? "default"
+                          : transaction.status === "failed"
+                            ? "destructive"
+                            : "secondary"
+                      }
+                    >
                       {transaction.status}
                     </Badge>
                   </div>
@@ -409,7 +453,10 @@ export default function FinanceGateways() {
                   ?.sort((a, b) => b.successRate - a.successRate)
                   ?.slice(0, 5)
                   ?.map((gateway) => (
-                    <div key={gateway.gatewayId} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={gateway.gatewayId}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div className="min-w-0 flex-1 mr-2">
                         <p className="font-medium">{gateway.gatewayName}</p>
                         <p className="text-sm text-muted-foreground">
@@ -417,9 +464,7 @@ export default function FinanceGateways() {
                         </p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-lg font-bold">
-                          {gateway.successRate.toFixed(1)}%
-                        </p>
+                        <p className="text-lg font-bold">{gateway.successRate.toFixed(1)}%</p>
                         <p className="text-xs text-muted-foreground">
                           {formatCurrency(gateway.fees)} fees
                         </p>
@@ -437,22 +482,17 @@ export default function FinanceGateways() {
                   ?.sort((a, b) => b.count - a.count)
                   ?.slice(0, 5)
                   ?.map((method) => (
-                    <div key={method.method} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={method.method}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div className="min-w-0 flex-1 mr-2">
-                        <p className="font-medium capitalize">
-                          {method.method.replace('_', ' ')}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {method.count} transactions
-                        </p>
+                        <p className="font-medium capitalize">{method.method.replace("_", " ")}</p>
+                        <p className="text-sm text-muted-foreground">{method.count} transactions</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-lg font-bold">
-                          {method.percentage.toFixed(1)}%
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          of total usage
-                        </p>
+                        <p className="text-lg font-bold">{method.percentage.toFixed(1)}%</p>
+                        <p className="text-xs text-muted-foreground">of total usage</p>
                       </div>
                     </div>
                   ))}
@@ -466,7 +506,10 @@ export default function FinanceGateways() {
               <h3 className="text-lg font-semibold">Monthly Trends</h3>
               <div className="space-y-3">
                 {statistics.monthlyTrend.slice(0, 6).map((month, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <p className="font-medium">{month.month}</p>
                       <p className="text-sm text-muted-foreground">
@@ -474,9 +517,7 @@ export default function FinanceGateways() {
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-lg font-bold">
-                        {formatCurrency(month.volume)}
-                      </p>
+                      <p className="text-lg font-bold">{formatCurrency(month.volume)}</p>
                       <p className="text-xs text-muted-foreground">
                         {month.successRate.toFixed(1)}% success rate
                       </p>

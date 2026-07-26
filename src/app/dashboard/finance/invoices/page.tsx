@@ -155,16 +155,20 @@ export default function FinanceInvoices() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="invoices" className="text-xs sm:text-sm py-2 px-2">All Invoices</TabsTrigger>
-          <TabsTrigger value="payments" className="text-xs sm:text-sm py-2 px-2">Payments</TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">Analytics</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="invoices" className="text-xs sm:text-sm py-2 px-2">
+            All Invoices
+          </TabsTrigger>
+          <TabsTrigger value="payments" className="text-xs sm:text-sm py-2 px-2">
+            Payments
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">
+            Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -178,10 +182,7 @@ export default function FinanceInvoices() {
               <CardContent>
                 <div className="space-y-3">
                   {invoices.slice(0, 5).map((invoice) => (
-                    <div
-                      key={invoice.id}
-                      className="flex items-center justify-between"
-                    >
+                    <div key={invoice.id} className="flex items-center justify-between">
                       <div className="min-w-0 flex-1 mr-2">
                         <p className="text-sm font-medium truncate">{invoice.invoiceNumber}</p>
                         <p className="text-xs text-muted-foreground truncate">
@@ -189,16 +190,14 @@ export default function FinanceInvoices() {
                         </p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-medium">
-                          {formatCurrency(invoice.totalAmount)}
-                        </p>
+                        <p className="text-sm font-medium">{formatCurrency(invoice.totalAmount)}</p>
                         <Badge
                           variant={
                             invoice.status === "paid"
                               ? "default"
                               : invoice.status === "overdue"
-                              ? "destructive"
-                              : "secondary"
+                                ? "destructive"
+                                : "secondary"
                           }
                           className="text-xs"
                         >
@@ -224,14 +223,11 @@ export default function FinanceInvoices() {
                       (invoice) =>
                         invoice.status === "sent" &&
                         new Date(invoice.dueDate) <=
-                          new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                          new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
                     )
                     .slice(0, 5)
                     .map((invoice) => (
-                      <div
-                        key={invoice.id}
-                        className="flex items-center justify-between"
-                      >
+                      <div key={invoice.id} className="flex items-center justify-between">
                         <div className="min-w-0 flex-1 mr-2">
                           <p className="text-sm font-medium truncate">{invoice.invoiceNumber}</p>
                           <p className="text-xs text-muted-foreground truncate">
@@ -258,7 +254,9 @@ export default function FinanceInvoices() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base sm:text-lg">Collection Trend</CardTitle>
-                <CardDescription className="text-sm">Monthly collection performance</CardDescription>
+                <CardDescription className="text-sm">
+                  Monthly collection performance
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -269,9 +267,7 @@ export default function FinanceInvoices() {
                         <TrendingUp className="h-4 w-4 text-muted-foreground shrink-0" />
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-medium">
-                          {formatCurrency(month.collected)}
-                        </p>
+                        <p className="text-sm font-medium">{formatCurrency(month.collected)}</p>
                         <p className="text-xs text-muted-foreground">
                           of {formatCurrency(month.amount)}
                         </p>
@@ -304,10 +300,7 @@ export default function FinanceInvoices() {
             <CardContent>
               <div className="space-y-3">
                 {payments.map((payment) => (
-                  <div
-                    key={payment.id}
-                    className="flex items-center justify-between"
-                  >
+                  <div key={payment.id} className="flex items-center justify-between">
                     <div className="min-w-0 flex-1 mr-2">
                       <p className="text-sm font-medium truncate">{payment.paymentMethod}</p>
                       <p className="text-xs text-muted-foreground truncate">
@@ -315,9 +308,7 @@ export default function FinanceInvoices() {
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-sm font-medium">
-                        {formatCurrency(payment.amount)}
-                      </p>
+                      <p className="text-sm font-medium">{formatCurrency(payment.amount)}</p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(payment.paymentDate).toLocaleDateString()}
                       </p>
@@ -344,10 +335,7 @@ export default function FinanceInvoices() {
                       .sort((a, b) => b.totalAmount - a.totalAmount)
                       .slice(0, 5)
                       .map((client, index) => (
-                        <div
-                          key={client.clientId}
-                          className="flex items-center justify-between"
-                        >
+                        <div key={client.clientId} className="flex items-center justify-between">
                           <div className="min-w-0 flex-1 mr-2">
                             <p className="text-sm font-medium truncate">{client.clientName}</p>
                             <p className="text-xs text-muted-foreground">
@@ -378,16 +366,19 @@ export default function FinanceInvoices() {
               <CardContent>
                 <div className="space-y-3">
                   {[
-                    { status: "draft", count: invoices.filter(i => i.status === "draft").length },
-                    { status: "sent", count: invoices.filter(i => i.status === "sent").length },
-                    { status: "paid", count: invoices.filter(i => i.status === "paid").length },
-                    { status: "overdue", count: invoices.filter(i => i.status === "overdue").length },
-                    { status: "cancelled", count: invoices.filter(i => i.status === "cancelled").length },
+                    { status: "draft", count: invoices.filter((i) => i.status === "draft").length },
+                    { status: "sent", count: invoices.filter((i) => i.status === "sent").length },
+                    { status: "paid", count: invoices.filter((i) => i.status === "paid").length },
+                    {
+                      status: "overdue",
+                      count: invoices.filter((i) => i.status === "overdue").length,
+                    },
+                    {
+                      status: "cancelled",
+                      count: invoices.filter((i) => i.status === "cancelled").length,
+                    },
                   ].map((item) => (
-                    <div
-                      key={item.status}
-                      className="flex items-center justify-between"
-                    >
+                    <div key={item.status} className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium capitalize">{item.status}</p>
                       </div>
@@ -396,8 +387,8 @@ export default function FinanceInvoices() {
                         <p className="text-xs text-muted-foreground">
                           {formatCurrency(
                             invoices
-                              .filter(i => i.status === item.status)
-                              .reduce((sum, i) => sum + i.totalAmount, 0)
+                              .filter((i) => i.status === item.status)
+                              .reduce((sum, i) => sum + i.totalAmount, 0),
                           )}
                         </p>
                       </div>

@@ -18,15 +18,20 @@ import {
   EventCheckInResponse,
   EventStatistics,
   EventDashboardData,
-} from '@/types/event.types';
-import { API } from '@/lib/config';
+} from "@/types/event.types";
+import { API } from "@/lib/config";
 import {
   getMockEvents,
   getMockEventById,
   getMockUserEventRegistrations,
-  getMockEventDashboardData
-} from '@/lib/mock/eventMockData';
-import { NotFoundError, ValidationError, AuthorizationError, BusinessLogicError } from '@/lib/errors';
+  getMockEventDashboardData,
+} from "@/lib/mock/eventMockData";
+import {
+  NotFoundError,
+  ValidationError,
+  AuthorizationError,
+  BusinessLogicError,
+} from "@/lib/errors";
 
 /**
  * Helper function to handle API responses
@@ -34,47 +39,49 @@ import { NotFoundError, ValidationError, AuthorizationError, BusinessLogicError 
 async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     let errorMessage = `Request failed with status ${response.status}`;
-    
+
     try {
       const errorData = await response.json();
       errorMessage = errorData.message || errorMessage;
-      
+
       // Map HTTP status codes to custom error types
       if (response.status === 400) {
         const errors = errorData.errors || { general: [errorMessage] };
         const fieldErrors = Object.entries(errors).flatMap(([field, messages]) =>
-          (messages as string[]).map(message => ({ field, message }))
+          (messages as string[]).map((message) => ({ field, message })),
         );
         throw new ValidationError(fieldErrors);
       } else if (response.status === 401) {
-        throw new AuthorizationError('Unauthorized access');
+        throw new AuthorizationError("Unauthorized access");
       } else if (response.status === 403) {
-        throw new AuthorizationError('Insufficient permissions');
+        throw new AuthorizationError("Insufficient permissions");
       } else if (response.status === 404) {
-        throw new NotFoundError('Resource', 'unknown');
+        throw new NotFoundError("Resource", "unknown");
       } else if (response.status === 409) {
-        throw new BusinessLogicError(errorMessage, 'CONFLICT');
+        throw new BusinessLogicError(errorMessage, "CONFLICT");
       } else if (response.status === 422) {
         const errors = errorData.errors || { general: [errorMessage] };
         const fieldErrors = Object.entries(errors).flatMap(([field, messages]) =>
-          (messages as string[]).map(message => ({ field, message }))
+          (messages as string[]).map((message) => ({ field, message })),
         );
         throw new ValidationError(fieldErrors);
       }
     } catch (error) {
-      if (error instanceof NotFoundError ||
-          error instanceof ValidationError ||
-          error instanceof AuthorizationError ||
-          error instanceof BusinessLogicError) {
+      if (
+        error instanceof NotFoundError ||
+        error instanceof ValidationError ||
+        error instanceof AuthorizationError ||
+        error instanceof BusinessLogicError
+      ) {
         throw error;
       }
       // If we can't parse the error response, use the status text
       errorMessage = response.statusText || errorMessage;
     }
-    
+
     throw new Error(errorMessage);
   }
-  
+
   return response.json();
 }
 
@@ -84,13 +91,13 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
 export async function getEvents(
   filter?: EventFilter,
   page = 1,
-  pageSize = 10
+  pageSize = 10,
 ): Promise<EventListResponse> {
   try {
     // Using mock data for demonstration
     return getMockEvents(filter, page, pageSize);
   } catch (error) {
-    console.error('Error fetching events:', error);
+    console.error("Error fetching events:", error);
     throw error;
   }
 }
@@ -100,9 +107,9 @@ export async function getEvents(
  */
 export async function getEventById(id: string): Promise<EventDetailsResponse> {
   if (!id) {
-    throw new ValidationError([{ field: 'eventId', message: 'Event ID is required' }]);
+    throw new ValidationError([{ field: "eventId", message: "Event ID is required" }]);
   }
-  
+
   try {
     // Using mock data for demonstration
     return getMockEventById(id);
@@ -118,16 +125,16 @@ export async function getEventById(id: string): Promise<EventDetailsResponse> {
 export async function createEvent(eventData: CreateEventRequest): Promise<Event> {
   try {
     const response = await fetch(`${API.PREFIX}/events`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(eventData),
     });
 
     return await handleApiResponse<Event>(response);
   } catch (error) {
-    console.error('Error creating event:', error);
+    console.error("Error creating event:", error);
     throw error;
   }
 }
@@ -137,14 +144,14 @@ export async function createEvent(eventData: CreateEventRequest): Promise<Event>
  */
 export async function updateEvent(id: string, eventData: UpdateEventRequest): Promise<Event> {
   if (!id) {
-    throw new ValidationError([{ field: 'eventId', message: 'Event ID is required' }]);
+    throw new ValidationError([{ field: "eventId", message: "Event ID is required" }]);
   }
-  
+
   try {
     const response = await fetch(`${API.PREFIX}/events/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(eventData),
     });
@@ -161,14 +168,14 @@ export async function updateEvent(id: string, eventData: UpdateEventRequest): Pr
  */
 export async function deleteEvent(id: string): Promise<void> {
   if (!id) {
-    throw new ValidationError([{ field: 'eventId', message: 'Event ID is required' }]);
+    throw new ValidationError([{ field: "eventId", message: "Event ID is required" }]);
   }
-  
+
   try {
     const response = await fetch(`${API.PREFIX}/events/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
@@ -183,24 +190,24 @@ export async function deleteEvent(id: string): Promise<void> {
  * Register for an event
  */
 export async function registerForEvent(
-  registrationData: RegisterForEventRequest
+  registrationData: RegisterForEventRequest,
 ): Promise<EventRegistrationResponse> {
   if (!registrationData.eventId) {
-    throw new ValidationError([{ field: 'eventId', message: 'Event ID is required' }]);
+    throw new ValidationError([{ field: "eventId", message: "Event ID is required" }]);
   }
-  
+
   try {
     const response = await fetch(`${API.PREFIX}/events/register`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(registrationData),
     });
 
     return await handleApiResponse<EventRegistrationResponse>(response);
   } catch (error) {
-    console.error('Error registering for event:', error);
+    console.error("Error registering for event:", error);
     throw error;
   }
 }
@@ -210,14 +217,14 @@ export async function registerForEvent(
  */
 export async function cancelEventRegistration(eventId: string): Promise<EventRegistrationResponse> {
   if (!eventId) {
-    throw new ValidationError([{ field: 'eventId', message: 'Event ID is required' }]);
+    throw new ValidationError([{ field: "eventId", message: "Event ID is required" }]);
   }
-  
+
   try {
     const response = await fetch(`${API.PREFIX}/events/${eventId}/cancel-registration`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
@@ -232,24 +239,24 @@ export async function cancelEventRegistration(eventId: string): Promise<EventReg
  * Check in to an event
  */
 export async function checkInToEvent(
-  checkInData: CheckInToEventRequest
+  checkInData: CheckInToEventRequest,
 ): Promise<EventCheckInResponse> {
   if (!checkInData.eventId) {
-    throw new ValidationError([{ field: 'eventId', message: 'Event ID is required' }]);
+    throw new ValidationError([{ field: "eventId", message: "Event ID is required" }]);
   }
-  
+
   try {
     const response = await fetch(`${API.PREFIX}/events/check-in`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(checkInData),
     });
 
     return await handleApiResponse<EventCheckInResponse>(response);
   } catch (error) {
-    console.error('Error checking in to event:', error);
+    console.error("Error checking in to event:", error);
     throw error;
   }
 }
@@ -260,16 +267,16 @@ export async function checkInToEvent(
 export async function getEventStatistics(): Promise<EventStatistics> {
   try {
     const response = await fetch(`${API.PREFIX}/events/statistics`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      cache: 'no-store',
+      cache: "no-store",
     });
 
     return await handleApiResponse<EventStatistics>(response);
   } catch (error) {
-    console.error('Error fetching event statistics:', error);
+    console.error("Error fetching event statistics:", error);
     throw error;
   }
 }
@@ -282,7 +289,7 @@ export async function getEventDashboardData(): Promise<EventDashboardData> {
     // Using mock data for demonstration
     return getMockEventDashboardData();
   } catch (error) {
-    console.error('Error fetching event dashboard data:', error);
+    console.error("Error fetching event dashboard data:", error);
     throw error;
   }
 }
@@ -292,12 +299,12 @@ export async function getEventDashboardData(): Promise<EventDashboardData> {
  */
 export async function getUserEventRegistrations(
   userId: string,
-  status?: string[]
+  status?: string[],
 ): Promise<EventRegistration[]> {
   if (!userId) {
-    throw new ValidationError([{ field: 'userId', message: 'User ID is required' }]);
+    throw new ValidationError([{ field: "userId", message: "User ID is required" }]);
   }
-  
+
   try {
     // Using mock data for demonstration
     return getMockUserEventRegistrations(userId, status as any);
@@ -312,16 +319,16 @@ export async function getUserEventRegistrations(
  */
 export async function getUserOrganizedEvents(userId: string): Promise<Event[]> {
   if (!userId) {
-    throw new ValidationError([{ field: 'userId', message: 'User ID is required' }]);
+    throw new ValidationError([{ field: "userId", message: "User ID is required" }]);
   }
-  
+
   try {
     const response = await fetch(`${API.PREFIX}/users/${userId}/organized-events`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      cache: 'no-store',
+      cache: "no-store",
     });
 
     return await handleApiResponse<Event[]>(response);
@@ -334,21 +341,24 @@ export async function getUserOrganizedEvents(userId: string): Promise<Event[]> {
 /**
  * Get event certificate
  */
-export async function getEventCertificate(eventId: string, userId: string): Promise<EventCertificate> {
+export async function getEventCertificate(
+  eventId: string,
+  userId: string,
+): Promise<EventCertificate> {
   if (!eventId || !userId) {
     const errors: Array<{ field: string; message: string }> = [];
-    if (!eventId) errors.push({ field: 'eventId', message: 'Event ID is required' });
-    if (!userId) errors.push({ field: 'userId', message: 'User ID is required' });
+    if (!eventId) errors.push({ field: "eventId", message: "Event ID is required" });
+    if (!userId) errors.push({ field: "userId", message: "User ID is required" });
     throw new ValidationError(errors);
   }
-  
+
   try {
     const response = await fetch(`${API.PREFIX}/events/${eventId}/certificate/${userId}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      cache: 'no-store',
+      cache: "no-store",
     });
 
     return await handleApiResponse<EventCertificate>(response);
@@ -363,16 +373,18 @@ export async function getEventCertificate(eventId: string, userId: string): Prom
  */
 export async function verifyEventCertificate(verificationCode: string): Promise<EventCertificate> {
   if (!verificationCode) {
-    throw new ValidationError([{ field: 'verificationCode', message: 'Verification code is required' }]);
+    throw new ValidationError([
+      { field: "verificationCode", message: "Verification code is required" },
+    ]);
   }
-  
+
   try {
     const response = await fetch(`${API.PREFIX}/certificates/verify/${verificationCode}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      cache: 'no-store',
+      cache: "no-store",
     });
 
     return await handleApiResponse<EventCertificate>(response);

@@ -25,21 +25,25 @@ export function SidebarHeaderComponent({ className }: SidebarHeaderComponentProp
               "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
               "group-data-[collapsible=icon]:px-2",
               "transition-all duration-200",
-              "hover:bg-sidebar-accent/50"
+              "hover:bg-sidebar-accent/50",
             )}
           >
-            <div className={cn(
-              "flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground",
-              "transition-all duration-200",
-              "group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:rounded-lg",
-              "group-hover:scale-105"
-            )}>
+            <div
+              className={cn(
+                "flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground",
+                "transition-all duration-200",
+                "group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:rounded-lg",
+                "group-hover:scale-105",
+              )}
+            >
               <TrendingUp className="size-4" />
             </div>
-            <div className={cn(
-              "grid flex-1 text-left text-sm leading-tight",
-              "group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 transition-all duration-200 overflow-hidden"
-            )}>
+            <div
+              className={cn(
+                "grid flex-1 text-left text-sm leading-tight",
+                "group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 transition-all duration-200 overflow-hidden",
+              )}
+            >
               <span className="truncate font-semibold">Nuvia</span>
               <span className="truncate text-xs">AMS Platform</span>
             </div>

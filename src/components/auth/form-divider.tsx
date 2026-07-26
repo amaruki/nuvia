@@ -16,9 +16,7 @@ export function FormDivider({ text, className = "" }: FormDividerProps) {
         <div className="w-full border-t border-border"></div>
       </div>
       <div className="relative flex justify-center text-sm">
-        <span className="bg-card px-4 text-foreground">
-          {text}
-        </span>
+        <span className="bg-card px-4 text-foreground">{text}</span>
       </div>
     </div>
   );

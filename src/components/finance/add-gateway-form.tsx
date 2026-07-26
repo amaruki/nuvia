@@ -9,10 +9,16 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -92,7 +98,7 @@ export function AddGatewayForm({
       recurringPayments: false,
       subscriptionSupport: false,
       maxTransactionAmount: 10000,
-      minTransactionAmount: 0.50,
+      minTransactionAmount: 0.5,
       dailyTransactionLimit: 50000,
       monthlyTransactionLimit: 1000000,
       webhookRetries: 3,
@@ -129,7 +135,7 @@ export function AddGatewayForm({
           recurringPayments: initialData.configuration?.recurringPayments ?? false,
           subscriptionSupport: initialData.configuration?.subscriptionSupport ?? false,
           maxTransactionAmount: initialData.configuration?.maxTransactionAmount ?? 10000,
-          minTransactionAmount: initialData.configuration?.minTransactionAmount ?? 0.50,
+          minTransactionAmount: initialData.configuration?.minTransactionAmount ?? 0.5,
           dailyTransactionLimit: initialData.configuration?.dailyTransactionLimit ?? 50000,
           monthlyTransactionLimit: initialData.configuration?.monthlyTransactionLimit ?? 1000000,
           webhookRetries: initialData.configuration?.webhookRetries ?? 3,
@@ -147,7 +153,7 @@ export function AddGatewayForm({
       name: "Standard Fee",
       description: "",
       percentage: 2.9,
-      amount: 0.30,
+      amount: 0.3,
       appliesTo: ["credit_card", "debit_card"],
     };
     setFees([...fees, newFee]);
@@ -169,13 +175,13 @@ export function AddGatewayForm({
   };
 
   const updateFormData = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const updateConfiguration = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      configuration: { ...prev.configuration, [field]: value }
+      configuration: { ...prev.configuration, [field]: value },
     }));
   };
 
@@ -191,7 +197,7 @@ export function AddGatewayForm({
             {isEditing ? "Update payment gateway configuration" : "Configure a new payment gateway"}
           </DialogDescription>
         </DialogHeader>
-        
+
         <Separator />
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -207,22 +213,20 @@ export function AddGatewayForm({
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="name">Gateway Name</Label>
-                  <Input 
+                  <Input
                     id="name"
-                    placeholder="e.g., stripe_main" 
+                    placeholder="e.g., stripe_main"
                     value={formData.name}
                     onChange={(e) => updateFormData("name", e.target.value)}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Internal identifier for gateway
-                  </p>
+                  <p className="text-xs text-muted-foreground">Internal identifier for gateway</p>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="displayName">Display Name</Label>
-                  <Input 
+                  <Input
                     id="displayName"
-                    placeholder="e.g., Stripe (Primary)" 
+                    placeholder="e.g., Stripe (Primary)"
                     value={formData.displayName}
                     onChange={(e) => updateFormData("displayName", e.target.value)}
                   />
@@ -234,8 +238,8 @@ export function AddGatewayForm({
 
               <div className="space-y-2">
                 <Label htmlFor="provider">Provider</Label>
-                <Select 
-                  value={formData.provider} 
+                <Select
+                  value={formData.provider}
                   onValueChange={(value) => updateFormData("provider", value)}
                 >
                   <SelectTrigger>
@@ -253,7 +257,7 @@ export function AddGatewayForm({
 
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
-                <Textarea 
+                <Textarea
                   id="description"
                   placeholder="Optional description of this gateway..."
                   value={formData.description}
@@ -264,8 +268,8 @@ export function AddGatewayForm({
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="environment">Environment</Label>
-                  <Select 
-                    value={formData.environment} 
+                  <Select
+                    value={formData.environment}
                     onValueChange={(value) => updateFormData("environment", value)}
                   >
                     <SelectTrigger>
@@ -290,11 +294,11 @@ export function AddGatewayForm({
                             const currentCurrencies = formData.currencies || [];
                             const newCurrencies = checked
                               ? [...currentCurrencies, option.value]
-                              : currentCurrencies.filter(c => c !== option.value);
+                              : currentCurrencies.filter((c) => c !== option.value);
                             updateFormData("currencies", newCurrencies);
                           }}
                         />
-                        <Label 
+                        <Label
                           htmlFor={`currency-${option.value}`}
                           className="text-sm font-normal cursor-pointer"
                         >
@@ -339,37 +343,33 @@ export function AddGatewayForm({
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="apiKey">API Key</Label>
-                  <Input 
+                  <Input
                     id="apiKey"
                     type="password"
                     placeholder="Enter API key..."
                     value={formData.apiKey}
                     onChange={(e) => updateFormData("apiKey", e.target.value)}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    API key for authentication
-                  </p>
+                  <p className="text-xs text-muted-foreground">API key for authentication</p>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="apiSecret">API Secret</Label>
-                  <Input 
+                  <Input
                     id="apiSecret"
                     type="password"
                     placeholder="Enter API secret..."
                     value={formData.apiSecret}
                     onChange={(e) => updateFormData("apiSecret", e.target.value)}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    API secret for authentication
-                  </p>
+                  <p className="text-xs text-muted-foreground">API secret for authentication</p>
                 </div>
               </div>
 
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="merchantId">Merchant ID</Label>
-                  <Input 
+                  <Input
                     id="merchantId"
                     placeholder="Enter merchant ID..."
                     value={formData.merchantId}
@@ -382,7 +382,7 @@ export function AddGatewayForm({
 
                 <div className="space-y-2">
                   <Label htmlFor="accountId">Account ID</Label>
-                  <Input 
+                  <Input
                     id="accountId"
                     placeholder="Enter account ID..."
                     value={formData.accountId}
@@ -396,7 +396,7 @@ export function AddGatewayForm({
 
               <div className="space-y-2">
                 <Label htmlFor="webhookUrl">Webhook URL</Label>
-                <Input 
+                <Input
                   id="webhookUrl"
                   placeholder="https://your-domain.com/webhooks/gateway"
                   value={formData.webhookUrl}
@@ -424,7 +424,9 @@ export function AddGatewayForm({
                       </div>
                       <Switch
                         checked={formData.configuration.allowPartialPayments}
-                        onCheckedChange={(checked) => updateConfiguration("allowPartialPayments", checked)}
+                        onCheckedChange={(checked) =>
+                          updateConfiguration("allowPartialPayments", checked)
+                        }
                       />
                     </div>
 
@@ -480,25 +482,29 @@ export function AddGatewayForm({
                   <div className="grid gap-6 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="minTransactionAmount">Minimum Transaction Amount</Label>
-                      <Input 
+                      <Input
                         id="minTransactionAmount"
                         type="number"
                         step="0.01"
                         placeholder="0.50"
                         value={formData.configuration.minTransactionAmount}
-                        onChange={(e) => updateConfiguration("minTransactionAmount", parseFloat(e.target.value))}
+                        onChange={(e) =>
+                          updateConfiguration("minTransactionAmount", parseFloat(e.target.value))
+                        }
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="maxTransactionAmount">Maximum Transaction Amount</Label>
-                      <Input 
+                      <Input
                         id="maxTransactionAmount"
                         type="number"
                         step="0.01"
                         placeholder="10000"
                         value={formData.configuration.maxTransactionAmount}
-                        onChange={(e) => updateConfiguration("maxTransactionAmount", parseFloat(e.target.value))}
+                        onChange={(e) =>
+                          updateConfiguration("maxTransactionAmount", parseFloat(e.target.value))
+                        }
                       />
                     </div>
                   </div>
@@ -506,25 +512,29 @@ export function AddGatewayForm({
                   <div className="grid gap-6 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="dailyTransactionLimit">Daily Transaction Limit</Label>
-                      <Input 
+                      <Input
                         id="dailyTransactionLimit"
                         type="number"
                         step="0.01"
                         placeholder="50000"
                         value={formData.configuration.dailyTransactionLimit}
-                        onChange={(e) => updateConfiguration("dailyTransactionLimit", parseFloat(e.target.value))}
+                        onChange={(e) =>
+                          updateConfiguration("dailyTransactionLimit", parseFloat(e.target.value))
+                        }
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="monthlyTransactionLimit">Monthly Transaction Limit</Label>
-                      <Input 
+                      <Input
                         id="monthlyTransactionLimit"
                         type="number"
                         step="0.01"
                         placeholder="1000000"
                         value={formData.configuration.monthlyTransactionLimit}
-                        onChange={(e) => updateConfiguration("monthlyTransactionLimit", parseFloat(e.target.value))}
+                        onChange={(e) =>
+                          updateConfiguration("monthlyTransactionLimit", parseFloat(e.target.value))
+                        }
                       />
                     </div>
                   </div>
@@ -598,7 +608,9 @@ export function AddGatewayForm({
                             type="number"
                             step="0.01"
                             value={fee.percentage || ""}
-                            onChange={(e) => updateFee(index, "percentage", parseFloat(e.target.value))}
+                            onChange={(e) =>
+                              updateFee(index, "percentage", parseFloat(e.target.value))
+                            }
                             placeholder="2.9"
                           />
                         </div>
@@ -631,11 +643,11 @@ export function AddGatewayForm({
                                     const currentAppliesTo = fee.appliesTo || [];
                                     const newAppliesTo = checked
                                       ? [...currentAppliesTo, option.value]
-                                      : currentAppliesTo.filter(m => m !== option.value);
+                                      : currentAppliesTo.filter((m) => m !== option.value);
                                     updateFee(index, "appliesTo", newAppliesTo);
                                   }}
                                 />
-                                <Label 
+                                <Label
                                   htmlFor={`fee-${index}-${option.value}`}
                                   className="text-sm font-normal cursor-pointer flex items-center"
                                 >
@@ -676,9 +688,7 @@ export function AddGatewayForm({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">
-              {isEditing ? "Update Gateway" : "Create Gateway"}
-            </Button>
+            <Button type="submit">{isEditing ? "Update Gateway" : "Create Gateway"}</Button>
           </div>
         </form>
       </DialogContent>

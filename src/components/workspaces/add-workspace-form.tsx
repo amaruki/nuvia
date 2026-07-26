@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -19,7 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -27,17 +27,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { 
+import {
   WorkspaceFormData,
   WorkspaceType,
   WorkspaceStatus,
   CommitteeRole,
-  Permission
+  Permission,
 } from "@/types/committee.types";
 import { X, Plus, Trash2 } from "lucide-react";
 
 const workspaceFormSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters").max(50, "Name must be less than 50 characters"),
+  name: z
+    .string()
+    .min(3, "Name must be at least 3 characters")
+    .max(50, "Name must be less than 50 characters"),
   description: z.string().optional(),
   type: z.enum(["general", "project", "document", "discussion", "meeting"] as const),
   settings: z.object({
@@ -45,13 +48,40 @@ const workspaceFormSchema = z.object({
     allowGuestAccess: z.boolean(),
     requireApproval: z.boolean(),
     enableNotifications: z.boolean(),
-    autoArchiveDays: z.number().min(1, "Auto archive must be at least 1 day").max(1095, "Auto archive must be less than 3 years"),
-    maxFileSize: z.number().min(1, "Max file size must be at least 1MB").max(1000, "Max file size must be less than 1000MB"),
+    autoArchiveDays: z
+      .number()
+      .min(1, "Auto archive must be at least 1 day")
+      .max(1095, "Auto archive must be less than 3 years"),
+    maxFileSize: z
+      .number()
+      .min(1, "Max file size must be at least 1MB")
+      .max(1000, "Max file size must be less than 1000MB"),
     allowedFileTypes: z.array(z.string()).min(1, "At least one file type must be allowed"),
-    memberPermissions: z.array(z.object({
-      role: z.enum(["chair", "co_chair", "secretary", "treasurer", "member", "advisor"] as const),
-      permissions: z.array(z.enum(["view", "edit", "delete", "upload", "download", "manage_members", "manage_settings"] as const))
-    })).min(1, "At least one permission set is required")
+    memberPermissions: z
+      .array(
+        z.object({
+          role: z.enum([
+            "chair",
+            "co_chair",
+            "secretary",
+            "treasurer",
+            "member",
+            "advisor",
+          ] as const),
+          permissions: z.array(
+            z.enum([
+              "view",
+              "edit",
+              "delete",
+              "upload",
+              "download",
+              "manage_members",
+              "manage_settings",
+            ] as const),
+          ),
+        }),
+      )
+      .min(1, "At least one permission set is required"),
   }),
 });
 
@@ -92,13 +122,21 @@ export function AddWorkspaceForm({
         memberPermissions: [
           {
             role: "chair",
-            permissions: ["view", "edit", "delete", "upload", "download", "manage_members", "manage_settings"]
+            permissions: [
+              "view",
+              "edit",
+              "delete",
+              "upload",
+              "download",
+              "manage_members",
+              "manage_settings",
+            ],
           },
           {
             role: "member",
-            permissions: ["view", "download"]
-          }
-        ]
+            permissions: ["view", "download"],
+          },
+        ],
       },
       ...initialData,
     },
@@ -120,7 +158,10 @@ export function AddWorkspaceForm({
 
   const handleRemoveFileType = (index: number) => {
     const currentFileTypes = form.getValues("settings.allowedFileTypes") || [];
-    form.setValue("settings.allowedFileTypes", currentFileTypes.filter((_, i) => i !== index));
+    form.setValue(
+      "settings.allowedFileTypes",
+      currentFileTypes.filter((_, i) => i !== index),
+    );
   };
 
   const handleAddPermissionSet = () => {
@@ -129,29 +170,32 @@ export function AddWorkspaceForm({
       ...currentPermissions,
       {
         role: "member",
-        permissions: ["view", "download"]
-      }
+        permissions: ["view", "download"],
+      },
     ]);
   };
 
   const handleRemovePermissionSet = (index: number) => {
     const currentPermissions = form.getValues("settings.memberPermissions") || [];
-    form.setValue("settings.memberPermissions", currentPermissions.filter((_, i) => i !== index));
+    form.setValue(
+      "settings.memberPermissions",
+      currentPermissions.filter((_, i) => i !== index),
+    );
   };
 
   const handlePermissionToggle = (permissionIndex: number, permission: Permission) => {
     const currentPermissions = form.getValues("settings.memberPermissions") || [];
     const permissionSet = currentPermissions[permissionIndex];
-    
+
     if (permissionSet) {
       const updatedPermissions = permissionSet.permissions.includes(permission)
-        ? permissionSet.permissions.filter(p => p !== permission)
+        ? permissionSet.permissions.filter((p) => p !== permission)
         : [...permissionSet.permissions, permission];
-      
+
       form.setValue("settings.memberPermissions", [
         ...currentPermissions.slice(0, permissionIndex),
         { ...permissionSet, permissions: updatedPermissions },
-        ...currentPermissions.slice(permissionIndex + 1)
+        ...currentPermissions.slice(permissionIndex + 1),
       ]);
     }
   };
@@ -170,10 +214,22 @@ export function AddWorkspaceForm({
   };
 
   const typeOptions: { value: WorkspaceType; label: string; description: string }[] = [
-    { value: "general", label: "General", description: "All-purpose workspace for general collaboration" },
+    {
+      value: "general",
+      label: "General",
+      description: "All-purpose workspace for general collaboration",
+    },
     { value: "project", label: "Project", description: "Focused workspace for specific projects" },
-    { value: "document", label: "Document", description: "Workspace optimized for document management" },
-    { value: "discussion", label: "Discussion", description: "Workspace for forums and discussions" },
+    {
+      value: "document",
+      label: "Document",
+      description: "Workspace optimized for document management",
+    },
+    {
+      value: "discussion",
+      label: "Discussion",
+      description: "Workspace for forums and discussions",
+    },
     { value: "meeting", label: "Meeting", description: "Workspace for meeting coordination" },
   ];
 
@@ -192,22 +248,27 @@ export function AddWorkspaceForm({
     { value: "delete", label: "Delete", description: "Can delete content" },
     { value: "upload", label: "Upload", description: "Can upload files" },
     { value: "download", label: "Download", description: "Can download files" },
-    { value: "manage_members", label: "Manage Members", description: "Can manage workspace members" },
-    { value: "manage_settings", label: "Manage Settings", description: "Can manage workspace settings" },
+    {
+      value: "manage_members",
+      label: "Manage Members",
+      description: "Can manage workspace members",
+    },
+    {
+      value: "manage_settings",
+      label: "Manage Settings",
+      description: "Can manage workspace settings",
+    },
   ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "Edit Workspace" : "Create New Workspace"}
-          </DialogTitle>
+          <DialogTitle>{isEditing ? "Edit Workspace" : "Create New Workspace"}</DialogTitle>
           <DialogDescription>
-            {isEditing 
+            {isEditing
               ? "Update workspace information and settings."
-              : "Create a new collaborative workspace for your committee."
-            }
+              : "Create a new collaborative workspace for your committee."}
           </DialogDescription>
         </DialogHeader>
 
@@ -245,7 +306,9 @@ export function AddWorkspaceForm({
                         <SelectItem key={option.value} value={option.value}>
                           <div>
                             <div className="font-medium">{option.label}</div>
-                            <div className="text-sm text-muted-foreground">{option.description}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {option.description}
+                            </div>
                           </div>
                         </SelectItem>
                       ))}
@@ -280,7 +343,9 @@ export function AddWorkspaceForm({
                       <Checkbox
                         id="isPublic"
                         checked={form.watch("settings.isPublic")}
-                        onCheckedChange={(checked) => form.setValue("settings.isPublic", checked as boolean)}
+                        onCheckedChange={(checked) =>
+                          form.setValue("settings.isPublic", checked as boolean)
+                        }
                       />
                       <Label htmlFor="isPublic" className="text-sm font-normal">
                         Public workspace
@@ -299,7 +364,9 @@ export function AddWorkspaceForm({
                       <Checkbox
                         id="allowGuestAccess"
                         checked={form.watch("settings.allowGuestAccess")}
-                        onCheckedChange={(checked) => form.setValue("settings.allowGuestAccess", checked as boolean)}
+                        onCheckedChange={(checked) =>
+                          form.setValue("settings.allowGuestAccess", checked as boolean)
+                        }
                       />
                       <Label htmlFor="allowGuestAccess" className="text-sm font-normal">
                         Allow guest access
@@ -309,7 +376,9 @@ export function AddWorkspaceForm({
                       <Checkbox
                         id="requireApproval"
                         checked={form.watch("settings.requireApproval")}
-                        onCheckedChange={(checked) => form.setValue("settings.requireApproval", checked as boolean)}
+                        onCheckedChange={(checked) =>
+                          form.setValue("settings.requireApproval", checked as boolean)
+                        }
                       />
                       <Label htmlFor="requireApproval" className="text-sm font-normal">
                         Require approval to join
@@ -326,7 +395,9 @@ export function AddWorkspaceForm({
                     <Checkbox
                       id="enableNotifications"
                       checked={form.watch("settings.enableNotifications")}
-                      onCheckedChange={(checked) => form.setValue("settings.enableNotifications", checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("settings.enableNotifications", checked as boolean)
+                      }
                     />
                     <Label htmlFor="enableNotifications" className="text-sm font-normal">
                       Enable notifications
@@ -347,7 +418,9 @@ export function AddWorkspaceForm({
                     <span className="text-sm text-muted-foreground">days</span>
                   </div>
                   {form.formState.errors.settings?.autoArchiveDays && (
-                    <p className="text-sm text-destructive">{form.formState.errors.settings.autoArchiveDays.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.settings.autoArchiveDays.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -366,7 +439,9 @@ export function AddWorkspaceForm({
                     <span className="text-sm text-muted-foreground">MB</span>
                   </div>
                   {form.formState.errors.settings?.maxFileSize && (
-                    <p className="text-sm text-destructive">{form.formState.errors.settings.maxFileSize.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.settings.maxFileSize.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -396,7 +471,7 @@ export function AddWorkspaceForm({
                       </Button>
                     </div>
                   ))}
-                  
+
                   <div className="flex items-center gap-2">
                     <Input
                       value={newFileType}
@@ -410,18 +485,15 @@ export function AddWorkspaceForm({
                       }}
                       className="flex-1"
                     />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleAddFileType}
-                    >
+                    <Button type="button" variant="outline" size="sm" onClick={handleAddFileType}>
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
                 {form.formState.errors.settings?.allowedFileTypes && (
-                  <p className="text-sm text-destructive">{form.formState.errors.settings.allowedFileTypes.message}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.settings.allowedFileTypes.message}
+                  </p>
                 )}
               </div>
             </CardContent>
@@ -445,7 +517,7 @@ export function AddWorkspaceForm({
                             form.setValue("settings.memberPermissions", [
                               ...current.slice(0, index),
                               { ...permissionSet, role: value as CommitteeRole },
-                              ...current.slice(index + 1)
+                              ...current.slice(index + 1),
                             ]);
                           }}
                         >
@@ -461,7 +533,7 @@ export function AddWorkspaceForm({
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <Button
                         type="button"
                         variant="outline"
@@ -481,7 +553,7 @@ export function AddWorkspaceForm({
                             checked={permissionSet.permissions.includes(permission.value)}
                             onCheckedChange={() => handlePermissionToggle(index, permission.value)}
                           />
-                          <Label 
+                          <Label
                             htmlFor={`permission-${index}-${permission.value}`}
                             className="text-sm font-normal cursor-pointer"
                             title={permission.description}

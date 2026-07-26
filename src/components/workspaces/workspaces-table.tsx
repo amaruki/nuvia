@@ -1,32 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
-import { 
-  MoreHorizontal, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Users, 
-  Power, 
+import {
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
+  Users,
+  Power,
   PowerOff,
   Calendar,
   FileText,
@@ -80,7 +80,7 @@ export function WorkspacesTable({
       archived: "secondary" as const,
       locked: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -96,9 +96,14 @@ export function WorkspacesTable({
       discussion: "bg-orange-100 text-orange-800 border-orange-200",
       meeting: "bg-indigo-100 text-indigo-800 border-indigo-200",
     };
-    
+
     return (
-      <Badge variant="outline" className={colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"}>
+      <Badge
+        variant="outline"
+        className={
+          colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"
+        }
+      >
         {type.charAt(0).toUpperCase() + type.slice(1)}
       </Badge>
     );
@@ -116,7 +121,10 @@ export function WorkspacesTable({
     return rate >= 0 ? "text-emerald-600" : "text-rose-600";
   };
 
-  const handleToggleStatus = async (workspace: CommitteeWorkspace, status: "active" | "archived") => {
+  const handleToggleStatus = async (
+    workspace: CommitteeWorkspace,
+    status: "active" | "archived",
+  ) => {
     setTogglingWorkspace(workspace.id);
     try {
       await onToggleStatus(workspace, status);
@@ -130,11 +138,11 @@ export function WorkspacesTable({
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   return (
@@ -187,7 +195,7 @@ export function WorkspacesTable({
                 <div>
                   <div className="font-medium">{workspace.members.length}</div>
                   <div className="text-sm text-muted-foreground">
-                    {workspace.members.filter(m => m.isActive).length} active
+                    {workspace.members.filter((m) => m.isActive).length} active
                   </div>
                 </div>
               </TableCell>
@@ -195,7 +203,11 @@ export function WorkspacesTable({
                 <div>
                   <div className="font-medium">{workspace.documents.length}</div>
                   <div className="text-sm text-muted-foreground">
-                    {workspace.documents.length > 0 ? formatFileSize(workspace.documents.reduce((sum, doc) => sum + doc.fileSize, 0)) : '0 Bytes'}
+                    {workspace.documents.length > 0
+                      ? formatFileSize(
+                          workspace.documents.reduce((sum, doc) => sum + doc.fileSize, 0),
+                        )
+                      : "0 Bytes"}
                   </div>
                 </div>
               </TableCell>
@@ -203,7 +215,7 @@ export function WorkspacesTable({
                 <div>
                   <div className="font-medium">{workspace.tasks.length}</div>
                   <div className="text-sm text-muted-foreground">
-                    {workspace.tasks.filter(t => t.status === "completed").length} completed
+                    {workspace.tasks.filter((t) => t.status === "completed").length} completed
                   </div>
                 </div>
               </TableCell>
@@ -219,7 +231,7 @@ export function WorkspacesTable({
                 <div>
                   <div className="font-medium">{workspace.meetings.length}</div>
                   <div className="text-sm text-muted-foreground">
-                    {workspace.meetings.filter(m => m.status === "completed").length} completed
+                    {workspace.meetings.filter((m) => m.status === "completed").length} completed
                   </div>
                 </div>
               </TableCell>
@@ -227,9 +239,7 @@ export function WorkspacesTable({
                 <div className="flex items-center space-x-2">
                   <Activity className="h-4 w-4 text-amber-500" />
                   <span className="font-medium">{workspace.activity.length}</span>
-                  <span className="text-xs text-muted-foreground">
-                    activities
-                  </span>
+                  <span className="text-xs text-muted-foreground">activities</span>
                 </div>
               </TableCell>
               <TableCell>
@@ -238,7 +248,10 @@ export function WorkspacesTable({
                     <Avatar key={member.id} className="h-6 w-6 border-2 border-background">
                       <AvatarImage src={member.avatar} alt={member.name} />
                       <AvatarFallback className="text-xs">
-                        {member.name.split(' ').map(n => n[0]).join('')}
+                        {member.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
                       </AvatarFallback>
                     </Avatar>
                   ))}
@@ -266,14 +279,23 @@ export function WorkspacesTable({
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <a href={`/dashboard/organization/committees/${workspace.committeeId}/workspace`} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={`/dashboard/organization/committees/${workspace.committeeId}/workspace`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <ExternalLink className="mr-2 h-4 w-4" />
                         Open Workspace
                       </a>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={() => handleToggleStatus(workspace, workspace.status === "active" ? "archived" : "active")}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        handleToggleStatus(
+                          workspace,
+                          workspace.status === "active" ? "archived" : "active",
+                        )
+                      }
                       disabled={togglingWorkspace === workspace.id}
                     >
                       {workspace.status === "active" ? (
@@ -289,7 +311,7 @@ export function WorkspacesTable({
                       )}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => onDelete(workspace)}
                       className="text-destructive focus:text-destructive"
                     >

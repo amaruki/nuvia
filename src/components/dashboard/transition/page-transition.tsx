@@ -81,7 +81,7 @@ export function PageTransition({
         "w-full h-full",
         "transition-all ease-in-out",
         isTransitioning && "pointer-events-none",
-        className
+        className,
       )}
       style={transitionStyles}
     >

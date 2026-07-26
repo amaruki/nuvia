@@ -1,11 +1,11 @@
-import { 
-  Chapter, 
-  ChapterOverallStatistics, 
+import {
+  Chapter,
+  ChapterOverallStatistics,
   ChapterFilterOptions,
   ChapterStatus,
   ChapterRole,
   ChapterPerformance,
-  ChapterRegionalBreakdown
+  ChapterRegionalBreakdown,
 } from "@/types/chapter.types";
 
 export const mockChapters: Chapter[] = [
@@ -13,7 +13,8 @@ export const mockChapters: Chapter[] = [
     id: "ch_1",
     name: "new_york_chapter",
     displayName: "New York Chapter",
-    description: "The flagship chapter serving the New York metropolitan area with a focus on professional development and networking.",
+    description:
+      "The flagship chapter serving the New York metropolitan area with a focus on professional development and networking.",
     status: "active",
     location: {
       address: "123 Madison Avenue",
@@ -23,10 +24,10 @@ export const mockChapters: Chapter[] = [
       postalCode: "10016",
       coordinates: {
         latitude: 40.7484,
-        longitude: -73.9857
+        longitude: -73.9857,
       },
       timezone: "America/New_York",
-      region: "Northeast"
+      region: "Northeast",
     },
     leadership: [
       {
@@ -39,7 +40,7 @@ export const mockChapters: Chapter[] = [
         startDate: new Date("2023-01-15"),
         isActive: true,
         avatar: "/avatars/sarah.jpg",
-        phone: "+1 (555) 123-4567"
+        phone: "+1 (555) 123-4567",
       },
       {
         id: "lead_2",
@@ -51,7 +52,7 @@ export const mockChapters: Chapter[] = [
         startDate: new Date("2023-03-01"),
         isActive: true,
         avatar: "/avatars/michael.jpg",
-        phone: "+1 (555) 234-5678"
+        phone: "+1 (555) 234-5678",
       },
       {
         id: "lead_3",
@@ -63,8 +64,8 @@ export const mockChapters: Chapter[] = [
         startDate: new Date("2023-02-10"),
         isActive: true,
         avatar: "/avatars/emily.jpg",
-        phone: "+1 (555) 345-6789"
-      }
+        phone: "+1 (555) 345-6789",
+      },
     ],
     memberCount: 245,
     establishedDate: new Date("2020-05-15"),
@@ -74,13 +75,13 @@ export const mockChapters: Chapter[] = [
       phone: "+1 (555) 987-6543",
       website: "https://nychapter.org",
       address: "123 Madison Avenue, New York, NY 10016",
-      mailingAddress: "PO Box 1234, New York, NY 10016"
+      mailingAddress: "PO Box 1234, New York, NY 10016",
     },
     socialMedia: {
       facebook: "https://facebook.com/nychapter",
       twitter: "https://twitter.com/nychapter",
       linkedin: "https://linkedin.com/company/nychapter",
-      instagram: "https://instagram.com/nychapter"
+      instagram: "https://instagram.com/nychapter",
     },
     metrics: {
       memberGrowthRate: 12.5,
@@ -91,10 +92,28 @@ export const mockChapters: Chapter[] = [
       newMembersThisMonth: 8,
       activeMembersThisMonth: 189,
       monthlyTrend: [
-        { month: "Nov 2025", memberCount: 245, eventCount: 4, attendanceRate: 78.3, revenue: 12450 },
-        { month: "Oct 2025", memberCount: 237, eventCount: 3, attendanceRate: 75.2, revenue: 10200 },
-        { month: "Sep 2025", memberCount: 230, eventCount: 5, attendanceRate: 82.1, revenue: 15600 }
-      ]
+        {
+          month: "Nov 2025",
+          memberCount: 245,
+          eventCount: 4,
+          attendanceRate: 78.3,
+          revenue: 12450,
+        },
+        {
+          month: "Oct 2025",
+          memberCount: 237,
+          eventCount: 3,
+          attendanceRate: 75.2,
+          revenue: 10200,
+        },
+        {
+          month: "Sep 2025",
+          memberCount: 230,
+          eventCount: 5,
+          attendanceRate: 82.1,
+          revenue: 15600,
+        },
+      ],
     },
     events: [
       {
@@ -103,7 +122,7 @@ export const mockChapters: Chapter[] = [
         date: new Date("2025-12-15"),
         attendance: 180,
         revenue: 12450,
-        status: "upcoming"
+        status: "upcoming",
       },
       {
         id: "evt_2",
@@ -111,8 +130,8 @@ export const mockChapters: Chapter[] = [
         date: new Date("2025-11-20"),
         attendance: 65,
         revenue: 3250,
-        status: "completed"
-      }
+        status: "completed",
+      },
     ],
     finances: {
       totalRevenue: 45600,
@@ -123,13 +142,13 @@ export const mockChapters: Chapter[] = [
       monthlyRevenue: [
         { month: "Nov 2025", amount: 12450 },
         { month: "Oct 2025", amount: 10200 },
-        { month: "Sep 2025", amount: 15600 }
+        { month: "Sep 2025", amount: 15600 },
       ],
       monthlyExpenses: [
         { month: "Nov 2025", amount: 8900 },
         { month: "Oct 2025", amount: 10500 },
-        { month: "Sep 2025", amount: 7800 }
-      ]
+        { month: "Sep 2025", amount: 7800 },
+      ],
     },
     settings: {
       allowOnlineRegistration: true,
@@ -140,18 +159,19 @@ export const mockChapters: Chapter[] = [
       meetingTime: "6:00 PM",
       autoRenewMembership: true,
       sendReminders: true,
-      publicDirectory: true
+      publicDirectory: true,
     },
     createdAt: new Date("2020-05-15"),
     updatedAt: new Date("2025-11-28"),
     createdBy: "admin@example.com",
-    updatedBy: "sarah.johnson@nychapter.org"
+    updatedBy: "sarah.johnson@nychapter.org",
   },
   {
     id: "ch_2",
     name: "los_angeles_chapter",
     displayName: "Los Angeles Chapter",
-    description: "Serving the greater Los Angeles area with focus on entertainment industry networking and tech innovation.",
+    description:
+      "Serving the greater Los Angeles area with focus on entertainment industry networking and tech innovation.",
     status: "active",
     location: {
       address: "456 Sunset Boulevard",
@@ -161,10 +181,10 @@ export const mockChapters: Chapter[] = [
       postalCode: "90028",
       coordinates: {
         latitude: 34.0522,
-        longitude: -118.2437
+        longitude: -118.2437,
       },
       timezone: "America/Los_Angeles",
-      region: "West"
+      region: "West",
     },
     leadership: [
       {
@@ -177,7 +197,7 @@ export const mockChapters: Chapter[] = [
         startDate: new Date("2023-06-01"),
         isActive: true,
         avatar: "/avatars/david.jpg",
-        phone: "+1 (555) 456-7890"
+        phone: "+1 (555) 456-7890",
       },
       {
         id: "lead_5",
@@ -189,8 +209,8 @@ export const mockChapters: Chapter[] = [
         startDate: new Date("2023-07-15"),
         isActive: true,
         avatar: "/avatars/jessica.jpg",
-        phone: "+1 (555) 567-8901"
-      }
+        phone: "+1 (555) 567-8901",
+      },
     ],
     memberCount: 189,
     establishedDate: new Date("2021-03-20"),
@@ -199,12 +219,12 @@ export const mockChapters: Chapter[] = [
       email: "info@lachapter.org",
       phone: "+1 (555) 876-5432",
       website: "https://lachapter.org",
-      address: "456 Sunset Boulevard, Los Angeles, CA 90028"
+      address: "456 Sunset Boulevard, Los Angeles, CA 90028",
     },
     socialMedia: {
       facebook: "https://facebook.com/lachapter",
       twitter: "https://twitter.com/lachapter",
-      instagram: "https://instagram.com/lachapter"
+      instagram: "https://instagram.com/lachapter",
     },
     metrics: {
       memberGrowthRate: 8.3,
@@ -216,9 +236,15 @@ export const mockChapters: Chapter[] = [
       activeMembersThisMonth: 137,
       monthlyTrend: [
         { month: "Nov 2025", memberCount: 189, eventCount: 3, attendanceRate: 72.5, revenue: 8900 },
-        { month: "Oct 2025", memberCount: 184, eventCount: 4, attendanceRate: 68.3, revenue: 11200 },
-        { month: "Sep 2025", memberCount: 180, eventCount: 2, attendanceRate: 75.1, revenue: 6700 }
-      ]
+        {
+          month: "Oct 2025",
+          memberCount: 184,
+          eventCount: 4,
+          attendanceRate: 68.3,
+          revenue: 11200,
+        },
+        { month: "Sep 2025", memberCount: 180, eventCount: 2, attendanceRate: 75.1, revenue: 6700 },
+      ],
     },
     events: [
       {
@@ -227,7 +253,7 @@ export const mockChapters: Chapter[] = [
         date: new Date("2025-12-10"),
         attendance: 120,
         revenue: 8900,
-        status: "upcoming"
+        status: "upcoming",
       },
       {
         id: "evt_4",
@@ -235,8 +261,8 @@ export const mockChapters: Chapter[] = [
         date: new Date("2025-11-15"),
         attendance: 85,
         revenue: 4200,
-        status: "completed"
-      }
+        status: "completed",
+      },
     ],
     finances: {
       totalRevenue: 32400,
@@ -247,13 +273,13 @@ export const mockChapters: Chapter[] = [
       monthlyRevenue: [
         { month: "Nov 2025", amount: 8900 },
         { month: "Oct 2025", amount: 11200 },
-        { month: "Sep 2025", amount: 6700 }
+        { month: "Sep 2025", amount: 6700 },
       ],
       monthlyExpenses: [
         { month: "Nov 2025", amount: 7800 },
         { month: "Oct 2025", amount: 9200 },
-        { month: "Sep 2025", amount: 6500 }
-      ]
+        { month: "Sep 2025", amount: 6500 },
+      ],
     },
     settings: {
       allowOnlineRegistration: true,
@@ -264,18 +290,19 @@ export const mockChapters: Chapter[] = [
       meetingTime: "7:00 PM",
       autoRenewMembership: false,
       sendReminders: true,
-      publicDirectory: true
+      publicDirectory: true,
     },
     createdAt: new Date("2021-03-20"),
     updatedAt: new Date("2025-11-25"),
     createdBy: "admin@example.com",
-    updatedBy: "david.kim@lachapter.org"
+    updatedBy: "david.kim@lachapter.org",
   },
   {
     id: "ch_3",
     name: "chicago_chapter",
     displayName: "Chicago Chapter",
-    description: "Midwest's premier chapter focusing on business development and community service initiatives.",
+    description:
+      "Midwest's premier chapter focusing on business development and community service initiatives.",
     status: "active",
     location: {
       address: "789 Michigan Avenue",
@@ -285,10 +312,10 @@ export const mockChapters: Chapter[] = [
       postalCode: "60611",
       coordinates: {
         latitude: 41.8781,
-        longitude: -87.6298
+        longitude: -87.6298,
       },
       timezone: "America/Chicago",
-      region: "Midwest"
+      region: "Midwest",
     },
     leadership: [
       {
@@ -301,7 +328,7 @@ export const mockChapters: Chapter[] = [
         startDate: new Date("2022-09-01"),
         isActive: true,
         avatar: "/avatars/robert.jpg",
-        phone: "+1 (555) 678-9012"
+        phone: "+1 (555) 678-9012",
       },
       {
         id: "lead_7",
@@ -313,8 +340,8 @@ export const mockChapters: Chapter[] = [
         startDate: new Date("2023-01-10"),
         isActive: true,
         avatar: "/avatars/amanda.jpg",
-        phone: "+1 (555) 789-0123"
-      }
+        phone: "+1 (555) 789-0123",
+      },
     ],
     memberCount: 156,
     establishedDate: new Date("2020-11-10"),
@@ -323,11 +350,11 @@ export const mockChapters: Chapter[] = [
       email: "info@chichapter.org",
       phone: "+1 (555) 765-4321",
       website: "https://chichapter.org",
-      address: "789 Michigan Avenue, Chicago, IL 60611"
+      address: "789 Michigan Avenue, Chicago, IL 60611",
     },
     socialMedia: {
       facebook: "https://facebook.com/chichapter",
-      linkedin: "https://linkedin.com/company/chichapter"
+      linkedin: "https://linkedin.com/company/chichapter",
     },
     metrics: {
       memberGrowthRate: 5.2,
@@ -340,8 +367,8 @@ export const mockChapters: Chapter[] = [
       monthlyTrend: [
         { month: "Nov 2025", memberCount: 156, eventCount: 2, attendanceRate: 68.9, revenue: 5600 },
         { month: "Oct 2025", memberCount: 153, eventCount: 3, attendanceRate: 71.2, revenue: 7800 },
-        { month: "Sep 2025", memberCount: 150, eventCount: 2, attendanceRate: 65.4, revenue: 5200 }
-      ]
+        { month: "Sep 2025", memberCount: 150, eventCount: 2, attendanceRate: 65.4, revenue: 5200 },
+      ],
     },
     events: [
       {
@@ -350,7 +377,7 @@ export const mockChapters: Chapter[] = [
         date: new Date("2025-12-05"),
         attendance: 75,
         revenue: 5600,
-        status: "upcoming"
+        status: "upcoming",
       },
       {
         id: "evt_6",
@@ -358,8 +385,8 @@ export const mockChapters: Chapter[] = [
         date: new Date("2025-11-10"),
         attendance: 45,
         revenue: 0,
-        status: "completed"
-      }
+        status: "completed",
+      },
     ],
     finances: {
       totalRevenue: 23400,
@@ -370,13 +397,13 @@ export const mockChapters: Chapter[] = [
       monthlyRevenue: [
         { month: "Nov 2025", amount: 5600 },
         { month: "Oct 2025", amount: 7800 },
-        { month: "Sep 2025", amount: 5200 }
+        { month: "Sep 2025", amount: 5200 },
       ],
       monthlyExpenses: [
         { month: "Nov 2025", amount: 5200 },
         { month: "Oct 2025", amount: 6800 },
-        { month: "Sep 2025", amount: 4500 }
-      ]
+        { month: "Sep 2025", amount: 4500 },
+      ],
     },
     settings: {
       allowOnlineRegistration: true,
@@ -387,18 +414,19 @@ export const mockChapters: Chapter[] = [
       meetingTime: "6:30 PM",
       autoRenewMembership: true,
       sendReminders: true,
-      publicDirectory: false
+      publicDirectory: false,
     },
     createdAt: new Date("2020-11-10"),
     updatedAt: new Date("2025-11-20"),
     createdBy: "admin@example.com",
-    updatedBy: "robert.thompson@chichapter.org"
+    updatedBy: "robert.thompson@chichapter.org",
   },
   {
     id: "ch_4",
     name: "miami_chapter",
     displayName: "Miami Chapter",
-    description: "Serving South Florida with focus on international business and cultural exchange.",
+    description:
+      "Serving South Florida with focus on international business and cultural exchange.",
     status: "pending",
     location: {
       address: "321 Ocean Drive",
@@ -408,10 +436,10 @@ export const mockChapters: Chapter[] = [
       postalCode: "33139",
       coordinates: {
         latitude: 25.7617,
-        longitude: -80.1918
+        longitude: -80.1918,
       },
       timezone: "America/New_York",
-      region: "Southeast"
+      region: "Southeast",
     },
     leadership: [
       {
@@ -424,8 +452,8 @@ export const mockChapters: Chapter[] = [
         startDate: new Date("2025-01-15"),
         isActive: true,
         avatar: "/avatars/carlos.jpg",
-        phone: "+1 (555) 890-1234"
-      }
+        phone: "+1 (555) 890-1234",
+      },
     ],
     memberCount: 45,
     establishedDate: new Date("2025-01-15"),
@@ -434,11 +462,11 @@ export const mockChapters: Chapter[] = [
       email: "info@miamichapter.org",
       phone: "+1 (555) 654-3210",
       website: "https://miamichapter.org",
-      address: "321 Ocean Drive, Miami, FL 33139"
+      address: "321 Ocean Drive, Miami, FL 33139",
     },
     socialMedia: {
       facebook: "https://facebook.com/miamichapter",
-      instagram: "https://instagram.com/miamichapter"
+      instagram: "https://instagram.com/miamichapter",
     },
     metrics: {
       memberGrowthRate: 15.8,
@@ -451,8 +479,8 @@ export const mockChapters: Chapter[] = [
       monthlyTrend: [
         { month: "Nov 2025", memberCount: 45, eventCount: 1, attendanceRate: 62.3, revenue: 1200 },
         { month: "Oct 2025", memberCount: 38, eventCount: 2, attendanceRate: 58.7, revenue: 2400 },
-        { month: "Sep 2025", memberCount: 32, eventCount: 1, attendanceRate: 55.2, revenue: 800 }
-      ]
+        { month: "Sep 2025", memberCount: 32, eventCount: 1, attendanceRate: 55.2, revenue: 800 },
+      ],
     },
     events: [
       {
@@ -461,8 +489,8 @@ export const mockChapters: Chapter[] = [
         date: new Date("2025-12-20"),
         attendance: 30,
         revenue: 1200,
-        status: "upcoming"
-      }
+        status: "upcoming",
+      },
     ],
     finances: {
       totalRevenue: 4400,
@@ -473,13 +501,13 @@ export const mockChapters: Chapter[] = [
       monthlyRevenue: [
         { month: "Nov 2025", amount: 1200 },
         { month: "Oct 2025", amount: 2400 },
-        { month: "Sep 2025", amount: 800 }
+        { month: "Sep 2025", amount: 800 },
       ],
       monthlyExpenses: [
         { month: "Nov 2025", amount: 1800 },
         { month: "Oct 2025", amount: 2200 },
-        { month: "Sep 2025", amount: 1200 }
-      ]
+        { month: "Sep 2025", amount: 1200 },
+      ],
     },
     settings: {
       allowOnlineRegistration: true,
@@ -490,18 +518,19 @@ export const mockChapters: Chapter[] = [
       meetingTime: "7:30 PM",
       autoRenewMembership: false,
       sendReminders: true,
-      publicDirectory: true
+      publicDirectory: true,
     },
     createdAt: new Date("2025-01-15"),
     updatedAt: new Date("2025-11-15"),
     createdBy: "admin@example.com",
-    updatedBy: "carlos.rodriguez@miamichapter.org"
+    updatedBy: "carlos.rodriguez@miamichapter.org",
   },
   {
     id: "ch_5",
     name: "seattle_chapter",
     displayName: "Seattle Chapter",
-    description: "Pacific Northwest chapter focusing on technology innovation and startup ecosystem.",
+    description:
+      "Pacific Northwest chapter focusing on technology innovation and startup ecosystem.",
     status: "inactive",
     location: {
       address: "567 Pine Street",
@@ -511,10 +540,10 @@ export const mockChapters: Chapter[] = [
       postalCode: "98101",
       coordinates: {
         latitude: 47.6062,
-        longitude: -122.3321
+        longitude: -122.3321,
       },
       timezone: "America/Los_Angeles",
-      region: "West"
+      region: "West",
     },
     leadership: [],
     memberCount: 23,
@@ -524,11 +553,11 @@ export const mockChapters: Chapter[] = [
       email: "info@seattlechapter.org",
       phone: "+1 (555) 543-2109",
       website: "https://seattlechapter.org",
-      address: "567 Pine Street, Seattle, WA 98101"
+      address: "567 Pine Street, Seattle, WA 98101",
     },
     socialMedia: {
       twitter: "https://twitter.com/seattlechapter",
-      linkedin: "https://linkedin.com/company/seattlechapter"
+      linkedin: "https://linkedin.com/company/seattlechapter",
     },
     metrics: {
       memberGrowthRate: -2.1,
@@ -541,8 +570,8 @@ export const mockChapters: Chapter[] = [
       monthlyTrend: [
         { month: "Nov 2025", memberCount: 23, eventCount: 0, attendanceRate: 0, revenue: 0 },
         { month: "Oct 2025", memberCount: 24, eventCount: 1, attendanceRate: 45.6, revenue: 600 },
-        { month: "Sep 2025", memberCount: 25, eventCount: 0, attendanceRate: 0, revenue: 0 }
-      ]
+        { month: "Sep 2025", memberCount: 25, eventCount: 0, attendanceRate: 0, revenue: 0 },
+      ],
     },
     events: [],
     finances: {
@@ -554,13 +583,13 @@ export const mockChapters: Chapter[] = [
       monthlyRevenue: [
         { month: "Nov 2025", amount: 0 },
         { month: "Oct 2025", amount: 600 },
-        { month: "Sep 2025", amount: 0 }
+        { month: "Sep 2025", amount: 0 },
       ],
       monthlyExpenses: [
         { month: "Nov 2025", amount: 1200 },
         { month: "Oct 2025", amount: 1100 },
-        { month: "Sep 2025", amount: 800 }
-      ]
+        { month: "Sep 2025", amount: 800 },
+      ],
     },
     settings: {
       allowOnlineRegistration: false,
@@ -571,12 +600,12 @@ export const mockChapters: Chapter[] = [
       meetingTime: "6:00 PM",
       autoRenewMembership: false,
       sendReminders: false,
-      publicDirectory: false
+      publicDirectory: false,
     },
     createdAt: new Date("2021-07-22"),
     updatedAt: new Date("2025-10-30"),
-    createdBy: "admin@example.com"
-  }
+    createdBy: "admin@example.com",
+  },
 ];
 
 export const mockChapterStatistics: ChapterOverallStatistics = {
@@ -600,7 +629,7 @@ export const mockChapterStatistics: ChapterOverallStatistics = {
       eventCount: 4,
       attendanceRate: 78.3,
       revenue: 45600,
-      engagementScore: 85.2
+      engagementScore: 85.2,
     },
     {
       chapterId: "ch_2",
@@ -611,7 +640,7 @@ export const mockChapterStatistics: ChapterOverallStatistics = {
       eventCount: 3,
       attendanceRate: 72.5,
       revenue: 32400,
-      engagementScore: 78.9
+      engagementScore: 78.9,
     },
     {
       chapterId: "ch_3",
@@ -622,8 +651,8 @@ export const mockChapterStatistics: ChapterOverallStatistics = {
       eventCount: 2,
       attendanceRate: 68.9,
       revenue: 23400,
-      engagementScore: 72.4
-    }
+      engagementScore: 72.4,
+    },
   ],
   regionalBreakdown: [
     {
@@ -632,7 +661,7 @@ export const mockChapterStatistics: ChapterOverallStatistics = {
       chapterCount: 1,
       memberCount: 245,
       averageMembersPerChapter: 245,
-      totalRevenue: 45600
+      totalRevenue: 45600,
     },
     {
       region: "West",
@@ -640,7 +669,7 @@ export const mockChapterStatistics: ChapterOverallStatistics = {
       chapterCount: 2,
       memberCount: 212,
       averageMembersPerChapter: 106,
-      totalRevenue: 33600
+      totalRevenue: 33600,
     },
     {
       region: "Midwest",
@@ -648,7 +677,7 @@ export const mockChapterStatistics: ChapterOverallStatistics = {
       chapterCount: 1,
       memberCount: 156,
       averageMembersPerChapter: 156,
-      totalRevenue: 23400
+      totalRevenue: 23400,
     },
     {
       region: "Southeast",
@@ -656,12 +685,12 @@ export const mockChapterStatistics: ChapterOverallStatistics = {
       chapterCount: 1,
       memberCount: 45,
       averageMembersPerChapter: 45,
-      totalRevenue: 4400
-    }
+      totalRevenue: 4400,
+    },
   ],
   monthlyTrend: [
     { month: "Nov 2025", memberCount: 658, eventCount: 10, attendanceRate: 71.2, revenue: 28150 },
     { month: "Oct 2025", memberCount: 636, eventCount: 12, attendanceRate: 68.7, revenue: 32200 },
-    { month: "Sep 2025", memberCount: 617, eventCount: 10, attendanceRate: 69.3, revenue: 28300 }
-  ]
+    { month: "Sep 2025", memberCount: 617, eventCount: 10, attendanceRate: 69.3, revenue: 28300 },
+  ],
 };

@@ -8,7 +8,7 @@ import { Article } from "@/types/article.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
+import {
   Calendar,
   User,
   Eye,
@@ -29,7 +29,7 @@ import {
   MessageSquare,
   Heart,
   Bookmark,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 
 export default function ArticleDetailsPage() {
@@ -37,7 +37,7 @@ export default function ArticleDetailsPage() {
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
   const { getArticle } = useArticles();
-  
+
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +60,7 @@ export default function ArticleDetailsPage() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const foundArticle = getArticle(articleId);
         if (foundArticle) {
           setArticle(foundArticle);
@@ -86,7 +86,7 @@ export default function ArticleDetailsPage() {
       month: "long",
       day: "numeric",
       hour: "2-digit",
-      minute: "2-digit"
+      minute: "2-digit",
     }).format(date);
   };
 
@@ -155,16 +155,16 @@ export default function ArticleDetailsPage() {
     <div className="container max-w-5xl py-6 mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           className="pl-0 text-muted-foreground hover:text-primary"
           onClick={() => router.back()}
         >
           <ChevronLeft className="w-4 h-4 mr-1" />
           Back to Articles
         </Button>
-        
+
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={handleShare}>
             <Share2 className="w-4 h-4 mr-2" />
@@ -184,35 +184,31 @@ export default function ArticleDetailsPage() {
             <div className="space-y-2 flex-1">
               <div className="flex items-center gap-3">
                 <CardTitle className="text-2xl">{article.title}</CardTitle>
-                {article.isFeatured && (
-                  <Star className="w-5 h-5 text-yellow-500 fill-current" />
-                )}
-                {article.isPinned && (
-                  <Pin className="w-5 h-5 text-primary" />
-                )}
+                {article.isFeatured && <Star className="w-5 h-5 text-yellow-500 fill-current" />}
+                {article.isPinned && <Pin className="w-5 h-5 text-primary" />}
               </div>
-              
+
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <Badge variant="secondary">{article.type.replace('_', ' ')}</Badge>
-                <Badge variant="outline">{article.category.replace('_', ' ')}</Badge>
+                <Badge variant="secondary">{article.type.replace("_", " ")}</Badge>
+                <Badge variant="outline">{article.category.replace("_", " ")}</Badge>
                 <Badge variant="outline">{article.difficulty}</Badge>
                 <Badge variant="outline">{article.format}</Badge>
               </div>
             </div>
-            
+
             <div className="text-right">
-              <Badge 
-                variant={article.status === 'published' ? 'default' : 'secondary'}
+              <Badge
+                variant={article.status === "published" ? "default" : "secondary"}
                 className="text-sm"
               >
-                {article.status.replace('_', ' ')}
+                {article.status.replace("_", " ")}
               </Badge>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">{article.excerpt}</p>
-          
+
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <User className="w-4 h-4" />
@@ -262,7 +258,7 @@ export default function ArticleDetailsPage() {
               </div>
               <p className="text-2xl font-bold">{formatNumber(article.metrics.views)}</p>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-green-600" />
@@ -270,7 +266,7 @@ export default function ArticleDetailsPage() {
               </div>
               <p className="text-2xl font-bold">{article.metrics.averageReadTime} min</p>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-purple-600" />
@@ -278,7 +274,7 @@ export default function ArticleDetailsPage() {
               </div>
               <p className="text-2xl font-bold">{article.metrics.engagementScore}%</p>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-orange-600" />
@@ -302,8 +298,8 @@ export default function ArticleDetailsPage() {
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {article.tags.map((tag) => (
-                <Badge 
-                  key={tag.id} 
+                <Badge
+                  key={tag.id}
                   variant="secondary"
                   className="text-sm"
                   style={{ backgroundColor: `${tag.color}20`, color: tag.color }}

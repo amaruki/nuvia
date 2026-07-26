@@ -1,28 +1,34 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { MemberCard } from "./member-card"
-import { MembershipProfile, MembershipFilter, MembershipSort } from "@/types/membership.types"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { EmptyState } from "@/components/ui/empty-state"
-import LoadingSkeleton from "@/components/ui/loading-skeleton"
-import { Users, ArrowUpDown, Download, Grid3X3, List, Filter, X, Loader2 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useState } from "react";
+import { MemberCard } from "./member-card";
+import { MembershipProfile, MembershipFilter, MembershipSort } from "@/types/membership.types";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import LoadingSkeleton from "@/components/ui/loading-skeleton";
+import { Users, ArrowUpDown, Download, Grid3X3, List, Filter, X, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface MembershipListProps {
-  members: MembershipProfile[]
-  isLoading: boolean
-  total: number
-  filters: MembershipFilter
-  sort: MembershipSort
-  onSortChange: (sort: MembershipSort) => void
-  onClearFilters?: () => void
-  onLoadMore?: () => void
-  hasMore?: boolean
-  className?: string
+  members: MembershipProfile[];
+  isLoading: boolean;
+  total: number;
+  filters: MembershipFilter;
+  sort: MembershipSort;
+  onSortChange: (sort: MembershipSort) => void;
+  onClearFilters?: () => void;
+  onLoadMore?: () => void;
+  hasMore?: boolean;
+  className?: string;
 }
 
 const SORT_OPTIONS = [
@@ -33,12 +39,12 @@ const SORT_OPTIONS = [
   { value: "membershipTier-asc", label: "Tier ↑", icon: "⭐" },
   { value: "membershipTier-desc", label: "Tier ↓", icon: "⭐" },
   { value: "location-asc", label: "Location (A-Z)", icon: "📍" },
-  { value: "company-asc", label: "Company (A-Z)", icon: "🏢" }
-]
+  { value: "company-asc", label: "Company (A-Z)", icon: "🏢" },
+];
 
 function parseSortValue(value: string): MembershipSort {
-  const [field, direction] = value.split("-") as [MembershipSort["field"], "asc" | "desc"]
-  return { field, direction }
+  const [field, direction] = value.split("-") as [MembershipSort["field"], "asc" | "desc"];
+  return { field, direction };
 }
 
 export function MembershipList({
@@ -51,31 +57,31 @@ export function MembershipList({
   onClearFilters,
   onLoadMore,
   hasMore,
-  className
+  className,
 }: MembershipListProps) {
-  const [isGridView, setIsGridView] = useState(true)
+  const [isGridView, setIsGridView] = useState(true);
 
   const handleSortChange = (value: string) => {
-    onSortChange(parseSortValue(value))
-  }
+    onSortChange(parseSortValue(value));
+  };
 
   const getSortValue = () => {
-    return `${sort.field}-${sort.direction}`
-  }
+    return `${sort.field}-${sort.direction}`;
+  };
 
   const getActiveFiltersCount = () => {
-    let count = 0
-    if (filters.search) count++
-    if (filters.tiers?.length) count++
-    if (filters.statuses?.length) count++
-    if (filters.locations?.length) count++
-    if (filters.committees?.length) count++
-    if (filters.startDateRange) count++
-    if (filters.endDateRange) count++
-    return count
-  }
+    let count = 0;
+    if (filters.search) count++;
+    if (filters.tiers?.length) count++;
+    if (filters.statuses?.length) count++;
+    if (filters.locations?.length) count++;
+    if (filters.committees?.length) count++;
+    if (filters.startDateRange) count++;
+    if (filters.endDateRange) count++;
+    return count;
+  };
 
-  const activeFiltersCount = getActiveFiltersCount()
+  const activeFiltersCount = getActiveFiltersCount();
 
   if (isLoading && members.length === 0) {
     return (
@@ -125,7 +131,7 @@ export function MembershipList({
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -140,7 +146,7 @@ export function MembershipList({
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Member Directory</h2>
               <p className="text-sm text-muted-foreground">
-                {total.toLocaleString()} {total === 1 ? 'member' : 'members'} total
+                {total.toLocaleString()} {total === 1 ? "member" : "members"} total
               </p>
             </div>
           </div>
@@ -178,10 +184,7 @@ export function MembershipList({
               variant={isGridView ? "default" : "ghost"}
               size="sm"
               onClick={() => setIsGridView(true)}
-              className={cn(
-                "h-10 px-3 rounded-r-none border-r",
-                isGridView && "shadow-sm"
-              )}
+              className={cn("h-10 px-3 rounded-r-none border-r", isGridView && "shadow-sm")}
             >
               <Grid3X3 className="size-4 mr-2" />
               Grid
@@ -190,10 +193,7 @@ export function MembershipList({
               variant={!isGridView ? "default" : "ghost"}
               size="sm"
               onClick={() => setIsGridView(false)}
-              className={cn(
-                "h-10 px-3 rounded-l-none",
-                !isGridView && "shadow-sm"
-              )}
+              className={cn("h-10 px-3 rounded-l-none", !isGridView && "shadow-sm")}
             >
               <List className="size-4 mr-2" />
               List
@@ -250,20 +250,14 @@ export function MembershipList({
 
       {/* Member Grid/List */}
       {members.length > 0 ? (
-        <div className={cn(
-          "gap-5",
-          isGridView
-            ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            : "flex flex-col"
-        )}>
+        <div
+          className={cn(
+            "gap-5",
+            isGridView ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "flex flex-col",
+          )}
+        >
           {members.map((member) => (
-            <MemberCard
-              key={member.id}
-              member={member}
-              className={cn(
-                !isGridView
-              )}
-            />
+            <MemberCard key={member.id} member={member} className={cn(!isGridView)} />
           ))}
         </div>
       ) : (
@@ -335,5 +329,5 @@ export function MembershipList({
         </div>
       )}
     </div>
-  )
+  );
 }

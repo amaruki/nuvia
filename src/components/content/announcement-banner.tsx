@@ -19,11 +19,11 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
 
   // Filter for banner announcements that haven't been dismissed
   const bannerAnnouncements = announcements.filter(
-    (announcement) => 
-      announcement.type === "banner" && 
+    (announcement) =>
+      announcement.type === "banner" &&
       announcement.status === "published" &&
       !dismissedBanners.has(announcement.id) &&
-      (!announcement.expiresAt || new Date(announcement.expiresAt) > new Date())
+      (!announcement.expiresAt || new Date(announcement.expiresAt) > new Date()),
   );
 
   // Load dismissed banners from localStorage
@@ -38,8 +38,8 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
   useEffect(() => {
     if (dismissedBanners.size > 0) {
       localStorage.setItem(
-        "dismissedAnnouncementBanners", 
-        JSON.stringify(Array.from(dismissedBanners))
+        "dismissedAnnouncementBanners",
+        JSON.stringify(Array.from(dismissedBanners)),
       );
     }
   }, [dismissedBanners]);
@@ -77,9 +77,7 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
   };
 
   const handlePrevious = () => {
-    setCurrentIndex((prev) => 
-      prev === 0 ? bannerAnnouncements.length - 1 : prev - 1
-    );
+    setCurrentIndex((prev) => (prev === 0 ? bannerAnnouncements.length - 1 : prev - 1));
   };
 
   const handleNext = () => {
@@ -118,10 +116,8 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 flex-1 min-w-0">
-              <div className="flex-shrink-0">
-                {getBannerIcon(currentBanner.type)}
-              </div>
-              
+              <div className="flex-shrink-0">{getBannerIcon(currentBanner.type)}</div>
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-2 mb-1">
                   <Badge variant="secondary" className="text-xs font-semibold">
@@ -133,11 +129,11 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
                     </Badge>
                   )}
                 </div>
-                
+
                 <h3 className="font-semibold text-sm md:text-base truncate">
                   {currentBanner.title}
                 </h3>
-                
+
                 <p className="text-xs md:text-sm opacity-90 truncate mt-1">
                   {currentBanner.excerpt}
                 </p>
@@ -155,11 +151,11 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
-                  
+
                   <span className="text-xs font-medium">
                     {currentIndex + 1} / {bannerAnnouncements.length}
                   </span>
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"
@@ -170,7 +166,7 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
                   </Button>
                 </div>
               )}
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -181,7 +177,7 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
               </Button>
             </div>
           </div>
-          
+
           {/* Progress indicator for auto-rotation */}
           {bannerAnnouncements.length > 1 && (
             <div className="flex space-x-1 mt-2 justify-center">
@@ -189,9 +185,7 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
                 <div
                   key={index}
                   className={`h-1 rounded-full transition-all duration-300 ${
-                    index === currentIndex 
-                      ? "bg-white w-8" 
-                      : "bg-white/40 w-4"
+                    index === currentIndex ? "bg-white w-8" : "bg-white/40 w-4"
                   }`}
                 />
               ))}

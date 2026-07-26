@@ -18,10 +18,10 @@ export function LoadingSpinner({ size = "md", className }: LoadingSpinnerProps) 
       className={cn(
         "animate-spin rounded-full border-2 border-muted-foreground",
         sizeClasses[size],
-        className
+        className,
       )}
       style={{
-        borderTopColor: 'var(--primary)',
+        borderTopColor: "var(--primary)",
       }}
     />
   );

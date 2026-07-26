@@ -2,9 +2,9 @@
  * Custom hooks for event-related data fetching and operations
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Event, EventFilter, EventListResponse, EventDetailsResponse } from '@/types/event.types';
-import { getEvents, getEventById } from '@/lib/services/event.service';
+import { useState, useEffect, useCallback } from "react";
+import { Event, EventFilter, EventListResponse, EventDetailsResponse } from "@/types/event.types";
+import { getEvents, getEventById } from "@/lib/services/event.service";
 
 /**
  * Hook for fetching events with optional filtering and pagination
@@ -23,9 +23,9 @@ export function useEvents(filter?: EventFilter, page = 1, pageSize = 10) {
       setData(response);
       setEvents(response.events);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch events';
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch events";
       setError(errorMessage);
-      console.error('Error fetching events:', err);
+      console.error("Error fetching events:", err);
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +65,7 @@ export function useEvent(eventId: string) {
       setEvent(response.event);
       setIsRegistered(response.isRegistered);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch event';
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch event";
       setError(errorMessage);
       console.error(`Error fetching event with ID ${eventId}:`, err);
     } finally {
@@ -94,19 +94,19 @@ export function useEventFilters(initialFilters: EventFilter = {}) {
   const [filters, setFilters] = useState<EventFilter>(initialFilters);
 
   const updateFilter = useCallback((key: keyof EventFilter, value: any) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       [key]: value,
     }));
   }, []);
 
   const addFilterValue = useCallback((key: keyof EventFilter, value: any) => {
-    setFilters(prev => {
-      const currentValues = prev[key] as any[] || [];
+    setFilters((prev) => {
+      const currentValues = (prev[key] as any[]) || [];
       if (currentValues.includes(value)) {
         return {
           ...prev,
-          [key]: currentValues.filter(v => v !== value),
+          [key]: currentValues.filter((v) => v !== value),
         };
       }
       return {
@@ -117,11 +117,11 @@ export function useEventFilters(initialFilters: EventFilter = {}) {
   }, []);
 
   const removeFilterValue = useCallback((key: keyof EventFilter, value: any) => {
-    setFilters(prev => {
-      const currentValues = prev[key] as any[] || [];
+    setFilters((prev) => {
+      const currentValues = (prev[key] as any[]) || [];
       return {
         ...prev,
-        [key]: currentValues.filter(v => v !== value),
+        [key]: currentValues.filter((v) => v !== value),
       };
     });
   }, []);
@@ -130,7 +130,7 @@ export function useEventFilters(initialFilters: EventFilter = {}) {
     setFilters({});
   }, []);
 
-  const hasActiveFilters = Object.keys(filters).some(key => {
+  const hasActiveFilters = Object.keys(filters).some((key) => {
     const value = filters[key as keyof EventFilter];
     return Array.isArray(value) ? value.length > 0 : !!value;
   });

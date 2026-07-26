@@ -1,8 +1,8 @@
-'use server';
+"use server";
 
-import { auth } from '@/lib/auth';
-import { AuthResponseFactory } from '@/lib/auth/common';
-import { BusinessLogicError } from '@/lib/errors';
+import { auth } from "@/lib/auth";
+import { AuthResponseFactory } from "@/lib/auth/common";
+import { BusinessLogicError } from "@/lib/errors";
 
 /**
  * OAuth Actions using better-auth (Server-side)
@@ -18,16 +18,13 @@ import { BusinessLogicError } from '@/lib/errors';
  * @param callbackURL - URL to redirect to after successful authentication
  * @returns Success response with OAuth URL
  */
-export async function signInWithOAuthAction(
-  provider: string,
-  callbackURL?: string
-) {
+export async function signInWithOAuthAction(provider: string, callbackURL?: string) {
   try {
     // Validate provider
     if (!checkProviderConfig(provider)) {
       throw new BusinessLogicError(
         `OAuth provider ${provider} is not configured`,
-        'OAUTH_PROVIDER_NOT_CONFIGURED'
+        "OAUTH_PROVIDER_NOT_CONFIGURED",
       );
     }
 
@@ -35,8 +32,8 @@ export async function signInWithOAuthAction(
     const result = await auth.api.signInSocial({
       body: {
         provider: provider as any,
-        callbackURL: callbackURL || '/dashboard'
-      }
+        callbackURL: callbackURL || "/dashboard",
+      },
     });
 
     // Better Auth returns URL for redirect
@@ -47,21 +44,18 @@ export async function signInWithOAuthAction(
           url: result.url,
           provider,
         },
-        message: 'OAuth sign-in initiated successfully'
+        message: "OAuth sign-in initiated successfully",
       };
     }
 
-    throw new BusinessLogicError(
-      'No OAuth redirect URL received',
-      'OAUTH_NO_REDIRECT_URL'
-    );
+    throw new BusinessLogicError("No OAuth redirect URL received", "OAUTH_NO_REDIRECT_URL");
   } catch (error) {
     console.error("OAuth sign-in error:", error instanceof Error ? error.message : String(error));
 
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to initiate OAuth sign-in',
-      errors: { server: [error instanceof Error ? error.message : 'OAuth sign-in failed'] }
+      message: error instanceof Error ? error.message : "Failed to initiate OAuth sign-in",
+      errors: { server: [error instanceof Error ? error.message : "OAuth sign-in failed"] },
     };
   }
 }
@@ -83,13 +77,14 @@ export async function getOAuthProviderConfigAction(provider: string) {
         provider,
         configured: isConfigured,
       },
-      message: 'OAuth provider configuration retrieved successfully'
+      message: "OAuth provider configuration retrieved successfully",
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to check OAuth provider configuration',
-      errors: { server: ['OAUTH_CONFIG_CHECK_FAILED'] }
+      message:
+        error instanceof Error ? error.message : "Failed to check OAuth provider configuration",
+      errors: { server: ["OAUTH_CONFIG_CHECK_FAILED"] },
     };
   }
 }
@@ -101,23 +96,21 @@ export async function getOAuthProviderConfigAction(provider: string) {
  */
 export async function getAvailableOAuthProvidersAction() {
   try {
-    const providers = ['google', 'github', 'linkedin'];
-    const availableProviders = providers.filter(provider =>
-      checkProviderConfig(provider)
-    );
+    const providers = ["google", "github", "linkedin"];
+    const availableProviders = providers.filter((provider) => checkProviderConfig(provider));
 
     return {
       success: true,
       data: {
         providers: availableProviders,
       },
-      message: 'Available OAuth providers retrieved successfully'
+      message: "Available OAuth providers retrieved successfully",
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to get available OAuth providers',
-      errors: { server: ['OAUTH_PROVIDERS_RETRIEVAL_FAILED'] }
+      message: error instanceof Error ? error.message : "Failed to get available OAuth providers",
+      errors: { server: ["OAUTH_PROVIDERS_RETRIEVAL_FAILED"] },
     };
   }
 }
@@ -140,13 +133,14 @@ export async function getOAuthProviderConfigurationAction(provider: string) {
         configured: isConfigured,
         redirectUri,
       },
-      message: 'OAuth provider configuration retrieved successfully'
+      message: "OAuth provider configuration retrieved successfully",
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to get OAuth provider configuration',
-      errors: { server: ['OAUTH_CONFIG_RETRIEVAL_FAILED'] }
+      message:
+        error instanceof Error ? error.message : "Failed to get OAuth provider configuration",
+      errors: { server: ["OAUTH_CONFIG_RETRIEVAL_FAILED"] },
     };
   }
 }
@@ -159,11 +153,11 @@ export async function getOAuthProviderConfigurationAction(provider: string) {
  */
 function checkProviderConfig(provider: string): boolean {
   switch (provider) {
-    case 'google':
+    case "google":
       return !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
-    case 'github':
+    case "github":
       return !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET);
-    case 'linkedin':
+    case "linkedin":
       return !!(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET);
     default:
       return false;

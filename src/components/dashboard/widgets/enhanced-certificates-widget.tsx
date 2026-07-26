@@ -32,14 +32,14 @@ export function EnhancedCertificatesWidget({
     const fetchCertificates = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch user registrations with certificates
         const registrations = await getUserEventRegistrations("current-user-id", ["confirmed"]);
-        
+
         // Filter for registrations with certificates
         const certs: EventCertificate[] = [];
         const evts: Event[] = [];
-        
+
         for (const registration of registrations) {
           if (registration.certificateIssued && registration.certificateUrl) {
             // Create a mock certificate object
@@ -53,14 +53,14 @@ export function EnhancedCertificatesWidget({
               createdAt: new Date(),
               updatedAt: new Date(),
             };
-            
+
             certs.push(certificate);
-            
+
             // If we have the event data, add it to our events array
             // In a real implementation, we would fetch event details for each certificate
           }
         }
-        
+
         setCertificates(certs.slice(0, limit));
         setEvents(evts);
       } catch (err) {
@@ -111,15 +111,10 @@ export function EnhancedCertificatesWidget({
           <div className="flex items-center space-x-2">
             <Award className="h-5 w-5 text-foreground/50" />
             <span className="text-sm font-medium text-foreground/70">
-              {certificates.length} certificate{certificates.length !== 1 ? 's' : ''}
+              {certificates.length} certificate{certificates.length !== 1 ? "s" : ""}
             </span>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleViewAllCertificates}
-            className="text-xs"
-          >
+          <Button variant="ghost" size="sm" onClick={handleViewAllCertificates} className="text-xs">
             View all
             <ArrowRight className="h-3 w-3 ml-1" />
           </Button>
@@ -129,7 +124,10 @@ export function EnhancedCertificatesWidget({
         <div className="space-y-4">
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted-foreground" style={{ borderTopColor: 'var(--primary)' }}></div>
+              <div
+                className="animate-spin rounded-full h-8 w-8 border-2 border-muted-foreground"
+                style={{ borderTopColor: "var(--primary)" }}
+              ></div>
             </div>
           ) : error ? (
             <div className="text-center py-8 text-destructive">
@@ -139,7 +137,9 @@ export function EnhancedCertificatesWidget({
             <div className="text-center py-8 text-foreground/50">
               <Award className="h-8 w-8 mx-auto mb-2 text-foreground/40" />
               <p>No certificates yet</p>
-              <p className="text-sm mt-2">Certificates will be awarded after you attend and complete events.</p>
+              <p className="text-sm mt-2">
+                Certificates will be awarded after you attend and complete events.
+              </p>
             </div>
           ) : (
             <EventCertificateList
@@ -155,7 +155,8 @@ export function EnhancedCertificatesWidget({
         {/* Footer with info */}
         <div className="pt-4 border-t">
           <div className="text-xs text-foreground/50 text-center">
-            Certificates are automatically issued to attendees who check in to events and meet participation requirements.
+            Certificates are automatically issued to attendees who check in to events and meet
+            participation requirements.
           </div>
         </div>
       </div>

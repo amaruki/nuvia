@@ -175,7 +175,7 @@ export type PasswordResetResponse = {
 };
 
 // OAuth provider type
-export type OAuthProvider = 'google' | 'github' | 'linkedin';
+export type OAuthProvider = "google" | "github" | "linkedin";
 
 // OAuth profile type
 export type OAuthProfile = {

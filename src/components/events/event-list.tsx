@@ -40,8 +40,7 @@ export function EventList({
 }: EventListProps) {
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
   const [showFilters, setShowFilters] = React.useState(false);
-  const { filters, updateFilter, clearFilters, hasActiveFilters } =
-    useEventFilters();
+  const { filters, updateFilter, clearFilters, hasActiveFilters } = useEventFilters();
 
   const { events, isLoading, error, refetch } = useEvents(filters);
 
@@ -106,11 +105,7 @@ export function EventList({
   }
 
   return (
-    <div
-      className={`space-y-6 ${className}`}
-      role="region"
-      aria-label="Events list"
-    >
+    <div className={`space-y-6 ${className}`} role="region" aria-label="Events list">
       <AsyncContent
         isLoading={isLoading}
         error={error}
@@ -120,11 +115,7 @@ export function EventList({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           {/* Filter button on the left */}
           <div className="flex justify-start items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              className="h-9"
-            >
+            <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="h-9">
               <Filter className="h-4 w-4 mr-2" />
               {showFilters ? "Hide Filters" : "Show Filters"}
             </Button>
@@ -135,9 +126,7 @@ export function EventList({
             <Button
               variant="outline"
               size="sm"
-              onClick={() =>
-                handleSortChange(sortOrder === "asc" ? "desc" : "asc")
-              }
+              onClick={() => handleSortChange(sortOrder === "asc" ? "desc" : "asc")}
               aria-label={`Sort events by date in ${
                 sortOrder === "asc" ? "descending" : "ascending"
               } order`}
@@ -162,21 +151,15 @@ export function EventList({
 
         {/* Active filters display */}
         {filter && (
-          <div
-            className="flex flex-wrap gap-2"
-            role="region"
-            aria-label="Active filters"
-          >
+          <div className="flex flex-wrap gap-2" role="region" aria-label="Active filters">
             {filter.status && filter.status.length > 0 && (
               <div className="text-sm px-3 py-1 rounded-full bg-muted text-muted-foreground">
-                Status:{" "}
-                {filter.status.map((s) => formatEventStatus(s)).join(", ")}
+                Status: {filter.status.map((s) => formatEventStatus(s)).join(", ")}
               </div>
             )}
             {filter.eventType && filter.eventType.length > 0 && (
               <div className="text-sm px-3 py-1 rounded-full bg-muted text-muted-foreground">
-                Type:{" "}
-                {filter.eventType.map((t) => formatEventType(t)).join(", ")}
+                Type: {filter.eventType.map((t) => formatEventType(t)).join(", ")}
               </div>
             )}
             {filter.searchQuery && (

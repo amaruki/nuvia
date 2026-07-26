@@ -1,18 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  MemberDue, 
-  DuePayment, 
-  DueReminder, 
-  DueStatistics, 
-  DueFilterOptions 
+import {
+  MemberDue,
+  DuePayment,
+  DueReminder,
+  DueStatistics,
+  DueFilterOptions,
 } from "@/types/finance.types";
-import { 
-  mockMemberDues, 
-  mockDuePayments, 
-  mockDueReminders, 
-  mockDueStatistics 
+import {
+  mockMemberDues,
+  mockDuePayments,
+  mockDueReminders,
+  mockDueStatistics,
 } from "@/lib/data/mock-dues-data";
 
 export function useDues() {
@@ -30,8 +30,8 @@ export function useDues() {
       try {
         setLoading(true);
         // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         setDues(mockMemberDues);
         setPayments(mockDuePayments);
         setReminders(mockDueReminders);
@@ -49,28 +49,28 @@ export function useDues() {
   }, []);
 
   // Filter dues based on current filters
-  const filteredDues = dues.filter(due => {
+  const filteredDues = dues.filter((due) => {
     if (filters.status && filters.status.length > 0) {
       if (!filters.status.includes(due.status)) return false;
     }
-    
+
     if (filters.tier && filters.tier.length > 0) {
       if (!filters.tier.includes(due.membershipTier)) return false;
     }
-    
+
     if (filters.dateRange) {
       const dueDate = new Date(due.dueDate);
       if (dueDate < filters.dateRange.start || dueDate > filters.dateRange.end) {
         return false;
       }
     }
-    
+
     if (filters.amountRange) {
       if (due.dueAmount < filters.amountRange.min || due.dueAmount > filters.amountRange.max) {
         return false;
       }
     }
-    
+
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       if (
@@ -81,27 +81,23 @@ export function useDues() {
         return false;
       }
     }
-    
+
     return true;
   });
 
   // Action functions
-  const updateDueStatus = async (dueId: string, status: MemberDue['status']) => {
+  const updateDueStatus = async (dueId: string, status: MemberDue["status"]) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setDues(prev => prev.map(due => 
-        due.id === dueId 
-          ? { ...due, status, updatedAt: new Date() }
-          : due
-      ));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setDues((prev) =>
+        prev.map((due) => (due.id === dueId ? { ...due, status, updatedAt: new Date() } : due)),
+      );
+
       // Update statistics
       if (statistics) {
-        const updatedDues = dues.map(due => 
-          due.id === dueId ? { ...due, status } : due
-        );
+        const updatedDues = dues.map((due) => (due.id === dueId ? { ...due, status } : due));
         updateStatistics(updatedDues);
       }
     } catch (err) {
@@ -113,8 +109,8 @@ export function useDues() {
   const recordPayment = async (dueId: string, amount: number, paymentMethod: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       const newPayment: DuePayment = {
         id: `payment-${Date.now()}`,
         dueId,
@@ -126,33 +122,39 @@ export function useDues() {
         processedBy: "current_user",
         createdAt: new Date(),
       };
-      
-      setPayments(prev => [...prev, newPayment]);
-      
+
+      setPayments((prev) => [...prev, newPayment]);
+
       // Update due with payment
-      setDues(prev => prev.map(due => {
-        if (due.id === dueId) {
-          const newPaidAmount = due.paidAmount + amount;
-          const newBalanceAmount = due.balanceAmount - amount;
-          const newStatus = newBalanceAmount <= 0 ? "paid" : 
-                          newBalanceAmount < due.dueAmount ? "partial" : due.status;
-          
-          return {
-            ...due,
-            paidAmount: newPaidAmount,
-            balanceAmount: Math.max(0, newBalanceAmount),
-            status: newStatus,
-            paidDate: newBalanceAmount <= 0 ? new Date() : due.paidDate,
-            paymentMethod,
-            transactionId: newPayment.transactionId,
-            updatedAt: new Date(),
-          };
-        }
-        return due;
-      }));
-      
+      setDues((prev) =>
+        prev.map((due) => {
+          if (due.id === dueId) {
+            const newPaidAmount = due.paidAmount + amount;
+            const newBalanceAmount = due.balanceAmount - amount;
+            const newStatus =
+              newBalanceAmount <= 0
+                ? "paid"
+                : newBalanceAmount < due.dueAmount
+                  ? "partial"
+                  : due.status;
+
+            return {
+              ...due,
+              paidAmount: newPaidAmount,
+              balanceAmount: Math.max(0, newBalanceAmount),
+              status: newStatus,
+              paidDate: newBalanceAmount <= 0 ? new Date() : due.paidDate,
+              paymentMethod,
+              transactionId: newPayment.transactionId,
+              updatedAt: new Date(),
+            };
+          }
+          return due;
+        }),
+      );
+
       // Update statistics
-      const updatedDues = dues.map(due => {
+      const updatedDues = dues.map((due) => {
         if (due.id === dueId) {
           const newPaidAmount = due.paidAmount + amount;
           const newBalanceAmount = due.balanceAmount - amount;
@@ -171,14 +173,14 @@ export function useDues() {
     }
   };
 
-  const sendReminder = async (dueId: string, reminderType: DueReminder['reminderType']) => {
+  const sendReminder = async (dueId: string, reminderType: DueReminder["reminderType"]) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const due = dues.find(d => d.id === dueId);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      const due = dues.find((d) => d.id === dueId);
       if (!due) throw new Error("Due not found");
-      
+
       const newReminder: DueReminder = {
         id: `reminder-${Date.now()}`,
         dueId,
@@ -190,8 +192,8 @@ export function useDues() {
         recipient: due.memberEmail,
         createdAt: new Date(),
       };
-      
-      setReminders(prev => [...prev, newReminder]);
+
+      setReminders((prev) => [...prev, newReminder]);
     } catch (err) {
       setError("Failed to send reminder");
       console.error("Error sending reminder:", err);
@@ -202,8 +204,8 @@ export function useDues() {
     try {
       setLoading(true);
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       setDues(mockMemberDues);
       setPayments(mockDuePayments);
       setReminders(mockDueReminders);
@@ -218,7 +220,7 @@ export function useDues() {
   };
 
   const updateFilters = (newFilters: Partial<DueFilterOptions>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    setFilters((prev) => ({ ...prev, ...newFilters }));
   };
 
   const clearFilters = () => {
@@ -230,30 +232,34 @@ export function useDues() {
     const totalAmount = updatedDues.reduce((sum, due) => sum + due.dueAmount, 0);
     const collectedAmount = updatedDues.reduce((sum, due) => sum + due.paidAmount, 0);
     const pendingAmount = updatedDues
-      .filter(due => due.status === 'pending')
+      .filter((due) => due.status === "pending")
       .reduce((sum, due) => sum + due.balanceAmount, 0);
     const overdueAmount = updatedDues
-      .filter(due => due.status === 'overdue')
+      .filter((due) => due.status === "overdue")
       .reduce((sum, due) => sum + due.balanceAmount, 0);
-    const overdueCount = updatedDues.filter(due => due.status === 'overdue').length;
-    const upcomingDues = updatedDues.filter(due => {
+    const overdueCount = updatedDues.filter((due) => due.status === "overdue").length;
+    const upcomingDues = updatedDues.filter((due) => {
       const dueDate = new Date(due.dueDate);
       const today = new Date();
       const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-      return due.status === 'pending' && dueDate <= thirtyDaysFromNow;
+      return due.status === "pending" && dueDate <= thirtyDaysFromNow;
     }).length;
 
-    setStatistics(prev => prev ? {
-      ...prev,
-      totalDues: updatedDues.length,
-      totalAmount,
-      collectedAmount,
-      pendingAmount,
-      overdueAmount,
-      collectionRate: totalAmount > 0 ? (collectedAmount / totalAmount) * 100 : 0,
-      overdueCount,
-      upcomingDues,
-    } : null);
+    setStatistics((prev) =>
+      prev
+        ? {
+            ...prev,
+            totalDues: updatedDues.length,
+            totalAmount,
+            collectedAmount,
+            pendingAmount,
+            overdueAmount,
+            collectionRate: totalAmount > 0 ? (collectedAmount / totalAmount) * 100 : 0,
+            overdueCount,
+            upcomingDues,
+          }
+        : null,
+    );
   };
 
   return {

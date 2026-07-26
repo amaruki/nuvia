@@ -5,8 +5,8 @@
  * provide consistent rate limiting across the application.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { AuthResponseFactory } from './common';
+import { NextRequest, NextResponse } from "next/server";
+import { AuthResponseFactory } from "./common";
 
 /**
  * Rate limit configuration interface
@@ -89,36 +89,41 @@ export const RATE_LIMIT_CONFIGS = {
   AUTH: {
     windowMs: 15 * 60 * 1000, // 15 minutes
     maxRequests: 5,
-    keyGenerator: (req: NextRequest) => `auth:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`
+    keyGenerator: (req: NextRequest) =>
+      `auth:${req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"}`,
   },
 
   // Password reset endpoints
   PASSWORD_RESET: {
     windowMs: 60 * 60 * 1000, // 1 hour
     maxRequests: 3,
-    keyGenerator: (req: NextRequest) => `password-reset:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`
+    keyGenerator: (req: NextRequest) =>
+      `password-reset:${req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"}`,
   },
 
   // Registration endpoints
   REGISTRATION: {
     windowMs: 60 * 60 * 1000, // 1 hour
     maxRequests: 5,
-    keyGenerator: (req: NextRequest) => `registration:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`
+    keyGenerator: (req: NextRequest) =>
+      `registration:${req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"}`,
   },
 
   // General API endpoints
   API: {
     windowMs: 15 * 60 * 1000, // 15 minutes
     maxRequests: 100,
-    keyGenerator: (req: NextRequest) => `api:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`
+    keyGenerator: (req: NextRequest) =>
+      `api:${req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"}`,
   },
 
   // File upload endpoints
   FILE_UPLOAD: {
     windowMs: 60 * 60 * 1000, // 1 hour
     maxRequests: 10,
-    keyGenerator: (req: NextRequest) => `upload:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`
-  }
+    keyGenerator: (req: NextRequest) =>
+      `upload:${req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"}`,
+  },
 } as const;
 
 /**
@@ -141,7 +146,7 @@ export class RateLimiter {
         isLimited: false,
         remainingRequests: Math.max(0, this.config.maxRequests - 1),
         resetTime: newEntry.resetTime,
-        totalRequests: 1
+        totalRequests: 1,
       };
     }
 
@@ -151,7 +156,7 @@ export class RateLimiter {
         isLimited: true,
         remainingRequests: 0,
         resetTime,
-        totalRequests: count
+        totalRequests: count,
       };
     }
 
@@ -161,7 +166,7 @@ export class RateLimiter {
       isLimited: false,
       remainingRequests: Math.max(0, this.config.maxRequests - newEntry.count),
       resetTime: newEntry.resetTime,
-      totalRequests: newEntry.count
+      totalRequests: newEntry.count,
     };
   }
 
@@ -172,9 +177,12 @@ export class RateLimiter {
     const response = AuthResponseFactory.rateLimitError(result.resetTime);
 
     // Add rate limit headers
-    response.headers.set('X-RateLimit-Limit', this.config.maxRequests.toString());
-    response.headers.set('X-RateLimit-Remaining', result.remainingRequests.toString());
-    response.headers.set('X-RateLimit-Reset', Math.ceil(result.resetTime.getTime() / 1000).toString());
+    response.headers.set("X-RateLimit-Limit", this.config.maxRequests.toString());
+    response.headers.set("X-RateLimit-Remaining", result.remainingRequests.toString());
+    response.headers.set(
+      "X-RateLimit-Reset",
+      Math.ceil(result.resetTime.getTime() / 1000).toString(),
+    );
 
     return response;
   }
@@ -183,9 +191,12 @@ export class RateLimiter {
    * Add rate limit headers to successful response
    */
   addHeaders(response: NextResponse, result: RateLimitResult): NextResponse {
-    response.headers.set('X-RateLimit-Limit', this.config.maxRequests.toString());
-    response.headers.set('X-RateLimit-Remaining', result.remainingRequests.toString());
-    response.headers.set('X-RateLimit-Reset', Math.ceil(result.resetTime.getTime() / 1000).toString());
+    response.headers.set("X-RateLimit-Limit", this.config.maxRequests.toString());
+    response.headers.set("X-RateLimit-Remaining", result.remainingRequests.toString());
+    response.headers.set(
+      "X-RateLimit-Reset",
+      Math.ceil(result.resetTime.getTime() / 1000).toString(),
+    );
 
     return response;
   }
@@ -194,7 +205,7 @@ export class RateLimiter {
    * Default key generator using IP address
    */
   private getDefaultKey(request: NextRequest): string {
-    return `rate-limit:${request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'}`;
+    return `rate-limit:${request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown"}`;
   }
 }
 
@@ -203,7 +214,7 @@ export class RateLimiter {
  */
 export function createRateLimitedHandler<T extends any[]>(
   config: RateLimitConfig,
-  handler: (request: NextRequest, ...args: T) => Promise<NextResponse>
+  handler: (request: NextRequest, ...args: T) => Promise<NextResponse>,
 ) {
   const rateLimiter = new RateLimiter(config);
 
@@ -224,7 +235,7 @@ export function createRateLimitedHandler<T extends any[]>(
  */
 export function withRateLimiting<T extends any[]>(
   configName: keyof typeof RATE_LIMIT_CONFIGS,
-  handler: (request: NextRequest, ...args: T) => Promise<NextResponse>
+  handler: (request: NextRequest, ...args: T) => Promise<NextResponse>,
 ) {
   const config = RATE_LIMIT_CONFIGS[configName];
   return createRateLimitedHandler(config, handler);
@@ -244,7 +255,7 @@ export function createRateLimitMiddleware(config: RateLimitConfig) {
     }
 
     // Add rate limit headers to the request for later use
-    request.headers.set('x-rate-limit-remaining', rateLimitResult.remainingRequests.toString());
+    request.headers.set("x-rate-limit-remaining", rateLimitResult.remainingRequests.toString());
 
     return null; // Continue processing
   };
@@ -256,7 +267,7 @@ export function createRateLimitMiddleware(config: RateLimitConfig) {
 export function createRateLimitResponse(rateLimitResult: RateLimitResult): NextResponse {
   const rateLimiter = new RateLimiter({
     windowMs: 15 * 60 * 1000,
-    maxRequests: 100
+    maxRequests: 100,
   });
 
   return rateLimiter.createLimitResponse(rateLimitResult);
@@ -265,10 +276,13 @@ export function createRateLimitResponse(rateLimitResult: RateLimitResult): NextR
 /**
  * Utility function to get rate limit headers
  */
-export function getRateLimitHeaders(rateLimitResult: RateLimitResult, maxRequests: number): Record<string, string> {
+export function getRateLimitHeaders(
+  rateLimitResult: RateLimitResult,
+  maxRequests: number,
+): Record<string, string> {
   return {
-    'X-RateLimit-Limit': maxRequests.toString(),
-    'X-RateLimit-Remaining': rateLimitResult.remainingRequests.toString(),
-    'X-RateLimit-Reset': Math.ceil(rateLimitResult.resetTime.getTime() / 1000).toString()
+    "X-RateLimit-Limit": maxRequests.toString(),
+    "X-RateLimit-Remaining": rateLimitResult.remainingRequests.toString(),
+    "X-RateLimit-Reset": Math.ceil(rateLimitResult.resetTime.getTime() / 1000).toString(),
   };
 }

@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { WidgetContainer } from "../../ui/widget-container"
-import { Card, CardContent } from "../../ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "../../ui/badge"
-import { 
-  Home, 
-  Users, 
-  Calendar, 
-  FileText, 
-  MessageSquare, 
-  Settings, 
-  Bell, 
-  BookOpen, 
+import * as React from "react";
+import { WidgetContainer } from "../../ui/widget-container";
+import { Card, CardContent } from "../../ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "../../ui/badge";
+import {
+  Home,
+  Users,
+  Calendar,
+  FileText,
+  MessageSquare,
+  Settings,
+  Bell,
+  BookOpen,
   Star,
   TrendingUp,
   ExternalLink,
-  ChevronRight
-} from "lucide-react"
+  ChevronRight,
+} from "lucide-react";
 
 interface QuickNavigationWidgetProps {
-  onNavigate?: (path: string) => void
+  onNavigate?: (path: string) => void;
 }
 
 // Mock navigation items data - in a real app, this would come from an API or config
@@ -98,26 +98,24 @@ const navigationItems = [
     badge: "5",
     isPopular: false,
   },
-]
+];
 
-export function QuickNavigationWidget({
-  onNavigate,
-}: QuickNavigationWidgetProps) {
+export function QuickNavigationWidget({ onNavigate }: QuickNavigationWidgetProps) {
   // Sort items: popular items first, then by title
   const sortedItems = [...navigationItems].sort((a, b) => {
-    if (a.isPopular && !b.isPopular) return -1
-    if (!a.isPopular && b.isPopular) return 1
-    return a.title.localeCompare(b.title)
-  })
-  
+    if (a.isPopular && !b.isPopular) return -1;
+    if (!a.isPopular && b.isPopular) return 1;
+    return a.title.localeCompare(b.title);
+  });
+
   const handleNavigate = (path: string) => {
     if (onNavigate) {
-      onNavigate(path)
+      onNavigate(path);
     }
     // In a real app, this would use Next.js router
     // router.push(path)
-  }
-  
+  };
+
   return (
     <WidgetContainer
       type="quick-navigation"
@@ -134,10 +132,10 @@ export function QuickNavigationWidget({
                 <Star className="h-4 w-4 text-chart-4" />
                 <span className="text-sm font-medium text-foreground/70">Popular Pages</span>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-2">
                 {sortedItems
-                  .filter(item => item.isPopular)
+                  .filter((item) => item.isPopular)
                   .map((item) => (
                     <div
                       key={item.id}
@@ -158,9 +156,7 @@ export function QuickNavigationWidget({
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-xs text-foreground/50 mt-1">
-                              {item.description}
-                            </p>
+                            <p className="text-xs text-foreground/50 mt-1">{item.description}</p>
                           </div>
                         </div>
                         <ChevronRight className="h-4 w-4 text-foreground/40" />
@@ -169,14 +165,14 @@ export function QuickNavigationWidget({
                   ))}
               </div>
             </div>
-            
+
             {/* All items section */}
             <div className="space-y-3 pt-3 border-t border-border">
               <div className="flex items-center space-x-2">
                 <TrendingUp className="h-4 w-4 text-chart-1" />
                 <span className="text-sm font-medium text-foreground/70">All Pages</span>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-2">
                 {sortedItems.map((item) => (
                   <div
@@ -206,7 +202,7 @@ export function QuickNavigationWidget({
                 ))}
               </div>
             </div>
-            
+
             {/* Custom navigation */}
             <div className="pt-3 border-t border-border">
               <Button
@@ -223,5 +219,5 @@ export function QuickNavigationWidget({
         </CardContent>
       </Card>
     </WidgetContainer>
-  )
+  );
 }

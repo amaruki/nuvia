@@ -12,9 +12,10 @@ interface FormMessageProps {
  */
 export function FormMessage({ type, message, className = "" }: FormMessageProps) {
   const baseClasses = "mb-6 p-3 rounded-lg border text-sm";
-  const typeClasses = type === "success"
-    ? "bg-primary/10 border-primary/30 text-primary"
-    : "bg-destructive/10 border-destructive/30 text-destructive";
+  const typeClasses =
+    type === "success"
+      ? "bg-primary/10 border-primary/30 text-primary"
+      : "bg-destructive/10 border-destructive/30 text-destructive";
 
   return (
     <div className={`${baseClasses} ${typeClasses} ${className}`}>

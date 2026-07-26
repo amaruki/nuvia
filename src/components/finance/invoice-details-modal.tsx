@@ -10,11 +10,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Calendar, 
-  Mail, 
-  CreditCard, 
-  User, 
+import {
+  Calendar,
+  Mail,
+  CreditCard,
+  User,
   DollarSign,
   Clock,
   CheckCircle,
@@ -22,7 +22,7 @@ import {
   XCircle,
   FileText,
   Send,
-  Download
+  Download,
 } from "lucide-react";
 import { Invoice, InvoicePayment } from "@/types/finance.types";
 
@@ -32,42 +32,67 @@ interface InvoiceDetailsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRecordPayment: (invoiceId: string, amount: number, paymentMethod: string) => void;
-  onSendReminder: (invoiceId: string, type: 'email' | 'sms' | 'in_app') => void;
+  onSendReminder: (invoiceId: string, type: "email" | "sms" | "in_app") => void;
 }
 
-export function InvoiceDetailsModal({ 
-  invoice, 
-  payments, 
-  open, 
-  onOpenChange, 
-  onRecordPayment, 
-  onSendReminder 
+export function InvoiceDetailsModal({
+  invoice,
+  payments,
+  open,
+  onOpenChange,
+  onRecordPayment,
+  onSendReminder,
 }: InvoiceDetailsModalProps) {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
   };
 
-  const getStatusBadge = (status: Invoice['status']) => {
+  const getStatusBadge = (status: Invoice["status"]) => {
     switch (status) {
-      case 'paid':
-        return { variant: 'default' as const, icon: CheckCircle, text: 'Paid', color: 'text-green-600' };
-      case 'sent':
-        return { variant: 'secondary' as const, icon: Send, text: 'Sent', color: 'text-blue-600' };
-      case 'overdue':
-        return { variant: 'destructive' as const, icon: AlertCircle, text: 'Overdue', color: 'text-red-600' };
-      case 'draft':
-        return { variant: 'outline' as const, icon: FileText, text: 'Draft', color: 'text-gray-600' };
-      case 'cancelled':
-        return { variant: 'outline' as const, icon: XCircle, text: 'Cancelled', color: 'text-gray-600' };
-      case 'refunded':
-        return { variant: 'outline' as const, icon: CreditCard, text: 'Refunded', color: 'text-orange-600' };
+      case "paid":
+        return {
+          variant: "default" as const,
+          icon: CheckCircle,
+          text: "Paid",
+          color: "text-green-600",
+        };
+      case "sent":
+        return { variant: "secondary" as const, icon: Send, text: "Sent", color: "text-blue-600" };
+      case "overdue":
+        return {
+          variant: "destructive" as const,
+          icon: AlertCircle,
+          text: "Overdue",
+          color: "text-red-600",
+        };
+      case "draft":
+        return {
+          variant: "outline" as const,
+          icon: FileText,
+          text: "Draft",
+          color: "text-gray-600",
+        };
+      case "cancelled":
+        return {
+          variant: "outline" as const,
+          icon: XCircle,
+          text: "Cancelled",
+          color: "text-gray-600",
+        };
+      case "refunded":
+        return {
+          variant: "outline" as const,
+          icon: CreditCard,
+          text: "Refunded",
+          color: "text-orange-600",
+        };
       default:
-        return { variant: 'secondary' as const, icon: Clock, text: status, color: 'text-gray-600' };
+        return { variant: "secondary" as const, icon: Clock, text: status, color: "text-gray-600" };
     }
   };
 
@@ -76,7 +101,7 @@ export function InvoiceDetailsModal({
   const statusBadge = getStatusBadge(invoice.status);
   const StatusIcon = statusBadge.icon;
   const balanceAmount = invoice.totalAmount - (invoice.paidAmount || 0);
-  const isOverdue = invoice.status === 'sent' && new Date(invoice.dueDate) < new Date();
+  const isOverdue = invoice.status === "sent" && new Date(invoice.dueDate) < new Date();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -86,12 +111,10 @@ export function InvoiceDetailsModal({
             <FileText className="h-5 w-5 shrink-0" />
             Invoice Details
           </DialogTitle>
-          <DialogDescription>
-            View detailed information about this invoice
-          </DialogDescription>
+          <DialogDescription>View detailed information about this invoice</DialogDescription>
         </DialogHeader>
-        
-        <Separator/>
+
+        <Separator />
 
         <div className="space-y-6">
           {/* Client Information */}
@@ -131,7 +154,7 @@ export function InvoiceDetailsModal({
                 </Badge>
               </div>
             </div>
-            
+
             {invoice.clientAddress && (
               <div className="space-y-1 sm:space-y-2">
                 <div className="flex items-center gap-2">
@@ -168,7 +191,7 @@ export function InvoiceDetailsModal({
                   <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-sm font-medium">Due Date</span>
                 </div>
-                <p className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : ''}`}>
+                <p className={`text-sm ${isOverdue ? "text-red-600 font-medium" : ""}`}>
                   {new Date(invoice.dueDate).toLocaleDateString()}
                   {isOverdue && <span className="block text-xs">Overdue</span>}
                 </p>
@@ -178,19 +201,23 @@ export function InvoiceDetailsModal({
                   <CreditCard className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-sm font-medium">Paid Amount</span>
                 </div>
-                <p className="text-lg font-semibold text-green-600">{formatCurrency(invoice.paidAmount || 0)}</p>
+                <p className="text-lg font-semibold text-green-600">
+                  {formatCurrency(invoice.paidAmount || 0)}
+                </p>
               </div>
               <div className="space-y-1 sm:space-y-2">
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-sm font-medium">Balance</span>
                 </div>
-                <p className={`text-lg font-semibold ${balanceAmount > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                <p
+                  className={`text-lg font-semibold ${balanceAmount > 0 ? "text-red-600" : "text-green-600"}`}
+                >
                   {formatCurrency(balanceAmount)}
                 </p>
               </div>
             </div>
-            
+
             {invoice.paymentMethod && (
               <div className="space-y-1 sm:space-y-2">
                 <div className="flex items-center gap-2">
@@ -200,7 +227,7 @@ export function InvoiceDetailsModal({
                 <p className="text-sm break-words">{invoice.paymentMethod}</p>
               </div>
             )}
-            
+
             {invoice.transactionId && (
               <div className="space-y-1 sm:space-y-2">
                 <div className="flex items-center gap-2">
@@ -210,7 +237,7 @@ export function InvoiceDetailsModal({
                 <p className="text-sm font-mono break-all">{invoice.transactionId}</p>
               </div>
             )}
-            
+
             {invoice.notes && (
               <div className="space-y-1 sm:space-y-2">
                 <div className="flex items-center gap-2">
@@ -237,21 +264,19 @@ export function InvoiceDetailsModal({
               </div>
 
               {invoice.items.map((item, index) => (
-                <div 
-                  key={item.id} 
+                <div
+                  key={item.id}
                   className={`
                     p-4 
                     flex flex-col gap-2
                     sm:grid sm:grid-cols-[2fr_1fr_1fr_1fr] sm:gap-4 
-                    ${index < invoice.items.length - 1 ? 'border-b sm:border-b-0' : ''} 
-                    ${index % 2 === 0 ? 'bg-muted/10' : ''}
+                    ${index < invoice.items.length - 1 ? "border-b sm:border-b-0" : ""} 
+                    ${index % 2 === 0 ? "bg-muted/10" : ""}
                   `}
                 >
                   {/* Description */}
-                  <div className="font-medium sm:font-normal break-words">
-                    {item.description}
-                  </div>
-                  
+                  <div className="font-medium sm:font-normal break-words">{item.description}</div>
+
                   {/* Stats Row for Mobile / Columns for Desktop */}
                   <div className="flex justify-between items-center sm:contents text-sm">
                     {/* Quantity */}
@@ -274,7 +299,7 @@ export function InvoiceDetailsModal({
                   </div>
                 </div>
               ))}
-              
+
               {/* Summary Section */}
               <div className="border-t bg-muted/5">
                 <div className="flex justify-between p-4 sm:grid sm:grid-cols-[2fr_1fr_1fr_1fr] sm:gap-4">
@@ -296,12 +321,12 @@ export function InvoiceDetailsModal({
           <Separator />
 
           {/* Payment History */}
-          {payments.filter(payment => payment.invoiceId === invoice.id).length > 0 && (
+          {payments.filter((payment) => payment.invoiceId === invoice.id).length > 0 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Payment History</h3>
               <div className="space-y-3">
                 {payments
-                  .filter(payment => payment.invoiceId === invoice.id)
+                  .filter((payment) => payment.invoiceId === invoice.id)
                   .map((payment) => (
                     <div key={payment.id} className="border rounded-lg p-3 sm:p-4">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -319,7 +344,9 @@ export function InvoiceDetailsModal({
                         </div>
                       </div>
                       {payment.notes && (
-                        <p className="text-xs sm:text-sm text-muted-foreground mt-2 break-words">{payment.notes}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-2 break-words">
+                          {payment.notes}
+                        </p>
                       )}
                     </div>
                   ))}
@@ -329,23 +356,36 @@ export function InvoiceDetailsModal({
 
           {/* Actions: Stack vertically on mobile, row on desktop */}
           <div className="flex flex-col flex-wrap sm:flex-row gap-3 pt-2 sm:pt-4">
-            {invoice.status !== 'paid' && invoice.status !== 'cancelled' && invoice.status !== 'refunded' && (
-              <>
-                <Button className="w-full sm:w-auto" onClick={() => onRecordPayment(invoice.id, balanceAmount, 'Credit Card')}>
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Record Payment
-                </Button>
-                <Button variant="outline" className="w-full sm:w-auto" onClick={() => onSendReminder(invoice.id, 'email')}>
-                  <Mail className="h-4 w-4 mr-2" />
-                  Send Reminder
-                </Button>
-              </>
-            )}
+            {invoice.status !== "paid" &&
+              invoice.status !== "cancelled" &&
+              invoice.status !== "refunded" && (
+                <>
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={() => onRecordPayment(invoice.id, balanceAmount, "Credit Card")}
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Record Payment
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                    onClick={() => onSendReminder(invoice.id, "email")}
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
+                    Send Reminder
+                  </Button>
+                </>
+              )}
             <Button variant="outline" className="w-full sm:w-auto">
               <Download className="h-4 w-4 mr-2" />
               Download PDF
             </Button>
-            <Button variant="outline" className="w-full sm:w-auto sm:ml-auto" onClick={() => onOpenChange(false)}>
+            <Button
+              variant="outline"
+              className="w-full sm:w-auto sm:ml-auto"
+              onClick={() => onOpenChange(false)}
+            >
               Close
             </Button>
           </div>

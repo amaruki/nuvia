@@ -1,13 +1,13 @@
-import { 
-  Committee, 
-  CommitteeOverallStatistics, 
+import {
+  Committee,
+  CommitteeOverallStatistics,
   CommitteeFilterOptions,
   CommitteeStatus,
   CommitteeType,
   CommitteeRole,
   CommitteeAuthorityLevel,
   CommitteePerformance,
-  CommitteeTypeBreakdown
+  CommitteeTypeBreakdown,
 } from "@/types/committee.types";
 
 export const mockCommittees: Committee[] = [
@@ -15,30 +15,35 @@ export const mockCommittees: Committee[] = [
     id: "com_1",
     name: "executive_committee",
     displayName: "Executive Committee",
-    description: "Strategic decision-making body responsible for overall organizational governance and direction.",
-    purpose: "Provide strategic leadership and governance for the organization, ensuring alignment with mission and values.",
+    description:
+      "Strategic decision-making body responsible for overall organizational governance and direction.",
+    purpose:
+      "Provide strategic leadership and governance for the organization, ensuring alignment with mission and values.",
     status: "active",
     type: "executive",
     charter: {
-      missionStatement: "To provide strategic leadership and governance that advances the organization's mission and ensures long-term sustainability.",
+      missionStatement:
+        "To provide strategic leadership and governance that advances the organization's mission and ensures long-term sustainability.",
       responsibilities: [
         "Strategic planning and goal setting",
         "Financial oversight and budget approval",
         "Policy development and implementation",
         "Executive director supervision and evaluation",
-        "Risk management and compliance"
+        "Risk management and compliance",
       ],
       authorityLevel: "executive",
-      decisionMakingProcess: "Majority vote with chair tie-breaker. Quorum requires 2/3 of members present.",
-      reportingStructure: "Reports directly to the Board of Directors. Monthly reports to full membership.",
+      decisionMakingProcess:
+        "Majority vote with chair tie-breaker. Quorum requires 2/3 of members present.",
+      reportingStructure:
+        "Reports directly to the Board of Directors. Monthly reports to full membership.",
       termLimits: {
         chairTerm: 24,
         memberTerm: 36,
-        maxTerms: 2
+        maxTerms: 2,
       },
       approvalDate: new Date("2020-01-15"),
       lastReviewed: new Date("2024-06-01"),
-      nextReview: new Date("2025-06-01")
+      nextReview: new Date("2025-06-01"),
     },
     leadership: [
       {
@@ -56,8 +61,8 @@ export const mockCommittees: Committee[] = [
           "Lead committee meetings",
           "Set meeting agendas",
           "Represent committee to board",
-          "Ensure charter compliance"
-        ]
+          "Ensure charter compliance",
+        ],
       },
       {
         id: "lead_2",
@@ -69,7 +74,7 @@ export const mockCommittees: Committee[] = [
         startDate: new Date("2023-03-01"),
         isActive: true,
         avatar: "/avatars/michael.jpg",
-        phone: "+1 (555) 234-5678"
+        phone: "+1 (555) 234-5678",
       },
       {
         id: "lead_3",
@@ -81,8 +86,8 @@ export const mockCommittees: Committee[] = [
         startDate: new Date("2023-02-10"),
         isActive: true,
         avatar: "/avatars/emily.jpg",
-        phone: "+1 (555) 345-6789"
-      }
+        phone: "+1 (555) 345-6789",
+      },
     ],
     members: [
       {
@@ -94,7 +99,7 @@ export const mockCommittees: Committee[] = [
         isActive: true,
         avatar: "/avatars/david.jpg",
         expertise: ["Strategic Planning", "Financial Management", "Risk Assessment"],
-        contributionLevel: "high"
+        contributionLevel: "high",
       },
       {
         id: "mem_2",
@@ -105,8 +110,8 @@ export const mockCommittees: Committee[] = [
         isActive: true,
         avatar: "/avatars/jessica.jpg",
         expertise: ["Policy Development", "Compliance", "Governance"],
-        contributionLevel: "medium"
-      }
+        contributionLevel: "medium",
+      },
     ],
     subCommitteeIds: ["com_1_1", "com_1_2"],
     contactInfo: {
@@ -114,7 +119,7 @@ export const mockCommittees: Committee[] = [
       phone: "+1 (555) 987-6543",
       meetingLocation: "Executive Boardroom, Headquarters",
       virtualMeetingLink: "https://zoom.us/j/executive-committee",
-      website: "https://org.org/committees/executive"
+      website: "https://org.org/committees/executive",
     },
     metrics: {
       memberCount: 5,
@@ -125,10 +130,31 @@ export const mockCommittees: Committee[] = [
       impactScore: 92.3,
       satisfactionScore: 89.7,
       monthlyTrend: [
-        { month: "Nov 2025", memberCount: 5, meetingCount: 2, attendanceRate: 95.2, goalsCompleted: 3, deliverablesCompleted: 4 },
-        { month: "Oct 2025", memberCount: 5, meetingCount: 2, attendanceRate: 90.0, goalsCompleted: 2, deliverablesCompleted: 3 },
-        { month: "Sep 2025", memberCount: 5, meetingCount: 1, attendanceRate: 100.0, goalsCompleted: 2, deliverablesCompleted: 2 }
-      ]
+        {
+          month: "Nov 2025",
+          memberCount: 5,
+          meetingCount: 2,
+          attendanceRate: 95.2,
+          goalsCompleted: 3,
+          deliverablesCompleted: 4,
+        },
+        {
+          month: "Oct 2025",
+          memberCount: 5,
+          meetingCount: 2,
+          attendanceRate: 90.0,
+          goalsCompleted: 2,
+          deliverablesCompleted: 3,
+        },
+        {
+          month: "Sep 2025",
+          memberCount: 5,
+          meetingCount: 1,
+          attendanceRate: 100.0,
+          goalsCompleted: 2,
+          deliverablesCompleted: 2,
+        },
+      ],
     },
     meetings: [
       {
@@ -143,7 +169,7 @@ export const mockCommittees: Committee[] = [
           "Review Q3 performance metrics",
           "Discuss 2026 strategic initiatives",
           "Budget allocation review",
-          "Risk assessment update"
+          "Risk assessment update",
         ],
         actionItems: [
           {
@@ -152,44 +178,48 @@ export const mockCommittees: Committee[] = [
             assignedTo: "Sarah Johnson",
             dueDate: new Date("2025-12-15"),
             status: "in_progress",
-            priority: "high"
-          }
-        ]
-      }
+            priority: "high",
+          },
+        ],
+      },
     ],
     createdAt: new Date("2020-01-15"),
     updatedAt: new Date("2025-11-28"),
     createdBy: "admin@example.com",
-    updatedBy: "sarah.johnson@org.org"
+    updatedBy: "sarah.johnson@org.org",
   },
   {
     id: "com_2",
     name: "finance_committee",
     displayName: "Finance Committee",
     description: "Oversight of financial operations, budgeting, and fiscal policy development.",
-    purpose: "Ensure financial sustainability and responsible stewardship of organizational resources.",
+    purpose:
+      "Ensure financial sustainability and responsible stewardship of organizational resources.",
     status: "active",
     type: "functional",
     charter: {
-      missionStatement: "To provide expert financial oversight and guidance that ensures fiscal responsibility and supports organizational growth.",
+      missionStatement:
+        "To provide expert financial oversight and guidance that ensures fiscal responsibility and supports organizational growth.",
       responsibilities: [
         "Budget development and monitoring",
         "Financial policy development",
         "Investment oversight",
         "Audit coordination",
-        "Financial reporting and transparency"
+        "Financial reporting and transparency",
       ],
       authorityLevel: "strategic",
-      decisionMakingProcess: "Consensus-based decisions with majority vote fallback. Financial decisions require 2/3 approval.",
-      reportingStructure: "Reports to Executive Committee. Quarterly reports to Board of Directors.",
+      decisionMakingProcess:
+        "Consensus-based decisions with majority vote fallback. Financial decisions require 2/3 approval.",
+      reportingStructure:
+        "Reports to Executive Committee. Quarterly reports to Board of Directors.",
       termLimits: {
         chairTerm: 24,
         memberTerm: 24,
-        maxTerms: 3
+        maxTerms: 3,
       },
       approvalDate: new Date("2020-03-10"),
       lastReviewed: new Date("2024-09-15"),
-      nextReview: new Date("2025-09-15")
+      nextReview: new Date("2025-09-15"),
     },
     leadership: [
       {
@@ -202,7 +232,7 @@ export const mockCommittees: Committee[] = [
         startDate: new Date("2023-06-01"),
         isActive: true,
         avatar: "/avatars/robert.jpg",
-        phone: "+1 (555) 456-7890"
+        phone: "+1 (555) 456-7890",
       },
       {
         id: "lead_5",
@@ -214,8 +244,8 @@ export const mockCommittees: Committee[] = [
         startDate: new Date("2023-07-15"),
         isActive: true,
         avatar: "/avatars/amanda.jpg",
-        phone: "+1 (555) 567-8901"
-      }
+        phone: "+1 (555) 567-8901",
+      },
     ],
     members: [
       {
@@ -227,15 +257,15 @@ export const mockCommittees: Committee[] = [
         isActive: true,
         avatar: "/avatars/carlos.jpg",
         expertise: ["Accounting", "Financial Analysis", "Budgeting"],
-        contributionLevel: "high"
-      }
+        contributionLevel: "high",
+      },
     ],
     subCommitteeIds: [],
     contactInfo: {
       email: "finance@org.org",
       phone: "+1 (555) 876-5432",
       meetingLocation: "Finance Conference Room, Headquarters",
-      virtualMeetingLink: "https://zoom.us/j/finance-committee"
+      virtualMeetingLink: "https://zoom.us/j/finance-committee",
     },
     metrics: {
       memberCount: 3,
@@ -246,10 +276,31 @@ export const mockCommittees: Committee[] = [
       impactScore: 87.5,
       satisfactionScore: 84.2,
       monthlyTrend: [
-        { month: "Nov 2025", memberCount: 3, meetingCount: 1, attendanceRate: 100.0, goalsCompleted: 2, deliverablesCompleted: 3 },
-        { month: "Oct 2025", memberCount: 3, meetingCount: 2, attendanceRate: 83.3, goalsCompleted: 1, deliverablesCompleted: 2 },
-        { month: "Sep 2025", memberCount: 3, meetingCount: 1, attendanceRate: 100.0, goalsCompleted: 2, deliverablesCompleted: 1 }
-      ]
+        {
+          month: "Nov 2025",
+          memberCount: 3,
+          meetingCount: 1,
+          attendanceRate: 100.0,
+          goalsCompleted: 2,
+          deliverablesCompleted: 3,
+        },
+        {
+          month: "Oct 2025",
+          memberCount: 3,
+          meetingCount: 2,
+          attendanceRate: 83.3,
+          goalsCompleted: 1,
+          deliverablesCompleted: 2,
+        },
+        {
+          month: "Sep 2025",
+          memberCount: 3,
+          meetingCount: 1,
+          attendanceRate: 100.0,
+          goalsCompleted: 2,
+          deliverablesCompleted: 1,
+        },
+      ],
     },
     meetings: [
       {
@@ -264,14 +315,14 @@ export const mockCommittees: Committee[] = [
           "Q3 financial performance review",
           "2026 budget proposal discussion",
           "Investment portfolio update",
-          "Audit preparation status"
-        ]
-      }
+          "Audit preparation status",
+        ],
+      },
     ],
     createdAt: new Date("2020-03-10"),
     updatedAt: new Date("2025-11-25"),
     createdBy: "admin@example.com",
-    updatedBy: "robert.thompson@org.org"
+    updatedBy: "robert.thompson@org.org",
   },
   {
     id: "com_3",
@@ -282,25 +333,27 @@ export const mockCommittees: Committee[] = [
     status: "active",
     type: "functional",
     charter: {
-      missionStatement: "To attract, retain, and engage members through innovative programs and exceptional service.",
+      missionStatement:
+        "To attract, retain, and engage members through innovative programs and exceptional service.",
       responsibilities: [
         "Membership recruitment strategies",
         "Onboarding and orientation programs",
         "Member engagement initiatives",
         "Retention program development",
-        "Membership benefits evaluation"
+        "Membership benefits evaluation",
       ],
       authorityLevel: "operational",
-      decisionMakingProcess: "Collaborative decision-making with majority vote. Member-facing decisions require consensus.",
+      decisionMakingProcess:
+        "Collaborative decision-making with majority vote. Member-facing decisions require consensus.",
       reportingStructure: "Reports to Executive Committee. Monthly membership reports to Board.",
       termLimits: {
         chairTerm: 18,
         memberTerm: 24,
-        maxTerms: 2
+        maxTerms: 2,
       },
       approvalDate: new Date("2020-05-20"),
       lastReviewed: new Date("2024-11-01"),
-      nextReview: new Date("2025-11-01")
+      nextReview: new Date("2025-11-01"),
     },
     leadership: [
       {
@@ -313,8 +366,8 @@ export const mockCommittees: Committee[] = [
         startDate: new Date("2023-09-01"),
         isActive: true,
         avatar: "/avatars/lisa.jpg",
-        phone: "+1 (555) 678-9012"
-      }
+        phone: "+1 (555) 678-9012",
+      },
     ],
     members: [
       {
@@ -326,7 +379,7 @@ export const mockCommittees: Committee[] = [
         isActive: true,
         avatar: "/avatars/james.jpg",
         expertise: ["Marketing", "Community Outreach", "Event Planning"],
-        contributionLevel: "medium"
+        contributionLevel: "medium",
       },
       {
         id: "mem_5",
@@ -337,15 +390,15 @@ export const mockCommittees: Committee[] = [
         isActive: true,
         avatar: "/avatars/maria.jpg",
         expertise: ["Member Services", "Communication", "Data Analysis"],
-        contributionLevel: "high"
-      }
+        contributionLevel: "high",
+      },
     ],
     subCommitteeIds: ["com_3_1"],
     contactInfo: {
       email: "membership@org.org",
       phone: "+1 (555) 765-4321",
       meetingLocation: "Member Lounge, Headquarters",
-      virtualMeetingLink: "https://zoom.us/j/membership-committee"
+      virtualMeetingLink: "https://zoom.us/j/membership-committee",
     },
     metrics: {
       memberCount: 3,
@@ -356,10 +409,31 @@ export const mockCommittees: Committee[] = [
       impactScore: 78.3,
       satisfactionScore: 82.1,
       monthlyTrend: [
-        { month: "Nov 2025", memberCount: 3, meetingCount: 2, attendanceRate: 83.3, goalsCompleted: 1, deliverablesCompleted: 2 },
-        { month: "Oct 2025", memberCount: 3, meetingCount: 1, attendanceRate: 100.0, goalsCompleted: 2, deliverablesCompleted: 1 },
-        { month: "Sep 2025", memberCount: 3, meetingCount: 2, attendanceRate: 83.3, goalsCompleted: 1, deliverablesCompleted: 2 }
-      ]
+        {
+          month: "Nov 2025",
+          memberCount: 3,
+          meetingCount: 2,
+          attendanceRate: 83.3,
+          goalsCompleted: 1,
+          deliverablesCompleted: 2,
+        },
+        {
+          month: "Oct 2025",
+          memberCount: 3,
+          meetingCount: 1,
+          attendanceRate: 100.0,
+          goalsCompleted: 2,
+          deliverablesCompleted: 1,
+        },
+        {
+          month: "Sep 2025",
+          memberCount: 3,
+          meetingCount: 2,
+          attendanceRate: 83.3,
+          goalsCompleted: 1,
+          deliverablesCompleted: 2,
+        },
+      ],
     },
     meetings: [
       {
@@ -374,14 +448,14 @@ export const mockCommittees: Committee[] = [
           "Q4 membership campaign review",
           "New member onboarding process",
           "Member satisfaction survey results",
-          "2026 membership goals"
-        ]
-      }
+          "2026 membership goals",
+        ],
+      },
     ],
     createdAt: new Date("2020-05-20"),
     updatedAt: new Date("2025-11-22"),
     createdBy: "admin@example.com",
-    updatedBy: "lisa.anderson@org.org"
+    updatedBy: "lisa.anderson@org.org",
   },
   {
     id: "com_4",
@@ -392,25 +466,27 @@ export const mockCommittees: Committee[] = [
     status: "pending",
     type: "special_interest",
     charter: {
-      missionStatement: "To guide technology strategy and implementation that drives innovation and operational excellence.",
+      missionStatement:
+        "To guide technology strategy and implementation that drives innovation and operational excellence.",
       responsibilities: [
         "Technology roadmap development",
         "Digital transformation initiatives",
         "IT infrastructure planning",
         "Cybersecurity oversight",
-        "Technology training and support"
+        "Technology training and support",
       ],
       authorityLevel: "advisory",
-      decisionMakingProcess: "Technical decisions by consensus, strategic decisions by majority vote.",
+      decisionMakingProcess:
+        "Technical decisions by consensus, strategic decisions by majority vote.",
       reportingStructure: "Reports to Executive Committee. Quarterly technology reports to Board.",
       termLimits: {
         chairTerm: 12,
         memberTerm: 18,
-        maxTerms: 2
+        maxTerms: 2,
       },
       approvalDate: new Date("2025-01-10"),
       lastReviewed: new Date("2025-01-10"),
-      nextReview: new Date("2026-01-10")
+      nextReview: new Date("2026-01-10"),
     },
     leadership: [
       {
@@ -423,8 +499,8 @@ export const mockCommittees: Committee[] = [
         startDate: new Date("2025-01-15"),
         isActive: true,
         avatar: "/avatars/kevin.jpg",
-        phone: "+1 (555) 890-1234"
-      }
+        phone: "+1 (555) 890-1234",
+      },
     ],
     members: [],
     subCommitteeIds: [],
@@ -432,7 +508,7 @@ export const mockCommittees: Committee[] = [
       email: "tech@org.org",
       phone: "+1 (555) 654-3210",
       meetingLocation: "Innovation Lab, Headquarters",
-      virtualMeetingLink: "https://zoom.us/j/tech-committee"
+      virtualMeetingLink: "https://zoom.us/j/tech-committee",
     },
     metrics: {
       memberCount: 1,
@@ -443,16 +519,37 @@ export const mockCommittees: Committee[] = [
       impactScore: 45.0,
       satisfactionScore: 75.0,
       monthlyTrend: [
-        { month: "Nov 2025", memberCount: 1, meetingCount: 1, attendanceRate: 100.0, goalsCompleted: 0, deliverablesCompleted: 1 },
-        { month: "Oct 2025", memberCount: 1, meetingCount: 0, attendanceRate: 0, goalsCompleted: 0, deliverablesCompleted: 0 },
-        { month: "Sep 2025", memberCount: 1, meetingCount: 0, attendanceRate: 0, goalsCompleted: 0, deliverablesCompleted: 0 }
-      ]
+        {
+          month: "Nov 2025",
+          memberCount: 1,
+          meetingCount: 1,
+          attendanceRate: 100.0,
+          goalsCompleted: 0,
+          deliverablesCompleted: 1,
+        },
+        {
+          month: "Oct 2025",
+          memberCount: 1,
+          meetingCount: 0,
+          attendanceRate: 0,
+          goalsCompleted: 0,
+          deliverablesCompleted: 0,
+        },
+        {
+          month: "Sep 2025",
+          memberCount: 1,
+          meetingCount: 0,
+          attendanceRate: 0,
+          goalsCompleted: 0,
+          deliverablesCompleted: 0,
+        },
+      ],
     },
     meetings: [],
     createdAt: new Date("2025-01-10"),
     updatedAt: new Date("2025-11-20"),
     createdBy: "admin@example.com",
-    updatedBy: "kevin.zhang@org.org"
+    updatedBy: "kevin.zhang@org.org",
   },
   {
     id: "com_5",
@@ -463,13 +560,14 @@ export const mockCommittees: Committee[] = [
     status: "inactive",
     type: "ad_hoc",
     charter: {
-      missionStatement: "To deliver high-quality events that provide value to members and advance organizational objectives.",
+      missionStatement:
+        "To deliver high-quality events that provide value to members and advance organizational objectives.",
       responsibilities: [
         "Event planning and coordination",
         "Program development",
         "Venue selection and management",
         "Speaker and presenter coordination",
-        "Event evaluation and improvement"
+        "Event evaluation and improvement",
       ],
       authorityLevel: "operational",
       decisionMakingProcess: "Event decisions by consensus, budget decisions by majority vote.",
@@ -477,11 +575,11 @@ export const mockCommittees: Committee[] = [
       termLimits: {
         chairTerm: 12,
         memberTerm: 12,
-        maxTerms: 1
+        maxTerms: 1,
       },
       approvalDate: new Date("2021-07-15"),
       lastReviewed: new Date("2024-07-15"),
-      nextReview: new Date("2025-07-15")
+      nextReview: new Date("2025-07-15"),
     },
     leadership: [],
     members: [
@@ -495,14 +593,14 @@ export const mockCommittees: Committee[] = [
         isActive: false,
         avatar: "/avatars/rachel.jpg",
         expertise: ["Event Planning", "Logistics", "Vendor Management"],
-        contributionLevel: "high"
-      }
+        contributionLevel: "high",
+      },
     ],
     subCommitteeIds: [],
     contactInfo: {
       email: "events@org.org",
       phone: "+1 (555) 543-2109",
-      meetingLocation: "Event Planning Office, Headquarters"
+      meetingLocation: "Event Planning Office, Headquarters",
     },
     metrics: {
       memberCount: 1,
@@ -513,16 +611,37 @@ export const mockCommittees: Committee[] = [
       impactScore: 55.0,
       satisfactionScore: 70.0,
       monthlyTrend: [
-        { month: "Nov 2025", memberCount: 1, meetingCount: 0, attendanceRate: 0, goalsCompleted: 0, deliverablesCompleted: 0 },
-        { month: "Oct 2025", memberCount: 1, meetingCount: 0, attendanceRate: 0, goalsCompleted: 0, deliverablesCompleted: 0 },
-        { month: "Sep 2025", memberCount: 1, meetingCount: 0, attendanceRate: 0, goalsCompleted: 0, deliverablesCompleted: 0 }
-      ]
+        {
+          month: "Nov 2025",
+          memberCount: 1,
+          meetingCount: 0,
+          attendanceRate: 0,
+          goalsCompleted: 0,
+          deliverablesCompleted: 0,
+        },
+        {
+          month: "Oct 2025",
+          memberCount: 1,
+          meetingCount: 0,
+          attendanceRate: 0,
+          goalsCompleted: 0,
+          deliverablesCompleted: 0,
+        },
+        {
+          month: "Sep 2025",
+          memberCount: 1,
+          meetingCount: 0,
+          attendanceRate: 0,
+          goalsCompleted: 0,
+          deliverablesCompleted: 0,
+        },
+      ],
     },
     meetings: [],
     createdAt: new Date("2021-07-15"),
     updatedAt: new Date("2024-06-30"),
-    createdBy: "admin@example.com"
-  }
+    createdBy: "admin@example.com",
+  },
 ];
 
 export const mockCommitteeStatistics: CommitteeOverallStatistics = {
@@ -546,7 +665,7 @@ export const mockCommitteeStatistics: CommitteeOverallStatistics = {
       goalCompletionRate: 88.5,
       deliverablesCount: 12,
       impactScore: 92.3,
-      satisfactionScore: 89.7
+      satisfactionScore: 89.7,
     },
     {
       committeeId: "com_2",
@@ -557,7 +676,7 @@ export const mockCommitteeStatistics: CommitteeOverallStatistics = {
       goalCompletionRate: 85.0,
       deliverablesCount: 8,
       impactScore: 87.5,
-      satisfactionScore: 84.2
+      satisfactionScore: 84.2,
     },
     {
       committeeId: "com_3",
@@ -568,8 +687,8 @@ export const mockCommitteeStatistics: CommitteeOverallStatistics = {
       goalCompletionRate: 76.5,
       deliverablesCount: 6,
       impactScore: 78.3,
-      satisfactionScore: 82.1
-    }
+      satisfactionScore: 82.1,
+    },
   ],
   typeBreakdown: [
     {
@@ -578,7 +697,7 @@ export const mockCommitteeStatistics: CommitteeOverallStatistics = {
       memberCount: 5,
       averageMembersPerCommittee: 5.0,
       totalDeliverables: 12,
-      averageImpactScore: 92.3
+      averageImpactScore: 92.3,
     },
     {
       type: "functional",
@@ -586,7 +705,7 @@ export const mockCommitteeStatistics: CommitteeOverallStatistics = {
       memberCount: 6,
       averageMembersPerCommittee: 3.0,
       totalDeliverables: 14,
-      averageImpactScore: 82.9
+      averageImpactScore: 82.9,
     },
     {
       type: "special_interest",
@@ -594,7 +713,7 @@ export const mockCommitteeStatistics: CommitteeOverallStatistics = {
       memberCount: 1,
       averageMembersPerCommittee: 1.0,
       totalDeliverables: 1,
-      averageImpactScore: 45.0
+      averageImpactScore: 45.0,
     },
     {
       type: "ad_hoc",
@@ -602,12 +721,33 @@ export const mockCommitteeStatistics: CommitteeOverallStatistics = {
       memberCount: 1,
       averageMembersPerCommittee: 1.0,
       totalDeliverables: 4,
-      averageImpactScore: 55.0
-    }
+      averageImpactScore: 55.0,
+    },
   ],
   monthlyTrend: [
-    { month: "Nov 2025", memberCount: 13, meetingCount: 3, attendanceRate: 91.7, goalsCompleted: 6, deliverablesCompleted: 9 },
-    { month: "Oct 2025", memberCount: 13, meetingCount: 3, attendanceRate: 87.5, goalsCompleted: 5, deliverablesCompleted: 7 },
-    { month: "Sep 2025", memberCount: 13, meetingCount: 2, attendanceRate: 94.4, goalsCompleted: 4, deliverablesCompleted: 5 }
-  ]
+    {
+      month: "Nov 2025",
+      memberCount: 13,
+      meetingCount: 3,
+      attendanceRate: 91.7,
+      goalsCompleted: 6,
+      deliverablesCompleted: 9,
+    },
+    {
+      month: "Oct 2025",
+      memberCount: 13,
+      meetingCount: 3,
+      attendanceRate: 87.5,
+      goalsCompleted: 5,
+      deliverablesCompleted: 7,
+    },
+    {
+      month: "Sep 2025",
+      memberCount: 13,
+      meetingCount: 2,
+      attendanceRate: 94.4,
+      goalsCompleted: 4,
+      deliverablesCompleted: 5,
+    },
+  ],
 };

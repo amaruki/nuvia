@@ -37,9 +37,11 @@ export function useSession(): SessionData {
   // Local state with caching
   const [userData, setUserData] = useState<User | null>(() => {
     // Initialize from global cache on first render
-    if (globalSessionCache &&
-        Date.now() - globalSessionCache.lastValidated < SESSION_CACHE_TTL &&
-        globalSessionCache.isValid) {
+    if (
+      globalSessionCache &&
+      Date.now() - globalSessionCache.lastValidated < SESSION_CACHE_TTL &&
+      globalSessionCache.isValid
+    ) {
       return globalSessionCache.user;
     }
     return null;
@@ -75,21 +77,23 @@ export function useSession(): SessionData {
 
       // Cache session data on server-side via API call (only if Redis is enabled)
       // Note: This is async but we don't await it to avoid blocking the UI
-      if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_ENABLE_REDIS_CACHE === 'true') {
-        fetch('/api/auth/cache-session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+      if (typeof window !== "undefined" && process.env.NEXT_PUBLIC_ENABLE_REDIS_CACHE === "true") {
+        fetch("/api/auth/cache-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            token: authUser.session?.token || '',
+            token: authUser.session?.token || "",
             sessionData: {
               id: authUser.user.id,
               userId: authUser.user.id,
-              expiresAt: new Date(authUser.session?.expiresAt || Date.now() + 7 * 24 * 60 * 60 * 1000),
+              expiresAt: new Date(
+                authUser.session?.expiresAt || Date.now() + 7 * 24 * 60 * 60 * 1000,
+              ),
               user: transformedUser,
             },
           }),
-        }).catch(error => {
-          console.warn('Failed to cache session:', error);
+        }).catch((error) => {
+          console.warn("Failed to cache session:", error);
         });
       }
 
@@ -118,11 +122,14 @@ export function useSession(): SessionData {
   }, [error]);
 
   // Memoize return value to prevent unnecessary re-renders
-  return useMemo(() => ({
-    user: userData,
-    isPending,
-    error: sessionError,
-  }), [userData, isPending, sessionError]);
+  return useMemo(
+    () => ({
+      user: userData,
+      isPending,
+      error: sessionError,
+    }),
+    [userData, isPending, sessionError],
+  );
 }
 
 /**
@@ -134,13 +141,17 @@ export function invalidateSessionCache(sessionToken?: string): void {
   globalSessionCache = null;
 
   // Clear server-side cache if token is provided (only if Redis is enabled)
-  if (sessionToken && typeof window !== 'undefined' && process.env.NEXT_PUBLIC_ENABLE_REDIS_CACHE === 'true') {
-    fetch('/api/auth/invalidate-session-cache', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+  if (
+    sessionToken &&
+    typeof window !== "undefined" &&
+    process.env.NEXT_PUBLIC_ENABLE_REDIS_CACHE === "true"
+  ) {
+    fetch("/api/auth/invalidate-session-cache", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: sessionToken }),
-    }).catch(error => {
-      console.warn('Failed to invalidate server session cache:', error);
+    }).catch((error) => {
+      console.warn("Failed to invalidate server session cache:", error);
     });
   }
 }
@@ -149,7 +160,9 @@ export function invalidateSessionCache(sessionToken?: string): void {
  * Utility function to check if session is cached and valid
  */
 export function isSessionCached(): boolean {
-  return globalSessionCache !== null &&
-         Date.now() - globalSessionCache.lastValidated < SESSION_CACHE_TTL &&
-         globalSessionCache.isValid;
+  return (
+    globalSessionCache !== null &&
+    Date.now() - globalSessionCache.lastValidated < SESSION_CACHE_TTL &&
+    globalSessionCache.isValid
+  );
 }

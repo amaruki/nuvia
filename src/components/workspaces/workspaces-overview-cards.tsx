@@ -106,7 +106,9 @@ export function WorkspacesOverviewCards({ statistics }: WorkspacesOverviewCardsP
               </div>
             </div>
             <div className="flex flex-col mt-3">
-              <span className="text-2xl font-bold">{formatPercentage(statistics.taskCompletionRate)}</span>
+              <span className="text-2xl font-bold">
+                {formatPercentage(statistics.taskCompletionRate)}
+              </span>
               <span className="text-xs text-muted-foreground mt-1">
                 {statistics.totalTasks} total tasks
               </span>
@@ -116,7 +118,6 @@ export function WorkspacesOverviewCards({ statistics }: WorkspacesOverviewCardsP
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        
         {/* Workspace Status Breakdown */}
         <Card className="shadow-sm col-span-1 lg:col-span-2 flex flex-col">
           <CardHeader>
@@ -124,43 +125,52 @@ export function WorkspacesOverviewCards({ statistics }: WorkspacesOverviewCardsP
             <CardDescription>Status distribution across all workspaces</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-center gap-4">
-             {/* Status Item: Active */}
+            {/* Status Item: Active */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                        <CheckSquare className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Active</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                  <CheckSquare className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-emerald-50 text-emerald-700 border-emerald-200">
-                    {statistics.activeWorkspaces}
-                </Badge>
+                <span className="text-sm font-medium">Active</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-emerald-50 text-emerald-700 border-emerald-200"
+              >
+                {statistics.activeWorkspaces}
+              </Badge>
             </div>
 
             {/* Status Item: Archived */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
-                        <FolderOpen className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Archived</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+                  <FolderOpen className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-slate-50 text-slate-700 border-slate-200">
-                    {statistics.archivedWorkspaces}
-                </Badge>
+                <span className="text-sm font-medium">Archived</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-slate-50 text-slate-700 border-slate-200"
+              >
+                {statistics.archivedWorkspaces}
+              </Badge>
             </div>
 
             {/* Status Item: Locked */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
-                        <Target className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Locked</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
+                  <Target className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-rose-50 text-rose-700 border-rose-200">
-                    {statistics.lockedWorkspaces}
-                </Badge>
+                <span className="text-sm font-medium">Locked</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-rose-50 text-rose-700 border-rose-200"
+              >
+                {statistics.lockedWorkspaces}
+              </Badge>
             </div>
           </CardContent>
         </Card>
@@ -169,29 +179,32 @@ export function WorkspacesOverviewCards({ statistics }: WorkspacesOverviewCardsP
         <Card className="shadow-sm col-span-1 lg:col-span-3">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                Most Active Workspaces
+              <TrendingUp className="h-4 w-4 text-primary" />
+              Most Active Workspaces
             </CardTitle>
             <CardDescription>By activity score and engagement rate</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-5">
-              {statistics.topActiveWorkspaces
-                .slice(0, 4)
-                .map((workspace, index) => {
-                  // Calculate percentage for bar width (relative to max activity score in set for visual)
-                  const maxScore = Math.max(...statistics.topActiveWorkspaces.map(w => w.activityScore));
-                  const percentage = (workspace.activityScore / maxScore) * 100;
-                   
-                  return (
+              {statistics.topActiveWorkspaces.slice(0, 4).map((workspace, index) => {
+                // Calculate percentage for bar width (relative to max activity score in set for visual)
+                const maxScore = Math.max(
+                  ...statistics.topActiveWorkspaces.map((w) => w.activityScore),
+                );
+                const percentage = (workspace.activityScore / maxScore) * 100;
+
+                return (
                   <div key={workspace.workspaceId} className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <span className="font-medium truncate max-w-[120px] sm:max-w-[200px]">
                           {workspace.workspaceName}
                         </span>
-                        <Badge variant="secondary" className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground">
-                            {workspace.type}
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground"
+                        >
+                          {workspace.type}
                         </Badge>
                       </div>
                       <div className="text-right">
@@ -200,17 +213,26 @@ export function WorkspacesOverviewCards({ statistics }: WorkspacesOverviewCardsP
                     </div>
                     {/* Visual Bar */}
                     <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                        <div 
-                            className="h-full bg-primary rounded-full" 
-                            style={{ width: `${percentage}%` }}
-                        />
+                      <div
+                        className="h-full bg-primary rounded-full"
+                        style={{ width: `${percentage}%` }}
+                      />
                     </div>
                     <div className="flex justify-between text-xs text-muted-foreground">
-                         <span>Engagement: <span className="font-medium">{formatPercentage(workspace.engagementRate)}</span></span>
-                         <span>Activity: <span className="font-medium">{workspace.activityScore.toFixed(1)}</span></span>
+                      <span>
+                        Engagement:{" "}
+                        <span className="font-medium">
+                          {formatPercentage(workspace.engagementRate)}
+                        </span>
+                      </span>
+                      <span>
+                        Activity:{" "}
+                        <span className="font-medium">{workspace.activityScore.toFixed(1)}</span>
+                      </span>
                     </div>
                   </div>
-                )})}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -227,14 +249,17 @@ export function WorkspacesOverviewCards({ statistics }: WorkspacesOverviewCardsP
                 .sort((a, b) => b.workspaceCount - a.workspaceCount)
                 .slice(0, 4)
                 .map((type) => (
-                  <div key={type.type} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                  <div
+                    key={type.type}
+                    className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                  >
                     <div className="flex items-center space-x-3">
                       <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                         <Activity className="h-4 w-4 text-primary" />
                       </div>
                       <div>
                         <p className="text-sm font-medium capitalize">
-                          {type.type.replace('_', ' ')}
+                          {type.type.replace("_", " ")}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {type.workspaceCount} workspaces
@@ -243,16 +268,13 @@ export function WorkspacesOverviewCards({ statistics }: WorkspacesOverviewCardsP
                     </div>
                     <div className="text-right">
                       <span className="text-sm font-bold">{type.documentCount}</span>
-                      <p className="text-xs text-muted-foreground">
-                        documents
-                      </p>
+                      <p className="text-xs text-muted-foreground">documents</p>
                     </div>
                   </div>
                 ))}
             </div>
           </CardContent>
         </Card>
-
       </div>
 
       {/* Additional Metrics Row */}
@@ -268,9 +290,7 @@ export function WorkspacesOverviewCards({ statistics }: WorkspacesOverviewCardsP
             </div>
             <div className="flex flex-col mt-3">
               <span className="text-2xl font-bold">{statistics.totalDiscussions}</span>
-              <span className="text-xs text-muted-foreground mt-1">
-                Active conversations
-              </span>
+              <span className="text-xs text-muted-foreground mt-1">Active conversations</span>
             </div>
           </CardContent>
         </Card>

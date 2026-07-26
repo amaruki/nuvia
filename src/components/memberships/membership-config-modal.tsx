@@ -1,46 +1,48 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Settings, Save, CreditCard, Mail, Shield } from "lucide-react"
-import { useState } from "react"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Settings, Save, CreditCard, Mail, Shield } from "lucide-react";
+import { useState } from "react";
 
 interface MembershipConfigModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSave: (config: MembershipConfig) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSave: (config: MembershipConfig) => void;
 }
 
 interface MembershipConfig {
-  defaultTier?: string
-  trialPeriodDays: number
-  autoRenewal: boolean
-  cancellationPolicy: string
-  paymentGateway: string
-  currency: string
-  welcomeEmail: boolean
-  upgradeReminders: boolean
-  renewalReminders: boolean
-  defaultPermissions: string[]
+  defaultTier?: string;
+  trialPeriodDays: number;
+  autoRenewal: boolean;
+  cancellationPolicy: string;
+  paymentGateway: string;
+  currency: string;
+  welcomeEmail: boolean;
+  upgradeReminders: boolean;
+  renewalReminders: boolean;
+  defaultPermissions: string[];
 }
 
-export function MembershipConfigModal({
-  open,
-  onOpenChange,
-  onSave
-}: MembershipConfigModalProps) {
+export function MembershipConfigModal({ open, onOpenChange, onSave }: MembershipConfigModalProps) {
   const [formData, setFormData] = useState<MembershipConfig>({
     defaultTier: "basic",
     trialPeriodDays: 14,
@@ -51,19 +53,19 @@ export function MembershipConfigModal({
     welcomeEmail: true,
     upgradeReminders: true,
     renewalReminders: true,
-    defaultPermissions: ["read_profile", "join_events"]
-  })
+    defaultPermissions: ["read_profile", "join_events"],
+  });
 
   const handleSave = () => {
     // Basic validation
     if (formData.trialPeriodDays < 0 || formData.trialPeriodDays > 365) {
-      alert("Trial period must be between 0 and 365 days")
-      return
+      alert("Trial period must be between 0 and 365 days");
+      return;
     }
 
-    onSave(formData)
-    onOpenChange(false)
-  }
+    onSave(formData);
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -95,7 +97,9 @@ export function MembershipConfigModal({
                 <Label htmlFor="defaultTier">Default Membership Tier</Label>
                 <Select
                   value={formData.defaultTier}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, defaultTier: value }))}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, defaultTier: value }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -114,7 +118,12 @@ export function MembershipConfigModal({
                   id="trialPeriod"
                   type="number"
                   value={formData.trialPeriodDays}
-                  onChange={(e) => setFormData(prev => ({ ...prev, trialPeriodDays: parseInt(e.target.value) || 0 }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      trialPeriodDays: parseInt(e.target.value) || 0,
+                    }))
+                  }
                   min="0"
                   max="365"
                 />
@@ -124,7 +133,7 @@ export function MembershipConfigModal({
                 <Label htmlFor="currency">Currency</Label>
                 <Select
                   value={formData.currency}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, currency: value }))}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -141,7 +150,9 @@ export function MembershipConfigModal({
                 <Label htmlFor="paymentGateway">Payment Gateway</Label>
                 <Select
                   value={formData.paymentGateway}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, paymentGateway: value }))}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, paymentGateway: value }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -160,7 +171,9 @@ export function MembershipConfigModal({
                 <Checkbox
                   id="autoRenewal"
                   checked={formData.autoRenewal}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, autoRenewal: checked as boolean }))}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, autoRenewal: checked as boolean }))
+                  }
                 />
                 <Label htmlFor="autoRenewal">Enable Automatic Renewal</Label>
               </div>
@@ -170,7 +183,9 @@ export function MembershipConfigModal({
                 <Textarea
                   id="cancellationPolicy"
                   value={formData.cancellationPolicy}
-                  onChange={(e) => setFormData(prev => ({ ...prev, cancellationPolicy: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, cancellationPolicy: e.target.value }))
+                  }
                   placeholder="Describe your cancellation policy..."
                   rows={3}
                 />
@@ -184,7 +199,9 @@ export function MembershipConfigModal({
                 <CreditCard className="w-5 h-5 text-muted-foreground" />
                 <div>
                   <h3 className="font-medium">Billing Settings</h3>
-                  <p className="text-sm text-muted-foreground">Configure payment and billing options</p>
+                  <p className="text-sm text-muted-foreground">
+                    Configure payment and billing options
+                  </p>
                 </div>
               </div>
 
@@ -236,7 +253,9 @@ export function MembershipConfigModal({
                 <Mail className="w-5 h-5 text-muted-foreground" />
                 <div>
                   <h3 className="font-medium">Email Notifications</h3>
-                  <p className="text-sm text-muted-foreground">Configure automated email communications</p>
+                  <p className="text-sm text-muted-foreground">
+                    Configure automated email communications
+                  </p>
                 </div>
               </div>
 
@@ -245,7 +264,9 @@ export function MembershipConfigModal({
                   <Checkbox
                     id="welcomeEmail"
                     checked={formData.welcomeEmail}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, welcomeEmail: checked as boolean }))}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({ ...prev, welcomeEmail: checked as boolean }))
+                    }
                   />
                   <Label htmlFor="welcomeEmail">Send welcome email to new members</Label>
                 </div>
@@ -254,7 +275,9 @@ export function MembershipConfigModal({
                   <Checkbox
                     id="upgradeReminders"
                     checked={formData.upgradeReminders}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, upgradeReminders: checked as boolean }))}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({ ...prev, upgradeReminders: checked as boolean }))
+                    }
                   />
                   <Label htmlFor="upgradeReminders">Send upgrade reminders</Label>
                 </div>
@@ -263,7 +286,9 @@ export function MembershipConfigModal({
                   <Checkbox
                     id="renewalReminders"
                     checked={formData.renewalReminders}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, renewalReminders: checked as boolean }))}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({ ...prev, renewalReminders: checked as boolean }))
+                    }
                   />
                   <Label htmlFor="renewalReminders">Send renewal reminders</Label>
                 </div>
@@ -271,11 +296,7 @@ export function MembershipConfigModal({
 
               <div className="space-y-2">
                 <Label htmlFor="adminEmail">Admin Notification Email</Label>
-                <Input
-                  id="adminEmail"
-                  type="email"
-                  placeholder="admin@example.com"
-                />
+                <Input id="adminEmail" type="email" placeholder="admin@example.com" />
               </div>
             </div>
           </TabsContent>
@@ -286,11 +307,9 @@ export function MembershipConfigModal({
           <Button variant="outline" onClick={() => onOpenChange(false)} className="mr-2">
             Cancel
           </Button>
-          <Button onClick={handleSave}>
-            Save Configuration
-          </Button>
+          <Button onClick={handleSave}>Save Configuration</Button>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

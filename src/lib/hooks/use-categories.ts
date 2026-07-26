@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { 
-  Category, 
-  CategoryFilters, 
-  CategoryFormData, 
+import {
+  Category,
+  CategoryFilters,
+  CategoryFormData,
   CategoryStatistics,
   CategoryUsage,
   CategoryType,
@@ -12,7 +12,7 @@ import {
   CategoryScope,
   CATEGORY_TYPES,
   CATEGORY_STATUSES,
-  CATEGORY_SCOPES
+  CATEGORY_SCOPES,
 } from "@/types/category.types";
 
 // Mock data for development
@@ -32,7 +32,7 @@ const mockCategories: Category[] = [
     order: 1,
     createdAt: new Date("2024-01-15"),
     updatedAt: new Date("2024-12-15"),
-    createdBy: "admin_1"
+    createdBy: "admin_1",
   },
   {
     id: "cat_2",
@@ -49,7 +49,7 @@ const mockCategories: Category[] = [
     order: 2,
     createdAt: new Date("2024-01-20"),
     updatedAt: new Date("2024-12-14"),
-    createdBy: "admin_1"
+    createdBy: "admin_1",
   },
   {
     id: "cat_3",
@@ -66,7 +66,7 @@ const mockCategories: Category[] = [
     order: 3,
     createdAt: new Date("2024-02-01"),
     updatedAt: new Date("2024-12-13"),
-    createdBy: "admin_2"
+    createdBy: "admin_2",
   },
   {
     id: "cat_4",
@@ -83,7 +83,7 @@ const mockCategories: Category[] = [
     order: 1,
     createdAt: new Date("2024-01-10"),
     updatedAt: new Date("2024-12-16"),
-    createdBy: "admin_1"
+    createdBy: "admin_1",
   },
   {
     id: "cat_5",
@@ -100,7 +100,7 @@ const mockCategories: Category[] = [
     order: 2,
     createdAt: new Date("2024-01-25"),
     updatedAt: new Date("2024-12-12"),
-    createdBy: "admin_2"
+    createdBy: "admin_2",
   },
   {
     id: "cat_6",
@@ -118,8 +118,8 @@ const mockCategories: Category[] = [
     allowedChapters: ["chapter_1", "chapter_2"],
     createdAt: new Date("2024-03-01"),
     updatedAt: new Date("2024-03-01"),
-    createdBy: "admin_1"
-  }
+    createdBy: "admin_1",
+  },
 ];
 
 const mockStatistics: CategoryStatistics = {
@@ -129,17 +129,17 @@ const mockStatistics: CategoryStatistics = {
   archivedCategories: 0,
   categoriesByType: [
     { type: "article", count: 3, contentCount: 105 },
-    { type: "announcement", count: 3, contentCount: 23 }
+    { type: "announcement", count: 3, contentCount: 23 },
   ],
   categoriesByScope: [
     { scope: "global", count: 5 },
     { scope: "chapter", count: 1 },
-    { scope: "committee", count: 0 }
+    { scope: "committee", count: 0 },
   ],
   categoriesByStatus: [
     { status: "active", count: 5 },
     { status: "inactive", count: 1 },
-    { status: "archived", count: 0 }
+    { status: "archived", count: 0 },
   ],
   mostUsedCategories: [
     {
@@ -147,15 +147,15 @@ const mockStatistics: CategoryStatistics = {
       name: "Technology",
       contentCount: 45,
       type: "article",
-      lastUsed: new Date("2024-12-15")
+      lastUsed: new Date("2024-12-15"),
     },
     {
       categoryId: "cat_2",
       name: "Business",
       contentCount: 32,
       type: "article",
-      lastUsed: new Date("2024-12-14")
-    }
+      lastUsed: new Date("2024-12-14"),
+    },
   ],
   recentlyCreated: [
     {
@@ -163,17 +163,17 @@ const mockStatistics: CategoryStatistics = {
       name: "Chapter News",
       type: "announcement",
       createdBy: "admin_1",
-      createdAt: new Date("2024-03-01")
-    }
+      createdAt: new Date("2024-03-01"),
+    },
   ],
   orphanedCategories: [
     {
       id: "cat_6",
       name: "Chapter News",
       type: "announcement",
-      lastUsed: undefined
-    }
-  ]
+      lastUsed: undefined,
+    },
+  ],
 };
 
 export function useCategories() {
@@ -182,76 +182,72 @@ export function useCategories() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<CategoryFilters>({
-    sortBy: 'order',
-    sortOrder: 'asc',
+    sortBy: "order",
+    sortOrder: "asc",
     page: 1,
-    limit: 20
+    limit: 20,
   });
 
   // Load categories
   const loadCategories = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       let filteredCategories = [...mockCategories];
-      
+
       // Apply filters
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
-        filteredCategories = filteredCategories.filter(cat =>
-          cat.name.toLowerCase().includes(searchLower) ||
-          cat.description?.toLowerCase().includes(searchLower) ||
-          cat.slug.toLowerCase().includes(searchLower)
+        filteredCategories = filteredCategories.filter(
+          (cat) =>
+            cat.name.toLowerCase().includes(searchLower) ||
+            cat.description?.toLowerCase().includes(searchLower) ||
+            cat.slug.toLowerCase().includes(searchLower),
         );
       }
-      
+
       if (filters.type && filters.type.length > 0) {
-        filteredCategories = filteredCategories.filter(cat =>
-          filters.type!.includes(cat.type)
-        );
+        filteredCategories = filteredCategories.filter((cat) => filters.type!.includes(cat.type));
       }
-      
+
       if (filters.status && filters.status.length > 0) {
-        filteredCategories = filteredCategories.filter(cat =>
-          filters.status!.includes(cat.status)
+        filteredCategories = filteredCategories.filter((cat) =>
+          filters.status!.includes(cat.status),
         );
       }
-      
+
       if (filters.scope && filters.scope.length > 0) {
-        filteredCategories = filteredCategories.filter(cat =>
-          filters.scope!.includes(cat.scope)
-        );
+        filteredCategories = filteredCategories.filter((cat) => filters.scope!.includes(cat.scope));
       }
-      
+
       // Sort
       filteredCategories.sort((a, b) => {
-        const { sortBy = 'order', sortOrder = 'asc' } = filters;
+        const { sortBy = "order", sortOrder = "asc" } = filters;
         let aValue: any = a[sortBy as keyof Category];
         let bValue: any = b[sortBy as keyof Category];
-        
-        if (sortBy === 'name') {
+
+        if (sortBy === "name") {
           aValue = a.name.toLowerCase();
           bValue = b.name.toLowerCase();
         }
-        
-        if (sortOrder === 'asc') {
+
+        if (sortOrder === "asc") {
           return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
         } else {
           return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
         }
       });
-      
+
       setCategories(filteredCategories);
-      
+
       // Load statistics
       setStatistics(mockStatistics);
-      
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load categories');
+      setError(err instanceof Error ? err.message : "Failed to load categories");
     } finally {
       setLoading(false);
     }
@@ -261,26 +257,25 @@ export function useCategories() {
   const createCategory = useCallback(async (data: CategoryFormData) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       const newCategory: Category = {
         id: `cat_${Date.now()}`,
         ...data,
-        slug: data.slug || data.name.toLowerCase().replace(/\s+/g, '-'),
+        slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
         contentCount: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
-        createdBy: "current_user" // Would come from auth context
+        createdBy: "current_user", // Would come from auth context
       };
-      
-      setCategories(prev => [...prev, newCategory]);
+
+      setCategories((prev) => [...prev, newCategory]);
       return newCategory;
-      
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create category');
+      setError(err instanceof Error ? err.message : "Failed to create category");
       throw err;
     } finally {
       setLoading(false);
@@ -291,24 +286,25 @@ export function useCategories() {
   const updateCategory = useCallback(async (id: string, data: Partial<CategoryFormData>) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      setCategories(prev => prev.map(cat =>
-        cat.id === id
-          ? {
-              ...cat,
-              ...data,
-              updatedAt: new Date(),
-              updatedBy: "current_user"
-            }
-          : cat
-      ));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat.id === id
+            ? {
+                ...cat,
+                ...data,
+                updatedAt: new Date(),
+                updatedBy: "current_user",
+              }
+            : cat,
+        ),
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update category');
+      setError(err instanceof Error ? err.message : "Failed to update category");
       throw err;
     } finally {
       setLoading(false);
@@ -319,15 +315,14 @@ export function useCategories() {
   const deleteCategory = useCallback(async (id: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      setCategories(prev => prev.filter(cat => cat.id !== id));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      setCategories((prev) => prev.filter((cat) => cat.id !== id));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete category');
+      setError(err instanceof Error ? err.message : "Failed to delete category");
       throw err;
     } finally {
       setLoading(false);
@@ -338,15 +333,14 @@ export function useCategories() {
   const bulkDelete = useCallback(async (ids: string[]) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setCategories(prev => prev.filter(cat => !ids.includes(cat.id)));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setCategories((prev) => prev.filter((cat) => !ids.includes(cat.id)));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete categories');
+      setError(err instanceof Error ? err.message : "Failed to delete categories");
       throw err;
     } finally {
       setLoading(false);
@@ -356,24 +350,25 @@ export function useCategories() {
   const bulkUpdateStatus = useCallback(async (ids: string[], status: CategoryStatus) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setCategories(prev => prev.map(cat =>
-        ids.includes(cat.id)
-          ? {
-              ...cat,
-              status,
-              updatedAt: new Date(),
-              updatedBy: "current_user"
-            }
-          : cat
-      ));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setCategories((prev) =>
+        prev.map((cat) =>
+          ids.includes(cat.id)
+            ? {
+                ...cat,
+                status,
+                updatedAt: new Date(),
+                updatedBy: "current_user",
+              }
+            : cat,
+        ),
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update categories');
+      setError(err instanceof Error ? err.message : "Failed to update categories");
       throw err;
     } finally {
       setLoading(false);
@@ -382,15 +377,15 @@ export function useCategories() {
 
   // Filter operations
   const updateFilters = useCallback((newFilters: Partial<CategoryFilters>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    setFilters((prev) => ({ ...prev, ...newFilters }));
   }, []);
 
   const clearFilters = useCallback(() => {
     setFilters({
-      sortBy: 'order',
-      sortOrder: 'asc',
+      sortBy: "order",
+      sortOrder: "asc",
       page: 1,
-      limit: 20
+      limit: 20,
     });
   }, []);
 
@@ -399,39 +394,42 @@ export function useCategories() {
   }, [loadCategories]);
 
   // Export/Import
-  const exportCategories = useCallback(async (format: 'json' | 'csv') => {
-    try {
-      const data = categories.map(cat => ({
-        id: cat.id,
-        name: cat.name,
-        slug: cat.slug,
-        description: cat.description,
-        type: cat.type,
-        status: cat.status,
-        scope: cat.scope,
-        color: cat.color,
-        icon: cat.icon,
-        contentCount: cat.contentCount,
-        createdAt: cat.createdAt,
-        createdBy: cat.createdBy
-      }));
-      
-      if (format === 'json') {
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `categories-${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-      } else {
-        // CSV export would be implemented here
-        console.log('CSV export not implemented yet');
+  const exportCategories = useCallback(
+    async (format: "json" | "csv") => {
+      try {
+        const data = categories.map((cat) => ({
+          id: cat.id,
+          name: cat.name,
+          slug: cat.slug,
+          description: cat.description,
+          type: cat.type,
+          status: cat.status,
+          scope: cat.scope,
+          color: cat.color,
+          icon: cat.icon,
+          contentCount: cat.contentCount,
+          createdAt: cat.createdAt,
+          createdBy: cat.createdBy,
+        }));
+
+        if (format === "json") {
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `categories-${new Date().toISOString().split("T")[0]}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+        } else {
+          // CSV export would be implemented here
+          console.log("CSV export not implemented yet");
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to export categories");
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to export categories');
-    }
-  }, [categories]);
+    },
+    [categories],
+  );
 
   // Load data on mount and filter changes
   useEffect(() => {
@@ -445,25 +443,25 @@ export function useCategories() {
     loading,
     error,
     filters,
-    
+
     // CRUD operations
     createCategory,
     updateCategory,
     deleteCategory,
     bulkDelete,
     bulkUpdateStatus,
-    
+
     // Filter operations
     updateFilters,
     clearFilters,
-    
+
     // Utility operations
     refreshData,
     exportCategories,
-    
+
     // Pagination
     currentPage: filters.page || 1,
     totalPages: Math.ceil(categories.length / (filters.limit || 20)),
-    totalItems: categories.length
+    totalItems: categories.length,
   };
 }

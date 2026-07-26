@@ -34,7 +34,7 @@ import {
   Trash2,
   Copy,
   Edit,
-  MoreHorizontal
+  MoreHorizontal,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 
@@ -79,13 +79,14 @@ export default function ContentMedia() {
     clearFilters,
     refreshData,
     toggleMediaSelection,
-    clearSelection
+    clearSelection,
   } = useMedia();
 
   useEffect(() => {
     setHeader({
       title: "Media Library",
-      description: "Manage your media assets with comprehensive organization, version control, and analytics",
+      description:
+        "Manage your media assets with comprehensive organization, version control, and analytics",
     });
 
     return () => {
@@ -102,7 +103,9 @@ export default function ContentMedia() {
   };
 
   const handleDelete = async (mediaItem: Media) => {
-    if (confirm(`Are you sure you want to delete "${mediaItem.title}"? This action cannot be undone.`)) {
+    if (
+      confirm(`Are you sure you want to delete "${mediaItem.title}"? This action cannot be undone.`)
+    ) {
       try {
         await deleteMedia(mediaItem.id);
       } catch (error) {
@@ -121,8 +124,12 @@ export default function ContentMedia() {
 
   const handleBulkDelete = async () => {
     if (selectedMedia.length === 0) return;
-    
-    if (confirm(`Are you sure you want to delete ${selectedMedia.length} selected items? This action cannot be undone.`)) {
+
+    if (
+      confirm(
+        `Are you sure you want to delete ${selectedMedia.length} selected items? This action cannot be undone.`,
+      )
+    ) {
       try {
         await bulkDelete(selectedMedia);
         clearSelection();
@@ -134,7 +141,7 @@ export default function ContentMedia() {
 
   const handleBulkMove = async (folderId: string) => {
     if (selectedMedia.length === 0) return;
-    
+
     try {
       await bulkMove(selectedMedia, folderId);
       clearSelection();
@@ -143,7 +150,7 @@ export default function ContentMedia() {
     }
   };
 
-  const handleExport = (format: 'csv' | 'json') => {
+  const handleExport = (format: "csv" | "json") => {
     exportMedia(format);
   };
 
@@ -162,10 +169,10 @@ export default function ContentMedia() {
     try {
       await uploadMedia(files, {
         folderId: selectedFolder || undefined,
-        visibility: 'private',
+        visibility: "private",
         generateThumbnail: true,
         generatePreview: true,
-        extractMetadata: true
+        extractMetadata: true,
       });
     } catch (error) {
       console.error("Error uploading media:", error);
@@ -187,7 +194,7 @@ export default function ContentMedia() {
       presentation: FileText,
       pdf: FileText,
       vector: ImageIcon,
-      font: FileText
+      font: FileText,
     };
     return iconMap[type] || FileText;
   };
@@ -198,7 +205,7 @@ export default function ContentMedia() {
       processing: "amber",
       ready: "emerald",
       failed: "red",
-      archived: "slate"
+      archived: "slate",
     };
     return colorMap[status] || "slate";
   };
@@ -208,7 +215,7 @@ export default function ContentMedia() {
       public: Globe,
       private: Lock,
       restricted: Users,
-      draft: Eye
+      draft: Eye,
     };
     return iconMap[visibility] || Lock;
   };
@@ -263,7 +270,7 @@ export default function ContentMedia() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg border p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -275,7 +282,7 @@ export default function ContentMedia() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg border p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -287,7 +294,7 @@ export default function ContentMedia() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg border p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -315,7 +322,7 @@ export default function ContentMedia() {
           )}
           {selectedFolder && (
             <Badge variant="secondary" className="text-sm">
-              Folder: {folders.find(f => f.id === selectedFolder)?.name}
+              Folder: {folders.find((f) => f.id === selectedFolder)?.name}
             </Badge>
           )}
         </div>
@@ -365,7 +372,7 @@ export default function ContentMedia() {
           <Folder className="mr-2 h-4 w-4" />
           All Media
         </Button>
-        {folders.map(folder => (
+        {folders.map((folder) => (
           <Button
             key={folder.id}
             variant={selectedFolder === folder.id ? "default" : "ghost"}
@@ -382,11 +389,11 @@ export default function ContentMedia() {
       {selectedMedia.length > 0 && (
         <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg border">
           <span className="text-sm font-medium">Bulk Actions:</span>
-          <Button variant="outline" size="sm" onClick={() => handleBulkMove('folder_images')}>
+          <Button variant="outline" size="sm" onClick={() => handleBulkMove("folder_images")}>
             <Folder className="mr-2 h-4 w-4" />
             Move to Images
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleBulkMove('folder_documents')}>
+          <Button variant="outline" size="sm" onClick={() => handleBulkMove("folder_documents")}>
             <Folder className="mr-2 h-4 w-4" />
             Move to Documents
           </Button>
@@ -398,16 +405,20 @@ export default function ContentMedia() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="library" className="text-xs sm:text-sm py-2 px-2">Library</TabsTrigger>
-          <TabsTrigger value="folders" className="text-xs sm:text-sm py-2 px-2">Folders</TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">Analytics</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="library" className="text-xs sm:text-sm py-2 px-2">
+            Library
+          </TabsTrigger>
+          <TabsTrigger value="folders" className="text-xs sm:text-sm py-2 px-2">
+            Folders
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">
+            Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -417,7 +428,10 @@ export default function ContentMedia() {
               <h3 className="text-lg font-semibold">Recent Uploads</h3>
               <div className="space-y-3">
                 {statistics?.recentUploads.slice(0, 5).map((upload) => (
-                  <div key={upload.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={upload.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <div className="flex items-center gap-2">
                         {React.createElement(getMediaIcon(upload.type), { className: "h-4 w-4" })}
@@ -444,7 +458,10 @@ export default function ContentMedia() {
               <h3 className="text-lg font-semibold">Storage by Type</h3>
               <div className="space-y-3">
                 {statistics?.mediaByType.map((type) => (
-                  <div key={type.type} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={type.type}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <div className="flex items-center gap-2">
                         {React.createElement(getMediaIcon(type.type), { className: "h-4 w-4" })}
@@ -470,14 +487,18 @@ export default function ContentMedia() {
             <h3 className="text-lg font-semibold">Top Performing Media</h3>
             <div className="space-y-3">
               {statistics?.topPerforming.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div className="min-w-0 flex-1 mr-2">
                     <div className="flex items-center gap-2">
                       {React.createElement(getMediaIcon(item.type), { className: "h-4 w-4" })}
                       <div>
                         <p className="text-sm font-medium truncate">{item.title}</p>
                         <p className="text-xs text-muted-foreground">
-                          {formatNumber(item.views)} views • {formatNumber(item.downloads)} downloads
+                          {formatNumber(item.views)} views • {formatNumber(item.downloads)}{" "}
+                          downloads
                         </p>
                       </div>
                     </div>
@@ -534,7 +555,7 @@ export default function ContentMedia() {
                 <div
                   key={item.id}
                   className={`relative group cursor-pointer rounded-lg border overflow-hidden hover:shadow-lg transition-shadow ${
-                    selectedMedia.includes(item.id) ? 'ring-2 ring-primary' : ''
+                    selectedMedia.includes(item.id) ? "ring-2 ring-primary" : ""
                   }`}
                   onClick={() => toggleMediaSelection(item.id)}
                 >
@@ -558,10 +579,12 @@ export default function ContentMedia() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        {React.createElement(getMediaIcon(item.type), { className: "h-8 w-8 text-muted-foreground" })}
+                        {React.createElement(getMediaIcon(item.type), {
+                          className: "h-8 w-8 text-muted-foreground",
+                        })}
                       </div>
                     )}
-                    
+
                     {/* Status Badge */}
                     <div className="absolute top-2 right-2">
                       <Badge
@@ -577,7 +600,7 @@ export default function ContentMedia() {
                     <div className="absolute bottom-2 right-2">
                       <div className="h-6 w-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center">
                         {React.createElement(getVisibilityIcon(item.visibility), {
-                          className: "h-3 w-3"
+                          className: "h-3 w-3",
                         })}
                       </div>
                     </div>
@@ -589,7 +612,7 @@ export default function ContentMedia() {
                     <p className="text-xs text-muted-foreground mb-2">
                       {item.type} • {(item.metadata.size / 1024 / 1024).toFixed(2)} MB
                     </p>
-                    
+
                     {/* Actions */}
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Button
@@ -648,7 +671,7 @@ export default function ContentMedia() {
                         checked={selectedMedia.length === media.length}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            setSelectedMedia(media.map(item => item.id));
+                            setSelectedMedia(media.map((item) => item.id));
                           } else {
                             clearSelection();
                           }
@@ -698,42 +721,24 @@ export default function ContentMedia() {
                       <td className="p-3">
                         <div className="flex items-center gap-1">
                           {React.createElement(getVisibilityIcon(item.visibility), {
-                            className: "h-3 w-3"
+                            className: "h-3 w-3",
                           })}
                           <span className="text-xs">{item.visibility}</span>
                         </div>
                       </td>
-                      <td className="p-3 text-sm">
-                        {item.createdAt.toLocaleDateString()}
-                      </td>
+                      <td className="p-3 text-sm">{item.createdAt.toLocaleDateString()}</td>
                       <td className="p-3">
                         <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewDetails(item)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleViewDetails(item)}>
                             <Eye className="h-3 w-3" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(item)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(item)}>
                             <Edit className="h-3 w-3" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDuplicate(item)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleDuplicate(item)}>
                             <Copy className="h-3 w-3" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(item)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(item)}>
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
@@ -786,20 +791,20 @@ export default function ContentMedia() {
                   </div>
                   <div className="flex items-center gap-1">
                     {React.createElement(getVisibilityIcon(folder.visibility), {
-                      className: "h-4 w-4"
+                      className: "h-4 w-4",
                     })}
                   </div>
                 </div>
-                
+
                 {folder.description && (
                   <p className="text-sm text-muted-foreground mb-3">{folder.description}</p>
                 )}
-                
+
                 <div className="flex items-center justify-between text-sm">
                   <span>{folder.mediaCount} items</span>
                   <span>{(folder.totalSize / 1024 / 1024).toFixed(2)} MB</span>
                 </div>
-                
+
                 <div className="text-xs text-muted-foreground mt-2">
                   Modified: {folder.lastModified.toLocaleDateString()}
                 </div>
@@ -812,7 +817,9 @@ export default function ContentMedia() {
           <div className="text-center py-8 text-muted-foreground">
             <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium mb-2">Media Analytics</p>
-            <p className="text-sm mb-4">Track views, downloads, and usage patterns across your media library</p>
+            <p className="text-sm mb-4">
+              Track views, downloads, and usage patterns across your media library
+            </p>
             <Link href="/dashboard/content/media/analytics">
               <Button>
                 <BarChart3 className="h-4 w-4 mr-2" />
@@ -840,11 +847,11 @@ export default function ContentMedia() {
               Import
             </label>
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
+          <Button variant="outline" size="sm" onClick={() => handleExport("csv")}>
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('json')}>
+          <Button variant="outline" size="sm" onClick={() => handleExport("json")}>
             <Download className="mr-2 h-4 w-4" />
             Export JSON
           </Button>
@@ -859,22 +866,17 @@ export default function ContentMedia() {
           onClose={() => setViewingMedia(null)}
           onEdit={handleEdit}
           onDelete={(mediaId) => handleDelete(viewingMedia!)}
-          onDownload={(media) => window.open(media.url, '_blank')}
+          onDownload={(media) => window.open(media.url, "_blank")}
           onShare={(media) => {
             // Simple share implementation - copy URL to clipboard
             navigator.clipboard.writeText(media.url);
-            alert('Media URL copied to clipboard!');
+            alert("Media URL copied to clipboard!");
           }}
         />
       )}
 
       {/* Upload Modal */}
-      {showUpload && (
-        <MediaUpload
-          onUpload={handleUpload}
-          onClose={() => setShowUpload(false)}
-        />
-      )}
+      {showUpload && <MediaUpload onUpload={handleUpload} onClose={() => setShowUpload(false)} />}
     </div>
   );
 }

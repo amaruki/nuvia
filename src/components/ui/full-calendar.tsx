@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { VariantProps, cva } from 'class-variance-authority';
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { VariantProps, cva } from "class-variance-authority";
 import {
   Locale,
   addDays,
@@ -24,8 +24,8 @@ import {
   subMonths,
   subWeeks,
   subYears,
-} from 'date-fns';
-import { enUS } from 'date-fns/locale/en-US';
+} from "date-fns";
+import { enUS } from "date-fns/locale/en-US";
 import {
   ReactNode,
   createContext,
@@ -34,45 +34,48 @@ import {
   useContext,
   useMemo,
   useState,
-} from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { EventDetailsPopover } from '@/app/dashboard/events/calendar/_components/event-details-popover';
+} from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { EventDetailsPopover } from "@/app/dashboard/events/calendar/_components/event-details-popover";
 
-const monthEventVariants = cva('size-2 rounded-full', {
+const monthEventVariants = cva("size-2 rounded-full", {
   variants: {
     variant: {
-      default: 'bg-primary',
-      blue: 'bg-blue-500',
-      green: 'bg-green-500',
-      pink: 'bg-pink-500',
-      purple: 'bg-purple-500',
-      orange: 'bg-orange-500',
-      red: 'bg-red-500',
+      default: "bg-primary",
+      blue: "bg-blue-500",
+      green: "bg-green-500",
+      pink: "bg-pink-500",
+      purple: "bg-purple-500",
+      orange: "bg-orange-500",
+      red: "bg-red-500",
     },
   },
   defaultVariants: {
-    variant: 'default',
+    variant: "default",
   },
 });
 
-const dayEventVariants = cva('font-medium border-l-4 rounded-md p-2 text-xs transition-all duration-200 hover:shadow-md', {
-  variants: {
-    variant: {
-      default: 'bg-muted/40 text-foreground border-muted-foreground/50 hover:bg-muted/60',
-      blue: 'bg-blue-50 text-blue-700 border-blue-500 hover:bg-blue-100',
-      green: 'bg-green-50 text-green-700 border-green-500 hover:bg-green-100',
-      pink: 'bg-pink-50 text-pink-700 border-pink-500 hover:bg-pink-100',
-      purple: 'bg-purple-50 text-purple-700 border-purple-500 hover:bg-purple-100',
-      orange: 'bg-orange-50 text-orange-700 border-orange-500 hover:bg-orange-100',
-      red: 'bg-red-50 text-red-700 border-red-500 hover:bg-red-100',
+const dayEventVariants = cva(
+  "font-medium border-l-4 rounded-md p-2 text-xs transition-all duration-200 hover:shadow-md",
+  {
+    variants: {
+      variant: {
+        default: "bg-muted/40 text-foreground border-muted-foreground/50 hover:bg-muted/60",
+        blue: "bg-blue-50 text-blue-700 border-blue-500 hover:bg-blue-100",
+        green: "bg-green-50 text-green-700 border-green-500 hover:bg-green-100",
+        pink: "bg-pink-50 text-pink-700 border-pink-500 hover:bg-pink-100",
+        purple: "bg-purple-50 text-purple-700 border-purple-500 hover:bg-purple-100",
+        orange: "bg-orange-50 text-orange-700 border-orange-500 hover:bg-orange-100",
+        red: "bg-red-50 text-red-700 border-red-500 hover:bg-red-100",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
     },
   },
-  defaultVariants: {
-    variant: 'default',
-  },
-});
+);
 
-type View = 'day' | 'week' | 'month' | 'year';
+type View = "day" | "week" | "month" | "year";
 
 type ContextType = {
   view: View;
@@ -96,7 +99,7 @@ export type CalendarEvent = {
   start: Date;
   end: Date;
   title: string;
-  color?: VariantProps<typeof monthEventVariants>['variant'];
+  color?: VariantProps<typeof monthEventVariants>["variant"];
 };
 
 type CalendarProps = {
@@ -116,7 +119,7 @@ const Calendar = ({
   defaultDate = new Date(),
   locale = enUS,
   enableHotkeys = true,
-  view: _defaultMode = 'month',
+  view: _defaultMode = "month",
   onEventClick,
   onDateClick,
   events: defaultEvents = [],
@@ -131,19 +134,19 @@ const Calendar = ({
     onChangeView?.(view);
   };
 
-  useHotkeys('m', () => changeView('month'), {
+  useHotkeys("m", () => changeView("month"), {
     enabled: enableHotkeys,
   });
 
-  useHotkeys('w', () => changeView('week'), {
+  useHotkeys("w", () => changeView("week"), {
     enabled: enableHotkeys,
   });
 
-  useHotkeys('y', () => changeView('year'), {
+  useHotkeys("y", () => changeView("year"), {
     enabled: enableHotkeys,
   });
 
-  useHotkeys('d', () => changeView('day'), {
+  useHotkeys("d", () => changeView("day"), {
     enabled: enableHotkeys,
   });
 
@@ -183,11 +186,8 @@ const CalendarViewTrigger = forwardRef<
     <Button
       aria-current={currentView === view}
       size="sm"
-      variant={currentView === view ? 'default' : 'ghost'}
-      className={cn(
-        'transition-all duration-200',
-        currentView === view && 'shadow-sm'
-      )}
+      variant={currentView === view ? "default" : "ghost"}
+      className={cn("transition-all duration-200", currentView === view && "shadow-sm")}
       {...props}
       onClick={() => {
         setView(view);
@@ -199,41 +199,34 @@ const CalendarViewTrigger = forwardRef<
     </Button>
   );
 });
-CalendarViewTrigger.displayName = 'CalendarViewTrigger';
+CalendarViewTrigger.displayName = "CalendarViewTrigger";
 
-const EventGroup = ({
-  events,
-  hour,
-}: {
-  events: CalendarEvent[];
-  hour: Date;
-}) => {
+const EventGroup = ({ events, hour }: { events: CalendarEvent[]; hour: Date }) => {
   return (
     <div className="h-20 border-t last:border-b relative">
       {events
         .filter((event) => isSameHour(event.start, hour))
         .map((event) => {
-          const hoursDifference =
-            differenceInMinutes(event.end, event.start) / 60;
+          const hoursDifference = differenceInMinutes(event.end, event.start) / 60;
           const startPosition = event.start.getMinutes() / 60;
 
           return (
             <EventDetailsPopover key={event.id} event={event}>
               <div
                 className={cn(
-                  'absolute cursor-pointer overflow-hidden z-10',
-                  dayEventVariants({ variant: event.color })
+                  "absolute cursor-pointer overflow-hidden z-10",
+                  dayEventVariants({ variant: event.color }),
                 )}
                 style={{
                   top: `${startPosition * 100}%`,
                   height: `${Math.max(hoursDifference * 100, 25)}%`,
-                  left: '4px',
-                  right: '4px',
+                  left: "4px",
+                  right: "4px",
                 }}
               >
                 <div className="font-semibold truncate">{event.title}</div>
                 <div className="text-[10px] opacity-75 mt-0.5">
-                  {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
+                  {format(event.start, "HH:mm")} - {format(event.end, "HH:mm")}
                 </div>
               </div>
             </EventDetailsPopover>
@@ -246,7 +239,7 @@ const EventGroup = ({
 const CalendarDayView = () => {
   const { view, events, date } = useCalendar();
 
-  if (view !== 'day') return null;
+  if (view !== "day") return null;
 
   const hours = [...Array(24)].map((_, i) => setHours(date, i));
 
@@ -287,7 +280,7 @@ const CalendarWeekView = () => {
     return daysOfWeek;
   }, [date]);
 
-  if (view !== 'week') return null;
+  if (view !== "week") return null;
 
   return (
     <div className="flex flex-col relative overflow-auto h-full">
@@ -297,21 +290,21 @@ const CalendarWeekView = () => {
           <div
             key={date.toString()}
             className={cn(
-              'text-center flex-1 gap-1 py-3 text-sm font-medium flex flex-col items-center justify-center transition-colors',
-              [0, 6].includes(i) && 'text-muted-foreground/70'
+              "text-center flex-1 gap-1 py-3 text-sm font-medium flex flex-col items-center justify-center transition-colors",
+              [0, 6].includes(i) && "text-muted-foreground/70",
             )}
           >
             <div className="text-xs uppercase tracking-wider text-muted-foreground">
-              {format(date, 'EEEE', { locale })}
+              {format(date, "EEEE", { locale })}
             </div>
             <span
               className={cn(
-                'h-8 w-8 grid place-content-center font-semibold transition-all duration-200',
+                "h-8 w-8 grid place-content-center font-semibold transition-all duration-200",
                 isToday(date) &&
-                'bg-primary text-primary-foreground rounded-full shadow-md scale-110'
+                  "bg-primary text-primary-foreground rounded-full shadow-md scale-110",
               )}
             >
-              {format(date, 'd')}
+              {format(date, "d")}
             </span>
           </div>
         ))}
@@ -325,17 +318,13 @@ const CalendarWeekView = () => {
             return (
               <div
                 className={cn(
-                  'h-full text-sm text-muted-foreground border-l first:border-l-0 transition-colors',
-                  [0, 6].includes(i) && 'bg-muted/30'
+                  "h-full text-sm text-muted-foreground border-l first:border-l-0 transition-colors",
+                  [0, 6].includes(i) && "bg-muted/30",
                 )}
                 key={hours[0].toString()}
               >
                 {hours.map((hour) => (
-                  <EventGroup
-                    key={hour.toString()}
-                    hour={hour}
-                    events={events}
-                  />
+                  <EventGroup key={hour.toString()} hour={hour} events={events} />
                 ))}
               </div>
             );
@@ -352,7 +341,7 @@ const CalendarMonthView = () => {
   const monthDates = useMemo(() => getDaysInMonth(date), [date]);
   const weekDays = useMemo(() => generateWeekdays(locale), [locale]);
 
-  if (view !== 'month') return null;
+  if (view !== "month") return null;
 
   return (
     <div className="h-full flex flex-col">
@@ -361,8 +350,8 @@ const CalendarMonthView = () => {
           <div
             key={day}
             className={cn(
-              'py-3 text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground',
-              [0, 6].includes(i) && 'text-muted-foreground/60'
+              "py-3 text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground",
+              [0, 6].includes(i) && "text-muted-foreground/60",
             )}
           >
             {day}
@@ -371,16 +360,14 @@ const CalendarMonthView = () => {
       </div>
       <div className="grid overflow-hidden -mt-px flex-1 auto-rows-fr p-px grid-cols-7 gap-px bg-muted/30">
         {monthDates.map((_date) => {
-          const currentEvents = events.filter((event) =>
-            isSameDay(event.start, _date)
-          );
+          const currentEvents = events.filter((event) => isSameDay(event.start, _date));
 
           return (
             <div
               className={cn(
-                'bg-card p-2 text-sm text-muted-foreground overflow-auto transition-all duration-200 hover:shadow-md hover:z-10 hover:scale-[1.02]',
-                !isSameMonth(date, _date) && 'text-muted-foreground/40 bg-muted/20',
-                isSameMonth(date, _date) && 'cursor-pointer'
+                "bg-card p-2 text-sm text-muted-foreground overflow-auto transition-all duration-200 hover:shadow-md hover:z-10 hover:scale-[1.02]",
+                !isSameMonth(date, _date) && "text-muted-foreground/40 bg-muted/20",
+                isSameMonth(date, _date) && "cursor-pointer",
               )}
               key={_date.toString()}
               onClick={() => {
@@ -391,11 +378,12 @@ const CalendarMonthView = () => {
             >
               <div
                 className={cn(
-                  'size-7 grid place-items-center rounded-full mb-2 sticky top-0 font-semibold transition-all duration-200',
-                  isToday(_date) && 'bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20'
+                  "size-7 grid place-items-center rounded-full mb-2 sticky top-0 font-semibold transition-all duration-200",
+                  isToday(_date) &&
+                    "bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20",
                 )}
               >
-                {format(_date, 'd')}
+                {format(_date, "d")}
               </div>
 
               <div className="space-y-1">
@@ -405,13 +393,13 @@ const CalendarMonthView = () => {
                       <div className="px-2 py-1 rounded-md text-xs flex items-center gap-2 cursor-pointer transition-all duration-200 hover:shadow-sm group">
                         <div
                           className={cn(
-                            'shrink-0 transition-transform duration-200 group-hover:scale-125',
-                            monthEventVariants({ variant: event.color })
+                            "shrink-0 transition-transform duration-200 group-hover:scale-125",
+                            monthEventVariants({ variant: event.color }),
                           )}
                         ></div>
                         <span className="flex-1 truncate font-medium">{event.title}</span>
                         <time className="tabular-nums text-muted-foreground/60 text-[10px]">
-                          {format(event.start, 'HH:mm')}
+                          {format(event.start, "HH:mm")}
                         </time>
                       </div>
                     </EventDetailsPopover>
@@ -441,14 +429,17 @@ const CalendarYearView = () => {
 
   const weekDays = useMemo(() => generateWeekdays(locale), [locale]);
 
-  if (view !== 'year') return null;
+  if (view !== "year") return null;
 
   return (
     <div className="grid grid-cols-3 lg:grid-cols-4 gap-8 overflow-auto h-full p-6">
       {months.map((days, i) => (
-        <div key={days[0].toString()} className="bg-card rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-200">
+        <div
+          key={days[0].toString()}
+          className="bg-card rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-200"
+        >
           <span className="text-lg font-bold text-foreground block mb-3">
-            {format(setMonth(date, i), 'MMMM', { locale })}
+            {format(setMonth(date, i), "MMMM", { locale })}
           </span>
 
           <div className="grid grid-cols-7 gap-1 mb-3">
@@ -471,27 +462,27 @@ const CalendarYearView = () => {
                 <div
                   key={_date.toString()}
                   className={cn(
-                    'transition-colors duration-200 relative',
-                    getMonth(_date) !== i && 'text-muted-foreground/40'
+                    "transition-colors duration-200 relative",
+                    getMonth(_date) !== i && "text-muted-foreground/40",
                   )}
                 >
                   <div
                     className={cn(
-                      'aspect-square grid place-content-center size-full tabular-nums rounded-md hover:bg-muted/50 transition-all duration-200 cursor-pointer relative',
+                      "aspect-square grid place-content-center size-full tabular-nums rounded-md hover:bg-muted/50 transition-all duration-200 cursor-pointer relative",
                       isSameDay(today, _date) &&
-                      getMonth(_date) === i &&
-                      'bg-primary text-primary-foreground font-bold shadow-md hover:shadow-lg hover:scale-110'
+                        getMonth(_date) === i &&
+                        "bg-primary text-primary-foreground font-bold shadow-md hover:shadow-lg hover:scale-110",
                     )}
                   >
-                    {format(_date, 'd')}
+                    {format(_date, "d")}
                     {hasEvents && getMonth(_date) === i && (
                       <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 flex gap-0.5">
                         {dayEvents.slice(0, 3).map((event, idx) => (
                           <div
                             key={event.id}
                             className={cn(
-                              'size-1 rounded-full',
-                              monthEventVariants({ variant: event.color })
+                              "size-1 rounded-full",
+                              monthEventVariants({ variant: event.color }),
                             )}
                             title={event.title}
                           />
@@ -512,123 +503,120 @@ const CalendarYearView = () => {
   );
 };
 
-const CalendarNextTrigger = forwardRef<
-  HTMLButtonElement,
-  React.HTMLAttributes<HTMLButtonElement>
->(({ children, onClick, ...props }, ref) => {
-  const { date, setDate, view, enableHotkeys } = useCalendar();
+const CalendarNextTrigger = forwardRef<HTMLButtonElement, React.HTMLAttributes<HTMLButtonElement>>(
+  ({ children, onClick, ...props }, ref) => {
+    const { date, setDate, view, enableHotkeys } = useCalendar();
 
-  const next = useCallback(() => {
-    if (view === 'day') {
-      setDate(addDays(date, 1));
-    } else if (view === 'week') {
-      setDate(addWeeks(date, 1));
-    } else if (view === 'month') {
-      setDate(addMonths(date, 1));
-    } else if (view === 'year') {
-      setDate(addYears(date, 1));
-    }
-  }, [date, view, setDate]);
+    const next = useCallback(() => {
+      if (view === "day") {
+        setDate(addDays(date, 1));
+      } else if (view === "week") {
+        setDate(addWeeks(date, 1));
+      } else if (view === "month") {
+        setDate(addMonths(date, 1));
+      } else if (view === "year") {
+        setDate(addYears(date, 1));
+      }
+    }, [date, view, setDate]);
 
-  useHotkeys('ArrowRight', () => next(), {
-    enabled: enableHotkeys,
-  });
+    useHotkeys("ArrowRight", () => next(), {
+      enabled: enableHotkeys,
+    });
 
-  return (
-    <Button
-      size="icon"
-      variant="outline"
-      className="transition-all duration-200 hover:scale-105 hover:shadow-md"
-      ref={ref}
-      {...props}
-      onClick={(e) => {
-        next();
-        onClick?.(e);
-      }}
-    >
-      {children}
-    </Button>
-  );
-});
-CalendarNextTrigger.displayName = 'CalendarNextTrigger';
+    return (
+      <Button
+        size="icon"
+        variant="outline"
+        className="transition-all duration-200 hover:scale-105 hover:shadow-md"
+        ref={ref}
+        {...props}
+        onClick={(e) => {
+          next();
+          onClick?.(e);
+        }}
+      >
+        {children}
+      </Button>
+    );
+  },
+);
+CalendarNextTrigger.displayName = "CalendarNextTrigger";
 
-const CalendarPrevTrigger = forwardRef<
-  HTMLButtonElement,
-  React.HTMLAttributes<HTMLButtonElement>
->(({ children, onClick, ...props }, ref) => {
-  const { date, setDate, view, enableHotkeys } = useCalendar();
+const CalendarPrevTrigger = forwardRef<HTMLButtonElement, React.HTMLAttributes<HTMLButtonElement>>(
+  ({ children, onClick, ...props }, ref) => {
+    const { date, setDate, view, enableHotkeys } = useCalendar();
 
-  const prev = useCallback(() => {
-    if (view === 'day') {
-      setDate(subDays(date, 1));
-    } else if (view === 'week') {
-      setDate(subWeeks(date, 1));
-    } else if (view === 'month') {
-      setDate(subMonths(date, 1));
-    } else if (view === 'year') {
-      setDate(subYears(date, 1));
-    }
-  }, [date, view, setDate]);
+    const prev = useCallback(() => {
+      if (view === "day") {
+        setDate(subDays(date, 1));
+      } else if (view === "week") {
+        setDate(subWeeks(date, 1));
+      } else if (view === "month") {
+        setDate(subMonths(date, 1));
+      } else if (view === "year") {
+        setDate(subYears(date, 1));
+      }
+    }, [date, view, setDate]);
 
-  useHotkeys('ArrowLeft', () => prev(), {
-    enabled: enableHotkeys,
-  });
+    useHotkeys("ArrowLeft", () => prev(), {
+      enabled: enableHotkeys,
+    });
 
-  return (
-    <Button
-      size="icon"
-      variant="outline"
-      className="transition-all duration-200 hover:scale-105 hover:shadow-md"
-      ref={ref}
-      {...props}
-      onClick={(e) => {
-        prev();
-        onClick?.(e);
-      }}
-    >
-      {children}
-    </Button>
-  );
-});
-CalendarPrevTrigger.displayName = 'CalendarPrevTrigger';
+    return (
+      <Button
+        size="icon"
+        variant="outline"
+        className="transition-all duration-200 hover:scale-105 hover:shadow-md"
+        ref={ref}
+        {...props}
+        onClick={(e) => {
+          prev();
+          onClick?.(e);
+        }}
+      >
+        {children}
+      </Button>
+    );
+  },
+);
+CalendarPrevTrigger.displayName = "CalendarPrevTrigger";
 
-const CalendarTodayTrigger = forwardRef<
-  HTMLButtonElement,
-  React.HTMLAttributes<HTMLButtonElement>
->(({ children, onClick, ...props }, ref) => {
-  const { setDate, enableHotkeys, today } = useCalendar();
+const CalendarTodayTrigger = forwardRef<HTMLButtonElement, React.HTMLAttributes<HTMLButtonElement>>(
+  ({ children, onClick, ...props }, ref) => {
+    const { setDate, enableHotkeys, today } = useCalendar();
 
-  useHotkeys('t', () => jumpToToday(), {
-    enabled: enableHotkeys,
-  });
+    useHotkeys("t", () => jumpToToday(), {
+      enabled: enableHotkeys,
+    });
 
-  const jumpToToday = useCallback(() => {
-    setDate(today);
-  }, [today, setDate]);
+    const jumpToToday = useCallback(() => {
+      setDate(today);
+    }, [today, setDate]);
 
-  return (
-    <Button
-      variant="outline"
-      className="transition-all duration-200 hover:shadow-md font-medium"
-      ref={ref}
-      {...props}
-      onClick={(e) => {
-        jumpToToday();
-        onClick?.(e);
-      }}
-    >
-      {children}
-    </Button>
-  );
-});
-CalendarTodayTrigger.displayName = 'CalendarTodayTrigger';
+    return (
+      <Button
+        variant="outline"
+        className="transition-all duration-200 hover:shadow-md font-medium"
+        ref={ref}
+        {...props}
+        onClick={(e) => {
+          jumpToToday();
+          onClick?.(e);
+        }}
+      >
+        {children}
+      </Button>
+    );
+  },
+);
+CalendarTodayTrigger.displayName = "CalendarTodayTrigger";
 
 const CalendarCurrentDate = () => {
   const { date, view } = useCalendar();
 
   return (
     <time dateTime={date.toISOString()} className="tabular-nums font-semibold text-lg">
-      {format(date, view === 'day' ? 'dd MMMM yyyy' : 'MMMM yyyy')}
+      {format(date, view === "day" ? "dd MMMM yyyy" : "MMMM yyyy")}
     </time>
   );
 };
@@ -655,7 +643,7 @@ const TimeTable = () => {
               </div>
             )}
             <p className="top-0 -translate-y-1/2 bg-card px-1">
-              {hour === 24 ? '00' : hour.toString().padStart(2, '0')}:00
+              {hour === 24 ? "00" : hour.toString().padStart(2, "0")}:00
             </p>
           </div>
         );
@@ -685,7 +673,7 @@ const generateWeekdays = (locale: Locale) => {
   const daysOfWeek = [];
   for (let i = 0; i < 7; i++) {
     const date = addDays(startOfWeek(new Date(), { weekStartsOn: 0 }), i);
-    daysOfWeek.push(format(date, 'EEEE', { locale }));
+    daysOfWeek.push(format(date, "EEEE", { locale }));
   }
   return daysOfWeek;
 };

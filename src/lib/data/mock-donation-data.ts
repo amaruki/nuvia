@@ -1,4 +1,9 @@
-import { Donation, DonationCampaign, DonationPayment, DonationStatistics } from "@/types/finance.types";
+import {
+  Donation,
+  DonationCampaign,
+  DonationPayment,
+  DonationStatistics,
+} from "@/types/finance.types";
 
 // Mock campaigns
 export const mockDonationCampaigns: DonationCampaign[] = [
@@ -226,18 +231,19 @@ export const mockDonationStatistics: DonationStatistics = {
   totalDonations: mockDonations.length,
   totalAmount: mockDonations.reduce((sum, donation) => sum + donation.amount, 0),
   completedAmount: mockDonations
-    .filter(d => d.status === "completed")
+    .filter((d) => d.status === "completed")
     .reduce((sum, donation) => sum + donation.amount, 0),
   pendingAmount: mockDonations
-    .filter(d => d.status === "pending")
+    .filter((d) => d.status === "pending")
     .reduce((sum, donation) => sum + donation.amount, 0),
   pledgedAmount: mockDonations
-    .filter(d => d.status === "pledged")
+    .filter((d) => d.status === "pledged")
     .reduce((sum, donation) => sum + donation.amount, 0),
-  averageDonation: mockDonations.reduce((sum, donation) => sum + donation.amount, 0) / mockDonations.length,
-  donorCount: new Set(mockDonations.map(d => d.donorId)).size,
+  averageDonation:
+    mockDonations.reduce((sum, donation) => sum + donation.amount, 0) / mockDonations.length,
+  donorCount: new Set(mockDonations.map((d) => d.donorId)).size,
   recurringDonorCount: new Set(
-    mockDonations.filter(d => d.donationType === "recurring").map(d => d.donorId)
+    mockDonations.filter((d) => d.donationType === "recurring").map((d) => d.donorId),
   ).size,
   monthlyTrend: [
     { month: "Jan", amount: 3500, count: 12 },

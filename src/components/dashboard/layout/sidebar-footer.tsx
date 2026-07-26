@@ -18,14 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  BadgeCheck,
-  CreditCard,
-  Settings,
-  Bell,
-  LogOut,
-  ChevronsUpDown,
-} from "lucide-react";
+import { BadgeCheck, CreditCard, Settings, Bell, LogOut, ChevronsUpDown } from "lucide-react";
 import { useSession } from "@/hooks/use-session";
 import { useState } from "react";
 import { logoutAction } from "@/lib/actions/auth.actions";
@@ -81,30 +74,36 @@ export function SidebarFooterComponent({ className }: SidebarFooterComponentProp
                   "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
                   "group-data-[collapsible=icon]:px-2",
                   "transition-all duration-200",
-                  "hover:bg-sidebar-accent/50"
+                  "hover:bg-sidebar-accent/50",
                 )}
               >
-                <Avatar className={cn(
-                  "size-8 rounded-lg",
-                  "group-data-[collapsible=icon]:size-8",
-                  "transition-all duration-200"
-                )}>
+                <Avatar
+                  className={cn(
+                    "size-8 rounded-lg",
+                    "group-data-[collapsible=icon]:size-8",
+                    "transition-all duration-200",
+                  )}
+                >
                   <AvatarImage src={user?.image || ""} alt={user?.displayName || ""} />
                   <AvatarFallback className="rounded-lg">
                     {getInitials(user?.displayName || "")}
                   </AvatarFallback>
                 </Avatar>
-                <div className={cn(
-                  "grid flex-1 text-left text-sm leading-tight",
-                  "group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 transition-all duration-200 overflow-hidden"
-                )}>
+                <div
+                  className={cn(
+                    "grid flex-1 text-left text-sm leading-tight",
+                    "group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 transition-all duration-200 overflow-hidden",
+                  )}
+                >
                   <span className="truncate font-semibold">{user?.displayName}</span>
                   <span className="truncate text-xs">{user?.email}</span>
                 </div>
-                <ChevronsUpDown className={cn(
-                  "ml-auto size-4 transition-transform duration-200",
-                  "group-data-[collapsible=icon]:hidden"
-                )} />
+                <ChevronsUpDown
+                  className={cn(
+                    "ml-auto size-4 transition-transform duration-200",
+                    "group-data-[collapsible=icon]:hidden",
+                  )}
+                />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -122,9 +121,7 @@ export function SidebarFooterComponent({ className }: SidebarFooterComponentProp
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {user?.displayName}
-                    </span>
+                    <span className="truncate font-semibold">{user?.displayName}</span>
                     <span className="truncate text-xs">{user?.email}</span>
                   </div>
                 </div>

@@ -1,31 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
-import { 
-  MoreHorizontal, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  TestTube, 
-  Power, 
+import {
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
+  TestTube,
+  Power,
   PowerOff,
   Star,
   StarOff,
@@ -81,7 +81,7 @@ export function GatewaysTable({
       testing: "outline" as const,
       error: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -145,9 +145,7 @@ export function GatewaysTable({
                       {gateway.currencies.join(", ")}
                     </div>
                   </div>
-                  {gateway.isDefault && (
-                    <Star className="h-4 w-4 text-yellow-500" />
-                  )}
+                  {gateway.isDefault && <Star className="h-4 w-4 text-yellow-500" />}
                 </div>
               </TableCell>
               <TableCell>
@@ -165,12 +163,12 @@ export function GatewaysTable({
                   )}
                 </div>
               </TableCell>
-              <TableCell>
-                {getEnvironmentBadge(gateway.environment)}
-              </TableCell>
+              <TableCell>{getEnvironmentBadge(gateway.environment)}</TableCell>
               <TableCell>
                 <div>
-                  <div className="font-medium">{gateway.statistics.totalTransactions.toLocaleString()}</div>
+                  <div className="font-medium">
+                    {gateway.statistics.totalTransactions.toLocaleString()}
+                  </div>
                   <div className="text-sm text-muted-foreground">
                     {gateway.statistics.monthlyTransactions[0]?.count || 0} this month
                   </div>
@@ -178,18 +176,26 @@ export function GatewaysTable({
               </TableCell>
               <TableCell>
                 <div>
-                  <div className="font-medium">{formatCurrency(gateway.statistics.totalVolume)}</div>
+                  <div className="font-medium">
+                    {formatCurrency(gateway.statistics.totalVolume)}
+                  </div>
                   <div className="text-sm text-muted-foreground">
-                    {formatCurrency(gateway.statistics.monthlyTransactions[0]?.volume || 0)} this month
+                    {formatCurrency(gateway.statistics.monthlyTransactions[0]?.volume || 0)} this
+                    month
                   </div>
                 </div>
               </TableCell>
               <TableCell>
                 <div className="flex items-center space-x-2">
-                  <span className={`font-medium ${
-                    gateway.statistics.successRate >= 95 ? "text-green-600" :
-                    gateway.statistics.successRate >= 90 ? "text-yellow-600" : "text-red-600"
-                  }`}>
+                  <span
+                    className={`font-medium ${
+                      gateway.statistics.successRate >= 95
+                        ? "text-green-600"
+                        : gateway.statistics.successRate >= 90
+                          ? "text-yellow-600"
+                          : "text-red-600"
+                    }`}
+                  >
                     {gateway.statistics.successRate.toFixed(1)}%
                   </span>
                   {gateway.statistics.errorRates.length > 0 && (
@@ -220,7 +226,7 @@ export function GatewaysTable({
                       <Edit className="mr-2 h-4 w-4" />
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => handleTest(gateway)}
                       disabled={testingGateway === gateway.id}
                     >
@@ -234,9 +240,7 @@ export function GatewaysTable({
                         Set as Default
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem 
-                      onClick={() => onToggleStatus(gateway, !gateway.isEnabled)}
-                    >
+                    <DropdownMenuItem onClick={() => onToggleStatus(gateway, !gateway.isEnabled)}>
                       {gateway.isEnabled ? (
                         <>
                           <PowerOff className="mr-2 h-4 w-4" />
@@ -250,7 +254,7 @@ export function GatewaysTable({
                       )}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => onDelete(gateway)}
                       className="text-destructive focus:text-destructive"
                     >

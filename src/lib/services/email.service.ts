@@ -1,6 +1,6 @@
-import nodemailer from 'nodemailer';
-import { EMAIL_CONFIG, APP_URL, FEATURES } from '@/lib/config';
-import { logError } from '@/lib/errors';
+import nodemailer from "nodemailer";
+import { EMAIL_CONFIG, APP_URL, FEATURES } from "@/lib/config";
+import { logError } from "@/lib/errors";
 
 /**
  * Email service for sending various types of emails
@@ -30,16 +30,16 @@ export class EmailService {
    */
   async sendPasswordResetEmail(to: string, resetToken: string, username: string): Promise<void> {
     if (!FEATURES.EMAIL_VERIFICATION) {
-      console.log('Email verification is disabled. Skipping password reset email.');
+      console.log("Email verification is disabled. Skipping password reset email.");
       return;
     }
 
     const resetUrl = `${APP_URL}/auth/reset-password?token=${resetToken}`;
-    
+
     const mailOptions = {
       from: EMAIL_CONFIG.FROM,
       to,
-      subject: 'Reset Your Password',
+      subject: "Reset Your Password",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Password Reset Request</h2>
@@ -62,12 +62,12 @@ export class EmailService {
       await this.transporter.sendMail(mailOptions);
       console.log(`Password reset email sent to ${to}`);
     } catch (error) {
-      logError(error as Error, { 
-        service: 'email',
-        type: 'password_reset',
+      logError(error as Error, {
+        service: "email",
+        type: "password_reset",
         recipient: to,
       });
-      throw new Error('Failed to send password reset email');
+      throw new Error("Failed to send password reset email");
     }
   }
 
@@ -78,18 +78,22 @@ export class EmailService {
    * @param username - User's username
    * @returns Promise that resolves when the email is sent
    */
-  async sendEmailVerificationEmail(to: string, verificationToken: string, username: string): Promise<void> {
+  async sendEmailVerificationEmail(
+    to: string,
+    verificationToken: string,
+    username: string,
+  ): Promise<void> {
     if (!FEATURES.EMAIL_VERIFICATION) {
-      console.log('Email verification is disabled. Skipping email verification email.');
+      console.log("Email verification is disabled. Skipping email verification email.");
       return;
     }
 
     const verificationUrl = `${APP_URL}/auth/verify-email?token=${verificationToken}`;
-    
+
     const mailOptions = {
       from: EMAIL_CONFIG.FROM,
       to,
-      subject: 'Verify Your Email Address',
+      subject: "Verify Your Email Address",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Verify Your Email Address</h2>
@@ -112,12 +116,12 @@ export class EmailService {
       await this.transporter.sendMail(mailOptions);
       console.log(`Email verification email sent to ${to}`);
     } catch (error) {
-      logError(error as Error, { 
-        service: 'email',
-        type: 'email_verification',
+      logError(error as Error, {
+        service: "email",
+        type: "email_verification",
         recipient: to,
       });
-      throw new Error('Failed to send email verification email');
+      throw new Error("Failed to send email verification email");
     }
   }
 
@@ -135,17 +139,17 @@ export class EmailService {
     username: string,
     deviceInfo: { deviceName: string; deviceType: string; ipAddress: string },
     location: string,
-    time: string
+    time: string,
   ): Promise<void> {
     if (!FEATURES.EMAIL_VERIFICATION) {
-      console.log('Email verification is disabled. Skipping login notification email.');
+      console.log("Email verification is disabled. Skipping login notification email.");
       return;
     }
 
     const mailOptions = {
       from: EMAIL_CONFIG.FROM,
       to,
-      subject: 'New Login to Your Account',
+      subject: "New Login to Your Account",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">New Login Detected</h2>
@@ -170,9 +174,9 @@ export class EmailService {
       await this.transporter.sendMail(mailOptions);
       console.log(`Login notification email sent to ${to}`);
     } catch (error) {
-      logError(error as Error, { 
-        service: 'email',
-        type: 'login_notification',
+      logError(error as Error, {
+        service: "email",
+        type: "login_notification",
         recipient: to,
       });
       // Don't throw an error for login notifications as they're not critical
@@ -187,14 +191,14 @@ export class EmailService {
    */
   async sendAccountDeletionEmail(to: string, username: string): Promise<void> {
     if (!FEATURES.EMAIL_VERIFICATION) {
-      console.log('Email verification is disabled. Skipping account deletion email.');
+      console.log("Email verification is disabled. Skipping account deletion email.");
       return;
     }
 
     const mailOptions = {
       from: EMAIL_CONFIG.FROM,
       to,
-      subject: 'Your Account Has Been Deleted',
+      subject: "Your Account Has Been Deleted",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Account Deletion Confirmation</h2>
@@ -212,9 +216,9 @@ export class EmailService {
       await this.transporter.sendMail(mailOptions);
       console.log(`Account deletion email sent to ${to}`);
     } catch (error) {
-      logError(error as Error, { 
-        service: 'email',
-        type: 'account_deletion',
+      logError(error as Error, {
+        service: "email",
+        type: "account_deletion",
         recipient: to,
       });
       // Don't throw an error for account deletion emails as the account is already deleted
@@ -229,7 +233,7 @@ export class EmailService {
     const mailOptions = {
       from: EMAIL_CONFIG.FROM,
       to: EMAIL_CONFIG.FROM, // Send to self for testing
-      subject: 'Email Configuration Test',
+      subject: "Email Configuration Test",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Email Configuration Test</h2>
@@ -241,13 +245,13 @@ export class EmailService {
 
     try {
       await this.transporter.sendMail(mailOptions);
-      console.log('Email configuration test successful');
+      console.log("Email configuration test successful");
     } catch (error) {
-      logError(error as Error, { 
-        service: 'email',
-        type: 'configuration_test',
+      logError(error as Error, {
+        service: "email",
+        type: "configuration_test",
       });
-      throw new Error('Email configuration test failed');
+      throw new Error("Email configuration test failed");
     }
   }
 }

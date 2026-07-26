@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function GET() {
   return NextResponse.json({
     success: true,
-    message: 'Debug endpoint working',
+    message: "Debug endpoint working",
     timestamp: new Date().toISOString(),
   });
 }

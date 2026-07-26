@@ -7,16 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { Event, EventRegistration } from "@/types/event.types";
-import { getEventById, getUserEventRegistrations, registerForEvent } from "@/lib/services/event.service";
+import {
+  getEventById,
+  getUserEventRegistrations,
+  registerForEvent,
+} from "@/lib/services/event.service";
 import { EventLayout } from "@/components/events/event-layout";
 
 export default function EventRegistrationPage() {
   const params = useParams();
   const router = useRouter();
   const eventId = params.id as string;
-  
+
   const [event, setEvent] = React.useState<Event | null>(null);
-  const [existingRegistration, setExistingRegistration] = React.useState<EventRegistration | null>(null);
+  const [existingRegistration, setExistingRegistration] = React.useState<EventRegistration | null>(
+    null,
+  );
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -25,11 +31,11 @@ export default function EventRegistrationPage() {
     const fetchEventData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch event details
         const eventResponse = await getEventById(eventId);
         setEvent(eventResponse.event);
-        
+
         // Check if user is already registered
         if (eventResponse.isRegistered && eventResponse.registration) {
           setExistingRegistration(eventResponse.registration);
@@ -49,12 +55,12 @@ export default function EventRegistrationPage() {
   const handleRegister = async (data: { eventId: string; notes?: string }) => {
     try {
       setIsSubmitting(true);
-      
+
       const response = await registerForEvent({
         eventId: data.eventId,
         notes: data.notes,
       });
-      
+
       if (response.success) {
         alert("Registration successful!");
         router.push(`/events/${eventId}`);
@@ -103,10 +109,7 @@ export default function EventRegistrationPage() {
   // If user is already registered, show registration status
   if (existingRegistration) {
     return (
-      <EventLayout
-        event={event}
-        showActions={false}
-      >
+      <EventLayout event={event} showActions={false}>
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
@@ -130,11 +133,12 @@ export default function EventRegistrationPage() {
                       You're Registered!
                     </h3>
                     <p className="text-foreground/60 mb-6">
-                      You have successfully registered for {event.title}. A confirmation email has been sent to your registered email address.
+                      You have successfully registered for {event.title}. A confirmation email has
+                      been sent to your registered email address.
                     </p>
                   </>
                 )}
-                
+
                 {existingRegistration.status === "pending" && (
                   <>
                     <Clock className="h-16 w-16 text-warning mx-auto mb-4" />
@@ -142,11 +146,12 @@ export default function EventRegistrationPage() {
                       Registration Pending
                     </h3>
                     <p className="text-foreground/60 mb-6">
-                      Your registration for {event.title} is being reviewed. You will receive an email once your registration is approved.
+                      Your registration for {event.title} is being reviewed. You will receive an
+                      email once your registration is approved.
                     </p>
                   </>
                 )}
-                
+
                 {existingRegistration.status === "cancelled" && (
                   <>
                     <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
@@ -154,11 +159,12 @@ export default function EventRegistrationPage() {
                       Registration Cancelled
                     </h3>
                     <p className="text-foreground/60 mb-6">
-                      Your registration for {event.title} has been cancelled. If you'd like to register again, please contact the event organizer.
+                      Your registration for {event.title} has been cancelled. If you'd like to
+                      register again, please contact the event organizer.
                     </p>
                   </>
                 )}
-                
+
                 <div className="flex justify-center space-x-4">
                   <Button onClick={() => router.push(`/events/${eventId}`)}>
                     View Event Details
@@ -176,10 +182,7 @@ export default function EventRegistrationPage() {
   }
 
   return (
-    <EventLayout
-      event={event}
-      showActions={false}
-    >
+    <EventLayout event={event} showActions={false}>
       <div className="max-w-2xl mx-auto">
         <EventRegistrationForm
           event={event}

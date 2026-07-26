@@ -97,7 +97,7 @@ export function ProfilePhotoUpload({ user }: ProfilePhotoUploadProps) {
       // Simulate upload progress
       for (let i = 0; i <= 100; i += 10) {
         setUploadProgress(i);
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise((resolve) => setTimeout(resolve, 50));
       }
 
       // Create a temporary URL for the uploaded file
@@ -105,7 +105,7 @@ export function ProfilePhotoUpload({ user }: ProfilePhotoUploadProps) {
 
       // Update profile with new photo URL
       const result = await updateProfile({
-        image: photoUrl
+        image: photoUrl,
       });
 
       if (result.data?.status) {
@@ -150,9 +150,7 @@ export function ProfilePhotoUpload({ user }: ProfilePhotoUploadProps) {
       {success && (
         <Alert className="border-green-200 bg-green-50 text-green-800">
           <CheckCircle className="h-4 w-4" />
-          <AlertDescription>
-            Profile photo updated successfully!
-          </AlertDescription>
+          <AlertDescription>Profile photo updated successfully!</AlertDescription>
         </Alert>
       )}
 
@@ -160,9 +158,7 @@ export function ProfilePhotoUpload({ user }: ProfilePhotoUploadProps) {
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            {error}
-          </AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
@@ -185,9 +181,7 @@ export function ProfilePhotoUpload({ user }: ProfilePhotoUploadProps) {
         </div>
 
         <div className="text-center">
-          <p className="text-sm font-medium">
-            {preview ? "Current Photo" : "No Photo"}
-          </p>
+          <p className="text-sm font-medium">{preview ? "Current Photo" : "No Photo"}</p>
           <p className="text-xs text-muted-foreground">
             {preview ? "Click below to change" : "Upload a photo to personalize your profile"}
           </p>
@@ -223,9 +217,7 @@ export function ProfilePhotoUpload({ user }: ProfilePhotoUploadProps) {
             <p className="text-sm font-medium">
               {isDragging ? "Drop your photo here" : "Click to upload or drag and drop"}
             </p>
-            <p className="text-xs text-muted-foreground">
-              JPEG, PNG, WebP, or GIF (MAX. 5MB)
-            </p>
+            <p className="text-xs text-muted-foreground">JPEG, PNG, WebP, or GIF (MAX. 5MB)</p>
           </div>
 
           <input

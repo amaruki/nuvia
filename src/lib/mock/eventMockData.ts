@@ -1,4 +1,11 @@
-import { Event, EventRegistration, EventCertificate, EventStatus, EventType, RegistrationStatus } from "@/types/event.types";
+import {
+  Event,
+  EventRegistration,
+  EventCertificate,
+  EventStatus,
+  EventType,
+  RegistrationStatus,
+} from "@/types/event.types";
 import { SafeUser } from "@/types/auth.types";
 
 // Mock organizer
@@ -9,7 +16,7 @@ const mockOrganizer: SafeUser = {
   displayName: "Event Organizer",
   email: "organizer@example.com",
   profilePhoto: "",
-//   role: "member",
+  //   role: "member",
   createdAt: new Date("2023-01-01"),
   updatedAt: new Date(),
 };
@@ -22,7 +29,7 @@ const mockUser: SafeUser = {
   email: "john.doe@example.com",
   emailVerified: true,
   profilePhoto: "",
-//   role: "member",
+  //   role: "member",
   createdAt: new Date("2023-01-15"),
   updatedAt: new Date(),
 };
@@ -32,7 +39,8 @@ export const mockEvents: Event[] = [
   {
     id: "event-1",
     title: "Web Development Workshop",
-    description: "Learn the latest techniques in modern web development with hands-on workshops and expert guidance. This workshop covers HTML5, CSS3, JavaScript ES6+, React, and modern development tools.",
+    description:
+      "Learn the latest techniques in modern web development with hands-on workshops and expert guidance. This workshop covers HTML5, CSS3, JavaScript ES6+, React, and modern development tools.",
     shortDescription: "Hands-on workshop covering modern web development techniques.",
     eventType: EventType.WORKSHOP,
     status: EventStatus.PUBLISHED,
@@ -55,7 +63,8 @@ export const mockEvents: Event[] = [
   {
     id: "event-2",
     title: "Community Meetup",
-    description: "Monthly community gathering to network, share ideas, and discuss the latest trends in technology. Join us for an evening of presentations, networking, and refreshments.",
+    description:
+      "Monthly community gathering to network, share ideas, and discuss the latest trends in technology. Join us for an evening of presentations, networking, and refreshments.",
     shortDescription: "Monthly community networking event with tech talks.",
     eventType: EventType.MEETUP,
     status: EventStatus.PUBLISHED,
@@ -78,7 +87,8 @@ export const mockEvents: Event[] = [
   {
     id: "event-3",
     title: "React Conference 2023",
-    description: "Annual conference featuring the latest updates in React ecosystem and best practices from industry experts. Three days of talks, workshops, and networking opportunities.",
+    description:
+      "Annual conference featuring the latest updates in React ecosystem and best practices from industry experts. Three days of talks, workshops, and networking opportunities.",
     shortDescription: "Annual conference for React developers with talks and workshops.",
     eventType: EventType.CONFERENCE,
     status: EventStatus.PUBLISHED,
@@ -101,7 +111,8 @@ export const mockEvents: Event[] = [
   {
     id: "event-4",
     title: "UI/UX Design Masterclass",
-    description: "Intensive masterclass on creating intuitive and beautiful user interfaces and experiences. Learn design principles, tools, and techniques from industry experts.",
+    description:
+      "Intensive masterclass on creating intuitive and beautiful user interfaces and experiences. Learn design principles, tools, and techniques from industry experts.",
     shortDescription: "Masterclass on UI/UX design principles and techniques.",
     eventType: EventType.TRAINING,
     status: EventStatus.PUBLISHED,
@@ -124,7 +135,8 @@ export const mockEvents: Event[] = [
   {
     id: "event-5",
     title: "JavaScript Webinar",
-    description: "Learn advanced JavaScript concepts and best practices in this live webinar. Topics include closures, async/await, prototypes, and modern ES6+ features.",
+    description:
+      "Learn advanced JavaScript concepts and best practices in this live webinar. Topics include closures, async/await, prototypes, and modern ES6+ features.",
     shortDescription: "Live webinar on advanced JavaScript concepts.",
     eventType: EventType.WEBINAR,
     status: EventStatus.PUBLISHED,
@@ -147,7 +159,8 @@ export const mockEvents: Event[] = [
   {
     id: "event-6",
     title: "Team Building Social",
-    description: "Fun social event with team building activities, games, and networking. A great opportunity to connect with colleagues in a relaxed environment.",
+    description:
+      "Fun social event with team building activities, games, and networking. A great opportunity to connect with colleagues in a relaxed environment.",
     shortDescription: "Social event with team building activities and games.",
     eventType: EventType.SOCIAL,
     status: EventStatus.PUBLISHED,
@@ -260,54 +273,61 @@ export function getMockEvents(
     searchQuery?: string;
   },
   page = 1,
-  pageSize = 10
+  pageSize = 10,
 ) {
   let filteredEvents = [...mockEvents];
 
   // Apply filters
   if (filter) {
     if (filter.status && filter.status.length > 0) {
-      filteredEvents = filteredEvents.filter(event => filter.status!.includes(event.status));
+      filteredEvents = filteredEvents.filter((event) => filter.status!.includes(event.status));
     }
-    
+
     if (filter.eventType && filter.eventType.length > 0) {
-      filteredEvents = filteredEvents.filter(event => filter.eventType!.includes(event.eventType));
-    }
-    
-    if (filter.startDate) {
-      filteredEvents = filteredEvents.filter(event => new Date(event.startDate) >= filter.startDate!);
-    }
-    
-    if (filter.endDate) {
-      filteredEvents = filteredEvents.filter(event => new Date(event.startDate) <= filter.endDate!);
-    }
-    
-    if (filter.organizerId) {
-      filteredEvents = filteredEvents.filter(event => event.organizerId === filter.organizerId);
-    }
-    
-    if (filter.tags && filter.tags.length > 0) {
-      filteredEvents = filteredEvents.filter(event => 
-        filter.tags!.some(tag => event.tags.includes(tag))
+      filteredEvents = filteredEvents.filter((event) =>
+        filter.eventType!.includes(event.eventType),
       );
     }
-    
+
+    if (filter.startDate) {
+      filteredEvents = filteredEvents.filter(
+        (event) => new Date(event.startDate) >= filter.startDate!,
+      );
+    }
+
+    if (filter.endDate) {
+      filteredEvents = filteredEvents.filter(
+        (event) => new Date(event.startDate) <= filter.endDate!,
+      );
+    }
+
+    if (filter.organizerId) {
+      filteredEvents = filteredEvents.filter((event) => event.organizerId === filter.organizerId);
+    }
+
+    if (filter.tags && filter.tags.length > 0) {
+      filteredEvents = filteredEvents.filter((event) =>
+        filter.tags!.some((tag) => event.tags.includes(tag)),
+      );
+    }
+
     if (filter.isVirtual !== undefined) {
-      filteredEvents = filteredEvents.filter(event => event.isVirtual === filter.isVirtual);
+      filteredEvents = filteredEvents.filter((event) => event.isVirtual === filter.isVirtual);
     }
-    
+
     if (filter.isInPerson !== undefined) {
-      filteredEvents = filteredEvents.filter(event => event.isInPerson === filter.isInPerson);
+      filteredEvents = filteredEvents.filter((event) => event.isInPerson === filter.isInPerson);
     }
-    
+
     if (filter.searchQuery) {
       const query = filter.searchQuery.toLowerCase();
-      filteredEvents = filteredEvents.filter(event => 
-        event.title.toLowerCase().includes(query) ||
-        event.description.toLowerCase().includes(query) ||
-        event.shortDescription?.toLowerCase().includes(query) ||
-        event.location.toLowerCase().includes(query) ||
-        event.tags.some(tag => tag.toLowerCase().includes(query))
+      filteredEvents = filteredEvents.filter(
+        (event) =>
+          event.title.toLowerCase().includes(query) ||
+          event.description.toLowerCase().includes(query) ||
+          event.shortDescription?.toLowerCase().includes(query) ||
+          event.location.toLowerCase().includes(query) ||
+          event.tags.some((tag) => tag.toLowerCase().includes(query)),
       );
     }
   }
@@ -331,40 +351,42 @@ export function getMockEvents(
 
 // Helper function to get mock event by ID
 export function getMockEventById(eventId: string) {
-  const event = mockEvents.find(e => e.id === eventId);
-  
+  const event = mockEvents.find((e) => e.id === eventId);
+
   if (!event) {
     throw new Error("Event not found");
   }
-  
+
   // Check if user is registered
-  const registration = mockEventRegistrations.find(r => r.eventId === eventId && r.userId === mockUser.id);
-  
+  const registration = mockEventRegistrations.find(
+    (r) => r.eventId === eventId && r.userId === mockUser.id,
+  );
+
   return {
     event,
     isRegistered: !!registration,
     registration,
-    organizerEvents: mockEvents.filter(e => e.organizerId === event.organizerId && e.id !== event.id),
-    similarEvents: mockEvents.filter(e => 
-      e.id !== event.id && 
-      (e.eventType === event.eventType || e.tags.some(tag => event.tags.includes(tag)))
+    organizerEvents: mockEvents.filter(
+      (e) => e.organizerId === event.organizerId && e.id !== event.id,
+    ),
+    similarEvents: mockEvents.filter(
+      (e) =>
+        e.id !== event.id &&
+        (e.eventType === event.eventType || e.tags.some((tag) => event.tags.includes(tag))),
     ),
   };
 }
 
 // Helper function to get mock user event registrations
-export function getMockUserEventRegistrations(
-  userId: string,
-  status?: RegistrationStatus[]
-) {
-  let registrations = mockEventRegistrations.filter(r => r.userId === userId);
-  
+export function getMockUserEventRegistrations(userId: string, status?: RegistrationStatus[]) {
+  let registrations = mockEventRegistrations.filter((r) => r.userId === userId);
+
   if (status && status.length > 0) {
-    registrations = registrations.filter(r => status.includes(r.status));
+    registrations = registrations.filter((r) => status.includes(r.status));
   }
-  
-  return registrations.map(registration => {
-    const event = mockEvents.find(e => e.id === registration.eventId);
+
+  return registrations.map((registration) => {
+    const event = mockEvents.find((e) => e.id === registration.eventId);
     return {
       ...registration,
       event,
@@ -374,23 +396,23 @@ export function getMockUserEventRegistrations(
 
 // Helper function to get mock event dashboard data
 export function getMockEventDashboardData() {
-  const upcomingEvents = mockEvents.filter(e => new Date(e.startDate) > new Date());
-  const myEvents = mockEvents.filter(e => e.organizerId === mockUser.id);
+  const upcomingEvents = mockEvents.filter((e) => new Date(e.startDate) > new Date());
+  const myEvents = mockEvents.filter((e) => e.organizerId === mockUser.id);
   const myRegistrationsData = getMockUserEventRegistrations(mockUser.id);
-  
+
   // Transform registrations to match the expected format
   const myRegistrations = myRegistrationsData
-    .filter(reg => reg.event) // Only include registrations with valid events
-    .map(reg => ({
+    .filter((reg) => reg.event) // Only include registrations with valid events
+    .map((reg) => ({
       event: reg.event!,
       registration: reg,
     }));
-  
+
   const eventStatistics = {
     totalEvents: mockEvents.length,
     upcomingEvents: upcomingEvents.length,
-    completedEvents: mockEvents.filter(e => new Date(e.endDate) < new Date()).length,
-    cancelledEvents: mockEvents.filter(e => e.status === EventStatus.CANCELLED).length,
+    completedEvents: mockEvents.filter((e) => new Date(e.endDate) < new Date()).length,
+    cancelledEvents: mockEvents.filter((e) => e.status === EventStatus.CANCELLED).length,
     totalRegistrations: mockEventRegistrations.length,
     averageAttendanceRate: 85.5,
     popularEventTypes: [
@@ -406,7 +428,7 @@ export function getMockEventDashboardData() {
       { month: "2023-11", events: 1, registrations: 8 },
     ],
   };
-  
+
   return {
     upcomingEvents,
     myEvents,

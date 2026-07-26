@@ -13,7 +13,7 @@ import {
   UserCheck,
   Plus,
   ArrowRight,
-  Award
+  Award,
 } from "lucide-react";
 import { Event, EventRegistration, EventStatistics } from "@/types/event.types";
 import { getEventDashboardData, getEventStatistics } from "@/lib/services/event.service";
@@ -33,7 +33,7 @@ export default function EventDashboardPage() {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch dashboard data
         const data = await getEventDashboardData();
         setDashboardData(data);
@@ -113,7 +113,7 @@ export default function EventDashboardPage() {
       icon={<Calendar className="h-8 w-8 text-primary" />}
     >
       <div className="flex justify-end mb-8">
-        <Button onClick={() => window.location.href = "/events/create"}>
+        <Button onClick={() => (window.location.href = "/events/create")}>
           <Plus className="h-4 w-4 mr-2" />
           Create Event
         </Button>
@@ -192,11 +192,7 @@ export default function EventDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Upcoming Events</span>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => window.location.href = "/events"}
-              >
+              <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/events")}>
                 View All
                 <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
@@ -211,7 +207,10 @@ export default function EventDashboardPage() {
             ) : (
               <div className="space-y-4">
                 {upcomingEvents.slice(0, 3).map((event) => (
-                  <div key={event.id} className="flex items-start p-3 border rounded-lg hover:bg-background transition-colors">
+                  <div
+                    key={event.id}
+                    className="flex items-start p-3 border rounded-lg hover:bg-background transition-colors"
+                  >
                     <div className="flex-1">
                       <h3 className="font-medium text-foreground/90">{event.title}</h3>
                       <div className="flex items-center text-sm text-foreground/50 mt-1">
@@ -247,10 +246,10 @@ export default function EventDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>My Registrations</span>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
-                onClick={() => window.location.href = "/events/certificates"}
+                onClick={() => (window.location.href = "/events/certificates")}
               >
                 Certificates
                 <Award className="h-4 w-4 ml-1" />
@@ -266,7 +265,10 @@ export default function EventDashboardPage() {
             ) : (
               <div className="space-y-4">
                 {myRegistrations.slice(0, 3).map(({ event, registration }) => (
-                  <div key={registration.id} className="flex items-start p-3 border rounded-lg hover:bg-background transition-colors">
+                  <div
+                    key={registration.id}
+                    className="flex items-start p-3 border rounded-lg hover:bg-background transition-colors"
+                  >
                     <div className="flex-1">
                       <h3 className="font-medium text-foreground/90">{event.title}</h3>
                       <div className="flex items-center text-sm text-foreground/50 mt-1">
@@ -279,21 +281,19 @@ export default function EventDashboardPage() {
                       </div>
                     </div>
                     <div className="ml-2">
-                      <Badge 
+                      <Badge
                         className={
-                          registration.status === "confirmed" 
+                          registration.status === "confirmed"
                             ? "bg-chart-2/20 text-success"
                             : registration.status === "pending"
-                            ? "bg-warning/20 text-warning"
-                            : "bg-muted text-muted-foreground"
+                              ? "bg-warning/20 text-warning"
+                              : "bg-muted text-muted-foreground"
                         }
                       >
                         {registration.status}
                       </Badge>
                       {registration.checkedInAt && (
-                        <Badge className="bg-info/20 text-info mt-1">
-                          Checked In
-                        </Badge>
+                        <Badge className="bg-info/20 text-info mt-1">Checked In</Badge>
                       )}
                     </div>
                   </div>
@@ -310,11 +310,7 @@ export default function EventDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Events I'm Organizing</span>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => window.location.href = "/events"}
-              >
+              <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/events")}>
                 View All
                 <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
@@ -342,23 +338,23 @@ export default function EventDashboardPage() {
                       <span className="truncate">{event.location}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <Badge 
+                      <Badge
                         className={
                           event.status === "published"
                             ? "bg-chart-2/20 text-success"
                             : event.status === "draft"
-                            ? "bg-warning/20 text-warning"
-                            : event.status === "cancelled"
-                            ? "bg-destructive/20 text-destructive"
-                            : "bg-info/20 text-info"
+                              ? "bg-warning/20 text-warning"
+                              : event.status === "cancelled"
+                                ? "bg-destructive/20 text-destructive"
+                                : "bg-info/20 text-info"
                         }
                       >
                         {event.status}
                       </Badge>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
-                        onClick={() => window.location.href = `/events/${event.id}`}
+                        onClick={() => (window.location.href = `/events/${event.id}`)}
                       >
                         Manage
                       </Button>

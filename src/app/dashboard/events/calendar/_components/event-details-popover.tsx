@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { CalendarEvent } from "@/components/ui/full-calendar";
 import { CalendarIcon, Clock, MapPin, Edit, Trash2 } from "lucide-react";
@@ -30,9 +26,7 @@ export function EventDetailsPopover({
         <div className={`h-2 w-full bg-${event.color}-500 rounded-t-md`} />
         <div className="p-4 space-y-4">
           <div>
-            <h4 className="font-semibold text-lg leading-none mb-1">
-              {event.title}
-            </h4>
+            <h4 className="font-semibold text-lg leading-none mb-1">{event.title}</h4>
             <p className="text-sm text-muted-foreground">Community Event</p>
           </div>
 
@@ -54,12 +48,7 @@ export function EventDetailsPopover({
           </div>
 
           <div className="flex items-center gap-2 pt-2 border-t">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1"
-              onClick={() => onEdit?.(event)}
-            >
+            <Button variant="outline" size="sm" className="flex-1" onClick={() => onEdit?.(event)}>
               <Edit className="h-3 w-3 mr-2" />
               Edit
             </Button>

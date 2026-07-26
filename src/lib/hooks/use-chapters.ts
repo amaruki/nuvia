@@ -1,16 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { 
-  Chapter, 
-  ChapterOverallStatistics, 
+import {
+  Chapter,
+  ChapterOverallStatistics,
   ChapterFilterOptions,
-  ChapterFormData 
+  ChapterFormData,
 } from "@/types/chapter.types";
-import { 
-  mockChapters, 
-  mockChapterStatistics
-} from "@/lib/data/mock-chapter-data";
+import { mockChapters, mockChapterStatistics } from "@/lib/data/mock-chapter-data";
 
 export function useChapters() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -25,8 +22,8 @@ export function useChapters() {
       try {
         setLoading(true);
         // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         setChapters(mockChapters);
         setStatistics(mockChapterStatistics);
         setError(null);
@@ -42,7 +39,7 @@ export function useChapters() {
   }, []);
 
   // Filter chapters based on current filters
-  const filteredChapters = chapters.filter(chapter => {
+  const filteredChapters = chapters.filter((chapter) => {
     if (filters.status && !filters.status.includes(chapter.status)) return false;
     if (filters.region && !filters.region.includes(chapter.location.region)) return false;
     if (filters.country && !filters.country.includes(chapter.location.country)) return false;
@@ -51,8 +48,8 @@ export function useChapters() {
       if (chapter.memberCount < min || chapter.memberCount > max) return false;
     }
     if (filters.leadershipRole && filters.leadershipRole.length > 0) {
-      const hasRole = chapter.leadership.some(leader => 
-        filters.leadershipRole!.includes(leader.role)
+      const hasRole = chapter.leadership.some((leader) =>
+        filters.leadershipRole!.includes(leader.role),
       );
       if (!hasRole) return false;
     }
@@ -71,7 +68,7 @@ export function useChapters() {
 
   // Update filters
   const updateFilters = useCallback((newFilters: Partial<ChapterFilterOptions>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    setFilters((prev) => ({ ...prev, ...newFilters }));
   }, []);
 
   // Clear all filters
@@ -84,8 +81,8 @@ export function useChapters() {
     try {
       setLoading(true);
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       setChapters(mockChapters);
       setStatistics(mockChapterStatistics);
       setError(null);
@@ -101,8 +98,8 @@ export function useChapters() {
   const addChapter = useCallback(async (chapterData: ChapterFormData) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       const newChapter: Chapter = {
         id: `ch_${Date.now()}`,
         name: chapterData.name,
@@ -124,7 +121,7 @@ export function useChapters() {
           retentionRate: 0,
           newMembersThisMonth: 0,
           activeMembersThisMonth: 0,
-          monthlyTrend: []
+          monthlyTrend: [],
         },
         events: [],
         finances: {
@@ -134,7 +131,7 @@ export function useChapters() {
           budget: chapterData.settings.membershipDues * 10, // Initial budget estimate
           budgetUtilization: 0,
           monthlyRevenue: [],
-          monthlyExpenses: []
+          monthlyExpenses: [],
         },
         settings: chapterData.settings,
         parentChapterId: chapterData.parentChapterId,
@@ -143,7 +140,7 @@ export function useChapters() {
         createdBy: "current-user@example.com",
       };
 
-      setChapters(prev => [...prev, newChapter]);
+      setChapters((prev) => [...prev, newChapter]);
       return newChapter;
     } catch (err) {
       setError("Failed to add chapter");
@@ -156,26 +153,34 @@ export function useChapters() {
   const updateChapter = useCallback(async (id: string, chapterData: Partial<ChapterFormData>) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setChapters(prev => prev.map(chapter =>
-        chapter.id === id
-          ? {
-              ...chapter,
-              name: chapterData.name || chapter.name,
-              displayName: chapterData.displayName || chapter.displayName,
-              description: chapterData.description !== undefined ? chapterData.description : chapter.description,
-              status: chapterData.status || chapter.status,
-              location: chapterData.location || chapter.location,
-              contactInfo: chapterData.contactInfo || chapter.contactInfo,
-              socialMedia: chapterData.socialMedia || chapter.socialMedia,
-              settings: chapterData.settings || chapter.settings,
-              parentChapterId: chapterData.parentChapterId !== undefined ? chapterData.parentChapterId : chapter.parentChapterId,
-              updatedAt: new Date(),
-              updatedBy: "current-user@example.com",
-            }
-          : chapter
-      ));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setChapters((prev) =>
+        prev.map((chapter) =>
+          chapter.id === id
+            ? {
+                ...chapter,
+                name: chapterData.name || chapter.name,
+                displayName: chapterData.displayName || chapter.displayName,
+                description:
+                  chapterData.description !== undefined
+                    ? chapterData.description
+                    : chapter.description,
+                status: chapterData.status || chapter.status,
+                location: chapterData.location || chapter.location,
+                contactInfo: chapterData.contactInfo || chapter.contactInfo,
+                socialMedia: chapterData.socialMedia || chapter.socialMedia,
+                settings: chapterData.settings || chapter.settings,
+                parentChapterId:
+                  chapterData.parentChapterId !== undefined
+                    ? chapterData.parentChapterId
+                    : chapter.parentChapterId,
+                updatedAt: new Date(),
+                updatedBy: "current-user@example.com",
+              }
+            : chapter,
+        ),
+      );
     } catch (err) {
       setError("Failed to update chapter");
       console.error("Error updating chapter:", err);
@@ -187,9 +192,9 @@ export function useChapters() {
   const deleteChapter = useCallback(async (id: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setChapters(prev => prev.filter(chapter => chapter.id !== id));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setChapters((prev) => prev.filter((chapter) => chapter.id !== id));
     } catch (err) {
       setError("Failed to delete chapter");
       console.error("Error deleting chapter:", err);
@@ -201,18 +206,20 @@ export function useChapters() {
   const toggleChapterStatus = useCallback(async (id: string, status: "active" | "inactive") => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      setChapters(prev => prev.map(chapter => 
-        chapter.id === id 
-          ? { 
-              ...chapter, 
-              status,
-              updatedAt: new Date(),
-              updatedBy: "current-user@example.com",
-            }
-          : chapter
-      ));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      setChapters((prev) =>
+        prev.map((chapter) =>
+          chapter.id === id
+            ? {
+                ...chapter,
+                status,
+                updatedAt: new Date(),
+                updatedBy: "current-user@example.com",
+              }
+            : chapter,
+        ),
+      );
     } catch (err) {
       setError("Failed to toggle chapter status");
       console.error("Error toggling chapter status:", err);
@@ -224,8 +231,8 @@ export function useChapters() {
   const addLeadershipMember = useCallback(async (chapterId: string, leadershipData: any) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       const newMember = {
         id: `lead_${Date.now()}`,
         ...leadershipData,
@@ -233,16 +240,18 @@ export function useChapters() {
         isActive: true,
       };
 
-      setChapters(prev => prev.map(chapter => 
-        chapter.id === chapterId 
-          ? { 
-              ...chapter, 
-              leadership: [...chapter.leadership, newMember],
-              updatedAt: new Date(),
-              updatedBy: "current-user@example.com",
-            }
-          : chapter
-      ));
+      setChapters((prev) =>
+        prev.map((chapter) =>
+          chapter.id === chapterId
+            ? {
+                ...chapter,
+                leadership: [...chapter.leadership, newMember],
+                updatedAt: new Date(),
+                updatedBy: "current-user@example.com",
+              }
+            : chapter,
+        ),
+      );
     } catch (err) {
       setError("Failed to add leadership member");
       console.error("Error adding leadership member:", err);
@@ -254,18 +263,20 @@ export function useChapters() {
   const removeLeadershipMember = useCallback(async (chapterId: string, memberId: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      setChapters(prev => prev.map(chapter => 
-        chapter.id === chapterId 
-          ? { 
-              ...chapter, 
-              leadership: chapter.leadership.filter(member => member.id !== memberId),
-              updatedAt: new Date(),
-              updatedBy: "current-user@example.com",
-            }
-          : chapter
-      ));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      setChapters((prev) =>
+        prev.map((chapter) =>
+          chapter.id === chapterId
+            ? {
+                ...chapter,
+                leadership: chapter.leadership.filter((member) => member.id !== memberId),
+                updatedAt: new Date(),
+                updatedBy: "current-user@example.com",
+              }
+            : chapter,
+        ),
+      );
     } catch (err) {
       setError("Failed to remove leadership member");
       console.error("Error removing leadership member:", err);

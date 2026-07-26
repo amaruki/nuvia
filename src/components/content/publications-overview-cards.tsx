@@ -39,8 +39,13 @@ export function PublicationsOverviewCards({ statistics }: PublicationsOverviewCa
   };
 
   const getEngagementBadge = (score: number) => {
-    if (score >= 85) return { className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100", text: "Excellent" };
-    if (score >= 70) return { className: "bg-amber-100 text-amber-700 hover:bg-amber-100", text: "Good" };
+    if (score >= 85)
+      return {
+        className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
+        text: "Excellent",
+      };
+    if (score >= 70)
+      return { className: "bg-amber-100 text-amber-700 hover:bg-amber-100", text: "Good" };
     return { className: "bg-rose-100 text-rose-700 hover:bg-rose-100", text: "Needs Improvement" };
   };
 
@@ -60,7 +65,9 @@ export function PublicationsOverviewCards({ statistics }: PublicationsOverviewCa
               </div>
             </div>
             <div className="flex flex-col mt-3">
-              <span className="text-2xl font-bold">{formatNumber(statistics.totalPublications)}</span>
+              <span className="text-2xl font-bold">
+                {formatNumber(statistics.totalPublications)}
+              </span>
               <span className="text-xs text-muted-foreground mt-1">
                 {statistics.publishedPublications} published, {statistics.draftPublications} drafts
               </span>
@@ -79,13 +86,21 @@ export function PublicationsOverviewCards({ statistics }: PublicationsOverviewCa
             </div>
             <div className="flex flex-col mt-3">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold">{formatNumber(statistics.publishedPublications)}</span>
-                <Badge variant="secondary" className={`text-[10px] px-2 h-5 ${engagementBadge.className}`}>
+                <span className="text-2xl font-bold">
+                  {formatNumber(statistics.publishedPublications)}
+                </span>
+                <Badge
+                  variant="secondary"
+                  className={`text-[10px] px-2 h-5 ${engagementBadge.className}`}
+                >
                   {engagementBadge.text}
                 </Badge>
               </div>
               <span className="text-xs text-muted-foreground mt-1">
-                {formatPercentage((statistics.publishedPublications / statistics.totalPublications) * 100)} publish rate
+                {formatPercentage(
+                  (statistics.publishedPublications / statistics.totalPublications) * 100,
+                )}{" "}
+                publish rate
               </span>
             </div>
           </CardContent>
@@ -102,9 +117,7 @@ export function PublicationsOverviewCards({ statistics }: PublicationsOverviewCa
             </div>
             <div className="flex flex-col mt-3">
               <span className="text-2xl font-bold">{formatNumber(statistics.totalViews)}</span>
-              <span className="text-xs text-muted-foreground mt-1">
-                Across all publications
-              </span>
+              <span className="text-xs text-muted-foreground mt-1">Across all publications</span>
             </div>
           </CardContent>
         </Card>
@@ -120,23 +133,25 @@ export function PublicationsOverviewCards({ statistics }: PublicationsOverviewCa
             </div>
             <div className="flex flex-col mt-3">
               <div className="flex items-center gap-2">
-                <span className={`text-2xl font-bold ${getEngagementColor(statistics.averageEngagementScore)}`}>
+                <span
+                  className={`text-2xl font-bold ${getEngagementColor(statistics.averageEngagementScore)}`}
+                >
                   {formatPercentage(statistics.averageEngagementScore)}
                 </span>
-                <Badge variant="secondary" className={`text-[10px] px-2 h-5 ${engagementBadge.className}`}>
+                <Badge
+                  variant="secondary"
+                  className={`text-[10px] px-2 h-5 ${engagementBadge.className}`}
+                >
                   {engagementBadge.text}
                 </Badge>
               </div>
-              <span className="text-xs text-muted-foreground mt-1">
-                Average engagement score
-              </span>
+              <span className="text-xs text-muted-foreground mt-1">Average engagement score</span>
             </div>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        
         {/* Publication Status Breakdown */}
         <Card className="shadow-sm col-span-1 lg:col-span-2 flex flex-col">
           <CardHeader>
@@ -144,56 +159,68 @@ export function PublicationsOverviewCards({ statistics }: PublicationsOverviewCa
             <CardDescription>Status distribution across all publications</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-center gap-4">
-             {/* Status Item: Published */}
+            {/* Status Item: Published */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                        <CheckCircle2 className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Published</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                  <CheckCircle2 className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-emerald-50 text-emerald-700 border-emerald-200">
-                    {statistics.publishedPublications}
-                </Badge>
+                <span className="text-sm font-medium">Published</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-emerald-50 text-emerald-700 border-emerald-200"
+              >
+                {statistics.publishedPublications}
+              </Badge>
             </div>
 
             {/* Status Item: Draft */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
-                        <FileText className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Draft</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+                  <FileText className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-slate-50 text-slate-700 border-slate-200">
-                    {statistics.draftPublications}
-                </Badge>
+                <span className="text-sm font-medium">Draft</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-slate-50 text-slate-700 border-slate-200"
+              >
+                {statistics.draftPublications}
+              </Badge>
             </div>
 
             {/* Status Item: Scheduled */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                        <Calendar className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Scheduled</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                  <Calendar className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-blue-50 text-blue-700 border-blue-200">
-                    {statistics.scheduledPublications}
-                </Badge>
+                <span className="text-sm font-medium">Scheduled</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-blue-50 text-blue-700 border-blue-200"
+              >
+                {statistics.scheduledPublications}
+              </Badge>
             </div>
 
             {/* Status Item: Archived */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
-                        <Archive className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Archived</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+                  <Archive className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-slate-50 text-slate-700 border-slate-200">
-                    {statistics.archivedPublications}
-                </Badge>
+                <span className="text-sm font-medium">Archived</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-slate-50 text-slate-700 border-slate-200"
+              >
+                {statistics.archivedPublications}
+              </Badge>
             </div>
           </CardContent>
         </Card>
@@ -202,48 +229,67 @@ export function PublicationsOverviewCards({ statistics }: PublicationsOverviewCa
         <Card className="shadow-sm col-span-1 lg:col-span-3">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                Top Performing Publications
+              <TrendingUp className="h-4 w-4 text-primary" />
+              Top Performing Publications
             </CardTitle>
             <CardDescription>By engagement score and views</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-5">
-              {statistics.topPerformingPublications
-                .slice(0, 4)
-                .map((publication, index) => {
-                  // Calculate percentage for the bar width (relative to max engagement in set for visual)
-                  const maxEngagement = Math.max(...statistics.topPerformingPublications.map(p => p.engagementScore));
-                  const percentage = (publication.engagementScore / maxEngagement) * 100;
-                   
-                  return (
+              {statistics.topPerformingPublications.slice(0, 4).map((publication, index) => {
+                // Calculate percentage for the bar width (relative to max engagement in set for visual)
+                const maxEngagement = Math.max(
+                  ...statistics.topPerformingPublications.map((p) => p.engagementScore),
+                );
+                const percentage = (publication.engagementScore / maxEngagement) * 100;
+
+                return (
                   <div key={publication.publicationId} className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <span className="font-medium truncate max-w-[120px] sm:max-w-[200px]">
                           {publication.title}
                         </span>
-                        <Badge variant="secondary" className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground">
-                            {publication.type.replace('_', ' ')}
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground"
+                        >
+                          {publication.type.replace("_", " ")}
                         </Badge>
                       </div>
                       <div className="text-right">
-                        <span className="font-semibold block">{formatNumber(publication.views)}</span>
+                        <span className="font-semibold block">
+                          {formatNumber(publication.views)}
+                        </span>
                       </div>
                     </div>
                     {/* Visual Bar */}
                     <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                        <div 
-                            className="h-full bg-primary rounded-full" 
-                            style={{ width: `${percentage}%` }}
-                        />
+                      <div
+                        className="h-full bg-primary rounded-full"
+                        style={{ width: `${percentage}%` }}
+                      />
                     </div>
                     <div className="flex justify-between text-xs text-muted-foreground">
-                         <span>Engagement: <span className={publication.engagementScore > 80 ? "text-emerald-600 font-medium" : "text-amber-600"}>{formatPercentage(publication.engagementScore)}</span></span>
-                         <span>Author: <span className="font-medium">{publication.author}</span></span>
+                      <span>
+                        Engagement:{" "}
+                        <span
+                          className={
+                            publication.engagementScore > 80
+                              ? "text-emerald-600 font-medium"
+                              : "text-amber-600"
+                          }
+                        >
+                          {formatPercentage(publication.engagementScore)}
+                        </span>
+                      </span>
+                      <span>
+                        Author: <span className="font-medium">{publication.author}</span>
+                      </span>
                     </div>
                   </div>
-                )})}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -260,18 +306,19 @@ export function PublicationsOverviewCards({ statistics }: PublicationsOverviewCa
                 .sort((a, b) => b.count - a.count)
                 .slice(0, 4)
                 .map((type) => (
-                  <div key={type.type} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                  <div
+                    key={type.type}
+                    className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                  >
                     <div className="flex items-center space-x-3">
                       <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                         <BookOpen className="h-4 w-4 text-primary" />
                       </div>
                       <div>
                         <p className="text-sm font-medium capitalize">
-                          {type.type.replace('_', ' ')}
+                          {type.type.replace("_", " ")}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          {type.count} publications
-                        </p>
+                        <p className="text-xs text-muted-foreground">{type.count} publications</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -285,7 +332,6 @@ export function PublicationsOverviewCards({ statistics }: PublicationsOverviewCa
             </div>
           </CardContent>
         </Card>
-
       </div>
     </div>
   );

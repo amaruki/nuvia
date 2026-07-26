@@ -52,7 +52,13 @@ export interface ChapterLeadership {
   phone?: string;
 }
 
-export type ChapterRole = "president" | "vice_president" | "secretary" | "treasurer" | "admin" | "member";
+export type ChapterRole =
+  | "president"
+  | "vice_president"
+  | "secretary"
+  | "treasurer"
+  | "admin"
+  | "member";
 
 export interface ChapterContactInfo {
   email: string;

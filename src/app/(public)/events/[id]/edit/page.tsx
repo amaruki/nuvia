@@ -41,7 +41,7 @@ export default function EditEventPage() {
   const params = useParams();
   const router = useRouter();
   const eventId = params.id as string;
-  
+
   const [event, setEvent] = React.useState<Event | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -69,15 +69,15 @@ export default function EditEventPage() {
         setIsLoading(true);
         const response = await getEventById(eventId);
         const eventData = response.event;
-        
+
         setEvent(eventData);
         setTags(eventData.tags);
-        
+
         // Format dates for input fields
         const formatDateForInput = (date: Date) => {
           return new Date(date).toISOString().slice(0, 16);
         };
-        
+
         setFormData({
           title: eventData.title,
           description: eventData.description,
@@ -91,8 +91,8 @@ export default function EditEventPage() {
           isVirtual: eventData.isVirtual,
           isInPerson: eventData.isInPerson,
           maxAttendees: eventData.maxAttendees?.toString() || "",
-          registrationDeadline: eventData.registrationDeadline 
-            ? formatDateForInput(eventData.registrationDeadline) 
+          registrationDeadline: eventData.registrationDeadline
+            ? formatDateForInput(eventData.registrationDeadline)
             : "",
         });
       } catch (error) {
@@ -110,24 +110,24 @@ export default function EditEventPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: checked
+      [name]: checked,
     }));
   };
 
@@ -139,7 +139,7 @@ export default function EditEventPage() {
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const handleTagKeyPress = (e: React.KeyboardEvent) => {
@@ -152,14 +152,14 @@ export default function EditEventPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       // Here you would typically call your API to update the event
       console.log("Updating event with data:", { ...formData, tags });
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Redirect to event details page
       router.push(`/events/${eventId}`);
     } catch (error) {
@@ -197,10 +197,7 @@ export default function EditEventPage() {
   }
 
   return (
-    <EventLayout
-      event={event}
-      showActions={false}
-    >
+    <EventLayout event={event} showActions={false}>
       <div className="max-w-3xl mx-auto">
         <Card>
           <CardHeader>
@@ -211,7 +208,7 @@ export default function EditEventPage() {
               {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-foreground/90">Basic Information</h3>
-                
+
                 <div>
                   <Label htmlFor="title">Event Title</Label>
                   <Input
@@ -223,7 +220,7 @@ export default function EditEventPage() {
                     className="mt-1"
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="shortDescription">Short Description</Label>
                   <Input
@@ -234,7 +231,7 @@ export default function EditEventPage() {
                     className="mt-1"
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="description">Full Description</Label>
                   <Textarea
@@ -246,7 +243,7 @@ export default function EditEventPage() {
                     className="mt-1"
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="eventType">Event Type</Label>
@@ -258,7 +255,7 @@ export default function EditEventPage() {
                         <SelectValue placeholder="Select event type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {eventTypeOptions.map(option => (
+                        {eventTypeOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
@@ -266,7 +263,7 @@ export default function EditEventPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="status">Status</Label>
                     <Select
@@ -277,7 +274,7 @@ export default function EditEventPage() {
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
-                        {statusOptions.map(option => (
+                        {statusOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
@@ -287,11 +284,11 @@ export default function EditEventPage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Date and Time */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-foreground/90">Date and Time</h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="startDate">Start Date and Time</Label>
@@ -305,7 +302,7 @@ export default function EditEventPage() {
                       className="mt-1"
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="endDate">End Date and Time</Label>
                     <Input
@@ -319,7 +316,7 @@ export default function EditEventPage() {
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <Label htmlFor="registrationDeadline">Registration Deadline</Label>
                   <Input
@@ -332,11 +329,11 @@ export default function EditEventPage() {
                   />
                 </div>
               </div>
-              
+
               {/* Location */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-foreground/90">Location</h3>
-                
+
                 <div>
                   <Label htmlFor="location">Location</Label>
                   <Input
@@ -348,7 +345,7 @@ export default function EditEventPage() {
                     className="mt-1"
                   />
                 </div>
-                
+
                 <div className="flex items-center space-x-6">
                   <div className="flex items-center">
                     <input
@@ -363,7 +360,7 @@ export default function EditEventPage() {
                       In-Person Event
                     </Label>
                   </div>
-                  
+
                   <div className="flex items-center">
                     <input
                       id="isVirtual"
@@ -378,7 +375,7 @@ export default function EditEventPage() {
                     </Label>
                   </div>
                 </div>
-                
+
                 {formData.isVirtual && (
                   <div>
                     <Label htmlFor="virtualEventUrl">Virtual Event URL</Label>
@@ -392,11 +389,11 @@ export default function EditEventPage() {
                   </div>
                 )}
               </div>
-              
+
               {/* Capacity */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-foreground/90">Capacity</h3>
-                
+
                 <div>
                   <Label htmlFor="maxAttendees">Maximum Attendees (Optional)</Label>
                   <Input
@@ -410,11 +407,11 @@ export default function EditEventPage() {
                   />
                 </div>
               </div>
-              
+
               {/* Tags */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-foreground/90">Tags</h3>
-                
+
                 <div>
                   <Label htmlFor="tags">Add Tags</Label>
                   <div className="flex mt-1">
@@ -426,17 +423,12 @@ export default function EditEventPage() {
                       placeholder="Add a tag..."
                       className="flex-1"
                     />
-                    <Button
-                      type="button"
-                      onClick={handleAddTag}
-                      variant="outline"
-                      className="ml-2"
-                    >
+                    <Button type="button" onClick={handleAddTag} variant="outline" className="ml-2">
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
-                
+
                 {tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {tags.map((tag, index) => (
@@ -454,20 +446,13 @@ export default function EditEventPage() {
                   </div>
                 )}
               </div>
-              
+
               {/* Actions */}
               <div className="flex justify-end space-x-3 pt-6 border-t">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleGoBack}
-                >
+                <Button type="button" variant="outline" onClick={handleGoBack}>
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                >
+                <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

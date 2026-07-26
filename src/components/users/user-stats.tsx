@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { UserStats as UserStatsType } from "@/types/user-management.types"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { UserStats as UserStatsType } from "@/types/user-management.types";
 import {
   Users,
   UserCheck,
@@ -15,25 +15,25 @@ import {
   Activity,
   Crown,
   ShieldCheck,
-  Star
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+  Star,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface UserStatsProps {
-  stats: UserStatsType
-  className?: string
+  stats: UserStatsType;
+  className?: string;
 }
 
 interface StatCardProps {
-  title: string
-  value: string | number
-  description?: string
-  icon: React.ReactNode
+  title: string;
+  value: string | number;
+  description?: string;
+  icon: React.ReactNode;
   trend?: {
-    value: string
-    isPositive: boolean
-  }
-  className?: string
+    value: string;
+    isPositive: boolean;
+  };
+  className?: string;
 }
 
 function StatCard({ title, value, description, icon, trend, className }: StatCardProps) {
@@ -41,46 +41,40 @@ function StatCard({ title, value, description, icon, trend, className }: StatCar
     <Card className={cn("hover:shadow-md transition-shadow", className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <div className="size-8 text-muted-foreground">
-          {icon}
-        </div>
+        <div className="size-8 text-muted-foreground">{icon}</div>
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value.toLocaleString()}</div>
-        {description && (
-          <p className="text-xs text-muted-foreground mt-1">{description}</p>
-        )}
+        {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
         {trend && (
           <div className="flex items-center gap-1 mt-2">
-            <TrendingUp className={cn(
-              "size-3",
-              trend.isPositive ? "text-green-500" : "text-red-500"
-            )} />
-            <span className={cn(
-              "text-xs font-medium",
-              trend.isPositive ? "text-green-500" : "text-red-500"
-            )}>
+            <TrendingUp
+              className={cn("size-3", trend.isPositive ? "text-green-500" : "text-red-500")}
+            />
+            <span
+              className={cn(
+                "text-xs font-medium",
+                trend.isPositive ? "text-green-500" : "text-red-500",
+              )}
+            >
               {trend.value}
             </span>
           </div>
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function UserStats({ stats, className }: UserStatsProps) {
-  const activePercentage = stats.totalUsers > 0
-    ? Math.round((stats.activeUsers / stats.totalUsers) * 100)
-    : 0
+  const activePercentage =
+    stats.totalUsers > 0 ? Math.round((stats.activeUsers / stats.totalUsers) * 100) : 0;
 
-  const verifiedPercentage = stats.totalUsers > 0
-    ? Math.round((stats.verifiedUsers / stats.totalUsers) * 100)
-    : 0
+  const verifiedPercentage =
+    stats.totalUsers > 0 ? Math.round((stats.verifiedUsers / stats.totalUsers) * 100) : 0;
 
-  const twoFactorPercentage = stats.totalUsers > 0
-    ? Math.round((stats.usersWithTwoFactor / stats.totalUsers) * 100)
-    : 0
+  const twoFactorPercentage =
+    stats.totalUsers > 0 ? Math.round((stats.usersWithTwoFactor / stats.totalUsers) * 100) : 0;
 
   return (
     <div className={cn("space-y-6", className)}>
@@ -93,7 +87,7 @@ export function UserStats({ stats, className }: UserStatsProps) {
           icon={<Users className="size-4" />}
           trend={{
             value: `+${stats.newUsersThisMonth} this month`,
-            isPositive: true
+            isPositive: true,
           }}
         />
 
@@ -104,7 +98,7 @@ export function UserStats({ stats, className }: UserStatsProps) {
           icon={<UserCheck className="size-4" />}
           trend={{
             value: `${stats.usersLastLogin30Days} in last 30 days`,
-            isPositive: true
+            isPositive: true,
           }}
         />
 
@@ -115,7 +109,7 @@ export function UserStats({ stats, className }: UserStatsProps) {
           icon={<ShieldCheck className="size-4" />}
           trend={{
             value: `${stats.unverifiedUsers} pending`,
-            isPositive: false
+            isPositive: false,
           }}
         />
 
@@ -126,7 +120,7 @@ export function UserStats({ stats, className }: UserStatsProps) {
           icon={<Key className="size-4" />}
           trend={{
             value: `${twoFactorPercentage}% adoption`,
-            isPositive: twoFactorPercentage > 50
+            isPositive: twoFactorPercentage > 50,
           }}
         />
       </div>
@@ -175,12 +169,14 @@ export function UserStats({ stats, className }: UserStatsProps) {
             {Object.entries(stats.roleDistribution).map(([role, count]) => (
               <div key={role} className="flex items-center justify-between p-3 rounded-lg border">
                 <div className="flex items-center gap-2">
-                  <div className={cn(
-                    "size-2 rounded-full",
-                    role === "admin" && "bg-red-500",
-                    role === "moderator" && "bg-indigo-500",
-                    role === "member" && "bg-green-500"
-                  )} />
+                  <div
+                    className={cn(
+                      "size-2 rounded-full",
+                      role === "admin" && "bg-red-500",
+                      role === "moderator" && "bg-indigo-500",
+                      role === "member" && "bg-green-500",
+                    )}
+                  />
                   <span className="font-medium capitalize">{role}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -228,5 +224,5 @@ export function UserStats({ stats, className }: UserStatsProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

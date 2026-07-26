@@ -12,7 +12,7 @@ export default function EditAnnouncementPage() {
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
   const { getAnnouncement, updateAnnouncement } = useAnnouncements();
-  
+
   const [announcement, setAnnouncement] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +35,7 @@ export default function EditAnnouncementPage() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const foundAnnouncement = getAnnouncement(announcementId);
         if (foundAnnouncement) {
           // Convert announcement to form data format
@@ -49,7 +49,7 @@ export default function EditAnnouncementPage() {
             targetAudience: foundAnnouncement.targetAudience,
             status: foundAnnouncement.status,
             authorId: foundAnnouncement.author.id,
-            tagIds: foundAnnouncement.tags.map(tag => tag.id),
+            tagIds: foundAnnouncement.tags.map((tag) => tag.id),
             featuredImage: foundAnnouncement.featuredImage,
             expiresAt: foundAnnouncement.expiresAt,
             isPinned: foundAnnouncement.isPinned,
@@ -65,7 +65,7 @@ export default function EditAnnouncementPage() {
             downloadEnabled: foundAnnouncement.downloadEnabled,
             isFeatured: foundAnnouncement.isFeatured,
           };
-          
+
           setAnnouncement(formData);
         } else {
           setError("Announcement not found");
@@ -129,7 +129,9 @@ export default function EditAnnouncementPage() {
       <div className="container max-w-5xl py-6 mx-auto text-center">
         <div className="space-y-4">
           <h1 className="text-2xl font-bold">Announcement not found</h1>
-          <p className="text-muted-foreground">The announcement you're trying to edit doesn't exist.</p>
+          <p className="text-muted-foreground">
+            The announcement you're trying to edit doesn't exist.
+          </p>
           <button
             onClick={() => router.back()}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
@@ -141,5 +143,11 @@ export default function EditAnnouncementPage() {
     );
   }
 
-  return <AddAnnouncementForm onSubmit={handleSubmit} onCancel={handleCancel} initialData={announcement} />;
+  return (
+    <AddAnnouncementForm
+      onSubmit={handleSubmit}
+      onCancel={handleCancel}
+      initialData={announcement}
+    />
+  );
 }

@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   RefreshCw,
   AlertTriangle,
   Download,
@@ -65,7 +65,8 @@ export default function ContentArticles() {
   useEffect(() => {
     setHeader({
       title: "Articles Management",
-      description: "Manage articles, tutorials, guides, and all content with comprehensive analytics and workflow controls",
+      description:
+        "Manage articles, tutorials, guides, and all content with comprehensive analytics and workflow controls",
     });
 
     return () => {
@@ -86,7 +87,9 @@ export default function ContentArticles() {
   };
 
   const handleDelete = async (article: Article) => {
-    if (confirm(`Are you sure you want to delete "${article.title}"? This action cannot be undone.`)) {
+    if (
+      confirm(`Are you sure you want to delete "${article.title}"? This action cannot be undone.`)
+    ) {
       try {
         await deleteArticle(article.id);
       } catch (error) {
@@ -129,7 +132,7 @@ export default function ContentArticles() {
 
   const handleBulkPublish = async () => {
     if (selectedArticles.length === 0) return;
-    
+
     if (confirm(`Are you sure you want to publish ${selectedArticles.length} selected articles?`)) {
       try {
         await bulkPublish(selectedArticles);
@@ -142,7 +145,7 @@ export default function ContentArticles() {
 
   const handleBulkArchive = async () => {
     if (selectedArticles.length === 0) return;
-    
+
     if (confirm(`Are you sure you want to archive ${selectedArticles.length} selected articles?`)) {
       try {
         await bulkArchive(selectedArticles);
@@ -155,8 +158,12 @@ export default function ContentArticles() {
 
   const handleBulkDelete = async () => {
     if (selectedArticles.length === 0) return;
-    
-    if (confirm(`Are you sure you want to delete ${selectedArticles.length} selected articles? This action cannot be undone.`)) {
+
+    if (
+      confirm(
+        `Are you sure you want to delete ${selectedArticles.length} selected articles? This action cannot be undone.`,
+      )
+    ) {
       try {
         await bulkDelete(selectedArticles);
         setSelectedArticles([]);
@@ -166,7 +173,7 @@ export default function ContentArticles() {
     }
   };
 
-  const handleExport = (format: 'csv' | 'json' | 'pdf') => {
+  const handleExport = (format: "csv" | "json" | "pdf") => {
     exportArticles(format);
   };
 
@@ -296,16 +303,20 @@ export default function ContentArticles() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="articles" className="text-xs sm:text-sm py-2 px-2">Articles</TabsTrigger>
-          <TabsTrigger value="drafts" className="text-xs sm:text-sm py-2 px-2">Drafts</TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">Analytics</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="articles" className="text-xs sm:text-sm py-2 px-2">
+            Articles
+          </TabsTrigger>
+          <TabsTrigger value="drafts" className="text-xs sm:text-sm py-2 px-2">
+            Drafts
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">
+            Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -315,7 +326,10 @@ export default function ContentArticles() {
               <h3 className="text-lg font-semibold">Recent Activity</h3>
               <div className="space-y-3">
                 {statistics?.recentActivity.slice(0, 5).map((activity) => (
-                  <div key={activity.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={activity.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <div>
                         <p className="text-sm font-medium">{activity.title}</p>
@@ -357,7 +371,9 @@ export default function ContentArticles() {
                     <span className="text-sm font-medium">Avg Engagement</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold">{statistics?.averageEngagementScore.toFixed(1) || 0}%</p>
+                    <p className="text-lg font-bold">
+                      {statistics?.averageEngagementScore.toFixed(1) || 0}%
+                    </p>
                   </div>
                 </div>
               </div>
@@ -370,7 +386,10 @@ export default function ContentArticles() {
               <h3 className="text-lg font-semibold">Monthly Trends</h3>
               <div className="space-y-3">
                 {statistics.monthlyTrend.slice(0, 6).map((trend, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <p className="font-medium">{trend.month}</p>
                       <p className="text-xs text-muted-foreground">
@@ -379,9 +398,7 @@ export default function ContentArticles() {
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-lg font-bold">{formatNumber(trend.totalViews)}</p>
-                      <p className="text-xs text-muted-foreground">
-                        views
-                      </p>
+                      <p className="text-xs text-muted-foreground">views</p>
                     </div>
                   </div>
                 ))}
@@ -403,7 +420,7 @@ export default function ContentArticles() {
             selectedArticles={selectedArticles}
             onSelectionChange={setSelectedArticles}
           />
-          
+
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-6">
@@ -434,28 +451,33 @@ export default function ContentArticles() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Draft Articles</h3>
             <div className="space-y-3">
-              {articles.filter(a => a.status === 'draft').map((article) => (
-                <div key={article.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="min-w-0 flex-1 mr-2">
-                    <p className="font-medium">{article.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Last modified: {article.lastModified.toLocaleDateString()}
-                    </p>
+              {articles
+                .filter((a) => a.status === "draft")
+                .map((article) => (
+                  <div
+                    key={article.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div className="min-w-0 flex-1 mr-2">
+                      <p className="font-medium">{article.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Last modified: {article.lastModified.toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleEdit(article)}>
+                        <Settings className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
+                      <Button size="sm" onClick={() => handlePublish(article)}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Publish
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEdit(article)}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
-                    <Button size="sm" onClick={() => handlePublish(article)}>
-                      <FileText className="mr-2 h-4 w-4" />
-                      Publish
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
-            {articles.filter(a => a.status === 'draft').length === 0 && (
+            {articles.filter((a) => a.status === "draft").length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 <FileText className="h-12 w-12 mx-auto mb-4 opacity-40" />
                 <h3 className="text-lg font-medium mb-2">No draft articles</h3>
@@ -474,12 +496,13 @@ export default function ContentArticles() {
               <h3 className="text-lg font-semibold">Performance by Type</h3>
               <div className="space-y-3">
                 {statistics?.articlesByType.map((type) => (
-                  <div key={type.type} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={type.type}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
-                      <p className="font-medium">{type.type.replace('_', ' ')}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {type.count} articles
-                      </p>
+                      <p className="font-medium">{type.type.replace("_", " ")}</p>
+                      <p className="text-xs text-muted-foreground">{type.count} articles</p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-lg font-bold">{formatNumber(type.views)}</p>
@@ -497,12 +520,13 @@ export default function ContentArticles() {
               <h3 className="text-lg font-semibold">Performance by Category</h3>
               <div className="space-y-3">
                 {statistics?.articlesByCategory.map((category) => (
-                  <div key={category.category} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={category.category}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
-                      <p className="font-medium">{category.category.replace('_', ' ')}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {category.count} articles
-                      </p>
+                      <p className="font-medium">{category.category.replace("_", " ")}</p>
+                      <p className="text-xs text-muted-foreground">{category.count} articles</p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-lg font-bold">{formatNumber(category.views)}</p>
@@ -535,17 +559,16 @@ export default function ContentArticles() {
               Import
             </label>
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
+          <Button variant="outline" size="sm" onClick={() => handleExport("csv")}>
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('json')}>
+          <Button variant="outline" size="sm" onClick={() => handleExport("json")}>
             <Download className="mr-2 h-4 w-4" />
             Export JSON
           </Button>
         </div>
       </div>
-
     </div>
   );
 }

@@ -5,11 +5,11 @@
  * between server and client utilities while providing a clean, type-safe API.
  */
 
-import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
-import { NextRequest } from 'next/server';
-import { AuthError, AuthErrorType, AuthResponseFactory, withAuthErrorHandling } from './common';
-import { SafeUser, UserSession } from '@/types/auth.types';
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { NextRequest } from "next/server";
+import { AuthError, AuthErrorType, AuthResponseFactory, withAuthErrorHandling } from "./common";
+import { SafeUser, UserSession } from "@/types/auth.types";
 
 // Better Auth Session type - matches the actual response from auth.api.getSession()
 interface Session {
@@ -27,13 +27,7 @@ interface Session {
 }
 
 // Type for JSON fields in Better Auth
-type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | { [key: string]: JsonValue };
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
 interface ProfileUpdateData {
   name?: string;
@@ -71,17 +65,17 @@ export class AuthUtils {
       if (request) {
         // For API routes and server actions with request
         return await auth.api.getSession({
-          headers: request.headers
+          headers: request.headers,
         });
       } else {
         // For server components and middleware
         const headerList = await headers();
         return await auth.api.getSession({
-          headers: headerList
+          headers: headerList,
         });
       }
     } catch (error) {
-      console.error('Error getting session:', error);
+      console.error("Error getting session:", error);
       return null;
     }
   }
@@ -94,7 +88,7 @@ export class AuthUtils {
       const session = await this.getSession(request);
       return session?.user || null;
     } catch (error) {
-      console.error('Error getting current user:', error);
+      console.error("Error getting current user:", error);
       return null;
     }
   }
@@ -107,7 +101,7 @@ export class AuthUtils {
       const user = await this.getCurrentUser(request);
       return user?.id || null;
     } catch (error) {
-      console.error('Error getting current user ID:', error);
+      console.error("Error getting current user ID:", error);
       return null;
     }
   }
@@ -120,7 +114,7 @@ export class AuthUtils {
       const session = await this.getSession(request);
       return !!session && !!session.user;
     } catch (error) {
-      console.error('Error checking authentication:', error);
+      console.error("Error checking authentication:", error);
       return false;
     }
   }
@@ -132,10 +126,7 @@ export class AuthUtils {
     const user = await this.getCurrentUser(request);
 
     if (!user) {
-      throw new AuthError(
-        AuthErrorType.AUTHENTICATION,
-        'Authentication required'
-      );
+      throw new AuthError(AuthErrorType.AUTHENTICATION, "Authentication required");
     }
 
     return user;
@@ -149,7 +140,7 @@ export class AuthUtils {
       const user = await this.getCurrentUser(request);
       return user?.role === role;
     } catch (error) {
-      console.error('Error checking user role:', error);
+      console.error("Error checking user role:", error);
       return false;
     }
   }
@@ -161,10 +152,7 @@ export class AuthUtils {
     const user = await this.requireAuth(request);
 
     if (user.role !== role) {
-      throw new AuthError(
-        AuthErrorType.AUTHORIZATION,
-        `Access denied. Required role: ${role}`
-      );
+      throw new AuthError(AuthErrorType.AUTHORIZATION, `Access denied. Required role: ${role}`);
     }
 
     return user;
@@ -175,7 +163,7 @@ export class AuthUtils {
    */
   static async updateProfile(
     data: ProfileUpdateData,
-    request?: NextRequest
+    request?: NextRequest,
   ): Promise<AuthResult<SafeUser>> {
     try {
       const session = await this.getSession(request);
@@ -183,7 +171,7 @@ export class AuthUtils {
       if (!session?.user) {
         throw new AuthError(
           AuthErrorType.AUTHENTICATION,
-          'Must be authenticated to update profile'
+          "Must be authenticated to update profile",
         );
       }
 
@@ -192,18 +180,18 @@ export class AuthUtils {
         body: {
           name: data.name,
           image: data.image || undefined,
-          externalLinks: data.externalLinks === null ? null : undefined
-        }
+          externalLinks: data.externalLinks === null ? null : undefined,
+        },
       });
 
       return {
         success: true,
-        data: result as any
+        data: result as any,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Profile update failed'
+        error: error instanceof Error ? error.message : "Profile update failed",
       };
     }
   }
@@ -213,7 +201,7 @@ export class AuthUtils {
    */
   static async changePassword(
     data: PasswordChangeData,
-    request?: NextRequest
+    request?: NextRequest,
   ): Promise<AuthResult<void>> {
     try {
       const session = await this.getSession(request);
@@ -221,7 +209,7 @@ export class AuthUtils {
       if (!session?.user) {
         throw new AuthError(
           AuthErrorType.AUTHENTICATION,
-          'Must be authenticated to change password'
+          "Must be authenticated to change password",
         );
       }
 
@@ -230,18 +218,18 @@ export class AuthUtils {
         body: {
           currentPassword: data.currentPassword,
           newPassword: data.newPassword,
-          revokeOtherSessions: true
-        }
+          revokeOtherSessions: true,
+        },
       });
 
       return {
         success: true,
-        data: undefined
+        data: undefined,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Password change failed'
+        error: error instanceof Error ? error.message : "Password change failed",
       };
     }
   }
@@ -253,17 +241,17 @@ export class AuthUtils {
     try {
       // Use Better Auth API to sign out
       await auth.api.signOut({
-        headers: request?.headers || (await headers())
+        headers: request?.headers || (await headers()),
       });
 
       return {
         success: true,
-        data: undefined
+        data: undefined,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Sign out failed'
+        error: error instanceof Error ? error.message : "Sign out failed",
       };
     }
   }
@@ -278,7 +266,7 @@ export class AuthUtils {
       if (!session?.user) {
         throw new AuthError(
           AuthErrorType.AUTHENTICATION,
-          'Must be authenticated to delete account'
+          "Must be authenticated to delete account",
         );
       }
 
@@ -289,7 +277,7 @@ export class AuthUtils {
 
       // Sign out first to invalidate all sessions
       await auth.api.signOut({
-        headers: headersToUse
+        headers: headersToUse,
       });
 
       // Note: Actual user deletion would need to be implemented at the database level
@@ -298,16 +286,16 @@ export class AuthUtils {
       // await auth.api.deleteUser({ headers: headersToUse });
       // or use a direct database call through your manager layer
 
-      console.log('Account deletion process initiated for user:', session.user.id);
+      console.log("Account deletion process initiated for user:", session.user.id);
 
       return {
         success: true,
-        data: undefined
+        data: undefined,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Account deletion failed'
+        error: error instanceof Error ? error.message : "Account deletion failed",
       };
     }
   }
@@ -318,7 +306,7 @@ export class AuthUtils {
   static async getUserById(userId: string, request?: NextRequest): Promise<AuthResult<SafeUser>> {
     try {
       // Verify requester is admin
-      await this.requireRole('admin', request);
+      await this.requireRole("admin", request);
 
       // Note: Better Auth typically doesn't expose a direct getUserById API in most configurations
       // This would usually require database access through the adapter or manager layer
@@ -326,12 +314,12 @@ export class AuthUtils {
 
       throw new AuthError(
         AuthErrorType.NOT_FOUND,
-        `User lookup requires database access. User ID: ${userId}. Use your manager layer for database operations.`
+        `User lookup requires database access. User ID: ${userId}. Use your manager layer for database operations.`,
       );
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to get user'
+        error: error instanceof Error ? error.message : "Failed to get user",
       };
     }
   }
@@ -341,11 +329,11 @@ export class AuthUtils {
    */
   static async listUsers(
     options?: { limit?: number; offset?: number },
-    request?: NextRequest
+    request?: NextRequest,
   ): Promise<AuthResult<SafeUser[]>> {
     try {
       // Verify requester is admin
-      await this.requireRole('admin', request);
+      await this.requireRole("admin", request);
 
       // Note: Better Auth typically doesn't expose a direct listUsers API in most configurations
       // This would require database access through the adapter or manager layer
@@ -353,12 +341,12 @@ export class AuthUtils {
 
       throw new AuthError(
         AuthErrorType.NOT_FOUND,
-        `User listing requires database access. Use your manager layer for database operations with pagination.`
+        `User listing requires database access. Use your manager layer for database operations with pagination.`,
       );
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to list users'
+        error: error instanceof Error ? error.message : "Failed to list users",
       };
     }
   }
@@ -369,11 +357,11 @@ export class AuthUtils {
   static async updateUserRole(
     userId: string,
     role: string,
-    request?: NextRequest
+    request?: NextRequest,
   ): Promise<AuthResult<SafeUser>> {
     try {
       // Verify requester is admin
-      await this.requireRole('admin', request);
+      await this.requireRole("admin", request);
 
       // Note: Better Auth typically doesn't expose a direct updateUserRole API in most configurations
       // This would require database access through the adapter or manager layer
@@ -381,12 +369,12 @@ export class AuthUtils {
 
       throw new AuthError(
         AuthErrorType.NOT_FOUND,
-        `User role update requires database access. User ID: ${userId}, Role: ${role}. Use your manager layer for database operations.`
+        `User role update requires database access. User ID: ${userId}, Role: ${role}. Use your manager layer for database operations.`,
       );
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to update user role'
+        error: error instanceof Error ? error.message : "Failed to update user role",
       };
     }
   }

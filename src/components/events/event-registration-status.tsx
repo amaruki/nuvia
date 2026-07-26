@@ -82,15 +82,17 @@ export function EventRegistrationStatus({
         <CardTitle className="flex items-center justify-between">
           <span>Registration Status</span>
           <Badge className={getRegistrationStatusColor(registration.status)}>
-            {registration.status.replace('_', ' ')}
+            {registration.status.replace("_", " ")}
           </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Event Information */}
         <div className="bg-background p-4 rounded-lg">
-          <h3 className="font-medium mb-2" style={{ color: 'var(--foreground)' }}>Event Details</h3>
-          <div className="space-y-2 text-sm" style={{ color: 'var(--muted-foreground)' }}>
+          <h3 className="font-medium mb-2" style={{ color: "var(--foreground)" }}>
+            Event Details
+          </h3>
+          <div className="space-y-2 text-sm" style={{ color: "var(--muted-foreground)" }}>
             <p>
               <span className="font-medium">Event:</span> {event.title}
             </p>
@@ -98,26 +100,36 @@ export function EventRegistrationStatus({
               <span className="font-medium">Date:</span> {formatDate(event.startDate)}
             </p>
             <p>
-              <span className="font-medium">Time:</span> {formatTime(event.startDate)} - {formatTime(event.endDate)}
+              <span className="font-medium">Time:</span> {formatTime(event.startDate)} -{" "}
+              {formatTime(event.endDate)}
             </p>
             <p>
               <span className="font-medium">Location:</span> {event.location}
             </p>
             <p>
-              <span className="font-medium">Registered on:</span> {formatDate(registration.registeredAt)}
+              <span className="font-medium">Registered on:</span>{" "}
+              {formatDate(registration.registeredAt)}
             </p>
           </div>
         </div>
 
         {/* Status-specific Messages */}
         {registration.status === RegistrationStatus.PENDING && (
-          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--destructive)', color: 'var(--chart-5-foreground)', opacity: '0.1' }}>
+          <div
+            className="p-4 rounded-lg"
+            style={{
+              backgroundColor: "var(--destructive)",
+              color: "var(--chart-5-foreground)",
+              opacity: "0.1",
+            }}
+          >
             <div className="flex">
-              <Clock className="h-5 w-5 mr-2" style={{ color: 'var(--destructive)' }} />
+              <Clock className="h-5 w-5 mr-2" style={{ color: "var(--destructive)" }} />
               <div>
                 <p className="font-medium">Registration Pending</p>
                 <p className="text-sm mt-1">
-                  Your registration is being reviewed. You will receive a confirmation email once your registration is approved.
+                  Your registration is being reviewed. You will receive a confirmation email once
+                  your registration is approved.
                 </p>
               </div>
             </div>
@@ -125,13 +137,21 @@ export function EventRegistrationStatus({
         )}
 
         {registration.status === RegistrationStatus.WAITLISTED && (
-          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--info)', color: 'var(--info-foreground)', opacity: '0.1' }}>
+          <div
+            className="p-4 rounded-lg"
+            style={{
+              backgroundColor: "var(--info)",
+              color: "var(--info-foreground)",
+              opacity: "0.1",
+            }}
+          >
             <div className="flex">
-              <Clock className="h-5 w-5 mr-2" style={{ color: 'var(--info)' }} />
+              <Clock className="h-5 w-5 mr-2" style={{ color: "var(--info)" }} />
               <div>
                 <p className="font-medium">Waitlisted</p>
                 <p className="text-sm mt-1">
-                  This event is currently full. You have been added to the waitlist and will be notified if a spot becomes available.
+                  This event is currently full. You have been added to the waitlist and will be
+                  notified if a spot becomes available.
                 </p>
               </div>
             </div>
@@ -139,13 +159,21 @@ export function EventRegistrationStatus({
         )}
 
         {registration.status === RegistrationStatus.CONFIRMED && upcoming && (
-          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--chart-2)', color: 'var(--chart-2-foreground)', opacity: '0.1' }}>
+          <div
+            className="p-4 rounded-lg"
+            style={{
+              backgroundColor: "var(--chart-2)",
+              color: "var(--chart-2-foreground)",
+              opacity: "0.1",
+            }}
+          >
             <div className="flex">
-              <CheckCircle className="h-5 w-5 mr-2" style={{ color: 'var(--chart-2)' }} />
+              <CheckCircle className="h-5 w-5 mr-2" style={{ color: "var(--chart-2)" }} />
               <div>
                 <p className="font-medium">Registration Confirmed</p>
                 <p className="text-sm mt-1">
-                  You are successfully registered for this event. Please check your email for confirmation details.
+                  You are successfully registered for this event. Please check your email for
+                  confirmation details.
                 </p>
               </div>
             </div>
@@ -153,14 +181,19 @@ export function EventRegistrationStatus({
         )}
 
         {registration.status === RegistrationStatus.CANCELLED && (
-          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--destructive)', color: 'var(--destructive-foreground)', opacity: '0.1' }}>
+          <div
+            className="p-4 rounded-lg"
+            style={{
+              backgroundColor: "var(--destructive)",
+              color: "var(--destructive-foreground)",
+              opacity: "0.1",
+            }}
+          >
             <div className="flex">
-              <XCircle className="h-5 w-5 mr-2" style={{ color: 'var(--destructive)' }} />
+              <XCircle className="h-5 w-5 mr-2" style={{ color: "var(--destructive)" }} />
               <div>
                 <p className="font-medium">Registration Cancelled</p>
-                <p className="text-sm mt-1">
-                  Your registration for this event has been cancelled.
-                </p>
+                <p className="text-sm mt-1">Your registration for this event has been cancelled.</p>
               </div>
             </div>
           </div>
@@ -180,25 +213,31 @@ export function EventRegistrationStatus({
                   {registration.checkedInAt ? "Already Checked In" : "Check In Now"}
                 </Button>
               )}
-              
+
               {!today && (
-                <div className="text-center text-sm p-3 rounded-lg" style={{ color: 'var(--muted-foreground)', backgroundColor: 'var(--background)' }}>
+                <div
+                  className="text-center text-sm p-3 rounded-lg"
+                  style={{ color: "var(--muted-foreground)", backgroundColor: "var(--background)" }}
+                >
                   Check-in will be available on the day of the event
                 </div>
               )}
             </>
           )}
 
-          {registration.status === RegistrationStatus.CONFIRMED && past && registration.certificateIssued && registration.certificateUrl && (
-            <Button
-              onClick={() => onViewCertificate?.(registration.certificateUrl!)}
-              variant="outline"
-              className="w-full"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              View Certificate
-            </Button>
-          )}
+          {registration.status === RegistrationStatus.CONFIRMED &&
+            past &&
+            registration.certificateIssued &&
+            registration.certificateUrl && (
+              <Button
+                onClick={() => onViewCertificate?.(registration.certificateUrl!)}
+                variant="outline"
+                className="w-full"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                View Certificate
+              </Button>
+            )}
 
           {registration.status === RegistrationStatus.CONFIRMED && upcoming && (
             <Button
@@ -225,18 +264,24 @@ export function EventRegistrationStatus({
 
         {/* Check-in Information */}
         {registration.checkedInAt && (
-          <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--chart-2)', color: 'var(--chart-2-foreground)', opacity: '0.1' }}>
+          <div
+            className="p-4 rounded-lg"
+            style={{
+              backgroundColor: "var(--chart-2)",
+              color: "var(--chart-2-foreground)",
+              opacity: "0.1",
+            }}
+          >
             <div className="flex">
-              <CheckCircle className="h-5 w-5 mr-2" style={{ color: 'var(--chart-2)' }} />
+              <CheckCircle className="h-5 w-5 mr-2" style={{ color: "var(--chart-2)" }} />
               <div>
                 <p className="font-medium">Checked In</p>
                 <p className="text-sm mt-1">
-                  You checked in at {formatTime(registration.checkedInAt)} on {formatDate(registration.checkedInAt)}.
+                  You checked in at {formatTime(registration.checkedInAt)} on{" "}
+                  {formatDate(registration.checkedInAt)}.
                 </p>
                 {registration.checkInMethod && (
-                  <p className="text-sm mt-1">
-                    Check-in method: {registration.checkInMethod}
-                  </p>
+                  <p className="text-sm mt-1">Check-in method: {registration.checkInMethod}</p>
                 )}
               </div>
             </div>

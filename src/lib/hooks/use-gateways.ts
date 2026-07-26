@@ -1,19 +1,19 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { 
-  PaymentGateway, 
-  GatewayOverallStatistics, 
-  GatewayTransaction, 
-  GatewayTestResult, 
+import {
+  PaymentGateway,
+  GatewayOverallStatistics,
+  GatewayTransaction,
+  GatewayTestResult,
   GatewayFilterOptions,
-  GatewayFormData 
+  GatewayFormData,
 } from "@/types/finance.types";
-import { 
-  mockPaymentGateways, 
-  mockGatewayStatistics, 
-  mockGatewayTransactions, 
-  mockGatewayTestResults 
+import {
+  mockPaymentGateways,
+  mockGatewayStatistics,
+  mockGatewayTransactions,
+  mockGatewayTestResults,
 } from "@/lib/data/mock-gateway-data";
 
 export function useGateways() {
@@ -31,8 +31,8 @@ export function useGateways() {
       try {
         setLoading(true);
         // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         setGateways(mockPaymentGateways);
         setTransactions(mockGatewayTransactions);
         setTestResults(mockGatewayTestResults);
@@ -50,11 +50,15 @@ export function useGateways() {
   }, []);
 
   // Filter gateways based on current filters
-  const filteredGateways = gateways.filter(gateway => {
+  const filteredGateways = gateways.filter((gateway) => {
     if (filters.status && !filters.status.includes(gateway.status)) return false;
     if (filters.provider && !filters.provider.includes(gateway.provider)) return false;
     if (filters.environment && !filters.environment.includes(gateway.environment)) return false;
-    if (filters.currency && !filters.currency.some(currency => gateway.currencies.includes(currency))) return false;
+    if (
+      filters.currency &&
+      !filters.currency.some((currency) => gateway.currencies.includes(currency))
+    )
+      return false;
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       return (
@@ -68,14 +72,15 @@ export function useGateways() {
   });
 
   // Filter transactions based on current filters
-  const filteredTransactions = transactions.filter(transaction => {
+  const filteredTransactions = transactions.filter((transaction) => {
     if (filters.status && !filters.status.includes(transaction.status)) return false;
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       return (
         transaction.transactionId.toLowerCase().includes(searchLower) ||
         transaction.gatewayName.toLowerCase().includes(searchLower) ||
-        (transaction.customerName && transaction.customerName.toLowerCase().includes(searchLower)) ||
+        (transaction.customerName &&
+          transaction.customerName.toLowerCase().includes(searchLower)) ||
         (transaction.customerEmail && transaction.customerEmail.toLowerCase().includes(searchLower))
       );
     }
@@ -84,7 +89,7 @@ export function useGateways() {
 
   // Update filters
   const updateFilters = useCallback((newFilters: Partial<GatewayFilterOptions>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    setFilters((prev) => ({ ...prev, ...newFilters }));
   }, []);
 
   // Clear all filters
@@ -97,8 +102,8 @@ export function useGateways() {
     try {
       setLoading(true);
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       setGateways(mockPaymentGateways);
       setTransactions(mockGatewayTransactions);
       setTestResults(mockGatewayTestResults);
@@ -116,8 +121,8 @@ export function useGateways() {
   const addGateway = useCallback(async (gatewayData: GatewayFormData) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       const newGateway: PaymentGateway = {
         id: `gw_${Date.now()}`,
         name: gatewayData.name,
@@ -158,7 +163,7 @@ export function useGateways() {
           recurringPayments: false,
           subscriptionSupport: false,
           maxTransactionAmount: 10000,
-          minTransactionAmount: 0.50,
+          minTransactionAmount: 0.5,
           dailyTransactionLimit: 50000,
           monthlyTransactionLimit: 1000000,
           webhookRetries: 3,
@@ -183,7 +188,7 @@ export function useGateways() {
         createdBy: "current-user@example.com",
       };
 
-      setGateways(prev => [...prev, newGateway]);
+      setGateways((prev) => [...prev, newGateway]);
       return newGateway;
     } catch (err) {
       setError("Failed to add gateway");
@@ -196,44 +201,60 @@ export function useGateways() {
   const updateGateway = useCallback(async (id: string, gatewayData: Partial<GatewayFormData>) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setGateways(prev => prev.map(gateway =>
-        gateway.id === id
-          ? {
-              ...gateway,
-              name: gatewayData.name || gateway.name,
-              provider: gatewayData.provider || gateway.provider,
-              displayName: gatewayData.displayName || gateway.displayName,
-              description: gatewayData.description !== undefined ? gatewayData.description : gateway.description,
-              environment: gatewayData.environment || gateway.environment,
-              currencies: gatewayData.currencies || gateway.currencies,
-              transactionFees: gatewayData.transactionFees ?
-                gatewayData.transactionFees.map((fee, index) => ({
-                  id: fee.id || `fee_${Date.now()}_${index}`,
-                  type: fee.type || "fixed",
-                  name: fee.name || "Standard Fee",
-                  description: fee.description,
-                  amount: fee.amount || 0,
-                  percentage: fee.percentage || 0,
-                  minAmount: fee.minAmount,
-                  maxAmount: fee.maxAmount,
-                  currency: "USD",
-                  appliesTo: fee.appliesTo || [],
-                  isActive: true,
-                })) : gateway.transactionFees,
-              webhookUrl: gatewayData.webhookUrl !== undefined ? gatewayData.webhookUrl : gateway.webhookUrl,
-              merchantId: gatewayData.merchantId !== undefined ? gatewayData.merchantId : gateway.merchantId,
-              accountId: gatewayData.accountId !== undefined ? gatewayData.accountId : gateway.accountId,
-              isDefault: gatewayData.isDefault !== undefined ? gatewayData.isDefault : gateway.isDefault,
-              isEnabled: gatewayData.isEnabled !== undefined ? gatewayData.isEnabled : gateway.isEnabled,
-              configuration: gatewayData.configuration ?
-                { ...gateway.configuration, ...gatewayData.configuration } : gateway.configuration,
-              updatedAt: new Date(),
-              updatedBy: "current-user@example.com",
-            }
-          : gateway
-      ));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setGateways((prev) =>
+        prev.map((gateway) =>
+          gateway.id === id
+            ? {
+                ...gateway,
+                name: gatewayData.name || gateway.name,
+                provider: gatewayData.provider || gateway.provider,
+                displayName: gatewayData.displayName || gateway.displayName,
+                description:
+                  gatewayData.description !== undefined
+                    ? gatewayData.description
+                    : gateway.description,
+                environment: gatewayData.environment || gateway.environment,
+                currencies: gatewayData.currencies || gateway.currencies,
+                transactionFees: gatewayData.transactionFees
+                  ? gatewayData.transactionFees.map((fee, index) => ({
+                      id: fee.id || `fee_${Date.now()}_${index}`,
+                      type: fee.type || "fixed",
+                      name: fee.name || "Standard Fee",
+                      description: fee.description,
+                      amount: fee.amount || 0,
+                      percentage: fee.percentage || 0,
+                      minAmount: fee.minAmount,
+                      maxAmount: fee.maxAmount,
+                      currency: "USD",
+                      appliesTo: fee.appliesTo || [],
+                      isActive: true,
+                    }))
+                  : gateway.transactionFees,
+                webhookUrl:
+                  gatewayData.webhookUrl !== undefined
+                    ? gatewayData.webhookUrl
+                    : gateway.webhookUrl,
+                merchantId:
+                  gatewayData.merchantId !== undefined
+                    ? gatewayData.merchantId
+                    : gateway.merchantId,
+                accountId:
+                  gatewayData.accountId !== undefined ? gatewayData.accountId : gateway.accountId,
+                isDefault:
+                  gatewayData.isDefault !== undefined ? gatewayData.isDefault : gateway.isDefault,
+                isEnabled:
+                  gatewayData.isEnabled !== undefined ? gatewayData.isEnabled : gateway.isEnabled,
+                configuration: gatewayData.configuration
+                  ? { ...gateway.configuration, ...gatewayData.configuration }
+                  : gateway.configuration,
+                updatedAt: new Date(),
+                updatedBy: "current-user@example.com",
+              }
+            : gateway,
+        ),
+      );
     } catch (err) {
       setError("Failed to update gateway");
       console.error("Error updating gateway:", err);
@@ -245,9 +266,9 @@ export function useGateways() {
   const deleteGateway = useCallback(async (id: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setGateways(prev => prev.filter(gateway => gateway.id !== id));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setGateways((prev) => prev.filter((gateway) => gateway.id !== id));
     } catch (err) {
       setError("Failed to delete gateway");
       console.error("Error deleting gateway:", err);
@@ -259,19 +280,21 @@ export function useGateways() {
   const toggleGatewayStatus = useCallback(async (id: string, enabled: boolean) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      setGateways(prev => prev.map(gateway => 
-        gateway.id === id 
-          ? { 
-              ...gateway, 
-              isEnabled: enabled,
-              status: enabled ? "active" : "inactive",
-              updatedAt: new Date(),
-              updatedBy: "current-user@example.com",
-            }
-          : gateway
-      ));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      setGateways((prev) =>
+        prev.map((gateway) =>
+          gateway.id === id
+            ? {
+                ...gateway,
+                isEnabled: enabled,
+                status: enabled ? "active" : "inactive",
+                updatedAt: new Date(),
+                updatedBy: "current-user@example.com",
+              }
+            : gateway,
+        ),
+      );
     } catch (err) {
       setError("Failed to toggle gateway status");
       console.error("Error toggling gateway status:", err);
@@ -283,8 +306,8 @@ export function useGateways() {
   const testGateway = useCallback(async (id: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const testResult: GatewayTestResult = {
         gatewayId: id,
         testType: "connection",
@@ -295,19 +318,21 @@ export function useGateways() {
         duration: Math.floor(Math.random() * 300 + 50),
       };
 
-      setTestResults(prev => [testResult, ...prev]);
-      
+      setTestResults((prev) => [testResult, ...prev]);
+
       // Update gateway's last tested date
-      setGateways(prev => prev.map(gateway => 
-        gateway.id === id 
-          ? { 
-              ...gateway, 
-              lastTestedAt: new Date(),
-              updatedAt: new Date(),
-              updatedBy: "current-user@example.com",
-            }
-          : gateway
-      ));
+      setGateways((prev) =>
+        prev.map((gateway) =>
+          gateway.id === id
+            ? {
+                ...gateway,
+                lastTestedAt: new Date(),
+                updatedAt: new Date(),
+                updatedBy: "current-user@example.com",
+              }
+            : gateway,
+        ),
+      );
 
       return testResult;
     } catch (err) {
@@ -321,7 +346,7 @@ export function useGateways() {
         duration: 5000,
       };
 
-      setTestResults(prev => [testResult, ...prev]);
+      setTestResults((prev) => [testResult, ...prev]);
       throw err;
     }
   }, []);
@@ -330,14 +355,16 @@ export function useGateways() {
   const setDefaultGateway = useCallback(async (id: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setGateways(prev => prev.map(gateway => ({
-        ...gateway,
-        isDefault: gateway.id === id,
-        updatedAt: new Date(),
-        updatedBy: "current-user@example.com",
-      })));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setGateways((prev) =>
+        prev.map((gateway) => ({
+          ...gateway,
+          isDefault: gateway.id === id,
+          updatedAt: new Date(),
+          updatedBy: "current-user@example.com",
+        })),
+      );
     } catch (err) {
       setError("Failed to set default gateway");
       console.error("Error setting default gateway:", err);

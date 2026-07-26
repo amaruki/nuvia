@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { WidgetContainer } from "../../ui/widget-container"
-import { Card, CardContent } from "../../ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "../../ui/badge"
-import { FileText, User, Calendar, MessageSquare, ExternalLink, Bookmark } from "lucide-react"
-import { Article } from "@/types/dashboard.types"
+import * as React from "react";
+import { WidgetContainer } from "../../ui/widget-container";
+import { Card, CardContent } from "../../ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "../../ui/badge";
+import { FileText, User, Calendar, MessageSquare, ExternalLink, Bookmark } from "lucide-react";
+import { Article } from "@/types/dashboard.types";
 
 interface RecentArticlesWidgetProps {
-  articles?: Article[]
-  onReadArticle?: (articleId: string) => void
-  onBookmarkArticle?: (articleId: string) => void
-  onViewAllArticles?: () => void
+  articles?: Article[];
+  onReadArticle?: (articleId: string) => void;
+  onBookmarkArticle?: (articleId: string) => void;
+  onViewAllArticles?: () => void;
 }
 
 // Mock articles data - in a real app, this would come from an API
@@ -20,7 +20,8 @@ const mockArticles: Article[] = [
   {
     id: "1",
     title: "Getting Started with React Hooks",
-    excerpt: "Learn the fundamentals of React Hooks and how to use them effectively in your applications.",
+    excerpt:
+      "Learn the fundamentals of React Hooks and how to use them effectively in your applications.",
     author: "Jane Smith",
     publishedAt: new Date("2023-10-01T10:30:00"),
     category: "Development",
@@ -32,7 +33,8 @@ const mockArticles: Article[] = [
   {
     id: "2",
     title: "The Future of Web Development",
-    excerpt: "Exploring emerging trends and technologies that will shape the future of web development.",
+    excerpt:
+      "Exploring emerging trends and technologies that will shape the future of web development.",
     author: "John Doe",
     publishedAt: new Date("2023-09-28T14:15:00"),
     category: "Technology",
@@ -44,7 +46,8 @@ const mockArticles: Article[] = [
   {
     id: "3",
     title: "Building Accessible Web Applications",
-    excerpt: "Best practices and techniques for creating web applications that are accessible to all users.",
+    excerpt:
+      "Best practices and techniques for creating web applications that are accessible to all users.",
     author: "Alex Johnson",
     publishedAt: new Date("2023-09-25T09:45:00"),
     category: "Accessibility",
@@ -56,7 +59,8 @@ const mockArticles: Article[] = [
   {
     id: "4",
     title: "Introduction to TypeScript",
-    excerpt: "A comprehensive guide to getting started with TypeScript and its benefits for JavaScript developers.",
+    excerpt:
+      "A comprehensive guide to getting started with TypeScript and its benefits for JavaScript developers.",
     author: "Sarah Williams",
     publishedAt: new Date("2023-09-22T16:20:00"),
     category: "Development",
@@ -65,30 +69,30 @@ const mockArticles: Article[] = [
     commentCount: 15,
     viewCount: 321,
   },
-]
+];
 
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(date)
-}
+  }).format(date);
+};
 
 const getCategoryColor = (category: string) => {
   switch (category) {
     case "Development":
-      return "bg-chart-1/20 text-chart-1"
+      return "bg-chart-1/20 text-chart-1";
     case "Technology":
-      return "bg-chart-2/20 text-chart-2"
+      return "bg-chart-2/20 text-chart-2";
     case "Accessibility":
-      return "bg-chart-3/20 text-chart-3"
+      return "bg-chart-3/20 text-chart-3";
     case "Design":
-      return "bg-chart-4/20 text-chart-4"
+      return "bg-chart-4/20 text-chart-4";
     default:
-      return "bg-secondary text-secondary-foreground"
+      return "bg-secondary text-secondary-foreground";
   }
-}
+};
 
 export function RecentArticlesWidget({
   articles = mockArticles,
@@ -100,7 +104,7 @@ export function RecentArticlesWidget({
     <WidgetContainer
       type="recent-articles"
       title="Recent Articles"
-      description={`${articles.length} latest article${articles.length !== 1 ? 's' : ''}`}
+      description={`${articles.length} latest article${articles.length !== 1 ? "s" : ""}`}
       size="large"
     >
       <Card className="border-0 shadow-none">
@@ -114,16 +118,11 @@ export function RecentArticlesWidget({
                   {articles.length} articles
                 </span>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onViewAllArticles}
-                className="text-xs"
-              >
+              <Button variant="ghost" size="sm" onClick={onViewAllArticles} className="text-xs">
                 View all articles
               </Button>
             </div>
-            
+
             {/* Articles list */}
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {articles.length === 0 ? (
@@ -133,10 +132,7 @@ export function RecentArticlesWidget({
                 </div>
               ) : (
                 articles.map((article) => (
-                  <div
-                    key={article.id}
-                    className="p-4 rounded-lg border bg-card border-border"
-                  >
+                  <div key={article.id} className="p-4 rounded-lg border bg-card border-border">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-1">
@@ -147,12 +143,12 @@ export function RecentArticlesWidget({
                             {article.category}
                           </Badge>
                         </div>
-                        
+
                         <p className="text-sm text-foreground/60 mb-3 line-clamp-2">
                           {article.excerpt}
                         </p>
                       </div>
-                      
+
                       <Button
                         variant="ghost"
                         size="sm"
@@ -167,7 +163,7 @@ export function RecentArticlesWidget({
                         />
                       </Button>
                     </div>
-                    
+
                     {/* Article metadata */}
                     <div className="flex items-center justify-between text-xs text-foreground/50 mb-3">
                       <div className="flex items-center space-x-3">
@@ -175,31 +171,31 @@ export function RecentArticlesWidget({
                           <User className="h-3 w-3" />
                           <span>{article.author}</span>
                         </div>
-                        
+
                         <div className="flex items-center space-x-1">
                           <Calendar className="h-3 w-3" />
                           <span>{formatDate(article.publishedAt)}</span>
                         </div>
-                        
+
                         <div className="flex items-center space-x-1">
                           <span>•</span>
                           <span>{article.readTime} min read</span>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center space-x-3">
                         <div className="flex items-center space-x-1">
                           <MessageSquare className="h-3 w-3" />
                           <span>{article.commentCount}</span>
                         </div>
-                        
+
                         <div className="flex items-center space-x-1">
                           <span>•</span>
                           <span>{article.viewCount} views</span>
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Article actions */}
                     <div className="flex items-center justify-between">
                       <div className="flex space-x-2">
@@ -212,7 +208,7 @@ export function RecentArticlesWidget({
                           Read Article
                         </Button>
                       </div>
-                      
+
                       <Button
                         variant="ghost"
                         size="sm"
@@ -231,5 +227,5 @@ export function RecentArticlesWidget({
         </CardContent>
       </Card>
     </WidgetContainer>
-  )
+  );
 }

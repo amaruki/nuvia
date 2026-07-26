@@ -19,8 +19,7 @@ export default function CreatePublicationPage() {
   useEffect(() => {
     setHeader({
       title: "Create New Publication",
-      description:
-        "Create a new publication with comprehensive metadata and content management",
+      description: "Create a new publication with comprehensive metadata and content management",
     });
 
     return () => {
@@ -33,9 +32,7 @@ export default function CreatePublicationPage() {
       const newPublication = await addPublication(data);
       router.push(`/dashboard/content/publications/${newPublication.id}`);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to create publication"
-      );
+      setError(err instanceof Error ? err.message : "Failed to create publication");
     }
   };
 

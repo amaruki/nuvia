@@ -1,13 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { 
+import {
   Download,
   Calendar,
   User,
@@ -25,14 +31,14 @@ import {
   CheckCircle,
   AlertTriangle,
 } from "lucide-react";
-import { 
+import {
   FinancialReport,
   IncomeStatementData,
   BalanceSheetData,
   CashFlowData,
   BudgetVsActualData,
   TaxDocumentData,
-  AuditTrailData
+  AuditTrailData,
 } from "@/types/finance.types";
 import { cn } from "@/lib/utils";
 
@@ -49,7 +55,7 @@ interface ReportsDetailsModalProps {
   onDownload: (report: FinancialReport) => void;
   onEdit: (report: FinancialReport) => void;
   onShare: (report: FinancialReport) => void;
-  onUpdateStatus: (report: FinancialReport, status: FinancialReport['status']) => void;
+  onUpdateStatus: (report: FinancialReport, status: FinancialReport["status"]) => void;
 }
 
 export function ReportsDetailsModal({
@@ -92,39 +98,47 @@ export function ReportsDetailsModal({
     if (!bytes) return "N/A";
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + " " + sizes[i];
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + " " + sizes[i];
   };
 
   const getReportTypeIcon = (type: string) => {
     switch (type) {
-      case 'income_statement':
+      case "income_statement":
         return <BarChart3 className="h-5 w-5" />;
-      case 'balance_sheet':
+      case "balance_sheet":
         return <PieChart className="h-5 w-5" />;
-      case 'cash_flow':
+      case "cash_flow":
         return <DollarSign className="h-5 w-5" />;
-      case 'budget_vs_actual':
+      case "budget_vs_actual":
         return <TrendingUp className="h-5 w-5" />;
-      case 'tax_document':
+      case "tax_document":
         return <FileText className="h-5 w-5" />;
-      case 'audit_trail':
+      case "audit_trail":
         return <Shield className="h-5 w-5" />;
       default:
         return <FileText className="h-5 w-5" />;
     }
   };
 
-  const getStatusBadge = (status: FinancialReport['status']) => {
+  const getStatusBadge = (status: FinancialReport["status"]) => {
     switch (status) {
-      case 'draft':
+      case "draft":
         return <Badge variant="secondary">Draft</Badge>;
-      case 'pending_review':
-        return <Badge variant="outline" className="border-yellow-500 text-yellow-600">Pending Review</Badge>;
-      case 'approved':
-        return <Badge variant="outline" className="border-blue-500 text-blue-600">Approved</Badge>;
-      case 'published':
+      case "pending_review":
+        return (
+          <Badge variant="outline" className="border-yellow-500 text-yellow-600">
+            Pending Review
+          </Badge>
+        );
+      case "approved":
+        return (
+          <Badge variant="outline" className="border-blue-500 text-blue-600">
+            Approved
+          </Badge>
+        );
+      case "published":
         return <Badge variant="default">Published</Badge>;
-      case 'archived':
+      case "archived":
         return <Badge variant="outline">Archived</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
@@ -145,7 +159,9 @@ export function ReportsDetailsModal({
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Total Revenue</span>
-                  <span className="font-medium">{formatCurrency(incomeStatementData.revenue.totalRevenue)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(incomeStatementData.revenue.totalRevenue)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Operating Revenue</span>
@@ -166,7 +182,9 @@ export function ReportsDetailsModal({
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Total Expenses</span>
-                  <span className="font-medium">{formatCurrency(incomeStatementData.expenses.totalExpenses)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(incomeStatementData.expenses.totalExpenses)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Operating Expenses</span>
@@ -188,11 +206,15 @@ export function ReportsDetailsModal({
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span>Gross Profit</span>
-                <span className="font-medium">{formatCurrency(incomeStatementData.grossProfit)}</span>
+                <span className="font-medium">
+                  {formatCurrency(incomeStatementData.grossProfit)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Operating Income</span>
-                <span className="font-medium">{formatCurrency(incomeStatementData.operatingIncome)}</span>
+                <span className="font-medium">
+                  {formatCurrency(incomeStatementData.operatingIncome)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>EBITDA</span>
@@ -223,7 +245,9 @@ export function ReportsDetailsModal({
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Total Assets</span>
-                  <span className="font-medium">{formatCurrency(balanceSheetData.assets.totalAssets)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(balanceSheetData.assets.totalAssets)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Current Assets</span>
@@ -244,7 +268,9 @@ export function ReportsDetailsModal({
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Total Liabilities</span>
-                  <span className="font-medium">{formatCurrency(balanceSheetData.liabilities.totalLiabilities)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(balanceSheetData.liabilities.totalLiabilities)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Current Liabilities</span>
@@ -265,7 +291,9 @@ export function ReportsDetailsModal({
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Total Equity</span>
-                  <span className="font-medium">{formatCurrency(balanceSheetData.equity.totalEquity)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(balanceSheetData.equity.totalEquity)}
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -297,11 +325,15 @@ export function ReportsDetailsModal({
                 </div>
                 <div className="flex justify-between">
                   <span>Changes in Working Capital</span>
-                  <span>{formatCurrency(cashFlowData.operatingActivities.changesInWorkingCapital)}</span>
+                  <span>
+                    {formatCurrency(cashFlowData.operatingActivities.changesInWorkingCapital)}
+                  </span>
                 </div>
                 <div className="flex justify-between font-medium">
                   <span>Net Cash from Operations</span>
-                  <span>{formatCurrency(cashFlowData.operatingActivities.netCashFromOperations)}</span>
+                  <span>
+                    {formatCurrency(cashFlowData.operatingActivities.netCashFromOperations)}
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -314,7 +346,9 @@ export function ReportsDetailsModal({
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Capital Expenditures</span>
-                  <span>{formatCurrency(cashFlowData.investingActivities.capitalExpenditures)}</span>
+                  <span>
+                    {formatCurrency(cashFlowData.investingActivities.capitalExpenditures)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Investments</span>
@@ -322,7 +356,9 @@ export function ReportsDetailsModal({
                 </div>
                 <div className="flex justify-between font-medium">
                   <span>Net Cash from Investing</span>
-                  <span>{formatCurrency(cashFlowData.investingActivities.netCashFromInvesting)}</span>
+                  <span>
+                    {formatCurrency(cashFlowData.investingActivities.netCashFromInvesting)}
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -343,7 +379,9 @@ export function ReportsDetailsModal({
                 </div>
                 <div className="flex justify-between font-medium">
                   <span>Net Cash from Financing</span>
-                  <span>{formatCurrency(cashFlowData.financingActivities.netCashFromFinancing)}</span>
+                  <span>
+                    {formatCurrency(cashFlowData.financingActivities.netCashFromFinancing)}
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -387,27 +425,37 @@ export function ReportsDetailsModal({
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span>Total Budgeted</span>
-                <span className="font-medium">{formatCurrency(budgetVsActualData.totalBudgeted)}</span>
+                <span className="font-medium">
+                  {formatCurrency(budgetVsActualData.totalBudgeted)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Total Actual</span>
-                <span className="font-medium">{formatCurrency(budgetVsActualData.totalActual)}</span>
+                <span className="font-medium">
+                  {formatCurrency(budgetVsActualData.totalActual)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Total Variance</span>
-                <span className={cn(
-                  "font-medium",
-                  budgetVsActualData.totalVariance >= 0 ? "text-green-600" : "text-red-600"
-                )}>
+                <span
+                  className={cn(
+                    "font-medium",
+                    budgetVsActualData.totalVariance >= 0 ? "text-green-600" : "text-red-600",
+                  )}
+                >
                   {formatCurrency(budgetVsActualData.totalVariance)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Variance Percentage</span>
-                <span className={cn(
-                  "font-medium",
-                  budgetVsActualData.totalVariancePercentage >= 0 ? "text-green-600" : "text-red-600"
-                )}>
+                <span
+                  className={cn(
+                    "font-medium",
+                    budgetVsActualData.totalVariancePercentage >= 0
+                      ? "text-green-600"
+                      : "text-red-600",
+                  )}
+                >
                   {budgetVsActualData.totalVariancePercentage.toFixed(1)}%
                 </span>
               </div>
@@ -420,11 +468,16 @@ export function ReportsDetailsModal({
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">{category.name}</CardTitle>
-                  <Badge variant={
-                    category.status === 'under_budget' ? 'default' :
-                    category.status === 'on_track' ? 'secondary' : 'destructive'
-                  }>
-                    {category.status.replace('_', ' ')}
+                  <Badge
+                    variant={
+                      category.status === "under_budget"
+                        ? "default"
+                        : category.status === "on_track"
+                          ? "secondary"
+                          : "destructive"
+                    }
+                  >
+                    {category.status.replace("_", " ")}
                   </Badge>
                 </div>
               </CardHeader>
@@ -440,10 +493,12 @@ export function ReportsDetailsModal({
                   </div>
                   <div className="flex justify-between">
                     <span>Variance</span>
-                    <span className={cn(
-                      "font-medium",
-                      category.variance >= 0 ? "text-green-600" : "text-red-600"
-                    )}>
+                    <span
+                      className={cn(
+                        "font-medium",
+                        category.variance >= 0 ? "text-green-600" : "text-red-600",
+                      )}
+                    >
                       {formatCurrency(category.variance)}
                     </span>
                   </div>
@@ -452,9 +507,9 @@ export function ReportsDetailsModal({
                       <span>Progress</span>
                       <span>{Math.abs(category.variancePercentage).toFixed(1)}%</span>
                     </div>
-                    <Progress 
-                      value={Math.min(Math.abs(category.variancePercentage), 100)} 
-                      className="h-2" 
+                    <Progress
+                      value={Math.min(Math.abs(category.variancePercentage), 100)}
+                      className="h-2"
                     />
                   </div>
                 </div>
@@ -483,11 +538,15 @@ export function ReportsDetailsModal({
               </div>
               <div className="flex justify-between">
                 <span>Tax Type</span>
-                <span className="font-medium capitalize">{taxDocumentData.taxType.replace('_', ' ')}</span>
+                <span className="font-medium capitalize">
+                  {taxDocumentData.taxType.replace("_", " ")}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Total Taxable Income</span>
-                <span className="font-medium">{formatCurrency(taxDocumentData.totalTaxableIncome)}</span>
+                <span className="font-medium">
+                  {formatCurrency(taxDocumentData.totalTaxableIncome)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Total Tax</span>
@@ -562,7 +621,8 @@ export function ReportsDetailsModal({
               <div className="flex justify-between">
                 <span>Audit Period</span>
                 <span className="font-medium">
-                  {formatDate(auditTrailData.auditPeriod.startDate)} - {formatDate(auditTrailData.auditPeriod.endDate)}
+                  {formatDate(auditTrailData.auditPeriod.startDate)} -{" "}
+                  {formatDate(auditTrailData.auditPeriod.endDate)}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -575,11 +635,16 @@ export function ReportsDetailsModal({
               </div>
               <div className="flex justify-between">
                 <span>Status</span>
-                <Badge variant={
-                  auditTrailData.status === 'completed' ? 'default' :
-                  auditTrailData.status === 'in_progress' ? 'secondary' : 'destructive'
-                }>
-                  {auditTrailData.status.replace('_', ' ')}
+                <Badge
+                  variant={
+                    auditTrailData.status === "completed"
+                      ? "default"
+                      : auditTrailData.status === "in_progress"
+                        ? "secondary"
+                        : "destructive"
+                  }
+                >
+                  {auditTrailData.status.replace("_", " ")}
                 </Badge>
               </div>
               <div className="flex justify-between">
@@ -597,37 +662,57 @@ export function ReportsDetailsModal({
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span>Overall Risk</span>
-                <Badge variant={
-                  auditTrailData.riskAssessment.overall === 'low' ? 'default' :
-                  auditTrailData.riskAssessment.overall === 'medium' ? 'secondary' : 'destructive'
-                }>
+                <Badge
+                  variant={
+                    auditTrailData.riskAssessment.overall === "low"
+                      ? "default"
+                      : auditTrailData.riskAssessment.overall === "medium"
+                        ? "secondary"
+                        : "destructive"
+                  }
+                >
                   {auditTrailData.riskAssessment.overall}
                 </Badge>
               </div>
               <div className="flex justify-between">
                 <span>Financial Risk</span>
-                <Badge variant={
-                  auditTrailData.riskAssessment.financial === 'low' ? 'default' :
-                  auditTrailData.riskAssessment.financial === 'medium' ? 'secondary' : 'destructive'
-                }>
+                <Badge
+                  variant={
+                    auditTrailData.riskAssessment.financial === "low"
+                      ? "default"
+                      : auditTrailData.riskAssessment.financial === "medium"
+                        ? "secondary"
+                        : "destructive"
+                  }
+                >
                   {auditTrailData.riskAssessment.financial}
                 </Badge>
               </div>
               <div className="flex justify-between">
                 <span>Operational Risk</span>
-                <Badge variant={
-                  auditTrailData.riskAssessment.operational === 'low' ? 'default' :
-                  auditTrailData.riskAssessment.operational === 'medium' ? 'secondary' : 'destructive'
-                }>
+                <Badge
+                  variant={
+                    auditTrailData.riskAssessment.operational === "low"
+                      ? "default"
+                      : auditTrailData.riskAssessment.operational === "medium"
+                        ? "secondary"
+                        : "destructive"
+                  }
+                >
                   {auditTrailData.riskAssessment.operational}
                 </Badge>
               </div>
               <div className="flex justify-between">
                 <span>Compliance Risk</span>
-                <Badge variant={
-                  auditTrailData.riskAssessment.compliance === 'low' ? 'default' :
-                  auditTrailData.riskAssessment.compliance === 'medium' ? 'secondary' : 'destructive'
-                }>
+                <Badge
+                  variant={
+                    auditTrailData.riskAssessment.compliance === "low"
+                      ? "default"
+                      : auditTrailData.riskAssessment.compliance === "medium"
+                        ? "secondary"
+                        : "destructive"
+                  }
+                >
                   {auditTrailData.riskAssessment.compliance}
                 </Badge>
               </div>
@@ -645,18 +730,29 @@ export function ReportsDetailsModal({
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium">{finding.category}</h4>
                     <div className="flex items-center gap-2">
-                      <Badge variant={
-                        finding.severity === 'low' ? 'secondary' :
-                        finding.severity === 'medium' ? 'outline' :
-                        finding.severity === 'high' ? 'destructive' : 'destructive'
-                      }>
+                      <Badge
+                        variant={
+                          finding.severity === "low"
+                            ? "secondary"
+                            : finding.severity === "medium"
+                              ? "outline"
+                              : finding.severity === "high"
+                                ? "destructive"
+                                : "destructive"
+                        }
+                      >
                         {finding.severity}
                       </Badge>
-                      <Badge variant={
-                        finding.status === 'resolved' ? 'default' :
-                        finding.status === 'in_progress' ? 'secondary' : 'outline'
-                      }>
-                        {finding.status.replace('_', ' ')}
+                      <Badge
+                        variant={
+                          finding.status === "resolved"
+                            ? "default"
+                            : finding.status === "in_progress"
+                              ? "secondary"
+                              : "outline"
+                        }
+                      >
+                        {finding.status.replace("_", " ")}
                       </Badge>
                     </div>
                   </div>
@@ -678,17 +774,17 @@ export function ReportsDetailsModal({
 
   const renderReportContent = () => {
     switch (report.type) {
-      case 'income_statement':
+      case "income_statement":
         return renderIncomeStatement();
-      case 'balance_sheet':
+      case "balance_sheet":
         return renderBalanceSheet();
-      case 'cash_flow':
+      case "cash_flow":
         return renderCashFlow();
-      case 'budget_vs_actual':
+      case "budget_vs_actual":
         return renderBudgetVsActual();
-      case 'tax_document':
+      case "tax_document":
         return renderTaxDocument();
-      case 'audit_trail':
+      case "audit_trail":
         return renderAuditTrail();
       default:
         return (
@@ -710,19 +806,13 @@ export function ReportsDetailsModal({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-md bg-primary/10">
-                {getReportTypeIcon(report.type)}
-              </div>
+              <div className="p-2 rounded-md bg-primary/10">{getReportTypeIcon(report.type)}</div>
               <div>
                 <DialogTitle className="text-xl">{report.title}</DialogTitle>
-                <DialogDescription className="mt-1">
-                  {report.description}
-                </DialogDescription>
+                <DialogDescription className="mt-1">{report.description}</DialogDescription>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              {getStatusBadge(report.status)}
-            </div>
+            <div className="flex items-center gap-2">{getStatusBadge(report.status)}</div>
           </div>
         </DialogHeader>
 
@@ -848,7 +938,8 @@ export function ReportsDetailsModal({
                       <div className="flex-1">
                         <p className="text-sm font-medium">Report reviewed</p>
                         <p className="text-xs text-muted-foreground">
-                          {report.reviewedBy} reviewed this report on {formatDate(report.reviewedAt!)}
+                          {report.reviewedBy} reviewed this report on{" "}
+                          {formatDate(report.reviewedAt!)}
                         </p>
                       </div>
                     </div>

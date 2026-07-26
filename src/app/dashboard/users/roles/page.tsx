@@ -5,14 +5,14 @@
  * and role-based access control for the Nuvia AMS platform.
  */
 
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import React, { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Shield,
   Users,
@@ -21,43 +21,43 @@ import {
   Lock,
   AlertTriangle,
   RefreshCw,
-  Plus
-} from 'lucide-react';
+  Plus,
+} from "lucide-react";
 
 // Import components
-import { RoleManagementTable } from '@/components/roles/role-management-table';
-import { PermissionMatrix } from '@/components/roles/permission-matrix';
-import { RoleStatistics, RoleStatisticsData } from '@/components/roles/role-statistics';
+import { RoleManagementTable } from "@/components/roles/role-management-table";
+import { PermissionMatrix } from "@/components/roles/permission-matrix";
+import { RoleStatistics, RoleStatisticsData } from "@/components/roles/role-statistics";
 
 // Import types and services
-import { Role, Permission } from '@/types/role.types';
-import { UserWithRoleInfo } from '@/lib/services/role.service';
-import { useHeader } from '@/contexts/dashboard-context';
+import { Role, Permission } from "@/types/role.types";
+import { UserWithRoleInfo } from "@/lib/services/role.service";
+import { useHeader } from "@/contexts/dashboard-context";
 
 export default function UserRoles() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(false);
   const { setHeader, clearHeader } = useHeader();
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<UserWithRoleInfo[]>([]);
   const [roleStats, setRoleStats] = useState<RoleStatisticsData | undefined>(undefined);
-  const [currentUserRole, setCurrentUserRole] = useState<Role>('admin');
-  const [selectedRole, setSelectedRole] = useState<Role>('user');
+  const [currentUserRole, setCurrentUserRole] = useState<Role>("admin");
+  const [selectedRole, setSelectedRole] = useState<Role>("user");
 
   // Set header and active tab from URL parameter if available
-    useEffect(() => {
-      // Set the header
-      setHeader({
-        title: "Role Management",
-        description: "Manage user roles, permissions, and access control for your organization."
-      });
-      setLoading(false);
-  
-      // Cleanup header on unmount
-      return () => {
-        clearHeader();
-      };
-    }, [setHeader, clearHeader]);
+  useEffect(() => {
+    // Set the header
+    setHeader({
+      title: "Role Management",
+      description: "Manage user roles, permissions, and access control for your organization.",
+    });
+    setLoading(false);
+
+    // Cleanup header on unmount
+    return () => {
+      clearHeader();
+    };
+  }, [setHeader, clearHeader]);
 
   // Load data
   const loadData = async () => {
@@ -66,34 +66,36 @@ export default function UserRoles() {
 
     try {
       // Load users with roles
-      const usersResponse = await fetch('/api/v1/admin/users?includeRoles=true&limit=100');
+      const usersResponse = await fetch("/api/v1/admin/users?includeRoles=true&limit=100");
       if (!usersResponse.ok) {
-        throw new Error('Failed to load users');
+        throw new Error("Failed to load users");
       }
       const usersData = await usersResponse.json();
 
       // Load role statistics
-      const statsResponse = await fetch('/api/v1/admin/roles?includeStats=true');
+      const statsResponse = await fetch("/api/v1/admin/roles?includeStats=true");
       if (!statsResponse.ok) {
-        throw new Error('Failed to load statistics');
+        throw new Error("Failed to load statistics");
       }
       const statsData = await statsResponse.json();
 
       // Load current user role
-      const sessionResponse = await fetch('/api/auth/session');
+      const sessionResponse = await fetch("/api/auth/session");
       if (sessionResponse.ok) {
         const sessionData = await sessionResponse.json();
-        setCurrentUserRole(sessionData.user?.role || 'user');
+        setCurrentUserRole(sessionData.user?.role || "user");
       }
 
       setUsers(usersData.data?.users || []);
-      setRoleStats(statsData.data?.statistics || {
-        totalUsers: 0,
-        roleDistribution: {},
-        roleBreakdown: []
-      });
+      setRoleStats(
+        statsData.data?.statistics || {
+          totalUsers: 0,
+          roleDistribution: {},
+          roleBreakdown: [],
+        },
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load data');
+      setError(err instanceof Error ? err.message : "Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -103,25 +105,25 @@ export default function UserRoles() {
   const handleRoleChange = async (userId: string, newRole: Role, reason?: string) => {
     try {
       const response = await fetch(`/api/v1/admin/users/${userId}/role`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           role: newRole,
-          reason: reason || 'Role updated by administrator'
+          reason: reason || "Role updated by administrator",
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update role');
+        throw new Error(errorData.message || "Failed to update role");
       }
 
       // Refresh data
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update role');
+      setError(err instanceof Error ? err.message : "Failed to update role");
       throw err;
     }
   };
@@ -129,28 +131,28 @@ export default function UserRoles() {
   // Handle bulk role change
   const handleBulkRoleChange = async (userIds: string[], newRole: Role, reason?: string) => {
     try {
-      const response = await fetch('/api/v1/admin/users/bulk-role-update', {
-        method: 'POST',
+      const response = await fetch("/api/v1/admin/users/bulk-role-update", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userIds,
           role: newRole,
-          reason: reason || 'Bulk role update by administrator',
-          confirm: true
+          reason: reason || "Bulk role update by administrator",
+          confirm: true,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update roles');
+        throw new Error(errorData.message || "Failed to update roles");
       }
 
       // Refresh data
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update roles');
+      setError(err instanceof Error ? err.message : "Failed to update roles");
       throw err;
     }
   };
@@ -158,7 +160,7 @@ export default function UserRoles() {
   // Handle permission toggle (for custom roles)
   const handlePermissionToggle = async (role: Role, permission: Permission, granted: boolean) => {
     // TODO: Implement custom role permission management
-    console.log('Permission toggle:', { role, permission, granted });
+    console.log("Permission toggle:", { role, permission, granted });
   };
 
   // Load data on mount
@@ -182,7 +184,7 @@ export default function UserRoles() {
             Current Role: {currentUserRole}
           </Badge>
           <Button variant="outline" onClick={loadData} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
             Refresh
           </Button>
         </div>
@@ -236,7 +238,7 @@ export default function UserRoles() {
                   <Button
                     className="w-full justify-start"
                     variant="outline"
-                    onClick={() => setActiveTab('users')}
+                    onClick={() => setActiveTab("users")}
                   >
                     <Users className="mr-2 h-4 w-4" />
                     Manage User Roles
@@ -244,7 +246,7 @@ export default function UserRoles() {
                   <Button
                     className="w-full justify-start"
                     variant="outline"
-                    onClick={() => setActiveTab('permissions')}
+                    onClick={() => setActiveTab("permissions")}
                   >
                     <Lock className="mr-2 h-4 w-4" />
                     View Permissions
@@ -252,7 +254,7 @@ export default function UserRoles() {
                   <Button
                     className="w-full justify-start"
                     variant="outline"
-                    onClick={() => setActiveTab('custom')}
+                    onClick={() => setActiveTab("custom")}
                   >
                     <Plus className="mr-2 h-4 w-4" />
                     Create Custom Role
@@ -264,9 +266,7 @@ export default function UserRoles() {
               <Card>
                 <CardHeader>
                   <CardTitle>Role Hierarchy</CardTitle>
-                  <CardDescription>
-                    Understanding role privileges and access levels
-                  </CardDescription>
+                  <CardDescription>Understanding role privileges and access levels</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -337,7 +337,8 @@ export default function UserRoles() {
                 <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium mb-2">Custom Role Management</h3>
                 <p className="text-muted-foreground mb-4">
-                  Create custom roles with specific permission combinations that fit your organization's needs.
+                  Create custom roles with specific permission combinations that fit your
+                  organization's needs.
                 </p>
                 <Button>Create Custom Role</Button>
               </div>

@@ -31,13 +31,17 @@ export function EnhancedUpcomingEventsWidget({
     const fetchUpcomingEvents = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch upcoming events
-        const response = await getEvents({
-          status: [EventStatus.PUBLISHED],
-          startDate: new Date(),
-        }, 1, limit);
-        
+        const response = await getEvents(
+          {
+            status: [EventStatus.PUBLISHED],
+            startDate: new Date(),
+          },
+          1,
+          limit,
+        );
+
         setEvents(response.events);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch events");
@@ -90,12 +94,7 @@ export function EnhancedUpcomingEventsWidget({
               {events.length} upcoming events
             </span>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleViewAllEvents}
-            className="text-xs"
-          >
+          <Button variant="ghost" size="sm" onClick={handleViewAllEvents} className="text-xs">
             View all
             <ArrowRight className="h-3 w-3 ml-1" />
           </Button>
@@ -105,7 +104,10 @@ export function EnhancedUpcomingEventsWidget({
         <div className="space-y-4">
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted-foreground" style={{ borderTopColor: 'var(--primary)' }}></div>
+              <div
+                className="animate-spin rounded-full h-8 w-8 border-2 border-muted-foreground"
+                style={{ borderTopColor: "var(--primary)" }}
+              ></div>
             </div>
           ) : error ? (
             <div className="text-center py-8 text-destructive">
@@ -139,7 +141,7 @@ export function EnhancedUpcomingEventsWidget({
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => window.location.href = "/events/create"}
+            onClick={() => (window.location.href = "/events/create")}
           >
             Create New Event
           </Button>

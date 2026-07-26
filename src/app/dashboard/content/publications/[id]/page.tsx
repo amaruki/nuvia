@@ -32,7 +32,11 @@ import {
 import { usePublications } from "@/lib/hooks/use-publications";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Publication } from "@/types/publication.types";
-import { PUBLICATION_TYPE_DISPLAY, PUBLICATION_CATEGORY_DISPLAY, PUBLICATION_STATUS_DISPLAY } from "@/types/publication.types";
+import {
+  PUBLICATION_TYPE_DISPLAY,
+  PUBLICATION_CATEGORY_DISPLAY,
+  PUBLICATION_STATUS_DISPLAY,
+} from "@/types/publication.types";
 
 export default function PublicationDetailsPage() {
   const params = useParams();
@@ -41,19 +45,29 @@ export default function PublicationDetailsPage() {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
 
-  const { getPublication, updatePublication, deletePublication, publishPublication, archivePublication } = usePublications();
+  const {
+    getPublication,
+    updatePublication,
+    deletePublication,
+    publishPublication,
+    archivePublication,
+  } = usePublications();
 
   // Query for publication data
-  const { data: publication, isLoading, error: queryError } = useQuery({
-    queryKey: ['publication', params.id],
+  const {
+    data: publication,
+    isLoading,
+    error: queryError,
+  } = useQuery({
+    queryKey: ["publication", params.id],
     queryFn: async () => {
       // Get the publication ID from params
       const id = params.id as string;
-      
+
       // Simulate API call - in real app this would be fetch('/api/publications/${id}')
       // For now, we'll use a simple timeout to simulate async behavior
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       // Get publication from the hook (this is already available in the component)
       const pub = getPublication(id);
       if (!pub) {
@@ -84,8 +98,12 @@ export default function PublicationDetailsPage() {
 
   const handleDelete = async () => {
     if (!publication) return;
-    
-    if (confirm(`Are you sure you want to delete "${publication.title}"? This action cannot be undone.`)) {
+
+    if (
+      confirm(
+        `Are you sure you want to delete "${publication.title}"? This action cannot be undone.`,
+      )
+    ) {
       try {
         await deletePublication(publication.id);
         router.push("/dashboard/content/publications");
@@ -97,11 +115,11 @@ export default function PublicationDetailsPage() {
 
   const handlePublish = async () => {
     if (!publication) return;
-    
+
     try {
       await publishPublication(publication.id);
       // Invalidate and refetch query to get updated data
-      queryClient.invalidateQueries({ queryKey: ['publication', params.id] });
+      queryClient.invalidateQueries({ queryKey: ["publication", params.id] });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to publish publication");
     }
@@ -109,11 +127,11 @@ export default function PublicationDetailsPage() {
 
   const handleArchive = async () => {
     if (!publication) return;
-    
+
     try {
       await archivePublication(publication.id);
       // Invalidate and refetch query to get updated data
-      queryClient.invalidateQueries({ queryKey: ['publication', params.id] });
+      queryClient.invalidateQueries({ queryKey: ["publication", params.id] });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to archive publication");
     }
@@ -156,10 +174,12 @@ export default function PublicationDetailsPage() {
             Back
           </Button>
         </div>
-        
+
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-destructive mb-2">Error</h2>
-          <p className="text-muted-foreground">{error || queryError?.message || "Publication not found"}</p>
+          <p className="text-muted-foreground">
+            {error || queryError?.message || "Publication not found"}
+          </p>
         </div>
       </div>
     );
@@ -177,7 +197,7 @@ export default function PublicationDetailsPage() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Publications
         </Button>
-        
+
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm">
             <Share2 className="mr-2 h-4 w-4" />
@@ -191,21 +211,21 @@ export default function PublicationDetailsPage() {
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Button>
-          
-          {publication.status === 'draft' && (
+
+          {publication.status === "draft" && (
             <Button size="sm" onClick={handlePublish}>
               <FileText className="mr-2 h-4 w-4" />
               Publish
             </Button>
           )}
-          
-          {publication.status === 'published' && (
+
+          {publication.status === "published" && (
             <Button variant="outline" size="sm" onClick={handleArchive}>
               <Archive className="mr-2 h-4 w-4" />
               Archive
             </Button>
           )}
-          
+
           <Button variant="destructive" size="sm" onClick={handleDelete}>
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
@@ -220,7 +240,7 @@ export default function PublicationDetailsPage() {
             <h1 className="text-3xl font-bold">{publication.title}</h1>
             <p className="text-lg text-muted-foreground">{publication.excerpt}</p>
           </div>
-          
+
           <div className="flex flex-col items-end gap-2">
             <Badge variant={statusDisplay.badgeVariant} className="flex items-center gap-1">
               {statusDisplay.name}
@@ -284,8 +304,8 @@ export default function PublicationDetailsPage() {
       {publication.featuredImage && (
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Featured Image</h3>
-          <img 
-            src={publication.featuredImage} 
+          <img
+            src={publication.featuredImage}
             alt={publication.title}
             className="w-full h-64 object-cover rounded-lg"
           />
@@ -307,8 +327,8 @@ export default function PublicationDetailsPage() {
           <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {publication.gallery.map((image, index) => (
               <div key={index} className="relative group">
-                <img 
-                  src={image} 
+                <img
+                  src={image}
                   alt={`Gallery image ${index + 1}`}
                   className="w-full h-32 object-cover rounded-lg"
                 />
@@ -316,7 +336,7 @@ export default function PublicationDetailsPage() {
                   variant="secondary"
                   size="sm"
                   className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => window.open(image, '_blank')}
+                  onClick={() => window.open(image, "_blank")}
                 >
                   <ExternalLink className="h-4 w-4" />
                 </Button>
@@ -345,7 +365,7 @@ export default function PublicationDetailsPage() {
                 <p className="text-sm text-muted-foreground">Views</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-50">
                 <Heart className="h-5 w-5 text-green-600" />
@@ -355,7 +375,7 @@ export default function PublicationDetailsPage() {
                 <p className="text-sm text-muted-foreground">Likes</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-50">
                 <MessageCircle className="h-5 w-5 text-purple-600" />
@@ -365,7 +385,7 @@ export default function PublicationDetailsPage() {
                 <p className="text-sm text-muted-foreground">Comments</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-orange-50">
                 <Bookmark className="h-5 w-5 text-orange-600" />
@@ -376,7 +396,7 @@ export default function PublicationDetailsPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <span className="text-sm font-medium">Engagement Score</span>
@@ -409,7 +429,7 @@ export default function PublicationDetailsPage() {
               <p className="text-sm text-muted-foreground">{publication.seo.description}</p>
             </div>
           </div>
-          
+
           {publication.seo.keywords && publication.seo.keywords.length > 0 && (
             <div>
               <h4 className="font-medium mb-2">Keywords</h4>
@@ -422,30 +442,42 @@ export default function PublicationDetailsPage() {
               </div>
             </div>
           )}
-          
+
           <div className="grid gap-4 md:grid-cols-2">
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <span className="text-sm font-medium">Visibility</span>
-              <Badge variant="outline">{publication.visibility.replace('_', ' ')}</Badge>
+              <Badge variant="outline">{publication.visibility.replace("_", " ")}</Badge>
             </div>
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <span className="text-sm font-medium">Priority</span>
               <span className="font-medium">{publication.priority}</span>
             </div>
           </div>
-          
+
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${publication.commentsEnabled ? 'bg-green-500' : 'bg-gray-300'}`} />
-              <span className="text-sm">Comments {publication.commentsEnabled ? 'Enabled' : 'Disabled'}</span>
+              <div
+                className={`w-2 h-2 rounded-full ${publication.commentsEnabled ? "bg-green-500" : "bg-gray-300"}`}
+              />
+              <span className="text-sm">
+                Comments {publication.commentsEnabled ? "Enabled" : "Disabled"}
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${publication.sharingEnabled ? 'bg-green-500' : 'bg-gray-300'}`} />
-              <span className="text-sm">Sharing {publication.sharingEnabled ? 'Enabled' : 'Disabled'}</span>
+              <div
+                className={`w-2 h-2 rounded-full ${publication.sharingEnabled ? "bg-green-500" : "bg-gray-300"}`}
+              />
+              <span className="text-sm">
+                Sharing {publication.sharingEnabled ? "Enabled" : "Disabled"}
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${publication.downloadEnabled ? 'bg-green-500' : 'bg-gray-300'}`} />
-              <span className="text-sm">Downloads {publication.downloadEnabled ? 'Enabled' : 'Disabled'}</span>
+              <div
+                className={`w-2 h-2 rounded-full ${publication.downloadEnabled ? "bg-green-500" : "bg-gray-300"}`}
+              />
+              <span className="text-sm">
+                Downloads {publication.downloadEnabled ? "Enabled" : "Disabled"}
+              </span>
             </div>
           </div>
         </CardContent>

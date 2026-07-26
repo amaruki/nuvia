@@ -22,7 +22,7 @@ import {
   Zap,
   Target,
   Shield,
-  Gift
+  Gift,
 } from "lucide-react";
 
 interface AnnouncementsOverviewCardsProps {
@@ -45,17 +45,26 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
   };
 
   const getEngagementBadge = (score: number) => {
-    if (score >= 85) return { className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100", text: "Excellent" };
-    if (score >= 70) return { className: "bg-amber-100 text-amber-700 hover:bg-amber-100", text: "Good" };
+    if (score >= 85)
+      return {
+        className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
+        text: "Excellent",
+      };
+    if (score >= 70)
+      return { className: "bg-amber-100 text-amber-700 hover:bg-amber-100", text: "Good" };
     return { className: "bg-rose-100 text-rose-700 hover:bg-rose-100", text: "Needs Improvement" };
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent': return "text-red-600";
-      case 'high': return "text-amber-600";
-      case 'medium': return "text-blue-600";
-      default: return "text-slate-600";
+      case "urgent":
+        return "text-red-600";
+      case "high":
+        return "text-amber-600";
+      case "medium":
+        return "text-blue-600";
+      default:
+        return "text-slate-600";
     }
   };
 
@@ -75,9 +84,12 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
               </div>
             </div>
             <div className="flex flex-col mt-3">
-              <span className="text-2xl font-bold">{formatNumber(statistics.totalAnnouncements)}</span>
+              <span className="text-2xl font-bold">
+                {formatNumber(statistics.totalAnnouncements)}
+              </span>
               <span className="text-xs text-muted-foreground mt-1">
-                {statistics.activeAnnouncements} published, {statistics.totalAnnouncements - statistics.activeAnnouncements} drafts
+                {statistics.activeAnnouncements} published,{" "}
+                {statistics.totalAnnouncements - statistics.activeAnnouncements} drafts
               </span>
             </div>
           </CardContent>
@@ -94,13 +106,19 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
             </div>
             <div className="flex flex-col mt-3">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold">{formatNumber(statistics.publishedArticles)}</span>
-                <Badge variant="secondary" className={`text-[10px] px-2 h-5 ${engagementBadge.className}`}>
+                <span className="text-2xl font-bold">
+                  {formatNumber(statistics.publishedArticles)}
+                </span>
+                <Badge
+                  variant="secondary"
+                  className={`text-[10px] px-2 h-5 ${engagementBadge.className}`}
+                >
                   {engagementBadge.text}
                 </Badge>
               </div>
               <span className="text-xs text-muted-foreground mt-1">
-                {formatPercentage((statistics.publishedArticles / statistics.totalArticles) * 100)} publish rate
+                {formatPercentage((statistics.publishedArticles / statistics.totalArticles) * 100)}{" "}
+                publish rate
               </span>
             </div>
           </CardContent>
@@ -116,10 +134,10 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
               </div>
             </div>
             <div className="flex flex-col mt-3">
-              <span className="text-2xl font-bold">{formatNumber(statistics.totalAcknowledgments)}</span>
-              <span className="text-xs text-muted-foreground mt-1">
-                Across all announcements
+              <span className="text-2xl font-bold">
+                {formatNumber(statistics.totalAcknowledgments)}
               </span>
+              <span className="text-xs text-muted-foreground mt-1">Across all announcements</span>
             </div>
           </CardContent>
         </Card>
@@ -135,10 +153,15 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
             </div>
             <div className="flex flex-col mt-3">
               <div className="flex items-center gap-2">
-                <span className={`text-2xl font-bold ${getEngagementColor(statistics.averageAcknowledgmentRate)}`}>
+                <span
+                  className={`text-2xl font-bold ${getEngagementColor(statistics.averageAcknowledgmentRate)}`}
+                >
                   {formatPercentage(statistics.averageAcknowledgmentRate)}
                 </span>
-                <Badge variant="secondary" className={`text-[10px] px-2 h-5 ${engagementBadge.className}`}>
+                <Badge
+                  variant="secondary"
+                  className={`text-[10px] px-2 h-5 ${engagementBadge.className}`}
+                >
                   {engagementBadge.text}
                 </Badge>
               </div>
@@ -151,7 +174,6 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        
         {/* Announcement Status Breakdown */}
         <Card className="shadow-sm col-span-1 lg:col-span-2 flex flex-col">
           <CardHeader>
@@ -159,82 +181,100 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
             <CardDescription>Status distribution across all announcements</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-center gap-4">
-             {/* Status Item: Published */}
+            {/* Status Item: Published */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                        <CheckCircle2 className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Published</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                  <CheckCircle2 className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-emerald-50 text-emerald-700 border-emerald-200">
-                    {statistics.activeAnnouncements}
-                </Badge>
+                <span className="text-sm font-medium">Published</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-emerald-50 text-emerald-700 border-emerald-200"
+              >
+                {statistics.activeAnnouncements}
+              </Badge>
             </div>
 
             {/* Status Item: Draft */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
-                        <Clock className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Draft</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+                  <Clock className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-slate-50 text-slate-700 border-slate-200">
-                    {statistics.totalAnnouncements - statistics.activeAnnouncements}
-                </Badge>
+                <span className="text-sm font-medium">Draft</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-slate-50 text-slate-700 border-slate-200"
+              >
+                {statistics.totalAnnouncements - statistics.activeAnnouncements}
+              </Badge>
             </div>
 
             {/* Status Item: Scheduled */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                        <Calendar className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Scheduled</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                  <Calendar className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-blue-50 text-blue-700 border-blue-200">
-                    {0}
-                </Badge>
+                <span className="text-sm font-medium">Scheduled</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-blue-50 text-blue-700 border-blue-200"
+              >
+                {0}
+              </Badge>
             </div>
 
             {/* Status Item: Archived */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
-                        <Archive className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Archived</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+                  <Archive className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-slate-50 text-slate-700 border-slate-200">
-                    {statistics.expiredAnnouncements}
-                </Badge>
+                <span className="text-sm font-medium">Archived</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-slate-50 text-slate-700 border-slate-200"
+              >
+                {statistics.expiredAnnouncements}
+              </Badge>
             </div>
 
             {/* Status Item: Active */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                        <Target className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Active</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                  <Target className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-green-50 text-green-700 border-green-200">
-                    {statistics.activeAnnouncements}
-                </Badge>
+                <span className="text-sm font-medium">Active</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-green-50 text-green-700 border-green-200"
+              >
+                {statistics.activeAnnouncements}
+              </Badge>
             </div>
 
             {/* Status Item: Expired */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
-                        <AlertTriangle className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">Expired</span>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                  <AlertTriangle className="h-4 w-4" />
                 </div>
-                <Badge variant="outline" className="text-sm font-bold bg-red-50 text-red-700 border-red-200">
-                    {statistics.expiredAnnouncements}
-                </Badge>
+                <span className="text-sm font-medium">Expired</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-sm font-bold bg-red-50 text-red-700 border-red-200"
+              >
+                {statistics.expiredAnnouncements}
+              </Badge>
             </div>
           </CardContent>
         </Card>
@@ -243,29 +283,32 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
         <Card className="shadow-sm col-span-1 lg:col-span-3">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                Top Performing Announcements
+              <TrendingUp className="h-4 w-4 text-primary" />
+              Top Performing Announcements
             </CardTitle>
             <CardDescription>By engagement score and views</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-5">
-              {statistics.topPerformingArticles
-                .slice(0, 4)
-                .map((article, index) => {
-                  // Calculate percentage for bar width (relative to max engagement in set for visual)
-                  const maxEngagement = Math.max(...statistics.topPerformingArticles.map(a => a.engagementScore));
-                  const percentage = (article.engagementScore / maxEngagement) * 100;
-                   
-                  return (
+              {statistics.topPerformingArticles.slice(0, 4).map((article, index) => {
+                // Calculate percentage for bar width (relative to max engagement in set for visual)
+                const maxEngagement = Math.max(
+                  ...statistics.topPerformingArticles.map((a) => a.engagementScore),
+                );
+                const percentage = (article.engagementScore / maxEngagement) * 100;
+
+                return (
                   <div key={article.articleId} className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <span className="font-medium truncate max-w-[120px] sm:max-w-[200px]">
                           {article.title}
                         </span>
-                        <Badge variant="secondary" className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground">
-                            {article.type?.replace('_', ' ') || 'announcement'}
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground"
+                        >
+                          {article.type?.replace("_", " ") || "announcement"}
                         </Badge>
                       </div>
                       <div className="text-right">
@@ -274,17 +317,31 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
                     </div>
                     {/* Visual Bar */}
                     <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                        <div 
-                            className="h-full bg-primary rounded-full" 
-                            style={{ width: `${percentage}%` }}
-                        />
+                      <div
+                        className="h-full bg-primary rounded-full"
+                        style={{ width: `${percentage}%` }}
+                      />
                     </div>
                     <div className="flex justify-between text-xs text-muted-foreground">
-                         <span>Engagement: <span className={article.engagementScore > 80 ? "text-emerald-600 font-medium" : "text-amber-600"}>{formatPercentage(article.engagementScore)}</span></span>
-                         <span>Author: <span className="font-medium">{article.author}</span></span>
+                      <span>
+                        Engagement:{" "}
+                        <span
+                          className={
+                            article.engagementScore > 80
+                              ? "text-emerald-600 font-medium"
+                              : "text-amber-600"
+                          }
+                        >
+                          {formatPercentage(article.engagementScore)}
+                        </span>
+                      </span>
+                      <span>
+                        Author: <span className="font-medium">{article.author}</span>
+                      </span>
                     </div>
                   </div>
-                )})}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -301,25 +358,24 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
                 .sort((a, b) => b.count - a.count)
                 .slice(0, 4)
                 .map((type) => (
-                  <div key={type.type} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                  <div
+                    key={type.type}
+                    className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                  >
                     <div className="flex items-center space-x-3">
                       <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                         <Megaphone className="h-4 w-4 text-primary" />
                       </div>
                       <div>
                         <p className="text-sm font-medium capitalize">
-                          {type.type.replace('_', ' ')}
+                          {type.type.replace("_", " ")}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          {type.count} announcements
-                        </p>
+                        <p className="text-xs text-muted-foreground">{type.count} announcements</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <span className="text-sm font-bold">{formatNumber(type.count)}</span>
-                      <p className="text-xs text-muted-foreground">
-                        announcements
-                      </p>
+                      <p className="text-xs text-muted-foreground">announcements</p>
                     </div>
                   </div>
                 ))}
@@ -338,23 +394,35 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
               {statistics.announcementsByPriority
                 .sort((a, b) => {
                   const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
-                  return priorityOrder[b.priority as keyof typeof priorityOrder] - priorityOrder[a.priority as keyof typeof priorityOrder];
+                  return (
+                    priorityOrder[b.priority as keyof typeof priorityOrder] -
+                    priorityOrder[a.priority as keyof typeof priorityOrder]
+                  );
                 })
                 .slice(0, 4)
                 .map((priority) => (
-                  <div key={priority.priority} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                  <div
+                    key={priority.priority}
+                    className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                  >
                     <div className="flex items-center space-x-3">
-                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${
-                        priority.priority === 'urgent' ? 'bg-red-100' :
-                        priority.priority === 'high' ? 'bg-amber-100' :
-                        priority.priority === 'medium' ? 'bg-blue-100' : 'bg-slate-100'
-                      }`}>
-                        <AlertTriangle className={`h-4 w-4 ${getPriorityColor(priority.priority)}`} />
+                      <div
+                        className={`h-8 w-8 rounded-lg flex items-center justify-center ${
+                          priority.priority === "urgent"
+                            ? "bg-red-100"
+                            : priority.priority === "high"
+                              ? "bg-amber-100"
+                              : priority.priority === "medium"
+                                ? "bg-blue-100"
+                                : "bg-slate-100"
+                        }`}
+                      >
+                        <AlertTriangle
+                          className={`h-4 w-4 ${getPriorityColor(priority.priority)}`}
+                        />
                       </div>
                       <div>
-                        <p className="text-sm font-medium capitalize">
-                          {priority.priority}
-                        </p>
+                        <p className="text-sm font-medium capitalize">{priority.priority}</p>
                         <p className="text-xs text-muted-foreground">
                           {priority.count} announcements
                         </p>
@@ -362,9 +430,7 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
                     </div>
                     <div className="text-right">
                       <span className="text-sm font-bold">{formatNumber(priority.count)}</span>
-                      <p className="text-xs text-muted-foreground">
-                        announcements
-                      </p>
+                      <p className="text-xs text-muted-foreground">announcements</p>
                     </div>
                   </div>
                 ))}
@@ -384,14 +450,17 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
                 .sort((a, b) => b.count - a.count)
                 .slice(0, 4)
                 .map((audience) => (
-                  <div key={audience.targetAudience} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                  <div
+                    key={audience.targetAudience}
+                    className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                  >
                     <div className="flex items-center space-x-3">
                       <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                         <Users className="h-4 w-4 text-primary" />
                       </div>
                       <div>
                         <p className="text-sm font-medium">
-                          {audience.targetAudience.replace('_', ' ')}
+                          {audience.targetAudience.replace("_", " ")}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {audience.count} announcements
@@ -400,16 +469,13 @@ export function AnnouncementsOverviewCards({ statistics }: AnnouncementsOverview
                     </div>
                     <div className="text-right">
                       <span className="text-sm font-bold">{formatNumber(audience.count)}</span>
-                      <p className="text-xs text-muted-foreground">
-                        announcements
-                      </p>
+                      <p className="text-xs text-muted-foreground">announcements</p>
                     </div>
                   </div>
                 ))}
             </div>
           </CardContent>
         </Card>
-
       </div>
     </div>
   );

@@ -23,8 +23,8 @@ export default function CertificationsPage() {
     };
   }, [setHeader, clearHeader]);
 
-  const filteredCertificates = certificates.filter(cert =>
-    cert.courseName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCertificates = certificates.filter((cert) =>
+    cert.courseName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -56,7 +56,9 @@ export default function CertificationsPage() {
           </div>
           <h3 className="text-xl font-semibold">No certificates found</h3>
           <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
-            {searchTerm ? "Try adjusting your search terms." : "Complete courses to earn certifications."}
+            {searchTerm
+              ? "Try adjusting your search terms."
+              : "Complete courses to earn certifications."}
           </p>
         </div>
       )}

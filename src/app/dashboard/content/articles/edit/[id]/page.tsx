@@ -12,7 +12,7 @@ export default function EditArticlePage() {
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
   const { getArticle, updateArticle } = useArticles();
-  
+
   const [article, setArticle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +35,7 @@ export default function EditArticlePage() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const foundArticle = getArticle(articleId);
         if (foundArticle) {
           // Convert article to form data format
@@ -50,9 +50,9 @@ export default function EditArticlePage() {
             difficulty: foundArticle.difficulty,
             status: foundArticle.status,
             authorId: foundArticle.author.id,
-            coAuthorIds: foundArticle.coAuthors?.map(author => author.id),
+            coAuthorIds: foundArticle.coAuthors?.map((author) => author.id),
             reviewerId: foundArticle.reviewer?.id,
-            tagIds: foundArticle.tags.map(tag => tag.id),
+            tagIds: foundArticle.tags.map((tag) => tag.id),
             seriesId: foundArticle.series?.id,
             featuredImage: foundArticle.featuredImage,
             gallery: foundArticle.gallery,
@@ -65,7 +65,7 @@ export default function EditArticlePage() {
             priority: foundArticle.priority,
             seo: foundArticle.seo,
           };
-          
+
           setArticle(formData);
         } else {
           setError("Article not found");

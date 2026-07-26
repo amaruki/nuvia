@@ -1,12 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Trophy,
-  Target,
-  Search,
-  Filter
-} from "lucide-react";
+import { Trophy, Target, Search, Filter } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useHeader } from "@/contexts/dashboard-context";
@@ -42,13 +37,17 @@ export default function LearningPage() {
     };
   }, [setHeader, clearHeader]);
 
-  const filteredCourses = courses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredCourses = courses.filter((course) => {
+    const matchesSearch =
+      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.category.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDifficulty = difficultyFilter === "all" || course.level.toLowerCase() === difficultyFilter.toLowerCase();
+    const matchesDifficulty =
+      difficultyFilter === "all" || course.level.toLowerCase() === difficultyFilter.toLowerCase();
 
-    if (activeTab === "in-progress") return matchesSearch && matchesDifficulty && course.progress > 0 && course.progress < 100;
-    if (activeTab === "completed") return matchesSearch && matchesDifficulty && course.progress === 100;
+    if (activeTab === "in-progress")
+      return matchesSearch && matchesDifficulty && course.progress > 0 && course.progress < 100;
+    if (activeTab === "completed")
+      return matchesSearch && matchesDifficulty && course.progress === 100;
     if (activeTab === "saved") return matchesSearch && matchesDifficulty && false; // Mock saved property
     return matchesSearch && matchesDifficulty;
   });
@@ -76,10 +75,18 @@ export default function LearningPage() {
           <Tabs defaultValue="all" onValueChange={setActiveTab} className="w-full">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <TabsList className="w-full sm:w-auto">
-                <TabsTrigger value="all" className="flex-1 sm:flex-none">All Courses</TabsTrigger>
-                <TabsTrigger value="in-progress" className="flex-1 sm:flex-none">In Progress</TabsTrigger>
-                <TabsTrigger value="completed" className="flex-1 sm:flex-none">Completed</TabsTrigger>
-                <TabsTrigger value="saved" className="flex-1 sm:flex-none">Saved</TabsTrigger>
+                <TabsTrigger value="all" className="flex-1 sm:flex-none">
+                  All Courses
+                </TabsTrigger>
+                <TabsTrigger value="in-progress" className="flex-1 sm:flex-none">
+                  In Progress
+                </TabsTrigger>
+                <TabsTrigger value="completed" className="flex-1 sm:flex-none">
+                  Completed
+                </TabsTrigger>
+                <TabsTrigger value="saved" className="flex-1 sm:flex-none">
+                  Saved
+                </TabsTrigger>
               </TabsList>
 
               <div className="flex w-full sm:w-auto gap-2">

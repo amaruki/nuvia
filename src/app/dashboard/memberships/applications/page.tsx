@@ -1,3 +1,3 @@
 export default function MembershipApplications() {
-  return <h1>Membership applications page</h1>
+  return <h1>Membership applications page</h1>;
 }

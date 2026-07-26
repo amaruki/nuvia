@@ -1,26 +1,26 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { 
-  FinancialReport, 
-  ReportStatistics, 
+import {
+  FinancialReport,
+  ReportStatistics,
   ReportFilterOptions,
   IncomeStatementData,
   BalanceSheetData,
   CashFlowData,
   BudgetVsActualData,
   TaxDocumentData,
-  AuditTrailData
+  AuditTrailData,
 } from "@/types/finance.types";
-import { 
-  mockReports, 
+import {
+  mockReports,
   mockReportStatistics,
   mockIncomeStatementData,
   mockBalanceSheetData,
   mockCashFlowData,
   mockBudgetVsActualData,
   mockTaxDocumentData,
-  mockAuditTrailData
+  mockAuditTrailData,
 } from "@/lib/data/mock-reports-data";
 
 export function useReports() {
@@ -45,60 +45,60 @@ export function useReports() {
       setError(null);
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Apply filters
       let filteredReports = [...mockReports];
 
       if (filters.type && filters.type.length > 0) {
-        filteredReports = filteredReports.filter(report => 
-          filters.type!.includes(report.type)
-        );
+        filteredReports = filteredReports.filter((report) => filters.type!.includes(report.type));
       }
 
       if (filters.status && filters.status.length > 0) {
-        filteredReports = filteredReports.filter(report => 
-          filters.status!.includes(report.status)
+        filteredReports = filteredReports.filter((report) =>
+          filters.status!.includes(report.status),
         );
       }
 
       if (filters.period && filters.period.length > 0) {
-        filteredReports = filteredReports.filter(report => 
-          filters.period!.includes(report.period)
+        filteredReports = filteredReports.filter((report) =>
+          filters.period!.includes(report.period),
         );
       }
 
       if (filters.dateRange) {
-        filteredReports = filteredReports.filter(report => 
-          report.startDate >= filters.dateRange!.start && 
-          report.endDate <= filters.dateRange!.end
+        filteredReports = filteredReports.filter(
+          (report) =>
+            report.startDate >= filters.dateRange!.start &&
+            report.endDate <= filters.dateRange!.end,
         );
       }
 
       if (filters.generatedBy && filters.generatedBy.length > 0) {
-        filteredReports = filteredReports.filter(report => 
-          filters.generatedBy!.includes(report.generatedBy)
+        filteredReports = filteredReports.filter((report) =>
+          filters.generatedBy!.includes(report.generatedBy),
         );
       }
 
       if (filters.tags && filters.tags.length > 0) {
-        filteredReports = filteredReports.filter(report => 
-          filters.tags!.some(tag => report.tags.includes(tag))
+        filteredReports = filteredReports.filter((report) =>
+          filters.tags!.some((tag) => report.tags.includes(tag)),
         );
       }
 
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
-        filteredReports = filteredReports.filter(report => 
-          report.title.toLowerCase().includes(searchLower) ||
-          report.description.toLowerCase().includes(searchLower) ||
-          report.tags.some(tag => tag.toLowerCase().includes(searchLower))
+        filteredReports = filteredReports.filter(
+          (report) =>
+            report.title.toLowerCase().includes(searchLower) ||
+            report.description.toLowerCase().includes(searchLower) ||
+            report.tags.some((tag) => tag.toLowerCase().includes(searchLower)),
         );
       }
 
       setReports(filteredReports);
       setStatistics(mockReportStatistics);
-      
+
       // Set mock data for different report types
       setIncomeStatementData(mockIncomeStatementData);
       setBalanceSheetData(mockBalanceSheetData);
@@ -121,7 +121,7 @@ export function useReports() {
 
   // Update filters
   const updateFilters = useCallback((newFilters: Partial<ReportFilterOptions>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    setFilters((prev) => ({ ...prev, ...newFilters }));
   }, []);
 
   // Clear all filters
@@ -135,27 +135,32 @@ export function useReports() {
   }, [fetchReports]);
 
   // Get report by ID
-  const getReportById = useCallback((id: string) => {
-    return reports.find(report => report.id === id) || null;
-  }, [reports]);
+  const getReportById = useCallback(
+    (id: string) => {
+      return reports.find((report) => report.id === id) || null;
+    },
+    [reports],
+  );
 
   // Update report status
-  const updateReportStatus = useCallback(async (id: string, status: FinancialReport['status']) => {
+  const updateReportStatus = useCallback(async (id: string, status: FinancialReport["status"]) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      setReports(prev => prev.map(report => 
-        report.id === id 
-          ? { 
-              ...report, 
-              status, 
-              updatedAt: new Date(),
-              ...(status === 'published' && { publishedAt: new Date() }),
-              ...(status === 'pending_review' && { reviewedAt: new Date() })
-            }
-          : report
-      ));
+      setReports((prev) =>
+        prev.map((report) =>
+          report.id === id
+            ? {
+                ...report,
+                status,
+                updatedAt: new Date(),
+                ...(status === "published" && { publishedAt: new Date() }),
+                ...(status === "pending_review" && { reviewedAt: new Date() }),
+              }
+            : report,
+        ),
+      );
 
       return true;
     } catch (err) {
@@ -165,39 +170,42 @@ export function useReports() {
   }, []);
 
   // Download report
-  const downloadReport = useCallback(async (id: string) => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+  const downloadReport = useCallback(
+    async (id: string) => {
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Increment download count
-      setReports(prev => prev.map(report => 
-        report.id === id 
-          ? { ...report, downloadCount: report.downloadCount + 1 }
-          : report
-      ));
+        // Increment download count
+        setReports((prev) =>
+          prev.map((report) =>
+            report.id === id ? { ...report, downloadCount: report.downloadCount + 1 } : report,
+          ),
+        );
 
-      // In a real app, this would trigger a file download
-      const report = getReportById(id);
-      if (report?.fileUrl) {
-        console.log(`Downloading report: ${report.fileUrl}`);
-        // window.open(report.fileUrl, '_blank');
+        // In a real app, this would trigger a file download
+        const report = getReportById(id);
+        if (report?.fileUrl) {
+          console.log(`Downloading report: ${report.fileUrl}`);
+          // window.open(report.fileUrl, '_blank');
+        }
+
+        return true;
+      } catch (err) {
+        console.error("Error downloading report:", err);
+        return false;
       }
-
-      return true;
-    } catch (err) {
-      console.error("Error downloading report:", err);
-      return false;
-    }
-  }, [getReportById]);
+    },
+    [getReportById],
+  );
 
   // Delete report
   const deleteReport = useCallback(async (id: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      setReports(prev => prev.filter(report => report.id !== id));
+      setReports((prev) => prev.filter((report) => report.id !== id));
 
       return true;
     } catch (err) {
@@ -207,27 +215,32 @@ export function useReports() {
   }, []);
 
   // Generate new report
-  const generateReport = useCallback(async (reportData: Omit<FinancialReport, 'id' | 'createdAt' | 'updatedAt' | 'downloadCount'>) => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+  const generateReport = useCallback(
+    async (
+      reportData: Omit<FinancialReport, "id" | "createdAt" | "updatedAt" | "downloadCount">,
+    ) => {
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const newReport: FinancialReport = {
-        ...reportData,
-        id: Date.now().toString(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        downloadCount: 0,
-      };
+        const newReport: FinancialReport = {
+          ...reportData,
+          id: Date.now().toString(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          downloadCount: 0,
+        };
 
-      setReports(prev => [newReport, ...prev]);
+        setReports((prev) => [newReport, ...prev]);
 
-      return newReport;
-    } catch (err) {
-      console.error("Error generating report:", err);
-      return null;
-    }
-  }, []);
+        return newReport;
+      } catch (err) {
+        console.error("Error generating report:", err);
+        return null;
+      }
+    },
+    [],
+  );
 
   return {
     // Data
@@ -239,12 +252,12 @@ export function useReports() {
     budgetVsActualData,
     taxDocumentData,
     auditTrailData,
-    
+
     // State
     loading,
     error,
     filters,
-    
+
     // Actions
     updateFilters,
     clearFilters,

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -19,7 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -27,19 +27,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { 
+import {
   CommitteeFormData,
   CommitteeStatus,
   CommitteeType,
-  CommitteeAuthorityLevel 
+  CommitteeAuthorityLevel,
 } from "@/types/committee.types";
 import { X, Plus, Trash2 } from "lucide-react";
 
 const committeeFormSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters").max(50, "Name must be less than 50 characters"),
-  displayName: z.string().min(3, "Display name must be at least 3 characters").max(100, "Display name must be less than 100 characters"),
+  name: z
+    .string()
+    .min(3, "Name must be at least 3 characters")
+    .max(50, "Name must be less than 50 characters"),
+  displayName: z
+    .string()
+    .min(3, "Display name must be at least 3 characters")
+    .max(100, "Display name must be less than 100 characters"),
   description: z.string().optional(),
-  purpose: z.string().min(10, "Purpose must be at least 10 characters").max(500, "Purpose must be less than 500 characters"),
+  purpose: z
+    .string()
+    .min(10, "Purpose must be at least 10 characters")
+    .max(500, "Purpose must be less than 500 characters"),
   status: z.enum(["active", "inactive", "pending", "suspended"] as const),
   type: z.enum(["executive", "functional", "special_interest", "ad_hoc", "standing"] as const),
   contactInfo: z.object({
@@ -50,16 +59,38 @@ const committeeFormSchema = z.object({
     website: z.string().url("Invalid URL").optional().or(z.literal("")),
   }),
   charter: z.object({
-    missionStatement: z.string().min(10, "Mission statement must be at least 10 characters").max(500, "Mission statement must be less than 500 characters"),
-    responsibilities: z.array(z.string().min(5, "Each responsibility must be at least 5 characters")).min(1, "At least one responsibility is required"),
+    missionStatement: z
+      .string()
+      .min(10, "Mission statement must be at least 10 characters")
+      .max(500, "Mission statement must be less than 500 characters"),
+    responsibilities: z
+      .array(z.string().min(5, "Each responsibility must be at least 5 characters"))
+      .min(1, "At least one responsibility is required"),
     authorityLevel: z.enum(["advisory", "operational", "strategic", "executive"] as const),
-    decisionMakingProcess: z.string().min(10, "Decision making process must be at least 10 characters").max(500, "Decision making process must be less than 500 characters"),
-    reportingStructure: z.string().min(10, "Reporting structure must be at least 10 characters").max(500, "Reporting structure must be less than 500 characters"),
-    termLimits: z.object({
-      chairTerm: z.number().min(1, "Chair term must be at least 1 month").max(60, "Chair term must be less than 60 months"),
-      memberTerm: z.number().min(1, "Member term must be at least 1 month").max(60, "Member term must be less than 60 months"),
-      maxTerms: z.number().min(1, "Max terms must be at least 1").max(10, "Max terms must be less than 10"),
-    }).optional(),
+    decisionMakingProcess: z
+      .string()
+      .min(10, "Decision making process must be at least 10 characters")
+      .max(500, "Decision making process must be less than 500 characters"),
+    reportingStructure: z
+      .string()
+      .min(10, "Reporting structure must be at least 10 characters")
+      .max(500, "Reporting structure must be less than 500 characters"),
+    termLimits: z
+      .object({
+        chairTerm: z
+          .number()
+          .min(1, "Chair term must be at least 1 month")
+          .max(60, "Chair term must be less than 60 months"),
+        memberTerm: z
+          .number()
+          .min(1, "Member term must be at least 1 month")
+          .max(60, "Member term must be less than 60 months"),
+        maxTerms: z
+          .number()
+          .min(1, "Max terms must be at least 1")
+          .max(10, "Max terms must be less than 10"),
+      })
+      .optional(),
   }),
   parentCommitteeId: z.string().optional(),
 });
@@ -126,14 +157,20 @@ export function AddCommitteeForm({
   const handleAddResponsibility = () => {
     if (newResponsibility.trim()) {
       const currentResponsibilities = form.getValues("charter.responsibilities") || [];
-      form.setValue("charter.responsibilities", [...currentResponsibilities, newResponsibility.trim()]);
+      form.setValue("charter.responsibilities", [
+        ...currentResponsibilities,
+        newResponsibility.trim(),
+      ]);
       setNewResponsibility("");
     }
   };
 
   const handleRemoveResponsibility = (index: number) => {
     const currentResponsibilities = form.getValues("charter.responsibilities") || [];
-    form.setValue("charter.responsibilities", currentResponsibilities.filter((_, i) => i !== index));
+    form.setValue(
+      "charter.responsibilities",
+      currentResponsibilities.filter((_, i) => i !== index),
+    );
   };
 
   const handleSubmit = async (values: CommitteeFormValues) => {
@@ -164,25 +201,23 @@ export function AddCommitteeForm({
     { value: "standing", label: "Standing", description: "Permanent committee" },
   ];
 
-  const authorityOptions: { value: CommitteeAuthorityLevel; label: string; description: string }[] = [
-    { value: "advisory", label: "Advisory", description: "Recommendations only" },
-    { value: "operational", label: "Operational", description: "Day-to-day decisions" },
-    { value: "strategic", label: "Strategic", description: "Long-term planning" },
-    { value: "executive", label: "Executive", description: "Full authority" },
-  ];
+  const authorityOptions: { value: CommitteeAuthorityLevel; label: string; description: string }[] =
+    [
+      { value: "advisory", label: "Advisory", description: "Recommendations only" },
+      { value: "operational", label: "Operational", description: "Day-to-day decisions" },
+      { value: "strategic", label: "Strategic", description: "Long-term planning" },
+      { value: "executive", label: "Executive", description: "Full authority" },
+    ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "Edit Committee" : "Create New Committee"}
-          </DialogTitle>
+          <DialogTitle>{isEditing ? "Edit Committee" : "Create New Committee"}</DialogTitle>
           <DialogDescription>
-            {isEditing 
+            {isEditing
               ? "Update the committee information and charter details."
-              : "Fill in the committee details and establish the charter."
-            }
+              : "Fill in the committee details and establish the charter."}
           </DialogDescription>
         </DialogHeader>
 
@@ -214,7 +249,9 @@ export function AddCommitteeForm({
                     {...form.register("displayName")}
                   />
                   {form.formState.errors.displayName && (
-                    <p className="text-sm text-destructive">{form.formState.errors.displayName.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.displayName.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -238,7 +275,9 @@ export function AddCommitteeForm({
                   {...form.register("purpose")}
                 />
                 {form.formState.errors.purpose && (
-                  <p className="text-sm text-destructive">{form.formState.errors.purpose.message}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.purpose.message}
+                  </p>
                 )}
               </div>
 
@@ -257,7 +296,9 @@ export function AddCommitteeForm({
                         <SelectItem key={option.value} value={option.value}>
                           <div>
                             <div className="font-medium">{option.label}</div>
-                            <div className="text-sm text-muted-foreground">{option.description}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {option.description}
+                            </div>
                           </div>
                         </SelectItem>
                       ))}
@@ -279,7 +320,9 @@ export function AddCommitteeForm({
                         <SelectItem key={option.value} value={option.value}>
                           <div>
                             <div className="font-medium">{option.label}</div>
-                            <div className="text-sm text-muted-foreground">{option.description}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {option.description}
+                            </div>
                           </div>
                         </SelectItem>
                       ))}
@@ -306,7 +349,9 @@ export function AddCommitteeForm({
                     {...form.register("contactInfo.email")}
                   />
                   {form.formState.errors.contactInfo?.email && (
-                    <p className="text-sm text-destructive">{form.formState.errors.contactInfo.email.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.contactInfo.email.message}
+                    </p>
                   )}
                 </div>
 
@@ -338,7 +383,9 @@ export function AddCommitteeForm({
                     {...form.register("contactInfo.virtualMeetingLink")}
                   />
                   {form.formState.errors.contactInfo?.virtualMeetingLink && (
-                    <p className="text-sm text-destructive">{form.formState.errors.contactInfo.virtualMeetingLink.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.contactInfo.virtualMeetingLink.message}
+                    </p>
                   )}
                 </div>
 
@@ -350,7 +397,9 @@ export function AddCommitteeForm({
                     {...form.register("contactInfo.website")}
                   />
                   {form.formState.errors.contactInfo?.website && (
-                    <p className="text-sm text-destructive">{form.formState.errors.contactInfo.website.message}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.contactInfo.website.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -372,7 +421,9 @@ export function AddCommitteeForm({
                   {...form.register("charter.missionStatement")}
                 />
                 {form.formState.errors.charter?.missionStatement && (
-                  <p className="text-sm text-destructive">{form.formState.errors.charter.missionStatement.message}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.charter.missionStatement.message}
+                  </p>
                 )}
               </div>
 
@@ -400,7 +451,7 @@ export function AddCommitteeForm({
                       </Button>
                     </div>
                   ))}
-                  
+
                   <div className="flex items-center gap-2">
                     <Input
                       value={newResponsibility}
@@ -424,7 +475,9 @@ export function AddCommitteeForm({
                   </div>
                 </div>
                 {form.formState.errors.charter?.responsibilities && (
-                  <p className="text-sm text-destructive">{form.formState.errors.charter.responsibilities.message}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.charter.responsibilities.message}
+                  </p>
                 )}
               </div>
 
@@ -432,7 +485,9 @@ export function AddCommitteeForm({
                 <Label htmlFor="authorityLevel">Authority Level</Label>
                 <Select
                   value={form.watch("charter.authorityLevel")}
-                  onValueChange={(value) => form.setValue("charter.authorityLevel", value as CommitteeAuthorityLevel)}
+                  onValueChange={(value) =>
+                    form.setValue("charter.authorityLevel", value as CommitteeAuthorityLevel)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select authority level" />
@@ -459,7 +514,9 @@ export function AddCommitteeForm({
                   {...form.register("charter.decisionMakingProcess")}
                 />
                 {form.formState.errors.charter?.decisionMakingProcess && (
-                  <p className="text-sm text-destructive">{form.formState.errors.charter.decisionMakingProcess.message}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.charter.decisionMakingProcess.message}
+                  </p>
                 )}
               </div>
 
@@ -472,7 +529,9 @@ export function AddCommitteeForm({
                   {...form.register("charter.reportingStructure")}
                 />
                 {form.formState.errors.charter?.reportingStructure && (
-                  <p className="text-sm text-destructive">{form.formState.errors.charter.reportingStructure.message}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.charter.reportingStructure.message}
+                  </p>
                 )}
               </div>
 

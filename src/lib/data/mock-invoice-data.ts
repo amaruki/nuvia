@@ -9,7 +9,7 @@ export const mockInvoiceItems: InvoiceItem[] = [
     unitPrice: 150,
     total: 6000,
     category: "Services",
-    serviceType: "Development"
+    serviceType: "Development",
   },
   {
     id: "item-2",
@@ -18,7 +18,7 @@ export const mockInvoiceItems: InvoiceItem[] = [
     unitPrice: 1200,
     total: 1200,
     category: "Services",
-    serviceType: "Hosting"
+    serviceType: "Hosting",
   },
   {
     id: "item-3",
@@ -27,8 +27,8 @@ export const mockInvoiceItems: InvoiceItem[] = [
     unitPrice: 800,
     total: 800,
     category: "Marketing",
-    serviceType: "SEO"
-  }
+    serviceType: "SEO",
+  },
 ];
 
 // Mock invoices data
@@ -48,8 +48,8 @@ export const mockInvoices: Invoice[] = [
         unitPrice: 150,
         total: 6000,
         category: "Services",
-        serviceType: "Development"
-      }
+        serviceType: "Development",
+      },
     ],
     subtotal: 6000,
     taxAmount: 480,
@@ -80,7 +80,7 @@ export const mockInvoices: Invoice[] = [
         unitPrice: 1200,
         total: 1200,
         category: "Services",
-        serviceType: "Hosting"
+        serviceType: "Hosting",
       },
       {
         id: "item-3",
@@ -89,8 +89,8 @@ export const mockInvoices: Invoice[] = [
         unitPrice: 800,
         total: 800,
         category: "Marketing",
-        serviceType: "SEO"
-      }
+        serviceType: "SEO",
+      },
     ],
     subtotal: 2000,
     taxAmount: 160,
@@ -117,8 +117,8 @@ export const mockInvoices: Invoice[] = [
         unitPrice: 120,
         total: 7200,
         category: "Services",
-        serviceType: "Development"
-      }
+        serviceType: "Development",
+      },
     ],
     subtotal: 7200,
     taxAmount: 576,
@@ -145,8 +145,8 @@ export const mockInvoices: Invoice[] = [
         unitPrice: 200,
         total: 4000,
         category: "Services",
-        serviceType: "Consulting"
-      }
+        serviceType: "Consulting",
+      },
     ],
     subtotal: 4000,
     taxAmount: 320,
@@ -173,8 +173,8 @@ export const mockInvoices: Invoice[] = [
         unitPrice: 2500,
         total: 2500,
         category: "Services",
-        serviceType: "Maintenance"
-      }
+        serviceType: "Maintenance",
+      },
     ],
     subtotal: 2500,
     taxAmount: 200,
@@ -189,7 +189,7 @@ export const mockInvoices: Invoice[] = [
     notes: "Early payment received",
     createdAt: new Date("2024-09-15"),
     updatedAt: new Date("2024-10-10"),
-  }
+  },
 ];
 
 // Mock invoice payments data
@@ -217,7 +217,7 @@ export const mockInvoicePayments: InvoicePayment[] = [
     processedBy: "system",
     notes: "Early payment",
     createdAt: new Date("2024-10-10"),
-  }
+  },
 ];
 
 // Mock invoice statistics

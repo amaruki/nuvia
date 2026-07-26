@@ -1,3 +1,3 @@
 export default function AnalyticsMembers() {
-  return <h1>AnalyticsMembers page</h1>
+  return <h1>AnalyticsMembers page</h1>;
 }

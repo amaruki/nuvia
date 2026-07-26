@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -15,7 +15,12 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Search, Filter } from "lucide-react";
-import { WorkspaceFilterOptions, WorkspaceStatus, WorkspaceType, CommitteeRole } from "@/types/committee.types";
+import {
+  WorkspaceFilterOptions,
+  WorkspaceStatus,
+  WorkspaceType,
+  CommitteeRole,
+} from "@/types/committee.types";
 
 interface WorkspacesFiltersProps {
   filters: WorkspaceFilterOptions;
@@ -57,38 +62,34 @@ export function WorkspacesFilters({
     const currentStatuses = filters.status || [];
     const newStatuses = checked
       ? [...currentStatuses, status]
-      : currentStatuses.filter(s => s !== status);
-    
+      : currentStatuses.filter((s) => s !== status);
+
     onFiltersChange({ status: newStatuses.length > 0 ? newStatuses : undefined });
   };
 
   const handleTypeChange = (type: WorkspaceType, checked: boolean) => {
     const currentTypes = filters.type || [];
-    const newTypes = checked
-      ? [...currentTypes, type]
-      : currentTypes.filter(t => t !== type);
-    
+    const newTypes = checked ? [...currentTypes, type] : currentTypes.filter((t) => t !== type);
+
     onFiltersChange({ type: newTypes.length > 0 ? newTypes : undefined });
   };
 
   const handleRoleChange = (role: CommitteeRole, checked: boolean) => {
     const currentRoles = filters.memberRole || [];
-    const newRoles = checked
-      ? [...currentRoles, role]
-      : currentRoles.filter(r => r !== role);
-    
+    const newRoles = checked ? [...currentRoles, role] : currentRoles.filter((r) => r !== role);
+
     onFiltersChange({ memberRole: newRoles.length > 0 ? newRoles : undefined });
   };
 
   const handleDateRangeChange = (field: "start" | "end", value: string) => {
     const dateValue = value ? new Date(value) : undefined;
     const currentRange = filters.dateRange || { start: new Date(), end: new Date() };
-    
+
     onFiltersChange({
       dateRange: {
         ...currentRange,
-        [field]: dateValue
-      }
+        [field]: dateValue,
+      },
     });
   };
 
@@ -120,17 +121,13 @@ export function WorkspacesFilters({
                 Clear All
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
               {isExpanded ? "Collapse" : "Expand"}
             </Button>
           </div>
         </div>
       </CardHeader>
-      
+
       {isExpanded && (
         <CardContent className="space-y-6">
           {/* Search */}
@@ -158,11 +155,11 @@ export function WorkspacesFilters({
                     <Checkbox
                       id={`status-${option.value}`}
                       checked={filters.status?.includes(option.value) || false}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         handleStatusChange(option.value, checked as boolean)
                       }
                     />
-                    <Label 
+                    <Label
                       htmlFor={`status-${option.value}`}
                       className="text-sm font-normal cursor-pointer"
                     >
@@ -182,11 +179,11 @@ export function WorkspacesFilters({
                     <Checkbox
                       id={`type-${option.value}`}
                       checked={filters.type?.includes(option.value) || false}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         handleTypeChange(option.value, checked as boolean)
                       }
                     />
-                    <Label 
+                    <Label
                       htmlFor={`type-${option.value}`}
                       className="text-sm font-normal cursor-pointer"
                     >
@@ -206,11 +203,11 @@ export function WorkspacesFilters({
                     <Checkbox
                       id={`role-${option.value}`}
                       checked={filters.memberRole?.includes(option.value) || false}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         handleRoleChange(option.value, checked as boolean)
                       }
                     />
-                    <Label 
+                    <Label
                       htmlFor={`role-${option.value}`}
                       className="text-sm font-normal cursor-pointer"
                     >
@@ -233,7 +230,11 @@ export function WorkspacesFilters({
                 <Input
                   id="start-date"
                   type="date"
-                  value={filters.dateRange?.start ? filters.dateRange.start.toISOString().split('T')[0] : ""}
+                  value={
+                    filters.dateRange?.start
+                      ? filters.dateRange.start.toISOString().split("T")[0]
+                      : ""
+                  }
                   onChange={(e) => handleDateRangeChange("start", e.target.value)}
                 />
               </div>
@@ -247,7 +248,9 @@ export function WorkspacesFilters({
                 <Input
                   id="end-date"
                   type="date"
-                  value={filters.dateRange?.end ? filters.dateRange.end.toISOString().split('T')[0] : ""}
+                  value={
+                    filters.dateRange?.end ? filters.dateRange.end.toISOString().split("T")[0] : ""
+                  }
                   onChange={(e) => handleDateRangeChange("end", e.target.value)}
                 />
               </div>
@@ -262,8 +265,8 @@ export function WorkspacesFilters({
                 {filters.search && (
                   <Badge variant="secondary" className="gap-1">
                     Search: "{filters.search}"
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
+                    <X
+                      className="h-3 w-3 cursor-pointer"
                       onClick={() => onFiltersChange({ search: undefined })}
                     />
                   </Badge>
@@ -271,8 +274,8 @@ export function WorkspacesFilters({
                 {filters.status?.map((status) => (
                   <Badge key={status} variant="secondary" className="gap-1">
                     Status: {status}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
+                    <X
+                      className="h-3 w-3 cursor-pointer"
                       onClick={() => handleStatusChange(status, false)}
                     />
                   </Badge>
@@ -280,26 +283,27 @@ export function WorkspacesFilters({
                 {filters.type?.map((type) => (
                   <Badge key={type} variant="secondary" className="gap-1">
                     Type: {type}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
+                    <X
+                      className="h-3 w-3 cursor-pointer"
                       onClick={() => handleTypeChange(type, false)}
                     />
                   </Badge>
                 ))}
                 {filters.memberRole?.map((role) => (
                   <Badge key={role} variant="secondary" className="gap-1">
-                    Role: {role.replace('_', ' ')}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
+                    Role: {role.replace("_", " ")}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
                       onClick={() => handleRoleChange(role, false)}
                     />
                   </Badge>
                 ))}
                 {filters.dateRange && (
                   <Badge variant="secondary" className="gap-1">
-                    Date: {filters.dateRange.start.toLocaleDateString()} - {filters.dateRange.end.toLocaleDateString()}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
+                    Date: {filters.dateRange.start.toLocaleDateString()} -{" "}
+                    {filters.dateRange.end.toLocaleDateString()}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
                       onClick={() => onFiltersChange({ dateRange: undefined })}
                     />
                   </Badge>

@@ -1,32 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
-import { 
-  MoreHorizontal, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Users, 
-  Power, 
+import {
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
+  Users,
+  Power,
   PowerOff,
   MapPin,
   Calendar,
@@ -82,7 +82,7 @@ export function ChaptersTable({
       pending: "outline" as const,
       suspended: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -97,7 +97,7 @@ export function ChaptersTable({
       fair: "outline" as const,
       poor: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[health as keyof typeof variants] || "secondary"}>
         {health.charAt(0).toUpperCase() + health.slice(1)}
@@ -167,7 +167,8 @@ export function ChaptersTable({
                   <div>
                     <div className="font-medium">{chapter.displayName}</div>
                     <div className="text-sm text-muted-foreground">
-                      Established {formatDistanceToNow(chapter.establishedDate, { addSuffix: true })}
+                      Established{" "}
+                      {formatDistanceToNow(chapter.establishedDate, { addSuffix: true })}
                     </div>
                   </div>
                 </div>
@@ -176,7 +177,9 @@ export function ChaptersTable({
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <div className="font-medium">{chapter.location.city}, {chapter.location.state}</div>
+                    <div className="font-medium">
+                      {chapter.location.city}, {chapter.location.state}
+                    </div>
                     <div className="text-sm text-muted-foreground">
                       {chapter.location.region} • {chapter.location.country}
                     </div>
@@ -184,9 +187,7 @@ export function ChaptersTable({
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex items-center space-x-2">
-                  {getStatusBadge(chapter.status)}
-                </div>
+                <div className="flex items-center space-x-2">{getStatusBadge(chapter.status)}</div>
               </TableCell>
               <TableCell>
                 <div>
@@ -199,7 +200,9 @@ export function ChaptersTable({
               <TableCell>
                 <div className="flex items-center space-x-2">
                   {getGrowthIcon(chapter.metrics.memberGrowthRate)}
-                  <span className={`font-medium ${getGrowthColor(chapter.metrics.memberGrowthRate)}`}>
+                  <span
+                    className={`font-medium ${getGrowthColor(chapter.metrics.memberGrowthRate)}`}
+                  >
                     {formatPercentage(chapter.metrics.memberGrowthRate)}
                   </span>
                 </div>
@@ -220,16 +223,17 @@ export function ChaptersTable({
                   </div>
                 </div>
               </TableCell>
-              <TableCell>
-                {getFinancialHealthBadge(chapter.metrics.financialHealth)}
-              </TableCell>
+              <TableCell>{getFinancialHealthBadge(chapter.metrics.financialHealth)}</TableCell>
               <TableCell>
                 <div className="flex items-center space-x-1">
                   {chapter.leadership.slice(0, 3).map((leader, index) => (
                     <Avatar key={leader.id} className="h-6 w-6 border-2 border-background">
                       <AvatarImage src={leader.avatar} alt={leader.name} />
                       <AvatarFallback className="text-xs">
-                        {leader.name.split(' ').map(n => n[0]).join('')}
+                        {leader.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
                       </AvatarFallback>
                     </Avatar>
                   ))}
@@ -257,14 +261,23 @@ export function ChaptersTable({
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <a href={chapter.contactInfo.website} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={chapter.contactInfo.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <ExternalLink className="mr-2 h-4 w-4" />
                         Visit Website
                       </a>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={() => handleToggleStatus(chapter, chapter.status === "active" ? "inactive" : "active")}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        handleToggleStatus(
+                          chapter,
+                          chapter.status === "active" ? "inactive" : "active",
+                        )
+                      }
                       disabled={togglingChapter === chapter.id}
                     >
                       {chapter.status === "active" ? (
@@ -280,7 +293,7 @@ export function ChaptersTable({
                       )}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => onDelete(chapter)}
                       className="text-destructive focus:text-destructive"
                     >

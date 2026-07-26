@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   ArrowLeft,
   Edit,
   Trash2,
@@ -32,7 +32,7 @@ import {
   Star,
   AlertTriangle,
   Megaphone,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -40,8 +40,9 @@ export default function AnnouncementViewPage() {
   const params = useParams();
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
-  const { getAnnouncement, deleteAnnouncement, publishAnnouncement, archiveAnnouncement } = useAnnouncements();
-  
+  const { getAnnouncement, deleteAnnouncement, publishAnnouncement, archiveAnnouncement } =
+    useAnnouncements();
+
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +65,7 @@ export default function AnnouncementViewPage() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const foundAnnouncement = getAnnouncement(announcementId);
         if (foundAnnouncement) {
           setAnnouncement(foundAnnouncement);
@@ -88,7 +89,11 @@ export default function AnnouncementViewPage() {
   };
 
   const handleDelete = async () => {
-    if (confirm(`Are you sure you want to delete "${announcement?.title}"? This action cannot be undone.`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete "${announcement?.title}"? This action cannot be undone.`,
+      )
+    ) {
       try {
         await deleteAnnouncement(announcementId);
         router.push("/dashboard/content/announcements");
@@ -122,7 +127,10 @@ export default function AnnouncementViewPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: any }> = {
+    const statusConfig: Record<
+      string,
+      { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: any }
+    > = {
       draft: { label: "Draft", variant: "secondary", icon: Clock },
       published: { label: "Published", variant: "default", icon: CheckCircle2 },
       scheduled: { label: "Scheduled", variant: "outline", icon: Calendar },
@@ -191,7 +199,9 @@ export default function AnnouncementViewPage() {
       <div className="container max-w-5xl py-6 mx-auto text-center">
         <div className="space-y-4">
           <h1 className="text-2xl font-bold">Announcement not found</h1>
-          <p className="text-muted-foreground">The announcement you're looking for doesn't exist.</p>
+          <p className="text-muted-foreground">
+            The announcement you're looking for doesn't exist.
+          </p>
           <Button onClick={() => router.back()} variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Go Back
@@ -209,7 +219,7 @@ export default function AnnouncementViewPage() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Announcements
         </Button>
-        
+
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleEdit}>
             <Edit className="mr-2 h-4 w-4" />
@@ -301,7 +311,7 @@ export default function AnnouncementViewPage() {
                   <span className="text-sm font-medium">Target Audience:</span>
                 </div>
                 <p className="text-sm text-muted-foreground capitalize">
-                  {announcement.targetAudience?.replace('_', ' ')}
+                  {announcement.targetAudience?.replace("_", " ")}
                 </p>
               </div>
 
@@ -311,7 +321,7 @@ export default function AnnouncementViewPage() {
                   <span className="text-sm font-medium">Type:</span>
                 </div>
                 <p className="text-sm text-muted-foreground capitalize">
-                  {announcement.type?.replace('_', ' ')}
+                  {announcement.type?.replace("_", " ")}
                 </p>
               </div>
 
@@ -434,14 +444,14 @@ export default function AnnouncementViewPage() {
               <CardTitle>Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {announcement.status === 'draft' && (
+              {announcement.status === "draft" && (
                 <Button onClick={handlePublish} className="w-full">
                   <Megaphone className="mr-2 h-4 w-4" />
                   Publish Announcement
                 </Button>
               )}
 
-              {announcement.status === 'published' && (
+              {announcement.status === "published" && (
                 <Button onClick={handleArchive} variant="outline" className="w-full">
                   <Archive className="mr-2 h-4 w-4" />
                   Archive Announcement

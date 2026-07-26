@@ -1,5 +1,5 @@
-import { 
-  CommitteeWorkspace, 
+import {
+  CommitteeWorkspace,
   WorkspaceOverallStatistics,
   WorkspaceFilterOptions,
   WorkspaceType,
@@ -12,7 +12,7 @@ import {
   MeetingStatus,
   DocumentStatus,
   ActivityType,
-  ActivityTargetType
+  ActivityTargetType,
 } from "@/types/committee.types";
 
 export const mockWorkspaces: CommitteeWorkspace[] = [
@@ -34,21 +34,29 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
       memberPermissions: [
         {
           role: "chair",
-          permissions: ["view", "edit", "delete", "upload", "download", "manage_members", "manage_settings"]
+          permissions: [
+            "view",
+            "edit",
+            "delete",
+            "upload",
+            "download",
+            "manage_members",
+            "manage_settings",
+          ],
         },
         {
           role: "co_chair",
-          permissions: ["view", "edit", "delete", "upload", "download", "manage_members"]
+          permissions: ["view", "edit", "delete", "upload", "download", "manage_members"],
         },
         {
           role: "secretary",
-          permissions: ["view", "edit", "upload", "download"]
+          permissions: ["view", "edit", "upload", "download"],
         },
         {
           role: "member",
-          permissions: ["view", "download"]
-        }
-      ]
+          permissions: ["view", "download"],
+        },
+      ],
     },
     members: [
       {
@@ -57,11 +65,19 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         name: "Sarah Johnson",
         email: "sarah.johnson@org.org",
         role: "chair",
-        permissions: ["view", "edit", "delete", "upload", "download", "manage_members", "manage_settings"],
+        permissions: [
+          "view",
+          "edit",
+          "delete",
+          "upload",
+          "download",
+          "manage_members",
+          "manage_settings",
+        ],
         joinedAt: new Date("2023-01-15"),
         lastActiveAt: new Date("2025-11-30"),
         isActive: true,
-        avatar: "/avatars/sarah.jpg"
+        avatar: "/avatars/sarah.jpg",
       },
       {
         id: "ws_mem_2",
@@ -73,7 +89,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         joinedAt: new Date("2023-03-01"),
         lastActiveAt: new Date("2025-11-29"),
         isActive: true,
-        avatar: "/avatars/michael.jpg"
+        avatar: "/avatars/michael.jpg",
       },
       {
         id: "ws_mem_3",
@@ -85,8 +101,8 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         joinedAt: new Date("2023-02-10"),
         lastActiveAt: new Date("2025-11-28"),
         isActive: true,
-        avatar: "/avatars/emily.jpg"
-      }
+        avatar: "/avatars/emily.jpg",
+      },
     ],
     documents: [
       {
@@ -116,7 +132,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             fileUrl: "/documents/2024_strategic_plan_v1.pdf",
             uploadedBy: "sarah.johnson@org.org",
             uploadedAt: new Date("2024-01-15"),
-            changeNotes: "Initial draft"
+            changeNotes: "Initial draft",
           },
           {
             id: "ver_2",
@@ -126,7 +142,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             fileUrl: "/documents/2024_strategic_plan_v2.pdf",
             uploadedBy: "michael.chen@org.org",
             uploadedAt: new Date("2024-06-10"),
-            changeNotes: "Updated financial projections"
+            changeNotes: "Updated financial projections",
           },
           {
             id: "ver_3",
@@ -136,9 +152,9 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             fileUrl: "/documents/2024_strategic_plan_v3.pdf",
             uploadedBy: "sarah.johnson@org.org",
             uploadedAt: new Date("2024-11-20"),
-            changeNotes: "Final version with board feedback"
-          }
-        ]
+            changeNotes: "Final version with board feedback",
+          },
+        ],
       },
       {
         id: "doc_2",
@@ -157,14 +173,15 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         category: "Meeting Records",
         isPublic: false,
         downloadCount: 12,
-        versions: []
-      }
+        versions: [],
+      },
     ],
     tasks: [
       {
         id: "task_1",
         title: "Review 2025 Budget Proposal",
-        description: "Review and provide feedback on the 2025 budget proposal prepared by finance committee",
+        description:
+          "Review and provide feedback on the 2025 budget proposal prepared by finance committee",
         status: "in_progress",
         priority: "high",
         assignedTo: ["user_1", "user_2"],
@@ -180,24 +197,25 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             fileUrl: "/attachments/2025_budget_proposal.pdf",
             fileSize: 3145728,
             uploadedBy: "user_3",
-            uploadedAt: new Date("2025-11-20")
-          }
+            uploadedAt: new Date("2025-11-20"),
+          },
         ],
         comments: [
           {
             id: "com_1",
-            content: "I've reviewed the initial draft and have some concerns about the marketing allocation.",
+            content:
+              "I've reviewed the initial draft and have some concerns about the marketing allocation.",
             author: "sarah.johnson@org.org",
             createdAt: new Date("2025-11-22"),
-            updatedAt: new Date("2025-11-22")
+            updatedAt: new Date("2025-11-22"),
           },
           {
             id: "com_2",
             content: "Agreed. Let's schedule a meeting to discuss this further.",
             author: "michael.chen@org.org",
             createdAt: new Date("2025-11-23"),
-            updatedAt: new Date("2025-11-23")
-          }
+            updatedAt: new Date("2025-11-23"),
+          },
         ],
         subtasks: [
           {
@@ -216,7 +234,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             subtasks: [],
             parentTaskId: "task_1",
             estimatedHours: 4,
-            actualHours: 3
+            actualHours: 3,
           },
           {
             id: "subtask_2",
@@ -234,11 +252,11 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             subtasks: [],
             parentTaskId: "task_1",
             estimatedHours: 6,
-            actualHours: 4
-          }
+            actualHours: 4,
+          },
         ],
         estimatedHours: 12,
-        actualHours: 7
+        actualHours: 7,
       },
       {
         id: "task_2",
@@ -256,14 +274,15 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         comments: [],
         subtasks: [],
         estimatedHours: 8,
-        actualHours: 0
-      }
+        actualHours: 0,
+      },
     ],
     discussions: [
       {
         id: "disc_1",
         title: "2025 Strategic Initiatives Discussion",
-        content: "Let's discuss the key strategic initiatives for 2025. I've prepared a draft list based on our previous meetings and current organizational priorities.",
+        content:
+          "Let's discuss the key strategic initiatives for 2025. I've prepared a draft list based on our previous meetings and current organizational priorities.",
         category: "Strategic Planning",
         status: "active",
         author: "sarah.johnson@org.org",
@@ -279,7 +298,8 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         replies: [
           {
             id: "reply_1",
-            content: "Great starting point! I think we should also consider digital transformation as a key initiative.",
+            content:
+              "Great starting point! I think we should also consider digital transformation as a key initiative.",
             author: "michael.chen@org.org",
             createdAt: new Date("2025-11-16"),
             updatedAt: new Date("2025-11-16"),
@@ -289,19 +309,20 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
                 id: "react_1",
                 emoji: "👍",
                 userId: "user_3",
-                createdAt: new Date("2025-11-16")
-              }
-            ]
+                createdAt: new Date("2025-11-16"),
+              },
+            ],
           },
           {
             id: "reply_2",
-            content: "I agree with Michael. Digital transformation should be a priority given the current market trends.",
+            content:
+              "I agree with Michael. Digital transformation should be a priority given the current market trends.",
             author: "emily.rodriguez@org.org",
             createdAt: new Date("2025-11-17"),
             updatedAt: new Date("2025-11-17"),
             attachments: [],
-            reactions: []
-          }
+            reactions: [],
+          },
         ],
         attachments: [
           {
@@ -310,30 +331,31 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             fileUrl: "/attachments/2025_strategic_initiatives_draft.pdf",
             fileSize: 1048576,
             uploadedBy: "sarah.johnson@org.org",
-            uploadedAt: new Date("2025-11-15")
-          }
+            uploadedAt: new Date("2025-11-15"),
+          },
         ],
         reactions: [
           {
             id: "react_2",
             emoji: "🎯",
             userId: "user_2",
-            createdAt: new Date("2025-11-15")
+            createdAt: new Date("2025-11-15"),
           },
           {
             id: "react_3",
             emoji: "💡",
             userId: "user_3",
-            createdAt: new Date("2025-11-16")
-          }
-        ]
-      }
+            createdAt: new Date("2025-11-16"),
+          },
+        ],
+      },
     ],
     meetings: [
       {
         id: "meet_1",
         title: "Executive Committee Meeting - December 2024",
-        description: "Monthly executive committee meeting to discuss strategic initiatives and budget planning",
+        description:
+          "Monthly executive committee meeting to discuss strategic initiatives and budget planning",
         startTime: new Date("2024-12-05T14:00:00Z"),
         endTime: new Date("2024-12-05T16:00:00Z"),
         location: "Executive Boardroom",
@@ -349,7 +371,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             role: "organizer",
             status: "attended",
             joinedAt: new Date("2024-12-05T13:55:00Z"),
-            leftAt: new Date("2024-12-05T16:05:00Z")
+            leftAt: new Date("2024-12-05T16:05:00Z"),
           },
           {
             id: "att_2",
@@ -359,7 +381,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             role: "attendee",
             status: "attended",
             joinedAt: new Date("2024-12-05T13:58:00Z"),
-            leftAt: new Date("2024-12-05T16:02:00Z")
+            leftAt: new Date("2024-12-05T16:02:00Z"),
           },
           {
             id: "att_3",
@@ -369,8 +391,8 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             role: "attendee",
             status: "attended",
             joinedAt: new Date("2024-12-05T13:57:00Z"),
-            leftAt: new Date("2024-12-05T16:00:00Z")
-          }
+            leftAt: new Date("2024-12-05T16:00:00Z"),
+          },
         ],
         agenda: [
           {
@@ -381,7 +403,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             presenter: "Sarah Johnson",
             order: 1,
             isCompleted: true,
-            notes: "All attendees introduced"
+            notes: "All attendees introduced",
           },
           {
             id: "agenda_2",
@@ -391,7 +413,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             presenter: "Michael Chen",
             order: 2,
             isCompleted: true,
-            notes: "Positive performance across all key metrics"
+            notes: "Positive performance across all key metrics",
           },
           {
             id: "agenda_3",
@@ -401,7 +423,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             presenter: "Sarah Johnson",
             order: 3,
             isCompleted: true,
-            notes: "Budget approved with minor adjustments"
+            notes: "Budget approved with minor adjustments",
           },
           {
             id: "agenda_4",
@@ -411,7 +433,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             presenter: "Emily Rodriguez",
             order: 4,
             isCompleted: true,
-            notes: "Three key initiatives identified and prioritized"
+            notes: "Three key initiatives identified and prioritized",
           },
           {
             id: "agenda_5",
@@ -421,10 +443,11 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             presenter: "Sarah Johnson",
             order: 5,
             isCompleted: true,
-            notes: "Action items assigned to respective committee members"
-          }
+            notes: "Action items assigned to respective committee members",
+          },
         ],
-        minutes: "The executive committee meeting was held on December 5, 2024. All key agenda items were discussed and decisions were made regarding the 2025 budget and strategic initiatives. Action items were assigned and follow-up meetings were scheduled.",
+        minutes:
+          "The executive committee meeting was held on December 5, 2024. All key agenda items were discussed and decisions were made regarding the 2025 budget and strategic initiatives. Action items were assigned and follow-up meetings were scheduled.",
         attachments: [
           {
             id: "meet_att_1",
@@ -433,7 +456,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             fileSize: 524288,
             uploadedBy: "emily.rodriguez@org.org",
             uploadedAt: new Date("2024-12-03"),
-            type: "agenda"
+            type: "agenda",
           },
           {
             id: "meet_att_2",
@@ -442,12 +465,12 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             fileSize: 1572864,
             uploadedBy: "michael.chen@org.org",
             uploadedAt: new Date("2024-12-04"),
-            type: "presentation"
-          }
+            type: "presentation",
+          },
         ],
         createdAt: new Date("2024-11-20"),
-        updatedAt: new Date("2024-12-06")
-      }
+        updatedAt: new Date("2024-12-06"),
+      },
     ],
     activity: [
       {
@@ -459,9 +482,9 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         description: "uploaded document 'Meeting Minutes - November 2024'",
         metadata: {
           documentId: "doc_2",
-          fileSize: 524288
+          fileSize: 524288,
         },
-        createdAt: new Date("2024-11-28")
+        createdAt: new Date("2024-11-28"),
       },
       {
         id: "act_2",
@@ -473,9 +496,9 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         metadata: {
           taskId: "task_1",
           priority: "high",
-          dueDate: new Date("2025-12-15")
+          dueDate: new Date("2025-12-15"),
         },
-        createdAt: new Date("2025-11-20")
+        createdAt: new Date("2025-11-20"),
       },
       {
         id: "act_3",
@@ -486,9 +509,9 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         description: "started discussion '2025 Strategic Initiatives Discussion'",
         metadata: {
           discussionId: "disc_1",
-          category: "Strategic Planning"
+          category: "Strategic Planning",
         },
-        createdAt: new Date("2025-11-15")
+        createdAt: new Date("2025-11-15"),
       },
       {
         id: "act_4",
@@ -500,21 +523,22 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         metadata: {
           meetingId: "meet_1",
           attendeeCount: 3,
-          duration: 120
+          duration: 120,
         },
-        createdAt: new Date("2024-12-06")
-      }
+        createdAt: new Date("2024-12-06"),
+      },
     ],
     createdAt: new Date("2023-01-15"),
     updatedAt: new Date("2025-11-30"),
     createdBy: "admin@example.com",
-    updatedBy: "sarah.johnson@org.org"
+    updatedBy: "sarah.johnson@org.org",
   },
   {
     id: "ws_2",
     committeeId: "com_2",
     name: "Finance Committee Workspace",
-    description: "Collaborative workspace for finance committee budget management and financial planning",
+    description:
+      "Collaborative workspace for finance committee budget management and financial planning",
     type: "project",
     status: "active",
     settings: {
@@ -528,17 +552,25 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
       memberPermissions: [
         {
           role: "chair",
-          permissions: ["view", "edit", "delete", "upload", "download", "manage_members", "manage_settings"]
+          permissions: [
+            "view",
+            "edit",
+            "delete",
+            "upload",
+            "download",
+            "manage_members",
+            "manage_settings",
+          ],
         },
         {
           role: "treasurer",
-          permissions: ["view", "edit", "upload", "download"]
+          permissions: ["view", "edit", "upload", "download"],
         },
         {
           role: "member",
-          permissions: ["view", "download"]
-        }
-      ]
+          permissions: ["view", "download"],
+        },
+      ],
     },
     members: [
       {
@@ -547,11 +579,19 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         name: "Robert Thompson",
         email: "robert.thompson@org.org",
         role: "chair",
-        permissions: ["view", "edit", "delete", "upload", "download", "manage_members", "manage_settings"],
+        permissions: [
+          "view",
+          "edit",
+          "delete",
+          "upload",
+          "download",
+          "manage_members",
+          "manage_settings",
+        ],
         joinedAt: new Date("2023-06-01"),
         lastActiveAt: new Date("2025-11-29"),
         isActive: true,
-        avatar: "/avatars/robert.jpg"
+        avatar: "/avatars/robert.jpg",
       },
       {
         id: "ws_mem_5",
@@ -563,8 +603,8 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         joinedAt: new Date("2023-07-15"),
         lastActiveAt: new Date("2025-11-28"),
         isActive: true,
-        avatar: "/avatars/amanda.jpg"
-      }
+        avatar: "/avatars/amanda.jpg",
+      },
     ],
     documents: [
       {
@@ -593,7 +633,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             fileUrl: "/documents/2025_budget_proposal_v1.xlsx",
             uploadedBy: "robert.thompson@org.org",
             uploadedAt: new Date("2025-11-10"),
-            changeNotes: "Initial draft"
+            changeNotes: "Initial draft",
           },
           {
             id: "ver_5",
@@ -603,10 +643,10 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             fileUrl: "/documents/2025_budget_proposal_v2.xlsx",
             uploadedBy: "amanda.wilson@org.org",
             uploadedAt: new Date("2025-11-25"),
-            changeNotes: "Updated with executive committee feedback"
-          }
-        ]
-      }
+            changeNotes: "Updated with executive committee feedback",
+          },
+        ],
+      },
     ],
     tasks: [
       {
@@ -625,14 +665,15 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         comments: [],
         subtasks: [],
         estimatedHours: 10,
-        actualHours: 6
-      }
+        actualHours: 6,
+      },
     ],
     discussions: [
       {
         id: "disc_2",
         title: "Investment Strategy Review",
-        content: "We need to review our current investment strategy and make recommendations for 2025. Please share your thoughts on the current portfolio performance.",
+        content:
+          "We need to review our current investment strategy and make recommendations for 2025. Please share your thoughts on the current portfolio performance.",
         category: "Financial Planning",
         status: "active",
         author: "robert.thompson@org.org",
@@ -648,13 +689,14 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         replies: [
           {
             id: "reply_3",
-            content: "I've analyzed the current portfolio and we're underperforming in the tech sector. I recommend rebalancing.",
+            content:
+              "I've analyzed the current portfolio and we're underperforming in the tech sector. I recommend rebalancing.",
             author: "amanda.wilson@org.org",
             createdAt: new Date("2025-11-20"),
             updatedAt: new Date("2025-11-20"),
             attachments: [],
-            reactions: []
-          }
+            reactions: [],
+          },
         ],
         attachments: [
           {
@@ -663,11 +705,11 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             fileUrl: "/attachments/portfolio_analysis_q4.pdf",
             fileSize: 838860,
             uploadedBy: "robert.thompson@org.org",
-            uploadedAt: new Date("2025-11-18")
-          }
+            uploadedAt: new Date("2025-11-18"),
+          },
         ],
-        reactions: []
-      }
+        reactions: [],
+      },
     ],
     meetings: [
       {
@@ -689,7 +731,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             role: "organizer",
             status: "attended",
             joinedAt: new Date("2025-11-25T14:55:00Z"),
-            leftAt: new Date("2025-11-25T16:35:00Z")
+            leftAt: new Date("2025-11-25T16:35:00Z"),
           },
           {
             id: "att_5",
@@ -699,8 +741,8 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             role: "attendee",
             status: "attended",
             joinedAt: new Date("2025-11-25T14:58:00Z"),
-            leftAt: new Date("2025-11-25T16:30:00Z")
-          }
+            leftAt: new Date("2025-11-25T16:30:00Z"),
+          },
         ],
         agenda: [
           {
@@ -711,7 +753,7 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             presenter: "Robert Thompson",
             order: 1,
             isCompleted: true,
-            notes: "Budget structure reviewed and approved"
+            notes: "Budget structure reviewed and approved",
           },
           {
             id: "agenda_7",
@@ -721,10 +763,11 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             presenter: "Amanda Wilson",
             order: 2,
             isCompleted: true,
-            notes: "Adjustments made to marketing and IT allocations"
-          }
+            notes: "Adjustments made to marketing and IT allocations",
+          },
         ],
-        minutes: "Budget review meeting completed successfully. Key decisions made regarding departmental allocations for 2025.",
+        minutes:
+          "Budget review meeting completed successfully. Key decisions made regarding departmental allocations for 2025.",
         attachments: [
           {
             id: "meet_att_3",
@@ -733,12 +776,12 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
             fileSize: 2097152,
             uploadedBy: "robert.thompson@org.org",
             uploadedAt: new Date("2025-11-24"),
-            type: "presentation"
-          }
+            type: "presentation",
+          },
         ],
         createdAt: new Date("2025-11-20"),
-        updatedAt: new Date("2025-11-26")
-      }
+        updatedAt: new Date("2025-11-26"),
+      },
     ],
     activity: [
       {
@@ -750,9 +793,9 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         description: "uploaded document '2025 Budget Proposal'",
         metadata: {
           documentId: "doc_3",
-          fileSize: 3145728
+          fileSize: 3145728,
         },
-        createdAt: new Date("2025-11-25")
+        createdAt: new Date("2025-11-25"),
       },
       {
         id: "act_6",
@@ -764,15 +807,15 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         metadata: {
           taskId: "task_3",
           priority: "high",
-          dueDate: new Date("2025-12-05")
+          dueDate: new Date("2025-12-05"),
         },
-        createdAt: new Date("2025-11-15")
-      }
+        createdAt: new Date("2025-11-15"),
+      },
     ],
     createdAt: new Date("2023-06-01"),
     updatedAt: new Date("2025-11-29"),
     createdBy: "admin@example.com",
-    updatedBy: "robert.thompson@org.org"
+    updatedBy: "robert.thompson@org.org",
   },
   {
     id: "ws_3",
@@ -792,13 +835,21 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
       memberPermissions: [
         {
           role: "chair",
-          permissions: ["view", "edit", "delete", "upload", "download", "manage_members", "manage_settings"]
+          permissions: [
+            "view",
+            "edit",
+            "delete",
+            "upload",
+            "download",
+            "manage_members",
+            "manage_settings",
+          ],
         },
         {
           role: "member",
-          permissions: ["view", "upload", "download"]
-        }
-      ]
+          permissions: ["view", "upload", "download"],
+        },
+      ],
     },
     members: [
       {
@@ -807,12 +858,20 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         name: "Lisa Anderson",
         email: "lisa.anderson@org.org",
         role: "chair",
-        permissions: ["view", "edit", "delete", "upload", "download", "manage_members", "manage_settings"],
+        permissions: [
+          "view",
+          "edit",
+          "delete",
+          "upload",
+          "download",
+          "manage_members",
+          "manage_settings",
+        ],
         joinedAt: new Date("2023-09-01"),
         lastActiveAt: new Date("2025-11-30"),
         isActive: true,
-        avatar: "/avatars/lisa.jpg"
-      }
+        avatar: "/avatars/lisa.jpg",
+      },
     ],
     documents: [
       {
@@ -832,8 +891,8 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         category: "Member Resources",
         isPublic: true,
         downloadCount: 156,
-        versions: []
-      }
+        versions: [],
+      },
     ],
     tasks: [
       {
@@ -852,8 +911,8 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         comments: [],
         subtasks: [],
         estimatedHours: 20,
-        actualHours: 0
-      }
+        actualHours: 0,
+      },
     ],
     discussions: [],
     meetings: [],
@@ -867,16 +926,16 @@ export const mockWorkspaces: CommitteeWorkspace[] = [
         description: "uploaded document 'Membership Benefits Guide'",
         metadata: {
           documentId: "doc_4",
-          fileSize: 1048576
+          fileSize: 1048576,
         },
-        createdAt: new Date("2025-10-15")
-      }
+        createdAt: new Date("2025-10-15"),
+      },
     ],
     createdAt: new Date("2023-09-01"),
     updatedAt: new Date("2025-11-30"),
     createdBy: "admin@example.com",
-    updatedBy: "lisa.anderson@org.org"
-  }
+    updatedBy: "lisa.anderson@org.org",
+  },
 ];
 
 export const mockWorkspaceStatistics: WorkspaceOverallStatistics = {
@@ -904,7 +963,7 @@ export const mockWorkspaceStatistics: WorkspaceOverallStatistics = {
       discussionCount: 1,
       meetingCount: 1,
       activityScore: 92.5,
-      engagementRate: 88.7
+      engagementRate: 88.7,
     },
     {
       workspaceId: "ws_2",
@@ -916,7 +975,7 @@ export const mockWorkspaceStatistics: WorkspaceOverallStatistics = {
       discussionCount: 1,
       meetingCount: 1,
       activityScore: 78.3,
-      engagementRate: 82.1
+      engagementRate: 82.1,
     },
     {
       workspaceId: "ws_3",
@@ -928,8 +987,8 @@ export const mockWorkspaceStatistics: WorkspaceOverallStatistics = {
       discussionCount: 0,
       meetingCount: 0,
       activityScore: 65.0,
-      engagementRate: 75.5
-    }
+      engagementRate: 75.5,
+    },
   ],
   typeBreakdown: [
     {
@@ -938,7 +997,7 @@ export const mockWorkspaceStatistics: WorkspaceOverallStatistics = {
       memberCount: 3,
       documentCount: 2,
       taskCount: 2,
-      averageActivityScore: 92.5
+      averageActivityScore: 92.5,
     },
     {
       type: "project",
@@ -946,7 +1005,7 @@ export const mockWorkspaceStatistics: WorkspaceOverallStatistics = {
       memberCount: 2,
       documentCount: 1,
       taskCount: 1,
-      averageActivityScore: 78.3
+      averageActivityScore: 78.3,
     },
     {
       type: "document",
@@ -954,12 +1013,36 @@ export const mockWorkspaceStatistics: WorkspaceOverallStatistics = {
       memberCount: 1,
       documentCount: 1,
       taskCount: 1,
-      averageActivityScore: 65.0
-    }
+      averageActivityScore: 65.0,
+    },
   ],
   monthlyTrend: [
-    { month: "Nov 2025", workspaceCount: 3, memberCount: 6, documentCount: 4, taskCount: 4, discussionCount: 2, meetingCount: 2 },
-    { month: "Oct 2025", workspaceCount: 3, memberCount: 6, documentCount: 3, taskCount: 3, discussionCount: 1, meetingCount: 1 },
-    { month: "Sep 2025", workspaceCount: 3, memberCount: 6, documentCount: 2, taskCount: 2, discussionCount: 1, meetingCount: 1 }
-  ]
+    {
+      month: "Nov 2025",
+      workspaceCount: 3,
+      memberCount: 6,
+      documentCount: 4,
+      taskCount: 4,
+      discussionCount: 2,
+      meetingCount: 2,
+    },
+    {
+      month: "Oct 2025",
+      workspaceCount: 3,
+      memberCount: 6,
+      documentCount: 3,
+      taskCount: 3,
+      discussionCount: 1,
+      meetingCount: 1,
+    },
+    {
+      month: "Sep 2025",
+      workspaceCount: 3,
+      memberCount: 6,
+      documentCount: 2,
+      taskCount: 2,
+      discussionCount: 1,
+      meetingCount: 1,
+    },
+  ],
 };

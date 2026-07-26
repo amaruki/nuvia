@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useRouter, usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -16,27 +16,27 @@ import {
   SidebarMenuSubItem,
   SidebarNotificationBadge,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { ChevronDown, ChevronRight } from "lucide-react"
+} from "@/components/ui/sidebar";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 /**
  * Props for the SidebarCategory component
  */
 interface SidebarCategoryProps {
   /** Unique identifier for the category */
-  id: string
+  id: string;
   /** Title of the category */
-  title: string
+  title: string;
   /** Icon to display for the category */
-  icon: React.ReactNode
+  icon: React.ReactNode;
   /** Items within this category */
-  items: SidebarCategoryItemProps[]
+  items: SidebarCategoryItemProps[];
   /** Optional badge count to display */
-  badge?: number
+  badge?: number;
   /** Whether the category is expanded by default */
-  defaultExpanded?: boolean
+  defaultExpanded?: boolean;
   /** Additional CSS classes */
-  className?: string
+  className?: string;
 }
 
 /**
@@ -44,21 +44,21 @@ interface SidebarCategoryProps {
  */
 interface SidebarCategoryItemProps {
   /** Unique identifier for the item */
-  id: string
+  id: string;
   /** Title of the item */
-  title: string
+  title: string;
   /** Icon to display for the item */
-  icon: React.ReactNode
+  icon: React.ReactNode;
   /** Navigation path for the item */
-  path: string
+  path: string;
   /** Description of the item (shown when sidebar is expanded) */
-  description?: string
+  description?: string;
   /** Optional sub-items for hierarchical navigation */
-  subItems?: Omit<SidebarCategoryItemProps, 'subItems'>[]
+  subItems?: Omit<SidebarCategoryItemProps, "subItems">[];
   /** Optional badge count to display */
-  badge?: number
+  badge?: number;
   /** Additional CSS classes */
-  className?: string
+  className?: string;
 }
 
 /**
@@ -74,66 +74,57 @@ export function SidebarCategory({
   defaultExpanded = false,
   className,
 }: SidebarCategoryProps) {
-  const [isExpanded, setIsExpanded] = React.useState(defaultExpanded)
-  const { state } = useSidebar()
-  const pathname = usePathname()
+  const [isExpanded, setIsExpanded] = React.useState(defaultExpanded);
+  const { state } = useSidebar();
+  const pathname = usePathname();
 
   // Check if any item in this category is active
   const hasActiveItem = React.useMemo(() => {
-    return items.some(item => {
-      if (item.path === pathname) return true
-      return item.subItems?.some(subItem => subItem.path === pathname)
-    })
-  }, [items, pathname])
+    return items.some((item) => {
+      if (item.path === pathname) return true;
+      return item.subItems?.some((subItem) => subItem.path === pathname);
+    });
+  }, [items, pathname]);
 
   // Auto-expand if an item is active
   React.useEffect(() => {
     if (hasActiveItem && !isExpanded) {
-      setIsExpanded(true)
+      setIsExpanded(true);
     }
-  }, [hasActiveItem, isExpanded])
+  }, [hasActiveItem, isExpanded]);
 
   const toggleExpanded = () => {
-    setIsExpanded(!isExpanded)
-  }
+    setIsExpanded(!isExpanded);
+  };
 
   return (
     <SidebarGroup className={cn("w-full", className)}>
       <SidebarGroupLabel
         className={cn(
           "flex items-center justify-between cursor-pointer hover:bg-sidebar-accent/50 rounded-md px-2 py-1.5",
-          hasActiveItem && "bg-sidebar-accent/80 text-sidebar-accent-foreground"
+          hasActiveItem && "bg-sidebar-accent/80 text-sidebar-accent-foreground",
         )}
         onClick={toggleExpanded}
       >
         <div className="flex items-center gap-2">
           {icon}
           <span>{title}</span>
-          {badge && badge > 0 && (
-            <SidebarNotificationBadge count={badge} />
-          )}
+          {badge && badge > 0 && <SidebarNotificationBadge count={badge} />}
         </div>
-        {isExpanded ? (
-          <ChevronDown className="h-4 w-4" />
-        ) : (
-          <ChevronRight className="h-4 w-4" />
-        )}
+        {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
       </SidebarGroupLabel>
-      
+
       {isExpanded && (
         <SidebarGroupContent>
           <SidebarMenu>
             {items.map((item) => (
-              <SidebarCategoryItem
-                key={item.id}
-                {...item}
-              />
+              <SidebarCategoryItem key={item.id} {...item} />
             ))}
           </SidebarMenu>
         </SidebarGroupContent>
       )}
     </SidebarGroup>
-  )
+  );
 }
 
 /**
@@ -150,38 +141,38 @@ export function SidebarCategoryItem({
   badge,
   className,
 }: SidebarCategoryItemProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const { state, setActiveItem } = useSidebar()
-  const [isExpanded, setIsExpanded] = React.useState(false)
-  
-  const isActive = path === pathname
-  
+  const router = useRouter();
+  const pathname = usePathname();
+  const { state, setActiveItem } = useSidebar();
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
+  const isActive = path === pathname;
+
   // Check if any sub-item is active
   const hasActiveSubItem = React.useMemo(() => {
-    return subItems?.some(subItem => subItem.path === pathname)
-  }, [subItems, pathname])
+    return subItems?.some((subItem) => subItem.path === pathname);
+  }, [subItems, pathname]);
 
   // Auto-expand if a sub-item is active
   React.useEffect(() => {
     if (hasActiveSubItem && !isExpanded) {
-      setIsExpanded(true)
+      setIsExpanded(true);
     }
-  }, [hasActiveSubItem, isExpanded])
+  }, [hasActiveSubItem, isExpanded]);
 
   const handleNavigate = () => {
     if (path) {
-      router.push(path)
+      router.push(path);
       if (setActiveItem) {
-        setActiveItem(id)
+        setActiveItem(id);
       }
     }
-  }
+  };
 
   const toggleExpanded = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsExpanded(!isExpanded)
-  }
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
+  };
 
   return (
     <>
@@ -195,14 +186,12 @@ export function SidebarCategoryItem({
           onClick={handleNavigate}
           className={cn(
             "group/menu-item",
-            (isActive || hasActiveSubItem) && "bg-sidebar-accent/80"
+            (isActive || hasActiveSubItem) && "bg-sidebar-accent/80",
           )}
         >
           {icon}
           <span>{title}</span>
-          {badge && badge > 0 && (
-            <SidebarNotificationBadge count={badge} />
-          )}
+          {badge && badge > 0 && <SidebarNotificationBadge count={badge} />}
           {subItems && subItems.length > 0 && (
             <button
               onClick={toggleExpanded}
@@ -216,14 +205,12 @@ export function SidebarCategoryItem({
             </button>
           )}
         </SidebarMenuButton>
-        
+
         {state !== "collapsed" && description && (
-          <p className="text-xs text-muted-foreground ml-11 mt-1 truncate">
-            {description}
-          </p>
+          <p className="text-xs text-muted-foreground ml-11 mt-1 truncate">{description}</p>
         )}
       </SidebarMenuItem>
-      
+
       {isExpanded && subItems && subItems.length > 0 && (
         <SidebarMenuSub>
           {subItems.map((subItem) => (
@@ -231,9 +218,9 @@ export function SidebarCategoryItem({
               <SidebarMenuSubButton
                 isActive={subItem.path === pathname}
                 onClick={() => {
-                  router.push(subItem.path)
+                  router.push(subItem.path);
                   if (setActiveItem) {
-                    setActiveItem(subItem.id)
+                    setActiveItem(subItem.id);
                   }
                 }}
               >
@@ -250,5 +237,5 @@ export function SidebarCategoryItem({
         </SidebarMenuSub>
       )}
     </>
-  )
+  );
 }

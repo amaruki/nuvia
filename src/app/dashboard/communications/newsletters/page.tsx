@@ -1,3 +1,3 @@
 export default function CommunicationsNewsletters() {
-  return <h1>CommunicationsNewsletters page</h1>
+  return <h1>CommunicationsNewsletters page</h1>;
 }

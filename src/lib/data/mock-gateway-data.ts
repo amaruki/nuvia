@@ -1,4 +1,12 @@
-import { PaymentGateway, GatewayStatistics, GatewayOverallStatistics, GatewayTransaction, GatewayTestResult, PaymentMethod, TransactionFee } from "@/types/finance.types";
+import {
+  PaymentGateway,
+  GatewayStatistics,
+  GatewayOverallStatistics,
+  GatewayTransaction,
+  GatewayTestResult,
+  PaymentMethod,
+  TransactionFee,
+} from "@/types/finance.types";
 
 export const mockPaymentMethods: PaymentMethod[] = [
   {
@@ -49,7 +57,7 @@ export const mockTransactionFees: TransactionFee[] = [
     name: "Standard Card Processing",
     description: "Standard fee for credit and debit card transactions",
     percentage: 2.9,
-    amount: 0.30,
+    amount: 0.3,
     currency: "USD",
     appliesTo: ["credit_card", "debit_card"],
     isActive: true,
@@ -69,7 +77,7 @@ export const mockTransactionFees: TransactionFee[] = [
     type: "fixed",
     name: "Bank Transfer Fee",
     description: "Fixed fee for bank transfers",
-    amount: 5.00,
+    amount: 5.0,
     currency: "USD",
     appliesTo: ["bank_transfer"],
     isActive: true,
@@ -96,11 +104,13 @@ export const mockPaymentGateways: PaymentGateway[] = [
     status: "active",
     environment: "production",
     currencies: ["USD", "EUR", "GBP", "CAD", "AUD"],
-    supportedPaymentMethods: mockPaymentMethods.filter(pm => 
-      ["credit_card", "debit_card", "digital_wallet"].includes(pm.type)
+    supportedPaymentMethods: mockPaymentMethods.filter((pm) =>
+      ["credit_card", "debit_card", "digital_wallet"].includes(pm.type),
     ),
-    transactionFees: mockTransactionFees.filter(fee => 
-      fee.appliesTo.some(method => ["credit_card", "debit_card", "digital_wallet"].includes(method))
+    transactionFees: mockTransactionFees.filter((fee) =>
+      fee.appliesTo.some((method) =>
+        ["credit_card", "debit_card", "digital_wallet"].includes(method),
+      ),
     ),
     webhookUrl: "https://api.example.com/webhooks/stripe",
     merchantId: "acct_1A2B3C4D5E6F7G8H",
@@ -118,7 +128,7 @@ export const mockPaymentGateways: PaymentGateway[] = [
       recurringPayments: true,
       subscriptionSupport: true,
       maxTransactionAmount: 10000,
-      minTransactionAmount: 0.50,
+      minTransactionAmount: 0.5,
       dailyTransactionLimit: 50000,
       monthlyTransactionLimit: 1000000,
       webhookRetries: 3,
@@ -129,7 +139,7 @@ export const mockPaymentGateways: PaymentGateway[] = [
       totalVolume: 156780,
       successRate: 98.5,
       averageTransactionValue: 125.67,
-      totalFees: 4534.50,
+      totalFees: 4534.5,
       chargebackCount: 3,
       refundCount: 47,
       dailyTransactions: [
@@ -151,7 +161,7 @@ export const mockPaymentGateways: PaymentGateway[] = [
       ],
       errorRates: [
         { errorType: "insufficient_funds", count: 8, percentage: 0.64 },
-        { errorType: "card_declined", count: 5, percentage: 0.40 },
+        { errorType: "card_declined", count: 5, percentage: 0.4 },
         { errorType: "invalid_cvv", count: 3, percentage: 0.24 },
         { errorType: "processing_error", count: 2, percentage: 0.16 },
       ],
@@ -171,11 +181,11 @@ export const mockPaymentGateways: PaymentGateway[] = [
     status: "active",
     environment: "production",
     currencies: ["USD", "EUR", "GBP", "CAD", "AUD", "JPY"],
-    supportedPaymentMethods: mockPaymentMethods.filter(pm => 
-      ["digital_wallet", "bank_transfer"].includes(pm.type)
+    supportedPaymentMethods: mockPaymentMethods.filter((pm) =>
+      ["digital_wallet", "bank_transfer"].includes(pm.type),
     ),
-    transactionFees: mockTransactionFees.filter(fee => 
-      fee.appliesTo.some(method => ["digital_wallet", "bank_transfer"].includes(method))
+    transactionFees: mockTransactionFees.filter((fee) =>
+      fee.appliesTo.some((method) => ["digital_wallet", "bank_transfer"].includes(method)),
     ),
     webhookUrl: "https://api.example.com/webhooks/paypal",
     merchantId: "merchant_1234567890",
@@ -193,7 +203,7 @@ export const mockPaymentGateways: PaymentGateway[] = [
       recurringPayments: true,
       subscriptionSupport: true,
       maxTransactionAmount: 15000,
-      minTransactionAmount: 1.00,
+      minTransactionAmount: 1.0,
       dailyTransactionLimit: 75000,
       monthlyTransactionLimit: 1500000,
       webhookRetries: 5,
@@ -204,7 +214,7 @@ export const mockPaymentGateways: PaymentGateway[] = [
       totalVolume: 98450,
       successRate: 97.2,
       averageTransactionValue: 110.37,
-      totalFees: 2953.50,
+      totalFees: 2953.5,
       chargebackCount: 2,
       refundCount: 31,
       dailyTransactions: [
@@ -225,7 +235,7 @@ export const mockPaymentGateways: PaymentGateway[] = [
       ],
       errorRates: [
         { errorType: "insufficient_funds", count: 12, percentage: 1.35 },
-        { errorType: "account_locked", count: 8, percentage: 0.90 },
+        { errorType: "account_locked", count: 8, percentage: 0.9 },
         { errorType: "processing_error", count: 5, percentage: 0.56 },
       ],
     },
@@ -244,11 +254,13 @@ export const mockPaymentGateways: PaymentGateway[] = [
     status: "testing",
     environment: "sandbox",
     currencies: ["USD", "CAD"],
-    supportedPaymentMethods: mockPaymentMethods.filter(pm => 
-      ["credit_card", "debit_card", "digital_wallet"].includes(pm.type)
+    supportedPaymentMethods: mockPaymentMethods.filter((pm) =>
+      ["credit_card", "debit_card", "digital_wallet"].includes(pm.type),
     ),
-    transactionFees: mockTransactionFees.filter(fee => 
-      fee.appliesTo.some(method => ["credit_card", "debit_card", "digital_wallet"].includes(method))
+    transactionFees: mockTransactionFees.filter((fee) =>
+      fee.appliesTo.some((method) =>
+        ["credit_card", "debit_card", "digital_wallet"].includes(method),
+      ),
     ),
     webhookUrl: "https://api.example.com/webhooks/square",
     merchantId: "sq_test_1234567890",
@@ -266,7 +278,7 @@ export const mockPaymentGateways: PaymentGateway[] = [
       recurringPayments: false,
       subscriptionSupport: false,
       maxTransactionAmount: 5000,
-      minTransactionAmount: 1.00,
+      minTransactionAmount: 1.0,
       dailyTransactionLimit: 10000,
       monthlyTransactionLimit: 100000,
       webhookRetries: 3,
@@ -276,8 +288,8 @@ export const mockPaymentGateways: PaymentGateway[] = [
       totalTransactions: 45,
       totalVolume: 2340,
       successRate: 95.6,
-      averageTransactionValue: 52.00,
-      totalFees: 67.80,
+      averageTransactionValue: 52.0,
+      totalFees: 67.8,
       chargebackCount: 0,
       refundCount: 2,
       dailyTransactions: [
@@ -297,9 +309,7 @@ export const mockPaymentGateways: PaymentGateway[] = [
         { method: "debit_card", count: 12, volume: 624 },
         { method: "digital_wallet", count: 5, volume: 260 },
       ],
-      errorRates: [
-        { errorType: "processing_error", count: 2, percentage: 4.44 },
-      ],
+      errorRates: [{ errorType: "processing_error", count: 2, percentage: 4.44 }],
     },
     createdAt: new Date("2025-10-15"),
     updatedAt: new Date("2025-11-25"),
@@ -316,7 +326,7 @@ export const mockGatewayTransactions: GatewayTransaction[] = [
     gatewayName: "Stripe (Primary)",
     transactionId: "ch_1A2B3C4D5E6F7G8H",
     externalTransactionId: "pi_1A2B3C4D5E6F7G8H",
-    amount: 125.50,
+    amount: 125.5,
     currency: "USD",
     status: "completed",
     paymentMethod: "credit_card",
@@ -356,7 +366,7 @@ export const mockGatewayTransactions: GatewayTransaction[] = [
     gatewayName: "Stripe (Primary)",
     transactionId: "ch_3B4C5D6E7F8G9H0I",
     externalTransactionId: "pi_3B4C5D6E7F8G9H0I",
-    amount: 250.00,
+    amount: 250.0,
     currency: "USD",
     status: "failed",
     paymentMethod: "credit_card",
@@ -376,7 +386,7 @@ export const mockGatewayTransactions: GatewayTransaction[] = [
     gatewayName: "PayPal (Secondary)",
     transactionId: "txn_4C5D6E7F8G9H0I1J",
     externalTransactionId: "PAYID-4C5D6E7F8G9H0I1J",
-    amount: 45.00,
+    amount: 45.0,
     currency: "USD",
     status: "refunded",
     paymentMethod: "digital_wallet",
@@ -386,7 +396,7 @@ export const mockGatewayTransactions: GatewayTransaction[] = [
     description: "Product purchase",
     feeAmount: 1.13,
     netAmount: 43.87,
-    refundAmount: 45.00,
+    refundAmount: 45.0,
     processedAt: new Date("2025-11-28T11:20:00Z"),
     createdAt: new Date("2025-11-28T11:15:00Z"),
     updatedAt: new Date("2025-11-28T11:20:00Z"),
@@ -441,7 +451,7 @@ export const mockGatewayStatistics: GatewayOverallStatistics = {
   totalTransactions: 2184,
   totalVolume: 257570,
   averageSuccessRate: 97.1,
-  totalFees: 7555.80,
+  totalFees: 7555.8,
   gatewayBreakdown: [
     {
       gatewayId: "gw_1",
@@ -451,7 +461,7 @@ export const mockGatewayStatistics: GatewayOverallStatistics = {
       transactionCount: 1247,
       volume: 156780,
       successRate: 98.5,
-      fees: 4534.50,
+      fees: 4534.5,
     },
     {
       gatewayId: "gw_2",
@@ -461,7 +471,7 @@ export const mockGatewayStatistics: GatewayOverallStatistics = {
       transactionCount: 892,
       volume: 98450,
       successRate: 97.2,
-      fees: 2953.50,
+      fees: 2953.5,
     },
     {
       gatewayId: "gw_3",
@@ -471,7 +481,7 @@ export const mockGatewayStatistics: GatewayOverallStatistics = {
       transactionCount: 45,
       volume: 2340,
       successRate: 95.6,
-      fees: 67.80,
+      fees: 67.8,
     },
   ],
   monthlyTrend: [

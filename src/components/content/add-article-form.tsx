@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -19,13 +19,8 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
   Upload,
   X,
   Calendar,
@@ -46,7 +41,7 @@ import {
   Zap,
   BookOpen,
 } from "lucide-react";
-import { 
+import {
   ArticleFormData,
   ArticleType,
   ArticleCategory,
@@ -57,7 +52,7 @@ import {
   ARTICLE_CATEGORIES,
   ARTICLE_STATUSES,
   ARTICLE_DIFFICULTIES,
-  ARTICLE_FORMATS
+  ARTICLE_FORMATS,
 } from "@/types/article.types";
 import { mockArticles } from "@/lib/data/mock-article-data";
 import { cn } from "@/lib/utils";
@@ -66,7 +61,10 @@ import { cn } from "@/lib/utils";
 const formSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
   slug: z.string().optional(),
-  excerpt: z.string().min(10, "Excerpt must be at least 10 characters").max(500, "Excerpt must be less than 500 characters"),
+  excerpt: z
+    .string()
+    .min(10, "Excerpt must be at least 10 characters")
+    .max(500, "Excerpt must be less than 500 characters"),
   content: z.string().min(50, "Content must be at least 50 characters"),
   type: z.enum(ARTICLE_TYPES),
   category: z.enum(ARTICLE_CATEGORIES),
@@ -86,8 +84,14 @@ const formSchema = z.object({
   isPinned: z.boolean(),
   priority: z.number().min(0).max(10),
   seo: z.object({
-    title: z.string().min(1, "SEO title is required").max(60, "SEO title must be less than 60 characters"),
-    description: z.string().min(1, "SEO description is required").max(160, "SEO description must be less than 160 characters"),
+    title: z
+      .string()
+      .min(1, "SEO title is required")
+      .max(60, "SEO title must be less than 60 characters"),
+    description: z
+      .string()
+      .min(1, "SEO description is required")
+      .max(160, "SEO description must be less than 160 characters"),
     keywords: z.array(z.string()).optional(),
     ogImage: z.string().optional(),
   }),
@@ -99,10 +103,10 @@ interface ArticlePageFormProps {
   isEditing?: boolean;
 }
 
-export default function ArticlePageForm({ 
-  onSubmit, 
+export default function ArticlePageForm({
+  onSubmit,
   initialData,
-  isEditing = false 
+  isEditing = false,
 }: ArticlePageFormProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
@@ -111,8 +115,9 @@ export default function ArticlePageForm({
   const [attachments, setAttachments] = useState<File[]>([]);
 
   // Extract unique authors from mock data
-  const mockAuthors = Array.from(new Set(mockArticles.map(a => a.author.id)))
-    .map(id => mockArticles.find(a => a.author.id === id)!.author);
+  const mockAuthors = Array.from(new Set(mockArticles.map((a) => a.author.id))).map(
+    (id) => mockArticles.find((a) => a.author.id === id)!.author,
+  );
 
   const form = useForm<ArticleFormData>({
     resolver: zodResolver(formSchema),
@@ -142,9 +147,9 @@ export default function ArticlePageForm({
         title: "",
         description: "",
         keywords: [],
-        ogImage: ""
+        ogImage: "",
       },
-      ...initialData
+      ...initialData,
     },
   });
 
@@ -161,14 +166,14 @@ export default function ArticlePageForm({
       ...data,
       featuredImage,
       gallery,
-      attachments
+      attachments,
     };
     onSubmit(formDataWithMedia);
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => setFeaturedImage(e.target?.result as string);
       reader.readAsDataURL(file);
@@ -177,17 +182,21 @@ export default function ArticlePageForm({
 
   const handleGalleryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    files.forEach(file => {
-      if (file.type.startsWith('image/')) {
+    files.forEach((file) => {
+      if (file.type.startsWith("image/")) {
         const reader = new FileReader();
-        reader.onload = (e) => setGallery(prev => [...prev, e.target?.result as string]);
+        reader.onload = (e) => setGallery((prev) => [...prev, e.target?.result as string]);
         reader.readAsDataURL(file);
       }
     });
   };
 
   const generateSlug = (title: string) => {
-    return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
   };
 
   const watchTitle = form.watch("title");
@@ -198,9 +207,9 @@ export default function ArticlePageForm({
       {/* Page Header */}
       <div className="flex flex-col gap-4 mb-8 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             className="pl-0 text-muted-foreground hover:text-primary"
             onClick={() => router.back()}
           >
@@ -211,16 +220,17 @@ export default function ArticlePageForm({
             {isEditing ? "Edit Article" : "Create New Article"}
           </h1>
           <p className="text-muted-foreground">
-            {isEditing 
+            {isEditing
               ? "Update details and metadata for your existing article."
-              : "Fill in the information below to create a new article."
-            }
+              : "Fill in the information below to create a new article."}
           </p>
         </div>
-        
+
         {/* Top Actions */}
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={() => router.back()}>Cancel</Button>
+          <Button variant="outline" onClick={() => router.back()}>
+            Cancel
+          </Button>
           <Button onClick={form.handleSubmit(handleSubmit)} disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? "Saving..." : isEditing ? "Update" : "Create Article"}
           </Button>
@@ -250,7 +260,9 @@ export default function ArticlePageForm({
                     className={cn(form.formState.errors.title && "border-destructive")}
                   />
                   {form.formState.errors.title && (
-                    <p className="text-sm text-destructive">{form.formState.errors.title.message as string}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.title.message as string}
+                    </p>
                   )}
                 </div>
 
@@ -276,7 +288,9 @@ export default function ArticlePageForm({
                   className={cn(form.formState.errors.excerpt && "border-destructive")}
                 />
                 {form.formState.errors.excerpt && (
-                  <p className="text-sm text-destructive">{form.formState.errors.excerpt.message as string}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.excerpt.message as string}
+                  </p>
                 )}
               </div>
 
@@ -349,7 +363,9 @@ export default function ArticlePageForm({
                   <Label htmlFor="difficulty">Difficulty *</Label>
                   <Select
                     value={form.watch("difficulty")}
-                    onValueChange={(value) => form.setValue("difficulty", value as ArticleDifficulty)}
+                    onValueChange={(value) =>
+                      form.setValue("difficulty", value as ArticleDifficulty)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Difficulty" />
@@ -375,7 +391,9 @@ export default function ArticlePageForm({
                     </SelectTrigger>
                     <SelectContent>
                       {mockAuthors.map((author) => (
-                        <SelectItem key={author.id} value={author.id}>{author.name}</SelectItem>
+                        <SelectItem key={author.id} value={author.id}>
+                          {author.name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -418,7 +436,9 @@ export default function ArticlePageForm({
                   <span>{Math.ceil((watchContent?.length || 0) / 200)} min read</span>
                 </div>
                 {form.formState.errors.content && (
-                  <p className="text-sm text-destructive">{form.formState.errors.content.message as string}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.content.message as string}
+                  </p>
                 )}
               </div>
             </TabsContent>
@@ -429,20 +449,31 @@ export default function ArticlePageForm({
                 <div className="space-y-2">
                   <Label htmlFor="seo.title">SEO Title</Label>
                   <Input {...form.register("seo.title")} placeholder="Search engine title" />
-                  {form.formState.errors.seo && 'title' in form.formState.errors.seo && (
-                    <p className="text-sm text-destructive">{(form.formState.errors.seo as any).title.message}</p>
+                  {form.formState.errors.seo && "title" in form.formState.errors.seo && (
+                    <p className="text-sm text-destructive">
+                      {(form.formState.errors.seo as any).title.message}
+                    </p>
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="seo.description">Meta Description</Label>
-                  <Textarea {...form.register("seo.description")} rows={4} placeholder="Description for search results..." />
-                  {form.formState.errors.seo && 'description' in form.formState.errors.seo && (
-                    <p className="text-sm text-destructive">{(form.formState.errors.seo as any).description.message}</p>
+                  <Textarea
+                    {...form.register("seo.description")}
+                    rows={4}
+                    placeholder="Description for search results..."
+                  />
+                  {form.formState.errors.seo && "description" in form.formState.errors.seo && (
+                    <p className="text-sm text-destructive">
+                      {(form.formState.errors.seo as any).description.message}
+                    </p>
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="seo.ogImage">OG Image URL</Label>
-                  <Input {...form.register("seo.ogImage")} placeholder="https://example.com/image.jpg" />
+                  <Input
+                    {...form.register("seo.ogImage")}
+                    placeholder="https://example.com/image.jpg"
+                  />
                 </div>
               </div>
             </TabsContent>
@@ -453,27 +484,37 @@ export default function ArticlePageForm({
                 <div className="space-y-4">
                   <h3 className="text-sm font-medium">Access & Visibility</h3>
                   <div className="space-y-4">
-                     <Select
-                        value={form.watch("visibility")}
-                        onValueChange={(value) => form.setValue("visibility", value as any)}
-                      >
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="public">Public</SelectItem>
-                          <SelectItem value="members_only">Members Only</SelectItem>
-                          <SelectItem value="premium_only">Premium Only</SelectItem>
-                          <SelectItem value="chapter_only">Chapter Only</SelectItem>
-                          <SelectItem value="committee_only">Committee Only</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="isFeatured" checked={form.watch("isFeatured")} onCheckedChange={(c) => form.setValue("isFeatured", !!c)} />
-                        <Label htmlFor="isFeatured">Feature this article</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="isPinned" checked={form.watch("isPinned")} onCheckedChange={(c) => form.setValue("isPinned", !!c)} />
-                        <Label htmlFor="isPinned">Pin this article</Label>
-                      </div>
+                    <Select
+                      value={form.watch("visibility")}
+                      onValueChange={(value) => form.setValue("visibility", value as any)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="public">Public</SelectItem>
+                        <SelectItem value="members_only">Members Only</SelectItem>
+                        <SelectItem value="premium_only">Premium Only</SelectItem>
+                        <SelectItem value="chapter_only">Chapter Only</SelectItem>
+                        <SelectItem value="committee_only">Committee Only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="isFeatured"
+                        checked={form.watch("isFeatured")}
+                        onCheckedChange={(c) => form.setValue("isFeatured", !!c)}
+                      />
+                      <Label htmlFor="isFeatured">Feature this article</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="isPinned"
+                        checked={form.watch("isPinned")}
+                        onCheckedChange={(c) => form.setValue("isPinned", !!c)}
+                      />
+                      <Label htmlFor="isPinned">Pin this article</Label>
+                    </div>
                   </div>
                 </div>
 
@@ -481,15 +522,27 @@ export default function ArticlePageForm({
                   <h3 className="text-sm font-medium">Capabilities</h3>
                   <div className="grid gap-3">
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="comments" checked={form.watch("commentsEnabled")} onCheckedChange={(c) => form.setValue("commentsEnabled", !!c)} />
+                      <Checkbox
+                        id="comments"
+                        checked={form.watch("commentsEnabled")}
+                        onCheckedChange={(c) => form.setValue("commentsEnabled", !!c)}
+                      />
                       <Label htmlFor="comments">Enable comments</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="sharing" checked={form.watch("sharingEnabled")} onCheckedChange={(c) => form.setValue("sharingEnabled", !!c)} />
+                      <Checkbox
+                        id="sharing"
+                        checked={form.watch("sharingEnabled")}
+                        onCheckedChange={(c) => form.setValue("sharingEnabled", !!c)}
+                      />
                       <Label htmlFor="sharing">Enable social sharing</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="download" checked={form.watch("downloadEnabled")} onCheckedChange={(c) => form.setValue("downloadEnabled", !!c)} />
+                      <Checkbox
+                        id="download"
+                        checked={form.watch("downloadEnabled")}
+                        onCheckedChange={(c) => form.setValue("downloadEnabled", !!c)}
+                      />
                       <Label htmlFor="download">Enable downloads</Label>
                     </div>
                   </div>
@@ -504,7 +557,11 @@ export default function ArticlePageForm({
                   <Label>Featured Image</Label>
                   {featuredImage ? (
                     <div className="relative group">
-                      <img src={featuredImage} alt="Featured" className="w-full h-48 object-cover rounded-lg border" />
+                      <img
+                        src={featuredImage}
+                        alt="Featured"
+                        className="w-full h-48 object-cover rounded-lg border"
+                      />
                       <Button
                         type="button"
                         variant="destructive"
@@ -518,10 +575,18 @@ export default function ArticlePageForm({
                   ) : (
                     <div className="border-2 border-dashed rounded-lg p-10 flex flex-col items-center justify-center bg-muted/30">
                       <ImageIcon className="h-10 w-10 text-muted-foreground mb-4" />
-                      <Input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="f-upload" />
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="f-upload"
+                      />
                       <Label htmlFor="f-upload" className="cursor-pointer">
                         <Button type="button" variant="secondary" size="sm" asChild>
-                          <span><Upload className="h-4 w-4 mr-2" /> Upload Image</span>
+                          <span>
+                            <Upload className="h-4 w-4 mr-2" /> Upload Image
+                          </span>
                         </Button>
                       </Label>
                     </div>
@@ -534,12 +599,16 @@ export default function ArticlePageForm({
                     <div className="grid grid-cols-2 gap-2">
                       {gallery.map((image, index) => (
                         <div key={index} className="relative group">
-                          <img src={image} alt={`Gallery ${index + 1}`} className="w-full h-24 object-cover rounded border" />
+                          <img
+                            src={image}
+                            alt={`Gallery ${index + 1}`}
+                            className="w-full h-24 object-cover rounded border"
+                          />
                           <Button
                             type="button"
                             variant="destructive"
                             size="icon"
-                            onClick={() => setGallery(prev => prev.filter((_, i) => i !== index))}
+                            onClick={() => setGallery((prev) => prev.filter((_, i) => i !== index))}
                             className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             <X className="h-3 w-3" />
@@ -550,10 +619,19 @@ export default function ArticlePageForm({
                   ) : (
                     <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center bg-muted/30">
                       <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
-                      <Input type="file" accept="image/*" multiple onChange={handleGalleryUpload} className="hidden" id="g-upload" />
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleGalleryUpload}
+                        className="hidden"
+                        id="g-upload"
+                      />
                       <Label htmlFor="g-upload" className="cursor-pointer">
                         <Button type="button" variant="secondary" size="sm" asChild>
-                          <span><Upload className="h-4 w-4 mr-2" /> Add Gallery Images</span>
+                          <span>
+                            <Upload className="h-4 w-4 mr-2" /> Add Gallery Images
+                          </span>
                         </Button>
                       </Label>
                     </div>
@@ -566,20 +644,20 @@ export default function ArticlePageForm({
 
         {/* Bottom Sticky Actions */}
         <div className="flex items-center justify-end gap-4 pt-6 border-t">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-          >
+          <Button type="button" variant="outline" onClick={() => router.back()}>
             Discard Changes
           </Button>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             size="lg"
             disabled={form.formState.isSubmitting}
             className="min-w-[150px]"
           >
-            {form.formState.isSubmitting ? "Saving..." : isEditing ? "Save Changes" : "Create Article"}
+            {form.formState.isSubmitting
+              ? "Saving..."
+              : isEditing
+                ? "Save Changes"
+                : "Create Article"}
           </Button>
         </div>
       </form>

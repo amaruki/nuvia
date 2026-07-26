@@ -1,3 +1,3 @@
 export default function UserSecurity() {
-  return <h1>UserSecurity page</h1>
+  return <h1>UserSecurity page</h1>;
 }

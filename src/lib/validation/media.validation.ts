@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { 
-  MediaType, 
-  MediaStatus, 
-  MediaVisibility, 
-  MediaStorageType, 
-  MediaCompressionLevel 
+import {
+  MediaType,
+  MediaStatus,
+  MediaVisibility,
+  MediaStorageType,
+  MediaCompressionLevel,
 } from "@/types/media.types";
 
 // Base validation schemas
@@ -19,13 +19,18 @@ const mediaMetadataSchema = z.object({
   fileName: z.string().min(1, "File name is required").max(255, "File name too long"),
   fileExtension: z.string().min(1, "File extension is required").max(10, "File extension too long"),
   mimeType: z.string().min(1, "MIME type is required").max(100, "MIME type too long"),
-  size: z.number().min(0, "File size must be positive").max(5 * 1024 * 1024 * 1024, "File size too large (max 5GB)"),
+  size: z
+    .number()
+    .min(0, "File size must be positive")
+    .max(5 * 1024 * 1024 * 1024, "File size too large (max 5GB)"),
   sizeFormatted: z.string().min(1, "Formatted size is required"),
-  dimensions: z.object({
-    width: z.number().min(1, "Width must be positive"),
-    height: z.number().min(1, "Height must be positive"),
-    aspectRatio: z.number().min(0, "Aspect ratio must be positive")
-  }).optional(),
+  dimensions: z
+    .object({
+      width: z.number().min(1, "Width must be positive"),
+      height: z.number().min(1, "Height must be positive"),
+      aspectRatio: z.number().min(0, "Aspect ratio must be positive"),
+    })
+    .optional(),
   duration: z.number().min(0, "Duration must be positive").optional(),
   fps: z.number().min(0, "FPS must be positive").max(120, "FPS too high").optional(),
   bitrate: z.number().min(0, "Bitrate must be positive").optional(),
@@ -33,27 +38,39 @@ const mediaMetadataSchema = z.object({
   hasTransparency: z.boolean().optional(),
   dominantColor: z.string().max(20, "Dominant color too long").optional(),
   colorPalette: z.array(z.string().max(20, "Color too long")).max(10, "Too many colors").optional(),
-  exif: z.object({
-    camera: z.string().max(100, "Camera name too long").optional(),
-    lens: z.string().max(100, "Lens name too long").optional(),
-    focalLength: z.string().max(20, "Focal length too long").optional(),
-    aperture: z.string().max(10, "Aperture too long").optional(),
-    shutterSpeed: z.string().max(20, "Shutter speed too long").optional(),
-    iso: z.number().min(0, "ISO must be positive").max(102400, "ISO too high").optional(),
-    flash: z.boolean().optional(),
-    gps: z.object({
-      latitude: z.number().min(-90, "Invalid latitude").max(90, "Invalid latitude"),
-      longitude: z.number().min(-180, "Invalid longitude").max(180, "Invalid longitude")
-    }).optional(),
-    dateTaken: dateSchema.optional()
-  }).optional(),
-  pageCount: z.number().min(1, "Page count must be positive").max(10000, "Page count too high").optional(),
-  wordCount: z.number().min(0, "Word count must be non-negative").max(1000000, "Word count too high").optional(),
+  exif: z
+    .object({
+      camera: z.string().max(100, "Camera name too long").optional(),
+      lens: z.string().max(100, "Lens name too long").optional(),
+      focalLength: z.string().max(20, "Focal length too long").optional(),
+      aperture: z.string().max(10, "Aperture too long").optional(),
+      shutterSpeed: z.string().max(20, "Shutter speed too long").optional(),
+      iso: z.number().min(0, "ISO must be positive").max(102400, "ISO too high").optional(),
+      flash: z.boolean().optional(),
+      gps: z
+        .object({
+          latitude: z.number().min(-90, "Invalid latitude").max(90, "Invalid latitude"),
+          longitude: z.number().min(-180, "Invalid longitude").max(180, "Invalid longitude"),
+        })
+        .optional(),
+      dateTaken: dateSchema.optional(),
+    })
+    .optional(),
+  pageCount: z
+    .number()
+    .min(1, "Page count must be positive")
+    .max(10000, "Page count too high")
+    .optional(),
+  wordCount: z
+    .number()
+    .min(0, "Word count must be non-negative")
+    .max(1000000, "Word count too high")
+    .optional(),
   author: z.string().max(255, "Author name too long").optional(),
   subject: z.string().max(255, "Subject too long").optional(),
   checksum: z.string().min(1, "Checksum is required").max(128, "Checksum too long"),
   encoding: z.string().max(50, "Encoding too long").optional(),
-  customFields: z.record(z.string(), z.any()).optional()
+  customFields: z.record(z.string(), z.any()).optional(),
 });
 
 // Media version validation
@@ -69,20 +86,28 @@ const mediaVersionSchema = z.object({
   changelog: z.string().max(1000, "Changelog too long").optional(),
   isActive: z.boolean(),
   size: z.number().min(0, "Size must be positive"),
-  compressionLevel: z.enum(["none", "low", "medium", "high", "maximum"]).optional()
+  compressionLevel: z.enum(["none", "low", "medium", "high", "maximum"]).optional(),
 });
 
 // Media usage validation
 const mediaUsageSchema = z.object({
   id: uuidSchema,
   mediaId: uuidSchema,
-  entityType: z.enum(["article", "announcement", "publication", "event", "user_profile", "chapter", "committee"]),
+  entityType: z.enum([
+    "article",
+    "announcement",
+    "publication",
+    "event",
+    "user_profile",
+    "chapter",
+    "committee",
+  ]),
   entityId: uuidSchema,
   entityTitle: z.string().min(1, "Entity title is required").max(255, "Entity title too long"),
   usageType: z.enum(["featured_image", "gallery", "attachment", "avatar", "banner", "thumbnail"]),
   url: urlSchema,
   addedAt: dateSchema,
-  addedBy: z.string().min(1, "Added by is required").max(255, "Added by name too long")
+  addedBy: z.string().min(1, "Added by is required").max(255, "Added by name too long"),
 });
 
 // Media permission validation
@@ -92,23 +117,32 @@ const mediaPermissionSchema = z.object({
   entityType: z.enum(["user", "role", "chapter", "committee"]),
   entityId: uuidSchema,
   entityName: z.string().min(1, "Entity name is required").max(255, "Entity name too long"),
-  permissions: z.array(z.enum(["view", "download", "edit", "delete", "share"])).min(1, "At least one permission required"),
+  permissions: z
+    .array(z.enum(["view", "download", "edit", "delete", "share"]))
+    .min(1, "At least one permission required"),
   grantedBy: z.string().min(1, "Granted by is required").max(255, "Granted by name too long"),
   grantedAt: dateSchema,
-  expiresAt: dateSchema.optional()
+  expiresAt: dateSchema.optional(),
 });
 
 // Media folder validation
 const mediaFolderSchema = z.object({
   id: uuidSchema,
   name: z.string().min(1, "Folder name is required").max(255, "Folder name too long"),
-  slug: z.string().min(1, "Slug is required").max(255, "Slug too long").regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+  slug: z
+    .string()
+    .min(1, "Slug is required")
+    .max(255, "Slug too long")
+    .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
   description: z.string().max(1000, "Description too long").optional(),
   parentId: uuidSchema.nullable().optional(),
   path: z.string().min(1, "Path is required").max(1000, "Path too long"),
   level: z.number().min(0, "Level must be non-negative").max(10, "Level too deep"),
   order: z.number().min(0, "Order must be non-negative").max(10000, "Order too high"),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format").optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format")
+    .optional(),
   icon: z.string().max(50, "Icon name too long").optional(),
   visibility: z.enum(["public", "private", "restricted", "draft"]),
   allowedRoles: z.array(z.string()).optional(),
@@ -120,30 +154,49 @@ const mediaFolderSchema = z.object({
   createdAt: dateSchema,
   updatedAt: dateSchema,
   createdBy: z.string().min(1, "Creator is required").max(255, "Creator name too long"),
-  updatedBy: z.string().max(255, "Updated by name too long").optional()
+  updatedBy: z.string().max(255, "Updated by name too long").optional(),
 });
 
 // Media tag validation
 const mediaTagSchema = z.object({
   id: uuidSchema,
   name: z.string().min(1, "Tag name is required").max(50, "Tag name too long"),
-  slug: z.string().min(1, "Slug is required").max(50, "Slug too long").regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+  slug: z
+    .string()
+    .min(1, "Slug is required")
+    .max(50, "Slug too long")
+    .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format"),
   description: z.string().max(500, "Description too long").optional(),
   count: z.number().min(0, "Count must be non-negative"),
   createdAt: dateSchema,
-  createdBy: z.string().min(1, "Creator is required").max(255, "Creator name too long")
+  createdBy: z.string().min(1, "Creator is required").max(255, "Creator name too long"),
 });
 
 // Main media validation
 const mediaSchema = z.object({
   id: uuidSchema,
   title: z.string().min(1, "Title is required").max(255, "Title too long"),
-  slug: z.string().min(1, "Slug is required").max(255, "Slug too long").regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+  slug: z
+    .string()
+    .min(1, "Slug is required")
+    .max(255, "Slug too long")
+    .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
   description: z.string().max(2000, "Description too long").optional(),
   altText: z.string().max(255, "Alt text too long").optional(),
   caption: z.string().max(500, "Caption too long").optional(),
-  type: z.enum(["image", "video", "audio", "document", "archive", "spreadsheet", "presentation", "pdf", "vector", "font"]),
+  type: z.enum([
+    "image",
+    "video",
+    "audio",
+    "document",
+    "archive",
+    "spreadsheet",
+    "presentation",
+    "pdf",
+    "vector",
+    "font",
+  ]),
   status: z.enum(["uploading", "processing", "ready", "failed", "archived"]),
   visibility: z.enum(["public", "private", "restricted", "draft"]),
   url: urlSchema,
@@ -179,7 +232,7 @@ const mediaSchema = z.object({
   deletedAt: dateSchema.optional(),
   isFeatured: z.boolean(),
   priority: z.number().min(0, "Priority must be non-negative").max(100, "Priority too high"),
-  customFields: z.record(z.string(), z.any()).optional()
+  customFields: z.record(z.string(), z.any()).optional(),
 });
 
 // Form data validation schemas
@@ -187,7 +240,18 @@ const createMediaDataSchema = z.object({
   title: z.string().min(1, "Title is required").max(255, "Title too long"),
   description: z.string().max(2000, "Description too long").optional(),
   altText: z.string().max(255, "Alt text too long").optional(),
-  type: z.enum(["image", "video", "audio", "document", "archive", "spreadsheet", "presentation", "pdf", "vector", "font"]),
+  type: z.enum([
+    "image",
+    "video",
+    "audio",
+    "document",
+    "archive",
+    "spreadsheet",
+    "presentation",
+    "pdf",
+    "vector",
+    "font",
+  ]),
   visibility: z.enum(["public", "private", "restricted", "draft"]).optional(),
   url: urlSchema.optional(),
   thumbnailUrl: urlSchema.optional(),
@@ -206,7 +270,7 @@ const createMediaDataSchema = z.object({
   compression: z.string().max(20, "Compression too long").optional(),
   exif: z.record(z.string(), z.any()).optional(),
   custom: z.record(z.string(), z.any()).optional(),
-  uploadedBy: z.string().max(255, "Uploaded by name too long").optional()
+  uploadedBy: z.string().max(255, "Uploaded by name too long").optional(),
 });
 
 const updateMediaDataSchema = z.object({
@@ -219,12 +283,16 @@ const updateMediaDataSchema = z.object({
   previewUrl: urlSchema.optional(),
   folderId: z.string().uuid().nullable().optional(),
   tags: z.array(z.string().max(50, "Tag name too long")).optional(),
-  metadata: mediaMetadataSchema.partial().optional()
+  metadata: mediaMetadataSchema.partial().optional(),
 });
 
 const mediaFormDataSchema = z.object({
   title: z.string().min(1, "Title is required").max(255, "Title too long"),
-  slug: z.string().max(255, "Slug too long").regex(/^[a-z0-9-]*$/, "Slug must contain only lowercase letters, numbers, and hyphens").optional(),
+  slug: z
+    .string()
+    .max(255, "Slug too long")
+    .regex(/^[a-z0-9-]*$/, "Slug must contain only lowercase letters, numbers, and hyphens")
+    .optional(),
   description: z.string().max(2000, "Description too long").optional(),
   altText: z.string().max(255, "Alt text too long").optional(),
   caption: z.string().max(500, "Caption too long").optional(),
@@ -237,7 +305,7 @@ const mediaFormDataSchema = z.object({
   allowedCommittees: z.array(z.string()).optional(),
   isFeatured: z.boolean(),
   priority: z.number().min(0, "Priority must be non-negative").max(100, "Priority too high"),
-  customFields: z.record(z.string(), z.any()).optional()
+  customFields: z.record(z.string(), z.any()).optional(),
 });
 
 const mediaUploadOptionsSchema = z.object({
@@ -256,7 +324,7 @@ const mediaUploadOptionsSchema = z.object({
   generatePreview: z.boolean().optional(),
   extractMetadata: z.boolean().optional(),
   autoTag: z.boolean().optional(),
-  customFields: z.record(z.string(), z.any()).optional()
+  customFields: z.record(z.string(), z.any()).optional(),
 });
 
 const createFolderDataSchema = z.object({
@@ -265,42 +333,63 @@ const createFolderDataSchema = z.object({
   parentId: z.string().uuid().nullable().optional(),
   visibility: z.enum(["public", "private", "restricted", "draft"]).optional(),
   permissions: z.array(z.string()).optional(),
-  createdBy: z.string().max(255, "Created by name too long").optional()
+  createdBy: z.string().max(255, "Created by name too long").optional(),
 });
 
 const updateFolderDataSchema = z.object({
   name: z.string().min(1, "Folder name is required").max(255, "Folder name too long").optional(),
   description: z.string().max(1000, "Description too long").optional(),
   visibility: z.enum(["public", "private", "restricted", "draft"]).optional(),
-  permissions: z.array(z.string()).optional()
+  permissions: z.array(z.string()).optional(),
 });
 
 // Filter validation
 const mediaFiltersSchema = z.object({
   search: z.string().max(500, "Search term too long").optional(),
-  type: z.array(z.enum(["image", "video", "audio", "document", "archive", "spreadsheet", "presentation", "pdf", "vector", "font"])).optional(),
+  type: z
+    .array(
+      z.enum([
+        "image",
+        "video",
+        "audio",
+        "document",
+        "archive",
+        "spreadsheet",
+        "presentation",
+        "pdf",
+        "vector",
+        "font",
+      ]),
+    )
+    .optional(),
   status: z.array(z.enum(["uploading", "processing", "ready", "failed", "archived"])).optional(),
   visibility: z.array(z.enum(["public", "private", "restricted", "draft"])).optional(),
   folderId: z.string().uuid().optional(),
   tags: z.array(z.string()).optional(),
   categories: z.array(z.string()).optional(),
   createdBy: z.array(z.string()).optional(),
-  dateRange: z.object({
-    start: dateSchema,
-    end: dateSchema
-  }).optional(),
-  sizeRange: z.object({
-    min: z.number().min(0, "Minimum size must be non-negative"),
-    max: z.number().min(0, "Maximum size must be non-negative")
-  }).optional(),
+  dateRange: z
+    .object({
+      start: dateSchema,
+      end: dateSchema,
+    })
+    .optional(),
+  sizeRange: z
+    .object({
+      min: z.number().min(0, "Minimum size must be non-negative"),
+      max: z.number().min(0, "Maximum size must be non-negative"),
+    })
+    .optional(),
   hasVersions: z.boolean().optional(),
   isOptimized: z.boolean().optional(),
   hasWebpVersion: z.boolean().optional(),
   hasAvifVersion: z.boolean().optional(),
-  sortBy: z.enum(["title", "createdAt", "updatedAt", "size", "views", "downloads", "usage", "type"]).optional(),
+  sortBy: z
+    .enum(["title", "createdAt", "updatedAt", "size", "views", "downloads", "usage", "type"])
+    .optional(),
   sortOrder: z.enum(["asc", "desc"]).optional(),
   page: z.number().min(1, "Page must be positive").optional(),
-  limit: z.number().min(1, "Limit must be positive").max(100, "Limit too high").optional()
+  limit: z.number().min(1, "Limit must be positive").max(100, "Limit too high").optional(),
 });
 
 // Export all schemas
@@ -310,7 +399,7 @@ export {
   urlSchema,
   emailSchema,
   dateSchema,
-  
+
   // Entity schemas
   mediaMetadataSchema,
   mediaVersionSchema,
@@ -319,7 +408,7 @@ export {
   mediaFolderSchema,
   mediaTagSchema,
   mediaSchema,
-  
+
   // Form schemas
   createMediaDataSchema,
   updateMediaDataSchema,
@@ -327,7 +416,7 @@ export {
   mediaUploadOptionsSchema,
   createFolderDataSchema,
   updateFolderDataSchema,
-  mediaFiltersSchema
+  mediaFiltersSchema,
 };
 
 // Type exports for inference
@@ -343,7 +432,8 @@ export type MediaFilters = z.infer<typeof mediaFiltersSchema>;
 export const validateCreateMediaData = (data: unknown) => createMediaDataSchema.safeParse(data);
 export const validateUpdateMediaData = (data: unknown) => updateMediaDataSchema.safeParse(data);
 export const validateMediaFormData = (data: unknown) => mediaFormDataSchema.safeParse(data);
-export const validateMediaUploadOptions = (data: unknown) => mediaUploadOptionsSchema.safeParse(data);
+export const validateMediaUploadOptions = (data: unknown) =>
+  mediaUploadOptionsSchema.safeParse(data);
 export const validateCreateFolderData = (data: unknown) => createFolderDataSchema.safeParse(data);
 export const validateUpdateFolderData = (data: unknown) => updateFolderDataSchema.safeParse(data);
 export const validateMediaFilters = (data: unknown) => mediaFiltersSchema.safeParse(data);

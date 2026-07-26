@@ -1,64 +1,64 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
 interface UseSidebarProps {
-  defaultCollapsed?: boolean
-  storageKey?: string
+  defaultCollapsed?: boolean;
+  storageKey?: string;
 }
 
 export function useSidebar({
   defaultCollapsed = false,
-  storageKey = "nuvia-sidebar-state"
+  storageKey = "nuvia-sidebar-state",
 }: UseSidebarProps = {}) {
-  const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
-  const [isMobile, setIsMobile] = React.useState(false)
+  const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
+  const [isMobile, setIsMobile] = React.useState(false);
 
   // Initialize from localStorage on mount
   React.useEffect(() => {
-    const stored = localStorage.getItem(storageKey)
+    const stored = localStorage.getItem(storageKey);
     if (stored !== null) {
-      setIsCollapsed(JSON.parse(stored))
+      setIsCollapsed(JSON.parse(stored));
     }
-    
+
     // Check if we're on mobile
     const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-    
+      setIsMobile(window.innerWidth < 768);
+    };
+
     // Initial check
-    checkIsMobile()
-    
+    checkIsMobile();
+
     // Add event listener for window resize
-    window.addEventListener("resize", checkIsMobile)
-    
+    window.addEventListener("resize", checkIsMobile);
+
     // Cleanup
-    return () => window.removeEventListener("resize", checkIsMobile)
-  }, [storageKey])
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, [storageKey]);
 
   // Update localStorage when isCollapsed changes
   React.useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(isCollapsed))
-  }, [isCollapsed, storageKey])
+    localStorage.setItem(storageKey, JSON.stringify(isCollapsed));
+  }, [isCollapsed, storageKey]);
 
   // Auto-collapse on mobile
   React.useEffect(() => {
     if (isMobile) {
-      setIsCollapsed(true)
+      setIsCollapsed(true);
     }
-  }, [isMobile])
+  }, [isMobile]);
 
   const toggleSidebar = React.useCallback(() => {
-    setIsCollapsed(prev => !prev)
-  }, [])
+    setIsCollapsed((prev) => !prev);
+  }, []);
 
   const expandSidebar = React.useCallback(() => {
-    setIsCollapsed(false)
-  }, [])
+    setIsCollapsed(false);
+  }, []);
 
   const collapseSidebar = React.useCallback(() => {
-    setIsCollapsed(true)
-  }, [])
+    setIsCollapsed(true);
+  }, []);
 
   return {
     isCollapsed,
@@ -66,6 +66,6 @@ export function useSidebar({
     toggleSidebar,
     expandSidebar,
     collapseSidebar,
-    setIsCollapsed
-  }
+    setIsCollapsed,
+  };
 }

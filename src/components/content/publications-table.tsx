@@ -1,25 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
+import {
   MoreHorizontal,
   Eye,
   Edit,
@@ -44,9 +44,13 @@ import {
   Megaphone,
   User,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
-import { Publication, PUBLICATION_TYPE_DISPLAY, PUBLICATION_STATUS_DISPLAY } from "@/types/publication.types";
+import {
+  Publication,
+  PUBLICATION_TYPE_DISPLAY,
+  PUBLICATION_STATUS_DISPLAY,
+} from "@/types/publication.types";
 import { cn } from "@/lib/utils";
 
 interface PublicationsTableProps {
@@ -72,7 +76,7 @@ export function PublicationsTable({
   onArchive,
   onSchedule,
   selectedPublications = [],
-  onSelectionChange
+  onSelectionChange,
 }: PublicationsTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
@@ -84,7 +88,7 @@ export function PublicationsTable({
       report: BarChart3,
       case_study: Briefcase,
       whitepaper: BookOpen,
-      research_paper: Microscope
+      research_paper: Microscope,
     };
     return iconMap[type as keyof typeof iconMap] || FileText;
   };
@@ -100,7 +104,7 @@ export function PublicationsTable({
       case_studies: Briefcase,
       announcements: Megaphone,
       member_spotlight: Star,
-      chapter_news: Building
+      chapter_news: Building,
     };
     return iconMap[category as keyof typeof iconMap] || FileText;
   };
@@ -111,7 +115,7 @@ export function PublicationsTable({
       review: Clock,
       published: CheckCircle2,
       archived: Archive,
-      scheduled: Calendar
+      scheduled: Calendar,
     };
     return iconMap[status as keyof typeof iconMap] || Clock;
   };
@@ -121,7 +125,7 @@ export function PublicationsTable({
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "short",
-      day: "numeric"
+      day: "numeric",
     }).format(date);
   };
 
@@ -147,21 +151,23 @@ export function PublicationsTable({
 
   const handleSelectAll = (checked: boolean) => {
     if (onSelectionChange) {
-      onSelectionChange(checked ? publications.map(p => p.id) : []);
+      onSelectionChange(checked ? publications.map((p) => p.id) : []);
     }
   };
 
   const handleSelectRow = (id: string, checked: boolean) => {
     if (onSelectionChange) {
-      const newSelection = checked 
+      const newSelection = checked
         ? [...selectedPublications, id]
-        : selectedPublications.filter(selectedId => selectedId !== id);
+        : selectedPublications.filter((selectedId) => selectedId !== id);
       onSelectionChange(newSelection);
     }
   };
 
-  const isAllSelected = publications.length > 0 && selectedPublications.length === publications.length;
-  const isIndeterminate = selectedPublications.length > 0 && selectedPublications.length < publications.length;
+  const isAllSelected =
+    publications.length > 0 && selectedPublications.length === publications.length;
+  const isIndeterminate =
+    selectedPublications.length > 0 && selectedPublications.length < publications.length;
 
   return (
     <div className="space-y-4">
@@ -202,7 +208,9 @@ export function PublicationsTable({
                     <TableCell>
                       <Checkbox
                         checked={isSelected}
-                        onCheckedChange={(checked: boolean) => handleSelectRow(publication.id, checked)}
+                        onCheckedChange={(checked: boolean) =>
+                          handleSelectRow(publication.id, checked)
+                        }
                         aria-label={`Select ${publication.title}`}
                       />
                     </TableCell>
@@ -240,7 +248,7 @@ export function PublicationsTable({
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <StatusIcon className="h-4 w-4 text-muted-foreground" />
-                        <Badge 
+                        <Badge
                           variant={PUBLICATION_STATUS_DISPLAY[publication.status].badgeVariant}
                           className="text-xs"
                         >
@@ -253,7 +261,10 @@ export function PublicationsTable({
                         <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
                           <User className="h-3 w-3 text-muted-foreground" />
                         </div>
-                        <span className="text-sm truncate max-w-[100px]" title={publication.author.name}>
+                        <span
+                          className="text-sm truncate max-w-[100px]"
+                          title={publication.author.name}
+                        >
                           {publication.author.name}
                         </span>
                       </div>
@@ -262,19 +273,22 @@ export function PublicationsTable({
                       <div className="flex items-center gap-2">
                         <CategoryIcon className="h-4 w-4 text-muted-foreground" />
                         <Badge variant="outline" className="text-xs">
-                          {publication.category.replace('_', ' ')}
+                          {publication.category.replace("_", " ")}
                         </Badge>
                       </div>
                     </TableCell>
-                    <TableCell className="text-sm">
-                      {formatDate(publication.publishedAt)}
-                    </TableCell>
+                    <TableCell className="text-sm">{formatDate(publication.publishedAt)}</TableCell>
                     <TableCell className="text-right text-sm">
                       {formatNumber(publication.metrics.views)}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <span className={cn("text-sm font-medium", getEngagementColor(publication.metrics.engagementScore))}>
+                        <span
+                          className={cn(
+                            "text-sm font-medium",
+                            getEngagementColor(publication.metrics.engagementScore),
+                          )}
+                        >
                           {publication.metrics.engagementScore}
                         </span>
                         <TrendingUp className="h-3 w-3 text-muted-foreground" />
@@ -302,21 +316,23 @@ export function PublicationsTable({
                             Duplicate
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          {publication.status === 'draft' && (
+                          {publication.status === "draft" && (
                             <DropdownMenuItem onClick={() => onPublish(publication)}>
                               <CheckCircle2 className="mr-2 h-4 w-4" />
                               Publish
                             </DropdownMenuItem>
                           )}
-                          {publication.status === 'published' && (
+                          {publication.status === "published" && (
                             <DropdownMenuItem onClick={() => onArchive(publication)}>
                               <Archive className="mr-2 h-4 w-4" />
                               Archive
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            onClick={() => window.open(`/publications/${publication.slug}`, '_blank')}
+                          <DropdownMenuItem
+                            onClick={() =>
+                              window.open(`/publications/${publication.slug}`, "_blank")
+                            }
                           >
                             <Share2 className="mr-2 h-4 w-4" />
                             Share
@@ -328,7 +344,7 @@ export function PublicationsTable({
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => onDelete(publication)}
                             className="text-destructive focus:text-destructive"
                           >
@@ -339,7 +355,7 @@ export function PublicationsTable({
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                  
+
                   {/* Expanded Row - Quick Preview */}
                   {isExpanded && (
                     <TableRow>
@@ -382,12 +398,15 @@ export function PublicationsTable({
                               <div className="mt-3">
                                 <h5 className="text-xs font-medium mb-2">Tags</h5>
                                 <div className="flex flex-wrap gap-1">
-                                  {publication.tags.map(tag => (
-                                    <Badge 
-                                      key={tag.id} 
-                                      variant="secondary" 
+                                  {publication.tags.map((tag) => (
+                                    <Badge
+                                      key={tag.id}
+                                      variant="secondary"
                                       className="text-xs"
-                                      style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                                      style={{
+                                        backgroundColor: `${tag.color}20`,
+                                        color: tag.color,
+                                      }}
                                     >
                                       {tag.name}
                                     </Badge>

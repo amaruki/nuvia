@@ -1,24 +1,24 @@
 // Media management types for Nuvia community platform
 
-export type MediaType = 
-  | 'image'
-  | 'video'
-  | 'audio'
-  | 'document'
-  | 'archive'
-  | 'spreadsheet'
-  | 'presentation'
-  | 'pdf'
-  | 'vector'
-  | 'font';
+export type MediaType =
+  | "image"
+  | "video"
+  | "audio"
+  | "document"
+  | "archive"
+  | "spreadsheet"
+  | "presentation"
+  | "pdf"
+  | "vector"
+  | "font";
 
-export type MediaStatus = 'uploading' | 'processing' | 'ready' | 'failed' | 'archived';
+export type MediaStatus = "uploading" | "processing" | "ready" | "failed" | "archived";
 
-export type MediaVisibility = 'public' | 'private' | 'restricted' | 'draft';
+export type MediaVisibility = "public" | "private" | "restricted" | "draft";
 
-export type MediaStorageType = 'local' | 's3' | 'cloudinary' | 'azure' | 'gcs';
+export type MediaStorageType = "local" | "s3" | "cloudinary" | "azure" | "gcs";
 
-export type MediaCompressionLevel = 'none' | 'low' | 'medium' | 'high' | 'maximum';
+export type MediaCompressionLevel = "none" | "low" | "medium" | "high" | "maximum";
 
 export interface MediaDimensions {
   width: number;
@@ -34,19 +34,19 @@ export interface MediaMetadata {
   mimeType: string;
   size: number; // in bytes
   sizeFormatted: string;
-  
+
   // Image/Video specific
   dimensions?: MediaDimensions;
   duration?: number; // in seconds for video/audio
   fps?: number; // for video
   bitrate?: number; // for video/audio
-  
+
   // Color information for images
   colorSpace?: string;
   hasTransparency?: boolean;
   dominantColor?: string;
   colorPalette?: string[];
-  
+
   // EXIF data for images
   exif?: {
     camera?: string;
@@ -62,17 +62,17 @@ export interface MediaMetadata {
     };
     dateTaken?: Date;
   };
-  
+
   // Document specific
   pageCount?: number;
   wordCount?: number;
   author?: string;
   subject?: string;
-  
+
   // Technical details
   checksum: string;
   encoding?: string;
-  
+
   // Custom metadata
   customFields?: Record<string, any>;
 }
@@ -95,10 +95,17 @@ export interface MediaVersion {
 export interface MediaUsage {
   id: string;
   mediaId: string;
-  entityType: 'article' | 'announcement' | 'publication' | 'event' | 'user_profile' | 'chapter' | 'committee';
+  entityType:
+    | "article"
+    | "announcement"
+    | "publication"
+    | "event"
+    | "user_profile"
+    | "chapter"
+    | "committee";
   entityId: string;
   entityTitle: string;
-  usageType: 'featured_image' | 'gallery' | 'attachment' | 'avatar' | 'banner' | 'thumbnail';
+  usageType: "featured_image" | "gallery" | "attachment" | "avatar" | "banner" | "thumbnail";
   url: string;
   addedAt: Date;
   addedBy: string;
@@ -107,10 +114,10 @@ export interface MediaUsage {
 export interface MediaPermission {
   id: string;
   mediaId: string;
-  entityType: 'user' | 'role' | 'chapter' | 'committee';
+  entityType: "user" | "role" | "chapter" | "committee";
   entityId: string;
   entityName: string;
-  permissions: ('view' | 'download' | 'edit' | 'delete' | 'share')[];
+  permissions: ("view" | "download" | "edit" | "delete" | "share")[];
   grantedBy: string;
   grantedAt: Date;
   expiresAt?: Date;
@@ -120,31 +127,31 @@ export interface MediaAnalytics {
   id: string;
   mediaId: string;
   date: Date;
-  
+
   // View metrics
   views: number;
   uniqueViews: number;
   avgViewDuration: number; // in seconds
-  
+
   // Download metrics
   downloads: number;
   uniqueDownloads: number;
-  
+
   // Usage metrics
   usageCount: number; // how many times used in content
   shares: number;
-  
+
   // Performance metrics
   loadTime: number; // average load time in ms
   errorRate: number; // percentage
-  
+
   // Geographic data
   topCountries: Array<{
     country: string;
     views: number;
     percentage: number;
   }>;
-  
+
   // Referrer data
   topReferrers: Array<{
     source: string;
@@ -161,23 +168,23 @@ export interface MediaFolder {
   parentId?: string; // For nested folders
   path: string; // Full path from root
   level: number; // Depth in folder hierarchy
-  
+
   // Organization
   order: number; // Sort order
   color?: string;
   icon?: string;
-  
+
   // Access control
   visibility: MediaVisibility;
   allowedRoles?: string[];
   allowedChapters?: string[];
   allowedCommittees?: string[];
-  
+
   // Content tracking
   mediaCount: number;
   totalSize: number;
   lastModified: Date;
-  
+
   // Metadata
   createdAt: Date;
   updatedAt: Date;
@@ -203,7 +210,7 @@ export interface Media {
   description?: string;
   altText?: string; // For accessibility
   caption?: string;
-  
+
   // File information
   type: MediaType;
   status: MediaStatus;
@@ -211,61 +218,61 @@ export interface Media {
   url: string;
   thumbnailUrl?: string;
   previewUrl?: string; // For documents/videos
-  
+
   // Organization
   folderId?: string;
   folderPath?: string;
   tags: MediaTag[];
   categories: string[]; // Simple string categories
-  
+
   // Metadata
   metadata: MediaMetadata;
-  
+
   // Version control
   currentVersion: number;
   versions: MediaVersion[];
-  
+
   // Usage tracking
   usage: MediaUsage[];
-  
+
   // Permissions
   permissions: MediaPermission[];
-  
+
   // Analytics
   analytics: MediaAnalytics[];
-  
+
   // Processing information
   processingStartedAt?: Date;
   processingCompletedAt?: Date;
   processingError?: string;
-  
+
   // Storage information
   storageType: MediaStorageType;
   storagePath: string;
   cdnUrl?: string;
-  
+
   // Optimization
   isOptimized: boolean;
   compressionLevel?: MediaCompressionLevel;
   hasWebpVersion?: boolean;
   hasAvifVersion?: boolean;
-  
+
   // Access control
   allowedRoles?: string[];
   allowedChapters?: string[];
   allowedCommittees?: string[];
-  
+
   // Metadata
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
   updatedBy?: string;
   deletedAt?: Date;
-  
+
   // Featured and priority
   isFeatured: boolean;
   priority: number;
-  
+
   // Additional properties
   customFields?: Record<string, any>;
 }
@@ -274,7 +281,7 @@ export interface MediaStatistics {
   totalMedia: number;
   totalSize: number;
   totalSizeFormatted: string;
-  
+
   // By type
   mediaByType: Array<{
     type: MediaType;
@@ -283,21 +290,21 @@ export interface MediaStatistics {
     sizeFormatted: string;
     percentage: number;
   }>;
-  
+
   // By status
   mediaByStatus: Array<{
     status: MediaStatus;
     count: number;
     percentage: number;
   }>;
-  
+
   // By visibility
   mediaByVisibility: Array<{
     visibility: MediaVisibility;
     count: number;
     percentage: number;
   }>;
-  
+
   // Storage usage
   storageUsage: {
     local: number;
@@ -306,12 +313,12 @@ export interface MediaStatistics {
     azure: number;
     gcs: number;
   };
-  
+
   // Usage metrics
   totalViews: number;
   totalDownloads: number;
   totalUsage: number;
-  
+
   // Recent activity
   recentUploads: Array<{
     id: string;
@@ -321,7 +328,7 @@ export interface MediaStatistics {
     uploadedBy: string;
     uploadedAt: Date;
   }>;
-  
+
   // Top performing media
   topPerforming: Array<{
     id: string;
@@ -331,7 +338,7 @@ export interface MediaStatistics {
     downloads: number;
     usage: number;
   }>;
-  
+
   // Storage trends
   monthlyTrends: Array<{
     month: string;
@@ -363,8 +370,8 @@ export interface MediaFilters {
   isOptimized?: boolean;
   hasWebpVersion?: boolean;
   hasAvifVersion?: boolean;
-  sortBy?: 'title' | 'createdAt' | 'updatedAt' | 'size' | 'views' | 'downloads' | 'usage' | 'type';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "title" | "createdAt" | "updatedAt" | "size" | "views" | "downloads" | "usage" | "type";
+  sortOrder?: "asc" | "desc";
   page?: number;
   limit?: number;
 }
@@ -408,191 +415,223 @@ export interface MediaUploadOptions {
 
 // Export type constants for re-use
 export const MEDIA_TYPES: MediaType[] = [
-  'image', 'video', 'audio', 'document', 'archive', 
-  'spreadsheet', 'presentation', 'pdf', 'vector', 'font'
+  "image",
+  "video",
+  "audio",
+  "document",
+  "archive",
+  "spreadsheet",
+  "presentation",
+  "pdf",
+  "vector",
+  "font",
 ] as const;
 
 export const MEDIA_STATUSES: MediaStatus[] = [
-  'uploading', 'processing', 'ready', 'failed', 'archived'
+  "uploading",
+  "processing",
+  "ready",
+  "failed",
+  "archived",
 ] as const;
 
 export const MEDIA_VISIBILITY: MediaVisibility[] = [
-  'public', 'private', 'restricted', 'draft'
+  "public",
+  "private",
+  "restricted",
+  "draft",
 ] as const;
 
 export const MEDIA_STORAGE_TYPES: MediaStorageType[] = [
-  'local', 's3', 'cloudinary', 'azure', 'gcs'
+  "local",
+  "s3",
+  "cloudinary",
+  "azure",
+  "gcs",
 ] as const;
 
 export const MEDIA_COMPRESSION_LEVELS: MediaCompressionLevel[] = [
-  'none', 'low', 'medium', 'high', 'maximum'
+  "none",
+  "low",
+  "medium",
+  "high",
+  "maximum",
 ] as const;
 
 // Display information
-export const MEDIA_TYPE_DISPLAY: Record<MediaType, {
-  name: string;
-  description: string;
-  icon: string;
-  color: string;
-  extensions: string[];
-  maxSize: number; // in MB
-}> = {
+export const MEDIA_TYPE_DISPLAY: Record<
+  MediaType,
+  {
+    name: string;
+    description: string;
+    icon: string;
+    color: string;
+    extensions: string[];
+    maxSize: number; // in MB
+  }
+> = {
   image: {
-    name: 'Image',
-    description: 'Image files including photos, graphics, and illustrations',
-    icon: 'image',
-    color: 'blue',
-    extensions: ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.tiff'],
-    maxSize: 50
+    name: "Image",
+    description: "Image files including photos, graphics, and illustrations",
+    icon: "image",
+    color: "blue",
+    extensions: [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp", ".tiff"],
+    maxSize: 50,
   },
   video: {
-    name: 'Video',
-    description: 'Video files for multimedia content',
-    icon: 'video',
-    color: 'purple',
-    extensions: ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv'],
-    maxSize: 500
+    name: "Video",
+    description: "Video files for multimedia content",
+    icon: "video",
+    color: "purple",
+    extensions: [".mp4", ".avi", ".mov", ".wmv", ".flv", ".webm", ".mkv"],
+    maxSize: 500,
   },
   audio: {
-    name: 'Audio',
-    description: 'Audio files for podcasts and music',
-    icon: 'music',
-    color: 'green',
-    extensions: ['.mp3', '.wav', '.ogg', '.flac', '.aac', '.m4a'],
-    maxSize: 100
+    name: "Audio",
+    description: "Audio files for podcasts and music",
+    icon: "music",
+    color: "green",
+    extensions: [".mp3", ".wav", ".ogg", ".flac", ".aac", ".m4a"],
+    maxSize: 100,
   },
   document: {
-    name: 'Document',
-    description: 'Text documents and PDFs',
-    icon: 'file-text',
-    color: 'red',
-    extensions: ['.doc', '.docx', '.txt', '.rtf', '.odt'],
-    maxSize: 25
+    name: "Document",
+    description: "Text documents and PDFs",
+    icon: "file-text",
+    color: "red",
+    extensions: [".doc", ".docx", ".txt", ".rtf", ".odt"],
+    maxSize: 25,
   },
   archive: {
-    name: 'Archive',
-    description: 'Compressed files and archives',
-    icon: 'archive',
-    color: 'orange',
-    extensions: ['.zip', '.rar', '.7z', '.tar', '.gz'],
-    maxSize: 100
+    name: "Archive",
+    description: "Compressed files and archives",
+    icon: "archive",
+    color: "orange",
+    extensions: [".zip", ".rar", ".7z", ".tar", ".gz"],
+    maxSize: 100,
   },
   spreadsheet: {
-    name: 'Spreadsheet',
-    description: 'Excel and spreadsheet files',
-    icon: 'grid',
-    color: 'emerald',
-    extensions: ['.xls', '.xlsx', '.csv', '.ods'],
-    maxSize: 25
+    name: "Spreadsheet",
+    description: "Excel and spreadsheet files",
+    icon: "grid",
+    color: "emerald",
+    extensions: [".xls", ".xlsx", ".csv", ".ods"],
+    maxSize: 25,
   },
   presentation: {
-    name: 'Presentation',
-    description: 'PowerPoint and presentation files',
-    icon: 'presentation',
-    color: 'indigo',
-    extensions: ['.ppt', '.pptx', '.odp'],
-    maxSize: 50
+    name: "Presentation",
+    description: "PowerPoint and presentation files",
+    icon: "presentation",
+    color: "indigo",
+    extensions: [".ppt", ".pptx", ".odp"],
+    maxSize: 50,
   },
   pdf: {
-    name: 'PDF',
-    description: 'PDF documents and forms',
-    icon: 'file-text',
-    color: 'red',
-    extensions: ['.pdf'],
-    maxSize: 50
+    name: "PDF",
+    description: "PDF documents and forms",
+    icon: "file-text",
+    color: "red",
+    extensions: [".pdf"],
+    maxSize: 50,
   },
   vector: {
-    name: 'Vector',
-    description: 'Vector graphics and illustrations',
-    icon: 'pen-tool',
-    color: 'pink',
-    extensions: ['.svg', '.ai', '.eps', '.svgz'],
-    maxSize: 25
+    name: "Vector",
+    description: "Vector graphics and illustrations",
+    icon: "pen-tool",
+    color: "pink",
+    extensions: [".svg", ".ai", ".eps", ".svgz"],
+    maxSize: 25,
   },
   font: {
-    name: 'Font',
-    description: 'Font files for typography',
-    icon: 'type',
-    color: 'cyan',
-    extensions: ['.ttf', '.otf', '.woff', '.woff2', '.eot'],
-    maxSize: 10
-  }
+    name: "Font",
+    description: "Font files for typography",
+    icon: "type",
+    color: "cyan",
+    extensions: [".ttf", ".otf", ".woff", ".woff2", ".eot"],
+    maxSize: 10,
+  },
 };
 
-export const MEDIA_STATUS_DISPLAY: Record<MediaStatus, {
-  name: string;
-  description: string;
-  icon: string;
-  color: string;
-  badgeVariant: 'default' | 'secondary' | 'destructive' | 'outline';
-}> = {
+export const MEDIA_STATUS_DISPLAY: Record<
+  MediaStatus,
+  {
+    name: string;
+    description: string;
+    icon: string;
+    color: string;
+    badgeVariant: "default" | "secondary" | "destructive" | "outline";
+  }
+> = {
   uploading: {
-    name: 'Uploading',
-    description: 'File is currently being uploaded',
-    icon: 'upload',
-    color: 'blue',
-    badgeVariant: 'outline'
+    name: "Uploading",
+    description: "File is currently being uploaded",
+    icon: "upload",
+    color: "blue",
+    badgeVariant: "outline",
   },
   processing: {
-    name: 'Processing',
-    description: 'File is being processed and optimized',
-    icon: 'loader',
-    color: 'amber',
-    badgeVariant: 'outline'
+    name: "Processing",
+    description: "File is being processed and optimized",
+    icon: "loader",
+    color: "amber",
+    badgeVariant: "outline",
   },
   ready: {
-    name: 'Ready',
-    description: 'File is ready for use',
-    icon: 'check-circle',
-    color: 'emerald',
-    badgeVariant: 'default'
+    name: "Ready",
+    description: "File is ready for use",
+    icon: "check-circle",
+    color: "emerald",
+    badgeVariant: "default",
   },
   failed: {
-    name: 'Failed',
-    description: 'File upload or processing failed',
-    icon: 'x-circle',
-    color: 'red',
-    badgeVariant: 'destructive'
+    name: "Failed",
+    description: "File upload or processing failed",
+    icon: "x-circle",
+    color: "red",
+    badgeVariant: "destructive",
   },
   archived: {
-    name: 'Archived',
-    description: 'File is archived and not actively used',
-    icon: 'archive',
-    color: 'slate',
-    badgeVariant: 'secondary'
-  }
+    name: "Archived",
+    description: "File is archived and not actively used",
+    icon: "archive",
+    color: "slate",
+    badgeVariant: "secondary",
+  },
 };
 
-export const MEDIA_VISIBILITY_DISPLAY: Record<MediaVisibility, {
-  name: string;
-  description: string;
-  icon: string;
-  color: string;
-}> = {
+export const MEDIA_VISIBILITY_DISPLAY: Record<
+  MediaVisibility,
+  {
+    name: string;
+    description: string;
+    icon: string;
+    color: string;
+  }
+> = {
   public: {
-    name: 'Public',
-    description: 'Visible to everyone',
-    icon: 'globe',
-    color: 'blue'
+    name: "Public",
+    description: "Visible to everyone",
+    icon: "globe",
+    color: "blue",
   },
   private: {
-    name: 'Private',
-    description: 'Only visible to you',
-    icon: 'lock',
-    color: 'red'
+    name: "Private",
+    description: "Only visible to you",
+    icon: "lock",
+    color: "red",
   },
   restricted: {
-    name: 'Restricted',
-    description: 'Visible to specific users/roles',
-    icon: 'users',
-    color: 'amber'
+    name: "Restricted",
+    description: "Visible to specific users/roles",
+    icon: "users",
+    color: "amber",
   },
   draft: {
-    name: 'Draft',
-    description: 'Not published, only visible to editors',
-    icon: 'eye-off',
-    color: 'slate'
-  }
+    name: "Draft",
+    description: "Not published, only visible to editors",
+    icon: "eye-off",
+    color: "slate",
+  },
 };
 
 // Additional interfaces for service operations

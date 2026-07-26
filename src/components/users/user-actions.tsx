@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,23 +13,23 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Users,
   X,
@@ -41,138 +41,171 @@ import {
   Mail,
   Phone,
   LogOut,
-  AlertTriangle
-} from "lucide-react"
-import { cn } from "@/lib/utils"
-import { type UserRole } from "@/types/dashboard.types"
+  AlertTriangle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { type UserRole } from "@/types/dashboard.types";
 
 interface UserActionsProps {
-  selectedUsers: string[]
-  onClearSelection: () => void
-  currentUserRole?: string
-  className?: string
+  selectedUsers: string[];
+  onClearSelection: () => void;
+  currentUserRole?: string;
+  className?: string;
 }
 
 interface BulkAction {
-  type: "activate" | "suspend" | "ban" | "unban" | "change_role" | "verify_email" | "verify_phone" | "reset_password" | "force_logout"
-  label: string
-  description: string
-  icon: React.ReactNode
-  variant: "default" | "destructive" | "outline"
-  requiresReason?: boolean
-  requiresRole?: boolean
+  type:
+    | "activate"
+    | "suspend"
+    | "ban"
+    | "unban"
+    | "change_role"
+    | "verify_email"
+    | "verify_phone"
+    | "reset_password"
+    | "force_logout";
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  variant: "default" | "destructive" | "outline";
+  requiresReason?: boolean;
+  requiresRole?: boolean;
 }
 
-export function UserActions({ selectedUsers, onClearSelection, currentUserRole, className }: UserActionsProps) {
+export function UserActions({
+  selectedUsers,
+  onClearSelection,
+  currentUserRole,
+  className,
+}: UserActionsProps) {
   // DEBUG: Log UserRole type validation
   console.log("DEBUG: UserRole type validation:", {
     currentUserRole,
     isAdmin: currentUserRole === "admin",
     isModerator: currentUserRole === "moderator",
-    availableRoles: ['member', 'moderator', 'admin', 'superadmin', 'staff', 'treasurer', 'chapter_president', 'chapter_admin', 'committee_chair', 'organizer', 'member_corporate', 'member_professional', 'member_student', 'user']
-  })
+    availableRoles: [
+      "member",
+      "moderator",
+      "admin",
+      "superadmin",
+      "staff",
+      "treasurer",
+      "chapter_president",
+      "chapter_admin",
+      "committee_chair",
+      "organizer",
+      "member_corporate",
+      "member_professional",
+      "member_student",
+      "user",
+    ],
+  });
 
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-  const [selectedAction, setSelectedAction] = useState<BulkAction | null>(null)
-  const [reason, setReason] = useState("")
-  const [newRole, setNewRole] = useState<UserRole>("member")
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [selectedAction, setSelectedAction] = useState<BulkAction | null>(null);
+  const [reason, setReason] = useState("");
+  const [newRole, setNewRole] = useState<UserRole>("member");
 
-  const isAdmin = currentUserRole === "admin"
-  const isModerator = currentUserRole === "moderator"
+  const isAdmin = currentUserRole === "admin";
+  const isModerator = currentUserRole === "moderator";
 
   // DEBUG: Log bulk action creation
-  console.log("DEBUG: Creating bulk actions array")
-  
+  console.log("DEBUG: Creating bulk actions array");
+
   const bulkActions: BulkAction[] = [
     {
       type: "activate",
       label: "Activate Users",
       description: "Reactivate suspended or inactive user accounts",
       icon: <UserCheck className="size-4" />,
-      variant: "default"
+      variant: "default",
     },
     {
       type: "verify_email",
       label: "Verify Email",
       description: "Manually verify user email addresses",
       icon: <Mail className="size-4" />,
-      variant: "outline"
+      variant: "outline",
     },
     {
       type: "verify_phone",
       label: "Verify Phone",
       description: "Manually verify user phone numbers",
       icon: <Phone className="size-4" />,
-      variant: "outline"
+      variant: "outline",
     },
     // DEBUG: Log conditional moderator actions
-    ...(isModerator ? (() => {
-      console.log("DEBUG: Adding moderator actions");
-      return [
-        {
-          type: "suspend",
-          label: "Suspend Users",
-          description: "Temporarily suspend user accounts",
-          icon: <Shield className="size-4" />,
-          variant: "default",
-          requiresReason: true
-        } as BulkAction
-      ];
-    })() : (() => {
-      console.log("DEBUG: Skipping moderator actions");
-      return [];
-    })()),
-    ...(isAdmin ? (() => {
-      console.log("DEBUG: Adding admin actions");
-      return [
-      {
-        type: "change_role",
-        label: "Change Role",
-        description: "Update user roles and permissions",
-        icon: <ShieldCheck className="size-4" />,
-        variant: "outline",
-        requiresRole: true
-      } as BulkAction,
-      {
-        type: "reset_password",
-        label: "Reset Password",
-        description: "Send password reset emails to users",
-        icon: <Key className="size-4" />,
-        variant: "outline"
-      } as BulkAction,
-      {
-        type: "force_logout",
-        label: "Force Logout",
-        description: "End all active user sessions",
-        icon: <LogOut className="size-4" />,
-        variant: "outline"
-      } as BulkAction,
-      {
-        type: "ban",
-        label: "Ban Users",
-        description: "Permanently ban user accounts",
-        icon: <Ban className="size-4" />,
-        variant: "destructive",
-        requiresReason: true
-      } as BulkAction
-    ];
-    })() : [])
-  ]
+    ...(isModerator
+      ? (() => {
+          console.log("DEBUG: Adding moderator actions");
+          return [
+            {
+              type: "suspend",
+              label: "Suspend Users",
+              description: "Temporarily suspend user accounts",
+              icon: <Shield className="size-4" />,
+              variant: "default",
+              requiresReason: true,
+            } as BulkAction,
+          ];
+        })()
+      : (() => {
+          console.log("DEBUG: Skipping moderator actions");
+          return [];
+        })()),
+    ...(isAdmin
+      ? (() => {
+          console.log("DEBUG: Adding admin actions");
+          return [
+            {
+              type: "change_role",
+              label: "Change Role",
+              description: "Update user roles and permissions",
+              icon: <ShieldCheck className="size-4" />,
+              variant: "outline",
+              requiresRole: true,
+            } as BulkAction,
+            {
+              type: "reset_password",
+              label: "Reset Password",
+              description: "Send password reset emails to users",
+              icon: <Key className="size-4" />,
+              variant: "outline",
+            } as BulkAction,
+            {
+              type: "force_logout",
+              label: "Force Logout",
+              description: "End all active user sessions",
+              icon: <LogOut className="size-4" />,
+              variant: "outline",
+            } as BulkAction,
+            {
+              type: "ban",
+              label: "Ban Users",
+              description: "Permanently ban user accounts",
+              icon: <Ban className="size-4" />,
+              variant: "destructive",
+              requiresReason: true,
+            } as BulkAction,
+          ];
+        })()
+      : []),
+  ];
 
   const handleActionClick = (action: BulkAction) => {
-    setSelectedAction(action)
+    setSelectedAction(action);
     if (action.requiresRole) {
       // Show role selection dialog first
-      setReason("")
-      setShowConfirmDialog(true)
+      setReason("");
+      setShowConfirmDialog(true);
     } else {
-      setReason("")
-      setShowConfirmDialog(true)
+      setReason("");
+      setShowConfirmDialog(true);
     }
-  }
+  };
 
   const handleConfirmAction = () => {
-    if (!selectedAction) return
+    if (!selectedAction) return;
 
     // DEBUG: Log validation checks
     console.log("DEBUG: Validating action requirements:", {
@@ -181,18 +214,18 @@ export function UserActions({ selectedUsers, onClearSelection, currentUserRole, 
       hasReason: !!reason,
       requiresRole: selectedAction.requiresRole,
       hasRole: !!newRole,
-      currentRole: newRole
-    })
+      currentRole: newRole,
+    });
 
     // Validate required fields
     if (selectedAction.requiresReason && !reason.trim()) {
-      console.log("DEBUG: Validation failed - reason required but not provided")
-      return
+      console.log("DEBUG: Validation failed - reason required but not provided");
+      return;
     }
 
     if (selectedAction.requiresRole && !newRole) {
-      console.log("DEBUG: Validation failed - role required but not selected")
-      return
+      console.log("DEBUG: Validation failed - role required but not selected");
+      return;
     }
 
     // Here you would implement the actual bulk action
@@ -200,25 +233,25 @@ export function UserActions({ selectedUsers, onClearSelection, currentUserRole, 
       type: selectedAction.type,
       userIds: selectedUsers,
       reason: selectedAction.requiresReason ? reason : undefined,
-      newRole: selectedAction.requiresRole ? newRole : undefined
-    }
+      newRole: selectedAction.requiresRole ? newRole : undefined,
+    };
 
-    console.log("DEBUG: Performing bulk action:", actionData)
+    console.log("DEBUG: Performing bulk action:", actionData);
 
     // Reset state
-    setShowConfirmDialog(false)
-    setSelectedAction(null)
-    setReason("")
-    setNewRole("member")
-    onClearSelection()
-  }
+    setShowConfirmDialog(false);
+    setSelectedAction(null);
+    setReason("");
+    setNewRole("member");
+    onClearSelection();
+  };
 
   const handleCancelAction = () => {
-    setShowConfirmDialog(false)
-    setSelectedAction(null)
-    setReason("")
-    setNewRole("member")
-  }
+    setShowConfirmDialog(false);
+    setSelectedAction(null);
+    setReason("");
+    setNewRole("member");
+  };
 
   return (
     <>
@@ -231,7 +264,7 @@ export function UserActions({ selectedUsers, onClearSelection, currentUserRole, 
               </div>
               <div>
                 <h3 className="font-semibold">
-                  {selectedUsers.length} {selectedUsers.length === 1 ? 'User' : 'Users'} Selected
+                  {selectedUsers.length} {selectedUsers.length === 1 ? "User" : "Users"} Selected
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   Choose an action to perform on selected users
@@ -240,12 +273,7 @@ export function UserActions({ selectedUsers, onClearSelection, currentUserRole, 
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClearSelection}
-                className="gap-1"
-              >
+              <Button variant="ghost" size="sm" onClick={onClearSelection} className="gap-1">
                 <X className="size-4" />
                 Clear Selection
               </Button>
@@ -266,24 +294,25 @@ export function UserActions({ selectedUsers, onClearSelection, currentUserRole, 
                       onClick={() => handleActionClick(action)}
                       className={cn(
                         "gap-3 p-3 cursor-pointer",
-                        action.variant === "destructive" && "text-destructive focus:text-destructive"
+                        action.variant === "destructive" &&
+                          "text-destructive focus:text-destructive",
                       )}
                     >
-                      <div className={cn(
-                        "flex items-center justify-center size-8 rounded-full",
-                        action.variant === "destructive"
-                          ? "bg-destructive/10 text-destructive"
-                          : action.variant === "default"
-                          ? "bg-primary/10 text-primary"
-                          : "bg-muted text-muted-foreground"
-                      )}>
+                      <div
+                        className={cn(
+                          "flex items-center justify-center size-8 rounded-full",
+                          action.variant === "destructive"
+                            ? "bg-destructive/10 text-destructive"
+                            : action.variant === "default"
+                              ? "bg-primary/10 text-primary"
+                              : "bg-muted text-muted-foreground",
+                        )}
+                      >
                         {action.icon}
                       </div>
                       <div className="flex-1">
                         <div className="font-medium">{action.label}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {action.description}
-                        </div>
+                        <div className="text-xs text-muted-foreground">{action.description}</div>
                       </div>
                       {action.requiresReason && (
                         <AlertTriangle className="size-4 text-muted-foreground" />
@@ -306,7 +335,8 @@ export function UserActions({ selectedUsers, onClearSelection, currentUserRole, 
               {selectedAction?.label}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action will be applied to {selectedUsers.length} selected {selectedUsers.length === 1 ? 'user' : 'users'}.
+              This action will be applied to {selectedUsers.length} selected{" "}
+              {selectedUsers.length === 1 ? "user" : "users"}.
               {selectedAction?.requiresReason && " Please provide a reason for this action."}
               {selectedAction?.requiresRole && " Please select the new role for these users."}
             </AlertDialogDescription>
@@ -349,7 +379,8 @@ export function UserActions({ selectedUsers, onClearSelection, currentUserRole, 
               <Label>Affected Users</Label>
               <div className="bg-muted/50 rounded-lg p-3">
                 <div className="text-sm font-medium text-muted-foreground mb-2">
-                  {selectedUsers.length} {selectedUsers.length === 1 ? 'user' : 'users'} will be affected
+                  {selectedUsers.length} {selectedUsers.length === 1 ? "user" : "users"} will be
+                  affected
                 </div>
                 <div className="text-xs text-muted-foreground">
                   User IDs: {selectedUsers.slice(0, 3).join(", ")}
@@ -360,13 +391,12 @@ export function UserActions({ selectedUsers, onClearSelection, currentUserRole, 
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancelAction}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel onClick={handleCancelAction}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmAction}
               className={cn(
-                selectedAction?.variant === "destructive" && "bg-destructive hover:bg-destructive/90"
+                selectedAction?.variant === "destructive" &&
+                  "bg-destructive hover:bg-destructive/90",
               )}
             >
               {selectedAction?.requiresReason && !reason && "Add Reason & "}
@@ -377,5 +407,5 @@ export function UserActions({ selectedUsers, onClearSelection, currentUserRole, 
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }

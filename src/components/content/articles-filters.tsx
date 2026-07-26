@@ -6,25 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { 
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { 
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
   Filter,
   X,
   Calendar as CalendarIcon,
@@ -36,12 +28,12 @@ import {
   ChevronDown,
   RotateCcw,
   Timer,
-  Zap
+  Zap,
 } from "lucide-react";
-import { 
-  ArticleFilters, 
-  ArticleStatus, 
-  ArticleType, 
+import {
+  ArticleFilters,
+  ArticleStatus,
+  ArticleType,
   ArticleCategory,
   ArticleDifficulty,
   ArticleFormat,
@@ -49,7 +41,7 @@ import {
   ARTICLE_CATEGORIES,
   ARTICLE_STATUSES,
   ARTICLE_DIFFICULTIES,
-  ARTICLE_FORMATS
+  ARTICLE_FORMATS,
 } from "@/types/article.types";
 import { cn } from "@/lib/utils";
 import { mockArticles } from "@/lib/data/mock-article-data";
@@ -60,19 +52,22 @@ interface ArticlesFiltersProps {
   onClearFilters: () => void;
 }
 
-export function ArticlesFilters({ 
-  filters, 
-  onFiltersChange, 
-  onClearFilters 
+export function ArticlesFilters({
+  filters,
+  onFiltersChange,
+  onClearFilters,
 }: ArticlesFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Extract unique authors and tags from mock data
-  const mockAuthors = Array.from(new Set(mockArticles.map(a => a.author.id)))
-    .map(id => mockArticles.find(a => a.author.id === id)!.author);
-  
-  const mockTags = Array.from(new Set(mockArticles.flatMap(a => a.tags)))
-    .map((tag, index) => ({ ...tag, id: tag.id || `tag_${index}` }));
+  const mockAuthors = Array.from(new Set(mockArticles.map((a) => a.author.id))).map(
+    (id) => mockArticles.find((a) => a.author.id === id)!.author,
+  );
+
+  const mockTags = Array.from(new Set(mockArticles.flatMap((a) => a.tags))).map((tag, index) => ({
+    ...tag,
+    id: tag.id || `tag_${index}`,
+  }));
 
   const hasActiveFilters = !!(
     filters.search ||
@@ -118,15 +113,13 @@ export function ArticlesFilters({
     const currentStatuses = filters.status || [];
     const newStatuses = checked
       ? [...currentStatuses, status]
-      : currentStatuses.filter(s => s !== status);
+      : currentStatuses.filter((s) => s !== status);
     onFiltersChange({ status: newStatuses });
   };
 
   const handleTypeChange = (type: ArticleType, checked: boolean) => {
     const currentTypes = filters.type || [];
-    const newTypes = checked
-      ? [...currentTypes, type]
-      : currentTypes.filter(t => t !== type);
+    const newTypes = checked ? [...currentTypes, type] : currentTypes.filter((t) => t !== type);
     onFiltersChange({ type: newTypes });
   };
 
@@ -134,7 +127,7 @@ export function ArticlesFilters({
     const currentCategories = filters.category || [];
     const newCategories = checked
       ? [...currentCategories, category]
-      : currentCategories.filter(c => c !== category);
+      : currentCategories.filter((c) => c !== category);
     onFiltersChange({ category: newCategories });
   };
 
@@ -142,7 +135,7 @@ export function ArticlesFilters({
     const currentDifficulties = filters.difficulty || [];
     const newDifficulties = checked
       ? [...currentDifficulties, difficulty]
-      : currentDifficulties.filter(d => d !== difficulty);
+      : currentDifficulties.filter((d) => d !== difficulty);
     onFiltersChange({ difficulty: newDifficulties });
   };
 
@@ -150,7 +143,7 @@ export function ArticlesFilters({
     const currentFormats = filters.format || [];
     const newFormats = checked
       ? [...currentFormats, format]
-      : currentFormats.filter(f => f !== format);
+      : currentFormats.filter((f) => f !== format);
     onFiltersChange({ format: newFormats });
   };
 
@@ -158,15 +151,13 @@ export function ArticlesFilters({
     const currentAuthors = filters.author || [];
     const newAuthors = checked
       ? [...currentAuthors, authorId]
-      : currentAuthors.filter(a => a !== authorId);
+      : currentAuthors.filter((a) => a !== authorId);
     onFiltersChange({ author: newAuthors });
   };
 
   const handleTagChange = (tagId: string, checked: boolean) => {
     const currentTags = filters.tags || [];
-    const newTags = checked
-      ? [...currentTags, tagId]
-      : currentTags.filter(t => t !== tagId);
+    const newTags = checked ? [...currentTags, tagId] : currentTags.filter((t) => t !== tagId);
     onFiltersChange({ tags: newTags });
   };
 
@@ -176,46 +167,46 @@ export function ArticlesFilters({
 
   const removeFilter = (filterType: string) => {
     switch (filterType) {
-      case 'search':
+      case "search":
         onFiltersChange({ search: "" });
         break;
-      case 'status':
+      case "status":
         onFiltersChange({ status: [] });
         break;
-      case 'type':
+      case "type":
         onFiltersChange({ type: [] });
         break;
-      case 'category':
+      case "category":
         onFiltersChange({ category: [] });
         break;
-      case 'difficulty':
+      case "difficulty":
         onFiltersChange({ difficulty: [] });
         break;
-      case 'format':
+      case "format":
         onFiltersChange({ format: [] });
         break;
-      case 'author':
+      case "author":
         onFiltersChange({ author: [] });
         break;
-      case 'tags':
+      case "tags":
         onFiltersChange({ tags: [] });
         break;
-      case 'dateRange':
+      case "dateRange":
         onFiltersChange({ dateRange: undefined });
         break;
-      case 'visibility':
+      case "visibility":
         onFiltersChange({ visibility: [] });
         break;
-      case 'featured':
+      case "featured":
         onFiltersChange({ featured: undefined });
         break;
-      case 'hasSeries':
+      case "hasSeries":
         onFiltersChange({ hasSeries: undefined });
         break;
-      case 'readTime':
+      case "readTime":
         onFiltersChange({ minReadTime: undefined, maxReadTime: undefined });
         break;
-      case 'engagement':
+      case "engagement":
         onFiltersChange({ minEngagement: undefined, maxEngagement: undefined });
         break;
     }
@@ -231,7 +222,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Search: "{filters.search}"
               <button
-                onClick={() => removeFilter('search')}
+                onClick={() => removeFilter("search")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -242,7 +233,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Status ({filters.status.length})
               <button
-                onClick={() => removeFilter('status')}
+                onClick={() => removeFilter("status")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -253,7 +244,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Type ({filters.type.length})
               <button
-                onClick={() => removeFilter('type')}
+                onClick={() => removeFilter("type")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -264,7 +255,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Category ({filters.category.length})
               <button
-                onClick={() => removeFilter('category')}
+                onClick={() => removeFilter("category")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -275,7 +266,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Difficulty ({filters.difficulty.length})
               <button
-                onClick={() => removeFilter('difficulty')}
+                onClick={() => removeFilter("difficulty")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -286,7 +277,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Format ({filters.format.length})
               <button
-                onClick={() => removeFilter('format')}
+                onClick={() => removeFilter("format")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -297,7 +288,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Authors ({filters.author.length})
               <button
-                onClick={() => removeFilter('author')}
+                onClick={() => removeFilter("author")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -308,7 +299,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Tags ({filters.tags.length})
               <button
-                onClick={() => removeFilter('tags')}
+                onClick={() => removeFilter("tags")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -319,7 +310,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Date Range
               <button
-                onClick={() => removeFilter('dateRange')}
+                onClick={() => removeFilter("dateRange")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -330,7 +321,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Visibility ({filters.visibility.length})
               <button
-                onClick={() => removeFilter('visibility')}
+                onClick={() => removeFilter("visibility")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -339,9 +330,9 @@ export function ArticlesFilters({
           )}
           {filters.featured !== undefined && (
             <Badge variant="secondary" className="gap-1">
-              Featured: {filters.featured ? 'Yes' : 'No'}
+              Featured: {filters.featured ? "Yes" : "No"}
               <button
-                onClick={() => removeFilter('featured')}
+                onClick={() => removeFilter("featured")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -350,9 +341,9 @@ export function ArticlesFilters({
           )}
           {filters.hasSeries !== undefined && (
             <Badge variant="secondary" className="gap-1">
-              Series: {filters.hasSeries ? 'Yes' : 'No'}
+              Series: {filters.hasSeries ? "Yes" : "No"}
               <button
-                onClick={() => removeFilter('hasSeries')}
+                onClick={() => removeFilter("hasSeries")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -363,7 +354,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Read Time
               <button
-                onClick={() => removeFilter('readTime')}
+                onClick={() => removeFilter("readTime")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -374,7 +365,7 @@ export function ArticlesFilters({
             <Badge variant="secondary" className="gap-1">
               Engagement
               <button
-                onClick={() => removeFilter('engagement')}
+                onClick={() => removeFilter("engagement")}
                 className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
@@ -399,14 +390,18 @@ export function ArticlesFilters({
                 {getActiveFilterCount()}
               </Badge>
             )}
-            <ChevronDown className={cn("ml-2 h-4 w-4 transition-transform", isExpanded && "rotate-180")} />
+            <ChevronDown
+              className={cn("ml-2 h-4 w-4 transition-transform", isExpanded && "rotate-180")}
+            />
           </Button>
         </CollapsibleTrigger>
-        
+
         <CollapsibleContent className="space-y-6 mt-4">
           {/* Search */}
           <div className="space-y-2">
-            <Label htmlFor="search" className="text-sm font-medium">Search</Label>
+            <Label htmlFor="search" className="text-sm font-medium">
+              Search
+            </Label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -431,11 +426,11 @@ export function ArticlesFilters({
                       checked={filters.status?.includes(status) || false}
                       onCheckedChange={(checked: boolean) => handleStatusChange(status, checked)}
                     />
-                    <Label 
-                      htmlFor={`status-${status}`} 
+                    <Label
+                      htmlFor={`status-${status}`}
                       className="text-sm font-normal cursor-pointer"
                     >
-                      {status.replace('_', ' ')}
+                      {status.replace("_", " ")}
                     </Label>
                   </div>
                 ))}
@@ -453,11 +448,8 @@ export function ArticlesFilters({
                       checked={filters.type?.includes(type) || false}
                       onCheckedChange={(checked: boolean) => handleTypeChange(type, checked)}
                     />
-                    <Label 
-                      htmlFor={`type-${type}`} 
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      {type.replace('_', ' ')}
+                    <Label htmlFor={`type-${type}`} className="text-sm font-normal cursor-pointer">
+                      {type.replace("_", " ")}
                     </Label>
                   </div>
                 ))}
@@ -473,13 +465,15 @@ export function ArticlesFilters({
                     <Checkbox
                       id={`category-${category}`}
                       checked={filters.category?.includes(category) || false}
-                      onCheckedChange={(checked: boolean) => handleCategoryChange(category, checked)}
+                      onCheckedChange={(checked: boolean) =>
+                        handleCategoryChange(category, checked)
+                      }
                     />
-                    <Label 
-                      htmlFor={`category-${category}`} 
+                    <Label
+                      htmlFor={`category-${category}`}
                       className="text-sm font-normal cursor-pointer"
                     >
-                      {category.replace('_', ' ')}
+                      {category.replace("_", " ")}
                     </Label>
                   </div>
                 ))}
@@ -495,13 +489,15 @@ export function ArticlesFilters({
                     <Checkbox
                       id={`difficulty-${difficulty}`}
                       checked={filters.difficulty?.includes(difficulty) || false}
-                      onCheckedChange={(checked: boolean) => handleDifficultyChange(difficulty, checked)}
+                      onCheckedChange={(checked: boolean) =>
+                        handleDifficultyChange(difficulty, checked)
+                      }
                     />
-                    <Label 
-                      htmlFor={`difficulty-${difficulty}`} 
+                    <Label
+                      htmlFor={`difficulty-${difficulty}`}
                       className="text-sm font-normal cursor-pointer"
                     >
-                      {difficulty.replace('_', ' ')}
+                      {difficulty.replace("_", " ")}
                     </Label>
                   </div>
                 ))}
@@ -519,11 +515,11 @@ export function ArticlesFilters({
                       checked={filters.format?.includes(format) || false}
                       onCheckedChange={(checked: boolean) => handleFormatChange(format, checked)}
                     />
-                    <Label 
-                      htmlFor={`format-${format}`} 
+                    <Label
+                      htmlFor={`format-${format}`}
                       className="text-sm font-normal cursor-pointer"
                     >
-                      {format.replace('_', ' ')}
+                      {format.replace("_", " ")}
                     </Label>
                   </div>
                 ))}
@@ -541,8 +537,8 @@ export function ArticlesFilters({
                       checked={filters.author?.includes(author.id) || false}
                       onCheckedChange={(checked: boolean) => handleAuthorChange(author.id, checked)}
                     />
-                    <Label 
-                      htmlFor={`author-${author.id}`} 
+                    <Label
+                      htmlFor={`author-${author.id}`}
                       className="text-sm font-normal cursor-pointer"
                     >
                       {author.name}
@@ -563,12 +559,12 @@ export function ArticlesFilters({
                       checked={filters.tags?.includes(tag.id) || false}
                       onCheckedChange={(checked: boolean) => handleTagChange(tag.id, checked)}
                     />
-                    <Label 
-                      htmlFor={`tag-${tag.id}`} 
+                    <Label
+                      htmlFor={`tag-${tag.id}`}
                       className="text-sm font-normal cursor-pointer flex items-center gap-2"
                     >
-                      <div 
-                        className="w-3 h-3 rounded-full" 
+                      <div
+                        className="w-3 h-3 rounded-full"
                         style={{ backgroundColor: tag.color }}
                       />
                       {tag.name}
@@ -587,35 +583,36 @@ export function ArticlesFilters({
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !filters.dateRange && "text-muted-foreground"
+                      !filters.dateRange && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {filters.dateRange 
+                    {filters.dateRange
                       ? `${filters.dateRange.start.toLocaleDateString()} - ${filters.dateRange.end.toLocaleDateString()}`
-                      : "Select date range"
-                    }
+                      : "Select date range"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="range"
-                    selected={filters.dateRange ? { from: filters.dateRange.start, to: filters.dateRange.end } : undefined}
-                    onSelect={(range) => onFiltersChange({
-                      dateRange: range && range.from && range.to
-                        ? { start: range.from, end: range.to }
+                    selected={
+                      filters.dateRange
+                        ? { from: filters.dateRange.start, to: filters.dateRange.end }
                         : undefined
-                    })}
+                    }
+                    onSelect={(range) =>
+                      onFiltersChange({
+                        dateRange:
+                          range && range.from && range.to
+                            ? { start: range.from, end: range.to }
+                            : undefined,
+                      })
+                    }
                   />
                 </PopoverContent>
               </Popover>
               {filters.dateRange && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearDateRange}
-                  className="mt-2 w-full"
-                >
+                <Button variant="ghost" size="sm" onClick={clearDateRange} className="mt-2 w-full">
                   <X className="mr-2 h-4 w-4" />
                   Clear Date Range
                 </Button>
@@ -647,9 +644,11 @@ export function ArticlesFilters({
               <Label className="text-sm font-medium">Featured</Label>
               <Select
                 value={filters.featured === undefined ? "" : filters.featured.toString()}
-                onValueChange={(value) => onFiltersChange({ 
-                  featured: value === "" ? undefined : value === "true" 
-                })}
+                onValueChange={(value) =>
+                  onFiltersChange({
+                    featured: value === "" ? undefined : value === "true",
+                  })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All" />
@@ -667,9 +666,11 @@ export function ArticlesFilters({
               <Label className="text-sm font-medium">Series</Label>
               <Select
                 value={filters.hasSeries === undefined ? "" : filters.hasSeries.toString()}
-                onValueChange={(value) => onFiltersChange({ 
-                  hasSeries: value === "" ? undefined : value === "true" 
-                })}
+                onValueChange={(value) =>
+                  onFiltersChange({
+                    hasSeries: value === "" ? undefined : value === "true",
+                  })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All" />
@@ -690,13 +691,21 @@ export function ArticlesFilters({
                   type="number"
                   placeholder="Min"
                   value={filters.minReadTime || ""}
-                  onChange={(e) => onFiltersChange({ minReadTime: e.target.value ? parseInt(e.target.value) : undefined })}
+                  onChange={(e) =>
+                    onFiltersChange({
+                      minReadTime: e.target.value ? parseInt(e.target.value) : undefined,
+                    })
+                  }
                 />
                 <Input
                   type="number"
                   placeholder="Max"
                   value={filters.maxReadTime || ""}
-                  onChange={(e) => onFiltersChange({ maxReadTime: e.target.value ? parseInt(e.target.value) : undefined })}
+                  onChange={(e) =>
+                    onFiltersChange({
+                      maxReadTime: e.target.value ? parseInt(e.target.value) : undefined,
+                    })
+                  }
                 />
               </div>
             </div>
@@ -709,13 +718,21 @@ export function ArticlesFilters({
                   type="number"
                   placeholder="Min"
                   value={filters.minEngagement || ""}
-                  onChange={(e) => onFiltersChange({ minEngagement: e.target.value ? parseInt(e.target.value) : undefined })}
+                  onChange={(e) =>
+                    onFiltersChange({
+                      minEngagement: e.target.value ? parseInt(e.target.value) : undefined,
+                    })
+                  }
                 />
                 <Input
                   type="number"
                   placeholder="Max"
                   value={filters.maxEngagement || ""}
-                  onChange={(e) => onFiltersChange({ maxEngagement: e.target.value ? parseInt(e.target.value) : undefined })}
+                  onChange={(e) =>
+                    onFiltersChange({
+                      maxEngagement: e.target.value ? parseInt(e.target.value) : undefined,
+                    })
+                  }
                 />
               </div>
             </div>
@@ -724,12 +741,16 @@ export function ArticlesFilters({
           {/* Sort Options */}
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="sortBy" className="text-sm font-medium">Sort By</Label>
+              <Label htmlFor="sortBy" className="text-sm font-medium">
+                Sort By
+              </Label>
               <Select
                 value={filters.sortBy || "publishedAt"}
-                onValueChange={(value) => onFiltersChange({ 
-                  sortBy: value as ArticleFilters['sortBy'] 
-                })}
+                onValueChange={(value) =>
+                  onFiltersChange({
+                    sortBy: value as ArticleFilters["sortBy"],
+                  })
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -749,12 +770,16 @@ export function ArticlesFilters({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sortOrder" className="text-sm font-medium">Order</Label>
+              <Label htmlFor="sortOrder" className="text-sm font-medium">
+                Order
+              </Label>
               <Select
                 value={filters.sortOrder || "desc"}
-                onValueChange={(value) => onFiltersChange({ 
-                  sortOrder: value as ArticleFilters['sortOrder'] 
-                })}
+                onValueChange={(value) =>
+                  onFiltersChange({
+                    sortOrder: value as ArticleFilters["sortOrder"],
+                  })
+                }
               >
                 <SelectTrigger>
                   <SelectValue />

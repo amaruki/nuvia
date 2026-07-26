@@ -7,19 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Collapsible, 
-  CollapsibleContent, 
-  CollapsibleTrigger 
-} from "@/components/ui/collapsible";
-import { 
-  ChevronDown, 
-  ChevronUp, 
-  Search, 
-  X,
-  Filter,
-  RotateCcw
-} from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown, ChevronUp, Search, X, Filter, RotateCcw } from "lucide-react";
 import { GatewayFilterOptions } from "@/types/finance.types";
 
 interface GatewaysFiltersProps {
@@ -78,7 +67,7 @@ export function GatewaysFilters({
     const currentStatus = filters.status || [];
     const newStatus = checked
       ? [...currentStatus, value]
-      : currentStatus.filter(s => s !== value);
+      : currentStatus.filter((s) => s !== value);
     onFiltersChange({ status: newStatus });
   };
 
@@ -86,7 +75,7 @@ export function GatewaysFilters({
     const currentProviders = filters.provider || [];
     const newProviders = checked
       ? [...currentProviders, value]
-      : currentProviders.filter(p => p !== value);
+      : currentProviders.filter((p) => p !== value);
     onFiltersChange({ provider: newProviders });
   };
 
@@ -94,7 +83,7 @@ export function GatewaysFilters({
     const currentEnvironments = filters.environment || [];
     const newEnvironments = checked
       ? [...currentEnvironments, value]
-      : currentEnvironments.filter(e => e !== value);
+      : currentEnvironments.filter((e) => e !== value);
     onFiltersChange({ environment: newEnvironments });
   };
 
@@ -102,7 +91,7 @@ export function GatewaysFilters({
     const currentCurrencies = filters.currency || [];
     const newCurrencies = checked
       ? [...currentCurrencies, value]
-      : currentCurrencies.filter(c => c !== value);
+      : currentCurrencies.filter((c) => c !== value);
     onFiltersChange({ currency: newCurrencies });
   };
 
@@ -135,15 +124,11 @@ export function GatewaysFilters({
                   </Badge>
                 )}
               </div>
-              {isOpen ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
+              {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </div>
           </CardHeader>
         </CollapsibleTrigger>
-        
+
         <CollapsibleContent>
           <CardContent className="space-y-6 pt-0">
             {/* Search */}
@@ -181,11 +166,11 @@ export function GatewaysFilters({
                       <Checkbox
                         id={`status-${option.value}`}
                         checked={filters.status?.includes(option.value) || false}
-                        onCheckedChange={(checked) => 
+                        onCheckedChange={(checked) =>
                           handleStatusChange(option.value, checked as boolean)
                         }
                       />
-                      <Label 
+                      <Label
                         htmlFor={`status-${option.value}`}
                         className="text-sm font-normal cursor-pointer"
                       >
@@ -216,11 +201,11 @@ export function GatewaysFilters({
                       <Checkbox
                         id={`provider-${option.value}`}
                         checked={filters.provider?.includes(option.value) || false}
-                        onCheckedChange={(checked) => 
+                        onCheckedChange={(checked) =>
                           handleProviderChange(option.value, checked as boolean)
                         }
                       />
-                      <Label 
+                      <Label
                         htmlFor={`provider-${option.value}`}
                         className="text-sm font-normal cursor-pointer"
                       >
@@ -251,11 +236,11 @@ export function GatewaysFilters({
                       <Checkbox
                         id={`environment-${option.value}`}
                         checked={filters.environment?.includes(option.value) || false}
-                        onCheckedChange={(checked) => 
+                        onCheckedChange={(checked) =>
                           handleEnvironmentChange(option.value, checked as boolean)
                         }
                       />
-                      <Label 
+                      <Label
                         htmlFor={`environment-${option.value}`}
                         className="text-sm font-normal cursor-pointer"
                       >
@@ -287,11 +272,8 @@ export function GatewaysFilters({
                     key={option.value}
                     variant={filters.currency?.includes(option.value) ? "default" : "outline"}
                     className="cursor-pointer"
-                    onClick={() => 
-                      handleCurrencyChange(
-                        option.value, 
-                        !filters.currency?.includes(option.value)
-                      )
+                    onClick={() =>
+                      handleCurrencyChange(option.value, !filters.currency?.includes(option.value))
                     }
                   >
                     {option.value}
@@ -314,11 +296,7 @@ export function GatewaysFilters({
             {/* Clear All Filters */}
             {hasActiveFilters && (
               <div className="flex justify-center pt-2 border-t">
-                <Button
-                  variant="outline"
-                  onClick={onClearFilters}
-                  className="text-sm"
-                >
+                <Button variant="outline" onClick={onClearFilters} className="text-sm">
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Clear All Filters
                 </Button>

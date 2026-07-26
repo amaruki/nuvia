@@ -1,14 +1,14 @@
-import { 
-  Publication, 
-  PublicationStatistics, 
-  PublicationAuthor, 
+import {
+  Publication,
+  PublicationStatistics,
+  PublicationAuthor,
   PublicationTag,
   PublicationType,
   PublicationCategory,
   PublicationStatus,
   PUBLICATION_TYPES,
   PUBLICATION_CATEGORIES,
-  PUBLICATION_STATUSES
+  PUBLICATION_STATUSES,
 } from "@/types/publication.types";
 
 // Mock authors
@@ -21,7 +21,7 @@ const mockAuthors: PublicationAuthor[] = [
     bio: "Research scientist with expertise in AI and machine learning",
     role: "Research Director",
     chapter: "San Francisco Bay Area",
-    committee: "Technology Committee"
+    committee: "Technology Committee",
   },
   {
     id: "author_2",
@@ -31,7 +31,7 @@ const mockAuthors: PublicationAuthor[] = [
     bio: "Business strategist and management consultant",
     role: "Business Analyst",
     chapter: "New York Metro",
-    committee: "Business Development"
+    committee: "Business Development",
   },
   {
     id: "author_3",
@@ -41,7 +41,7 @@ const mockAuthors: PublicationAuthor[] = [
     bio: "Education specialist and curriculum developer",
     role: "Education Lead",
     chapter: "Austin",
-    committee: "Education Committee"
+    committee: "Education Committee",
   },
   {
     id: "author_4",
@@ -51,7 +51,7 @@ const mockAuthors: PublicationAuthor[] = [
     bio: "Industry analyst and trends researcher",
     role: "Industry Analyst",
     chapter: "Chicago",
-    committee: "Research Committee"
+    committee: "Research Committee",
   },
   {
     id: "author_5",
@@ -60,8 +60,8 @@ const mockAuthors: PublicationAuthor[] = [
     avatar: "/avatars/lisa.jpg",
     bio: "Chapter president and community organizer",
     role: "Chapter President",
-    chapter: "Seattle"
-  }
+    chapter: "Seattle",
+  },
 ];
 
 // Mock tags
@@ -75,7 +75,7 @@ const mockTags: PublicationTag[] = [
   { id: "tag_7", name: "research", color: "#84CC16", count: 36 },
   { id: "tag_8", name: "education", color: "#F97316", count: 29 },
   { id: "tag_9", name: "industry-trends", color: "#6366F1", count: 33 },
-  { id: "tag_10", name: "innovation", color: "#EC4899", count: 27 }
+  { id: "tag_10", name: "innovation", color: "#EC4899", count: 27 },
 ];
 
 // Mock publications
@@ -84,8 +84,10 @@ const mockPublications: Publication[] = [
     id: "pub_1",
     title: "The Future of Artificial Intelligence in Community Management",
     slug: "future-ai-community-management",
-    excerpt: "Exploring how AI technologies are revolutionizing community management and member engagement strategies for modern organizations.",
-    content: "Artificial Intelligence is transforming how communities are managed and engaged. This comprehensive analysis explores the latest AI technologies, their applications in community management, and practical implementation strategies for organizations looking to leverage these powerful tools...",
+    excerpt:
+      "Exploring how AI technologies are revolutionizing community management and member engagement strategies for modern organizations.",
+    content:
+      "Artificial Intelligence is transforming how communities are managed and engaged. This comprehensive analysis explores the latest AI technologies, their applications in community management, and practical implementation strategies for organizations looking to leverage these powerful tools...",
     type: "research_paper",
     category: "technology",
     status: "published",
@@ -101,9 +103,10 @@ const mockPublications: Publication[] = [
     difficulty: "advanced",
     seo: {
       title: "The Future of AI in Community Management | Nuvia Research",
-      description: "Explore how AI is revolutionizing community management with cutting-edge technologies and strategies.",
+      description:
+        "Explore how AI is revolutionizing community management with cutting-edge technologies and strategies.",
       keywords: ["AI", "community management", "artificial intelligence", "member engagement"],
-      ogImage: "/images/ai-community-og.jpg"
+      ogImage: "/images/ai-community-og.jpg",
     },
     metrics: {
       views: 1250,
@@ -114,7 +117,7 @@ const mockPublications: Publication[] = [
       bookmarks: 67,
       averageReadTime: 8.5,
       bounceRate: 25.3,
-      engagementScore: 87
+      engagementScore: 87,
     },
     visibility: "public",
     version: 1,
@@ -124,14 +127,16 @@ const mockPublications: Publication[] = [
     downloadEnabled: true,
     isFeatured: true,
     isPinned: false,
-    priority: 5
+    priority: 5,
   },
   {
     id: "pub_2",
     title: "Digital Transformation Strategies for Non-Profit Organizations",
     slug: "digital-transformation-nonprofit-strategies",
-    excerpt: "A comprehensive guide to implementing digital transformation initiatives in non-profit organizations with limited resources and budgets.",
-    content: "Digital transformation can seem daunting for non-profit organizations operating with limited resources. This guide provides practical strategies, step-by-step implementation plans, and real-world case studies of successful digital transformations in the non-profit sector...",
+    excerpt:
+      "A comprehensive guide to implementing digital transformation initiatives in non-profit organizations with limited resources and budgets.",
+    content:
+      "Digital transformation can seem daunting for non-profit organizations operating with limited resources. This guide provides practical strategies, step-by-step implementation plans, and real-world case studies of successful digital transformations in the non-profit sector...",
     type: "case_study",
     category: "business",
     status: "published",
@@ -145,8 +150,9 @@ const mockPublications: Publication[] = [
     difficulty: "intermediate",
     seo: {
       title: "Digital Transformation for Non-Profits | Nuvia Case Study",
-      description: "Practical digital transformation strategies for non-profit organizations with limited resources.",
-      keywords: ["digital transformation", "non-profit", "technology strategy", "case study"]
+      description:
+        "Practical digital transformation strategies for non-profit organizations with limited resources.",
+      keywords: ["digital transformation", "non-profit", "technology strategy", "case study"],
     },
     metrics: {
       views: 980,
@@ -157,7 +163,7 @@ const mockPublications: Publication[] = [
       bookmarks: 54,
       averageReadTime: 11.2,
       bounceRate: 28.7,
-      engagementScore: 82
+      engagementScore: 82,
     },
     visibility: "members_only",
     version: 1,
@@ -167,14 +173,16 @@ const mockPublications: Publication[] = [
     downloadEnabled: true,
     isFeatured: false,
     isPinned: false,
-    priority: 3
+    priority: 3,
   },
   {
     id: "pub_3",
     title: "Building Effective Educational Programs for Professional Communities",
     slug: "effective-educational-programs-communities",
-    excerpt: "Best practices and methodologies for creating engaging educational programs that drive member retention and skill development.",
-    content: "Educational programs are the backbone of professional communities. This comprehensive guide covers curriculum design, delivery methods, assessment strategies, and continuous improvement processes for creating educational programs that truly engage members and drive professional development...",
+    excerpt:
+      "Best practices and methodologies for creating engaging educational programs that drive member retention and skill development.",
+    content:
+      "Educational programs are the backbone of professional communities. This comprehensive guide covers curriculum design, delivery methods, assessment strategies, and continuous improvement processes for creating educational programs that truly engage members and drive professional development...",
     type: "article",
     category: "education",
     status: "published",
@@ -188,8 +196,9 @@ const mockPublications: Publication[] = [
     difficulty: "beginner",
     seo: {
       title: "Educational Programs for Professional Communities | Nuvia Guide",
-      description: "Best practices for creating engaging educational programs that drive member retention.",
-      keywords: ["education", "professional development", "community programs", "best practices"]
+      description:
+        "Best practices for creating engaging educational programs that drive member retention.",
+      keywords: ["education", "professional development", "community programs", "best practices"],
     },
     metrics: {
       views: 1450,
@@ -200,7 +209,7 @@ const mockPublications: Publication[] = [
       bookmarks: 89,
       averageReadTime: 7.8,
       bounceRate: 22.1,
-      engagementScore: 91
+      engagementScore: 91,
     },
     visibility: "public",
     version: 1,
@@ -210,14 +219,16 @@ const mockPublications: Publication[] = [
     downloadEnabled: true,
     isFeatured: true,
     isPinned: true,
-    priority: 8
+    priority: 8,
   },
   {
     id: "pub_4",
     title: "Industry Trends Report: Q4 2024 Community Management Insights",
     slug: "q4-2024-community-management-trends",
-    excerpt: "Comprehensive analysis of emerging trends in community management, member engagement strategies, and technology adoption patterns.",
-    content: "Our quarterly industry trends report provides deep insights into the evolving landscape of community management. This Q4 2024 edition covers emerging technologies, changing member expectations, new engagement strategies, and predictions for 2025...",
+    excerpt:
+      "Comprehensive analysis of emerging trends in community management, member engagement strategies, and technology adoption patterns.",
+    content:
+      "Our quarterly industry trends report provides deep insights into the evolving landscape of community management. This Q4 2024 edition covers emerging technologies, changing member expectations, new engagement strategies, and predictions for 2025...",
     type: "report",
     category: "industry_trends",
     status: "published",
@@ -231,8 +242,8 @@ const mockPublications: Publication[] = [
         name: "Q4-2024-Trends-Full-Report.pdf",
         url: "/files/q4-2024-trends.pdf",
         size: 2456789,
-        type: "application/pdf"
-      }
+        type: "application/pdf",
+      },
     ],
     publishedAt: new Date("2024-11-01T08:00:00Z"),
     lastModified: new Date("2024-10-31T17:30:00Z"),
@@ -241,8 +252,9 @@ const mockPublications: Publication[] = [
     difficulty: "intermediate",
     seo: {
       title: "Q4 2024 Community Management Trends Report | Nuvia Insights",
-      description: "Comprehensive analysis of community management trends and insights for Q4 2024.",
-      keywords: ["community management", "industry trends", "Q4 2024", "member engagement"]
+      description:
+        "Comprehensive analysis of community management trends and insights for Q4 2024.",
+      keywords: ["community management", "industry trends", "Q4 2024", "member engagement"],
     },
     metrics: {
       views: 2100,
@@ -253,7 +265,7 @@ const mockPublications: Publication[] = [
       bookmarks: 123,
       averageReadTime: 14.2,
       bounceRate: 19.8,
-      engagementScore: 94
+      engagementScore: 94,
     },
     visibility: "premium_only",
     version: 1,
@@ -263,14 +275,16 @@ const mockPublications: Publication[] = [
     downloadEnabled: true,
     isFeatured: true,
     isPinned: false,
-    priority: 7
+    priority: 7,
   },
   {
     id: "pub_5",
     title: "Member Spotlight: Sarah Johnson's Journey in Technology Leadership",
     slug: "member-spotlight-sarah-johnson",
-    excerpt: "An inspiring story of how Sarah Johnson rose through the ranks to become a technology leader in our community.",
-    content: "Sarah Johnson's journey from a junior developer to Technology Committee chair is nothing short of inspiring. In this member spotlight, we explore her career path, challenges overcome, and vision for the future of technology in our community...",
+    excerpt:
+      "An inspiring story of how Sarah Johnson rose through the ranks to become a technology leader in our community.",
+    content:
+      "Sarah Johnson's journey from a junior developer to Technology Committee chair is nothing short of inspiring. In this member spotlight, we explore her career path, challenges overcome, and vision for the future of technology in our community...",
     type: "blog",
     category: "member_spotlight",
     status: "published",
@@ -286,7 +300,7 @@ const mockPublications: Publication[] = [
     seo: {
       title: "Member Spotlight: Sarah Johnson | Nuvia Community",
       description: "Sarah Johnson's inspiring journey to technology leadership in our community.",
-      keywords: ["member spotlight", "Sarah Johnson", "technology leadership", "community story"]
+      keywords: ["member spotlight", "Sarah Johnson", "technology leadership", "community story"],
     },
     metrics: {
       views: 890,
@@ -297,7 +311,7 @@ const mockPublications: Publication[] = [
       bookmarks: 34,
       averageReadTime: 6.5,
       bounceRate: 31.2,
-      engagementScore: 76
+      engagementScore: 76,
     },
     visibility: "public",
     version: 1,
@@ -307,14 +321,16 @@ const mockPublications: Publication[] = [
     downloadEnabled: false,
     isFeatured: false,
     isPinned: false,
-    priority: 2
+    priority: 2,
   },
   {
     id: "pub_6",
     title: "Best Practices for Virtual Event Management in Hybrid Communities",
     slug: "virtual-event-management-hybrid-communities",
-    excerpt: "Comprehensive guide to planning and executing successful virtual events that engage both remote and in-person community members.",
-    content: "As communities increasingly adopt hybrid models, virtual event management has become more complex and important. This guide covers everything from platform selection and technical setup to engagement strategies and post-event analysis...",
+    excerpt:
+      "Comprehensive guide to planning and executing successful virtual events that engage both remote and in-person community members.",
+    content:
+      "As communities increasingly adopt hybrid models, virtual event management has become more complex and important. This guide covers everything from platform selection and technical setup to engagement strategies and post-event analysis...",
     type: "whitepaper",
     category: "best_practices",
     status: "review",
@@ -329,7 +345,7 @@ const mockPublications: Publication[] = [
     seo: {
       title: "Virtual Event Management Best Practices | Nuvia Whitepaper",
       description: "Comprehensive guide to virtual event management for hybrid communities.",
-      keywords: ["virtual events", "event management", "hybrid communities", "best practices"]
+      keywords: ["virtual events", "event management", "hybrid communities", "best practices"],
     },
     metrics: {
       views: 0,
@@ -340,7 +356,7 @@ const mockPublications: Publication[] = [
       bookmarks: 0,
       averageReadTime: 0,
       bounceRate: 0,
-      engagementScore: 0
+      engagementScore: 0,
     },
     visibility: "public",
     version: 1,
@@ -350,14 +366,16 @@ const mockPublications: Publication[] = [
     downloadEnabled: false,
     isFeatured: false,
     isPinned: false,
-    priority: 4
+    priority: 4,
   },
   {
     id: "pub_7",
     title: "Chapter News: Seattle Chapter Launches New Mentorship Program",
     slug: "seattle-chapter-mentorship-program-launch",
-    excerpt: "Exciting news from our Seattle chapter as they launch an innovative mentorship program connecting experienced members with newcomers.",
-    content: "The Seattle chapter is proud to announce the launch of our new mentorship program designed to foster connections between experienced members and those new to our community. The program includes monthly meetups, skill-sharing workshops, and one-on-one mentoring sessions...",
+    excerpt:
+      "Exciting news from our Seattle chapter as they launch an innovative mentorship program connecting experienced members with newcomers.",
+    content:
+      "The Seattle chapter is proud to announce the launch of our new mentorship program designed to foster connections between experienced members and those new to our community. The program includes monthly meetups, skill-sharing workshops, and one-on-one mentoring sessions...",
     type: "newsletter",
     category: "chapter_news",
     status: "published",
@@ -372,7 +390,7 @@ const mockPublications: Publication[] = [
     seo: {
       title: "Seattle Chapter Mentorship Program | Nuvia News",
       description: "Seattle chapter launches innovative mentorship program for community members.",
-      keywords: ["Seattle chapter", "mentorship program", "community news", "member development"]
+      keywords: ["Seattle chapter", "mentorship program", "community news", "member development"],
     },
     metrics: {
       views: 567,
@@ -383,7 +401,7 @@ const mockPublications: Publication[] = [
       bookmarks: 19,
       averageReadTime: 4.2,
       bounceRate: 35.6,
-      engagementScore: 68
+      engagementScore: 68,
     },
     visibility: "chapter_only",
     allowedChapters: ["seattle"],
@@ -394,14 +412,16 @@ const mockPublications: Publication[] = [
     downloadEnabled: true,
     isFeatured: false,
     isPinned: false,
-    priority: 3
+    priority: 3,
   },
   {
     id: "pub_8",
     title: "Machine Learning Applications in Member Engagement Analytics",
     slug: "machine-learning-member-engagement-analytics",
-    excerpt: "Advanced techniques for using machine learning to analyze member engagement patterns and predict community health metrics.",
-    content: "Machine learning offers powerful tools for understanding and predicting member engagement patterns. This technical paper explores advanced ML techniques, implementation strategies, and real-world applications in community management...",
+    excerpt:
+      "Advanced techniques for using machine learning to analyze member engagement patterns and predict community health metrics.",
+    content:
+      "Machine learning offers powerful tools for understanding and predicting member engagement patterns. This technical paper explores advanced ML techniques, implementation strategies, and real-world applications in community management...",
     type: "research_paper",
     category: "research",
     status: "scheduled",
@@ -415,8 +435,9 @@ const mockPublications: Publication[] = [
     difficulty: "advanced",
     seo: {
       title: "Machine Learning for Member Engagement Analytics | Nuvia Research",
-      description: "Advanced ML techniques for analyzing member engagement and predicting community health.",
-      keywords: ["machine learning", "member engagement", "analytics", "community health"]
+      description:
+        "Advanced ML techniques for analyzing member engagement and predicting community health.",
+      keywords: ["machine learning", "member engagement", "analytics", "community health"],
     },
     metrics: {
       views: 0,
@@ -427,7 +448,7 @@ const mockPublications: Publication[] = [
       bookmarks: 0,
       averageReadTime: 0,
       bounceRate: 0,
-      engagementScore: 0
+      engagementScore: 0,
     },
     visibility: "premium_only",
     version: 1,
@@ -437,14 +458,16 @@ const mockPublications: Publication[] = [
     downloadEnabled: true,
     isFeatured: false,
     isPinned: false,
-    priority: 6
+    priority: 6,
   },
   {
     id: "pub_9",
     title: "Draft: Innovation Framework for Community Growth",
     slug: "innovation-framework-community-growth",
-    excerpt: "A structured approach to fostering innovation within community organizations and measuring its impact on growth.",
-    content: "This is a draft publication exploring innovation frameworks for community growth. The content is still being developed and will include case studies, implementation guides, and measurement strategies...",
+    excerpt:
+      "A structured approach to fostering innovation within community organizations and measuring its impact on growth.",
+    content:
+      "This is a draft publication exploring innovation frameworks for community growth. The content is still being developed and will include case studies, implementation guides, and measurement strategies...",
     type: "article",
     category: "business",
     status: "draft",
@@ -457,7 +480,7 @@ const mockPublications: Publication[] = [
     seo: {
       title: "Innovation Framework for Community Growth | Nuvia Draft",
       description: "Structured approach to fostering innovation in community organizations.",
-      keywords: ["innovation", "community growth", "framework", "strategy"]
+      keywords: ["innovation", "community growth", "framework", "strategy"],
     },
     metrics: {
       views: 0,
@@ -468,7 +491,7 @@ const mockPublications: Publication[] = [
       bookmarks: 0,
       averageReadTime: 0,
       bounceRate: 0,
-      engagementScore: 0
+      engagementScore: 0,
     },
     visibility: "public",
     version: 1,
@@ -478,14 +501,16 @@ const mockPublications: Publication[] = [
     downloadEnabled: false,
     isFeatured: false,
     isPinned: false,
-    priority: 1
+    priority: 1,
   },
   {
     id: "pub_10",
     title: "Archived: 2023 Annual Community Report",
     slug: "2023-annual-community-report",
-    excerpt: "Complete annual report for 2023 including membership statistics, financial overview, and strategic achievements.",
-    content: "This archived report provides a comprehensive overview of our community's performance in 2023. While some information may be outdated, it serves as an important historical record of our achievements and challenges...",
+    excerpt:
+      "Complete annual report for 2023 including membership statistics, financial overview, and strategic achievements.",
+    content:
+      "This archived report provides a comprehensive overview of our community's performance in 2023. While some information may be outdated, it serves as an important historical record of our achievements and challenges...",
     type: "report",
     category: "announcements",
     status: "archived",
@@ -500,7 +525,7 @@ const mockPublications: Publication[] = [
     seo: {
       title: "2023 Annual Community Report | Nuvia Archives",
       description: "Complete annual report for 2023 with membership statistics and achievements.",
-      keywords: ["annual report", "2023", "community statistics", "archived"]
+      keywords: ["annual report", "2023", "community statistics", "archived"],
     },
     metrics: {
       views: 3200,
@@ -511,7 +536,7 @@ const mockPublications: Publication[] = [
       bookmarks: 189,
       averageReadTime: 22.5,
       bounceRate: 15.2,
-      engagementScore: 88
+      engagementScore: 88,
     },
     visibility: "public",
     version: 1,
@@ -521,65 +546,74 @@ const mockPublications: Publication[] = [
     downloadEnabled: true,
     isFeatured: false,
     isPinned: false,
-    priority: 0
-  }
+    priority: 0,
+  },
 ];
 
 // Mock statistics
 const mockStatistics: PublicationStatistics = {
   totalPublications: mockPublications.length,
-  publishedPublications: mockPublications.filter(p => p.status === 'published').length,
-  draftPublications: mockPublications.filter(p => p.status === 'draft').length,
-  scheduledPublications: mockPublications.filter(p => p.status === 'scheduled').length,
-  archivedPublications: mockPublications.filter(p => p.status === 'archived').length,
-  
+  publishedPublications: mockPublications.filter((p) => p.status === "published").length,
+  draftPublications: mockPublications.filter((p) => p.status === "draft").length,
+  scheduledPublications: mockPublications.filter((p) => p.status === "scheduled").length,
+  archivedPublications: mockPublications.filter((p) => p.status === "archived").length,
+
   totalViews: mockPublications.reduce((sum, p) => sum + p.metrics.views, 0),
   totalDownloads: mockPublications.reduce((sum, p) => sum + p.metrics.downloads, 0),
   totalShares: mockPublications.reduce((sum, p) => sum + p.metrics.shares, 0),
   totalComments: mockPublications.reduce((sum, p) => sum + p.metrics.comments, 0),
   averageEngagementScore: Math.round(
-    mockPublications.reduce((sum, p) => sum + p.metrics.engagementScore, 0) / mockPublications.length
+    mockPublications.reduce((sum, p) => sum + p.metrics.engagementScore, 0) /
+      mockPublications.length,
   ),
-  
-  publicationsByType: PUBLICATION_TYPES.map(type => ({
+
+  publicationsByType: PUBLICATION_TYPES.map((type) => ({
     type,
-    count: mockPublications.filter(p => p.type === type).length,
-    views: mockPublications.filter(p => p.type === type).reduce((sum, p) => sum + p.metrics.views, 0),
+    count: mockPublications.filter((p) => p.type === type).length,
+    views: mockPublications
+      .filter((p) => p.type === type)
+      .reduce((sum, p) => sum + p.metrics.views, 0),
     engagement: Math.round(
-      mockPublications.filter(p => p.type === type).reduce((sum, p) => sum + p.metrics.engagementScore, 0) / 
-      Math.max(1, mockPublications.filter(p => p.type === type).length)
-    )
+      mockPublications
+        .filter((p) => p.type === type)
+        .reduce((sum, p) => sum + p.metrics.engagementScore, 0) /
+        Math.max(1, mockPublications.filter((p) => p.type === type).length),
+    ),
   })),
-  
-  publicationsByCategory: PUBLICATION_CATEGORIES.map(category => ({
+
+  publicationsByCategory: PUBLICATION_CATEGORIES.map((category) => ({
     category,
-    count: mockPublications.filter(p => p.category === category).length,
-    views: mockPublications.filter(p => p.category === category).reduce((sum, p) => sum + p.metrics.views, 0),
+    count: mockPublications.filter((p) => p.category === category).length,
+    views: mockPublications
+      .filter((p) => p.category === category)
+      .reduce((sum, p) => sum + p.metrics.views, 0),
     engagement: Math.round(
-      mockPublications.filter(p => p.category === category).reduce((sum, p) => sum + p.metrics.engagementScore, 0) / 
-      Math.max(1, mockPublications.filter(p => p.category === category).length)
-    )
+      mockPublications
+        .filter((p) => p.category === category)
+        .reduce((sum, p) => sum + p.metrics.engagementScore, 0) /
+        Math.max(1, mockPublications.filter((p) => p.category === category).length),
+    ),
   })),
-  
-  publicationsByStatus: PUBLICATION_STATUSES.map(status => ({
+
+  publicationsByStatus: PUBLICATION_STATUSES.map((status) => ({
     status,
-    count: mockPublications.filter(p => p.status === status).length
+    count: mockPublications.filter((p) => p.status === status).length,
   })),
-  
+
   topPerformingPublications: mockPublications
-    .filter(p => p.status === 'published')
+    .filter((p) => p.status === "published")
     .sort((a, b) => b.metrics.engagementScore - a.metrics.engagementScore)
     .slice(0, 5)
-    .map(p => ({
+    .map((p) => ({
       publicationId: p.id,
       title: p.title,
       author: p.author.name,
       views: p.metrics.views,
       engagementScore: p.metrics.engagementScore,
       type: p.type,
-      category: p.category
+      category: p.category,
     })),
-  
+
   recentActivity: [
     {
       id: "activity_1",
@@ -587,7 +621,7 @@ const mockStatistics: PublicationStatistics = {
       title: "Best Practices for Virtual Event Management in Hybrid Communities",
       action: "updated",
       author: "Emily Rodriguez",
-      timestamp: new Date("2024-11-16T10:30:00Z")
+      timestamp: new Date("2024-11-16T10:30:00Z"),
     },
     {
       id: "activity_2",
@@ -595,7 +629,7 @@ const mockStatistics: PublicationStatistics = {
       title: "Innovation Framework for Community Growth",
       action: "created",
       author: "Michael Chen",
-      timestamp: new Date("2024-11-16T09:45:00Z")
+      timestamp: new Date("2024-11-16T09:45:00Z"),
     },
     {
       id: "activity_3",
@@ -603,7 +637,7 @@ const mockStatistics: PublicationStatistics = {
       title: "Machine Learning Applications in Member Engagement Analytics",
       action: "created",
       author: "Dr. Sarah Johnson",
-      timestamp: new Date("2024-11-15T11:20:00Z")
+      timestamp: new Date("2024-11-15T11:20:00Z"),
     },
     {
       id: "activity_4",
@@ -611,7 +645,7 @@ const mockStatistics: PublicationStatistics = {
       title: "The Future of Artificial Intelligence in Community Management",
       action: "published",
       author: "Dr. Sarah Johnson",
-      timestamp: new Date("2024-11-15T10:00:00Z")
+      timestamp: new Date("2024-11-15T10:00:00Z"),
     },
     {
       id: "activity_5",
@@ -619,54 +653,54 @@ const mockStatistics: PublicationStatistics = {
       title: "Chapter News: Seattle Chapter Launches New Mentorship Program",
       action: "published",
       author: "Lisa Thompson",
-      timestamp: new Date("2024-11-12T16:00:00Z")
-    }
+      timestamp: new Date("2024-11-12T16:00:00Z"),
+    },
   ],
-  
+
   monthlyTrend: [
     {
       month: "November 2024",
       publicationsCreated: 4,
       publicationsPublished: 3,
       totalViews: 5234,
-      totalEngagement: 412
+      totalEngagement: 412,
     },
     {
       month: "October 2024",
       publicationsCreated: 3,
       publicationsPublished: 2,
       totalViews: 3890,
-      totalEngagement: 298
+      totalEngagement: 298,
     },
     {
       month: "September 2024",
       publicationsCreated: 2,
       publicationsPublished: 4,
       totalViews: 4567,
-      totalEngagement: 387
+      totalEngagement: 387,
     },
     {
       month: "August 2024",
       publicationsCreated: 5,
       publicationsPublished: 3,
       totalViews: 5123,
-      totalEngagement: 445
+      totalEngagement: 445,
     },
     {
       month: "July 2024",
       publicationsCreated: 3,
       publicationsPublished: 4,
       totalViews: 4789,
-      totalEngagement: 398
+      totalEngagement: 398,
     },
     {
       month: "June 2024",
       publicationsCreated: 4,
       publicationsPublished: 2,
       totalViews: 4234,
-      totalEngagement: 356
-    }
-  ]
+      totalEngagement: 356,
+    },
+  ],
 };
 
 export { mockPublications, mockStatistics, mockAuthors, mockTags };

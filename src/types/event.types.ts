@@ -1,32 +1,32 @@
 // Event types for Nuvia community platform
 
-import { SafeUser } from './auth.types';
+import { SafeUser } from "./auth.types";
 
 // Event status enum
 export enum EventStatus {
-  DRAFT = 'draft',
-  PUBLISHED = 'published',
-  CANCELLED = 'cancelled',
-  COMPLETED = 'completed',
+  DRAFT = "draft",
+  PUBLISHED = "published",
+  CANCELLED = "cancelled",
+  COMPLETED = "completed",
 }
 
 // Event type enum
 export enum EventType {
-  WORKSHOP = 'workshop',
-  MEETUP = 'meetup',
-  CONFERENCE = 'conference',
-  WEBINAR = 'webinar',
-  SOCIAL = 'social',
-  TRAINING = 'training',
-  OTHER = 'other',
+  WORKSHOP = "workshop",
+  MEETUP = "meetup",
+  CONFERENCE = "conference",
+  WEBINAR = "webinar",
+  SOCIAL = "social",
+  TRAINING = "training",
+  OTHER = "other",
 }
 
 // Registration status enum
 export enum RegistrationStatus {
-  PENDING = 'pending',
-  CONFIRMED = 'confirmed',
-  CANCELLED = 'cancelled',
-  WAITLISTED = 'waitlisted',
+  PENDING = "pending",
+  CONFIRMED = "confirmed",
+  CANCELLED = "cancelled",
+  WAITLISTED = "waitlisted",
 }
 
 // Event interface
@@ -64,7 +64,7 @@ export interface EventRegistration {
   status: RegistrationStatus;
   registeredAt: Date;
   checkedInAt?: Date;
-  checkInMethod?: 'qr' | 'manual' | 'app';
+  checkInMethod?: "qr" | "manual" | "app";
   certificateIssued: boolean;
   certificateUrl?: string;
   notes?: string;
@@ -98,7 +98,7 @@ export interface EventCheckIn {
   user?: SafeUser;
   checkedInAt: Date;
   checkedInBy: string; // User ID of who performed the check-in
-  checkInMethod: 'qr' | 'manual' | 'app';
+  checkInMethod: "qr" | "manual" | "app";
   ipAddress?: string;
   location?: string;
   createdAt: Date;
@@ -164,7 +164,7 @@ export interface RegisterForEventRequest {
 export interface CheckInToEventRequest {
   eventId: string;
   registrationId?: string;
-  checkInMethod: 'qr' | 'manual' | 'app';
+  checkInMethod: "qr" | "manual" | "app";
   verificationCode?: string; // For QR code check-ins
 }
 

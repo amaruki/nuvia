@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { WidgetContainer } from "../../ui/widget-container"
-import { Card, CardContent } from "../../ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "../../ui/badge"
-import { Sparkles, User, Calendar, Clock, ExternalLink, Bookmark, FileText } from "lucide-react"
-import { Article, Event } from "@/types/dashboard.types"
+import * as React from "react";
+import { WidgetContainer } from "../../ui/widget-container";
+import { Card, CardContent } from "../../ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "../../ui/badge";
+import { Sparkles, User, Calendar, Clock, ExternalLink, Bookmark, FileText } from "lucide-react";
+import { Article, Event } from "@/types/dashboard.types";
 
 interface PersonalRecommendationsWidgetProps {
-  recommendedArticles?: Article[]
-  recommendedEvents?: Event[]
-  onReadArticle?: (articleId: string) => void
-  onRegisterForEvent?: (eventId: string) => void
-  onViewAllRecommendations?: () => void
+  recommendedArticles?: Article[];
+  recommendedEvents?: Event[];
+  onReadArticle?: (articleId: string) => void;
+  onRegisterForEvent?: (eventId: string) => void;
+  onViewAllRecommendations?: () => void;
 }
 
 // Mock recommended articles data - in a real app, this would come from an API
@@ -38,7 +38,7 @@ const mockRecommendedArticles: Article[] = [
     readTime: 6,
     isBookmarked: true,
   },
-]
+];
 
 // Mock recommended events data - in a real app, this would come from an API
 const mockRecommendedEvents: Event[] = [
@@ -62,37 +62,37 @@ const mockRecommendedEvents: Event[] = [
     isRegistered: true,
     isCheckedIn: false,
   },
-]
+];
 
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(date)
-}
+  }).format(date);
+};
 
 const formatTime = (date: Date) => {
   return new Intl.DateTimeFormat("en-US", {
     hour: "2-digit",
     minute: "2-digit",
-  }).format(date)
-}
+  }).format(date);
+};
 
 const getCategoryColor = (category: string) => {
   switch (category) {
     case "Development":
-      return "bg-chart-1/20 text-chart-1"
+      return "bg-chart-1/20 text-chart-1";
     case "Design":
-      return "bg-chart-4/20 text-chart-4"
+      return "bg-chart-4/20 text-chart-4";
     case "Technology":
-      return "bg-chart-2/20 text-chart-2"
+      return "bg-chart-2/20 text-chart-2";
     case "Accessibility":
-      return "bg-chart-3/20 text-chart-3"
+      return "bg-chart-3/20 text-chart-3";
     default:
-      return "bg-secondary text-secondary-foreground"
+      return "bg-secondary text-secondary-foreground";
   }
-}
+};
 
 export function PersonalRecommendationsWidget({
   recommendedArticles = mockRecommendedArticles,
@@ -128,14 +128,16 @@ export function PersonalRecommendationsWidget({
                 View all
               </Button>
             </div>
-            
+
             {/* Recommendations list */}
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {recommendedArticles.length === 0 && recommendedEvents.length === 0 ? (
                 <div className="text-center py-8 text-foreground/50">
                   <Sparkles className="h-8 w-8 mx-auto mb-2 text-foreground/40" />
                   <p>No recommendations available</p>
-                  <p className="text-sm mt-2">Recommendations based on your interests will be displayed here.</p>
+                  <p className="text-sm mt-2">
+                    Recommendations based on your interests will be displayed here.
+                  </p>
                 </div>
               ) : (
                 <>
@@ -146,7 +148,7 @@ export function PersonalRecommendationsWidget({
                         <FileText className="h-4 w-4 mr-1" />
                         Recommended Articles
                       </h4>
-                      
+
                       {recommendedArticles.map((article) => (
                         <div
                           key={`article-${article.id}`}
@@ -162,12 +164,12 @@ export function PersonalRecommendationsWidget({
                                   {article.category}
                                 </Badge>
                               </div>
-                              
+
                               <p className="text-sm text-foreground/60 mb-2 line-clamp-2">
                                 {article.excerpt}
                               </p>
                             </div>
-                            
+
                             <Button
                               variant="ghost"
                               size="sm"
@@ -181,7 +183,7 @@ export function PersonalRecommendationsWidget({
                               />
                             </Button>
                           </div>
-                          
+
                           {/* Article metadata */}
                           <div className="flex items-center justify-between text-xs text-foreground/50 mb-2">
                             <div className="flex items-center space-x-3">
@@ -189,19 +191,19 @@ export function PersonalRecommendationsWidget({
                                 <User className="h-3 w-3" />
                                 <span>{article.author}</span>
                               </div>
-                              
+
                               <div className="flex items-center space-x-1">
                                 <Calendar className="h-3 w-3" />
                                 <span>{formatDate(article.publishedAt)}</span>
                               </div>
-                              
+
                               <div className="flex items-center space-x-1">
                                 <Clock className="h-3 w-3" />
                                 <span>{article.readTime} min read</span>
                               </div>
                             </div>
                           </div>
-                          
+
                           {/* Article actions */}
                           <div className="flex items-center justify-between">
                             <Button
@@ -212,7 +214,7 @@ export function PersonalRecommendationsWidget({
                             >
                               Read Article
                             </Button>
-                            
+
                             <Button
                               variant="ghost"
                               size="sm"
@@ -227,7 +229,7 @@ export function PersonalRecommendationsWidget({
                       ))}
                     </div>
                   )}
-                  
+
                   {/* Recommended Events Section */}
                   {recommendedEvents.length > 0 && (
                     <div className="space-y-3">
@@ -235,7 +237,7 @@ export function PersonalRecommendationsWidget({
                         <Calendar className="h-4 w-4 mr-1" />
                         Recommended Events
                       </h4>
-                      
+
                       {recommendedEvents.map((event) => (
                         <div
                           key={`event-${event.id}`}
@@ -246,39 +248,38 @@ export function PersonalRecommendationsWidget({
                               <h5 className="text-sm font-semibold text-foreground/90 line-clamp-1">
                                 {event.title}
                               </h5>
-                              
+
                               <p className="text-sm text-foreground/60 mb-2 line-clamp-2">
                                 {event.description}
                               </p>
                             </div>
                           </div>
-                          
+
                           {/* Event metadata */}
                           <div className="space-y-2 mb-3">
                             <div className="flex items-center text-xs text-foreground/50">
                               <Calendar className="h-3 w-3 mr-2" />
                               <span>{formatDate(new Date(event.startDate))}</span>
                             </div>
-                            
+
                             <div className="flex items-center text-xs text-foreground/50">
                               <Clock className="h-3 w-3 mr-2" />
                               <span>
-                                {formatTime(new Date(event.startDate))} - {formatTime(new Date(event.endDate))}
+                                {formatTime(new Date(event.startDate))} -{" "}
+                                {formatTime(new Date(event.endDate))}
                               </span>
                             </div>
-                            
+
                             <div className="flex items-center text-xs text-foreground/50">
                               <span className="inline-block w-3 h-3 mr-2 rounded-full bg-muted-foreground"></span>
                               <span>{event.location}</span>
                             </div>
                           </div>
-                          
+
                           {/* Event actions */}
                           <div className="flex items-center justify-between">
                             {event.isRegistered ? (
-                              <Badge className="bg-chart-3/20 text-chart-3">
-                                Registered
-                              </Badge>
+                              <Badge className="bg-chart-3/20 text-chart-3">Registered</Badge>
                             ) : (
                               <Button
                                 variant="outline"
@@ -289,7 +290,7 @@ export function PersonalRecommendationsWidget({
                                 Register Now
                               </Button>
                             )}
-                            
+
                             <Button
                               variant="ghost"
                               size="sm"
@@ -307,7 +308,7 @@ export function PersonalRecommendationsWidget({
                 </>
               )}
             </div>
-            
+
             {/* Empty state hint */}
             {recommendedArticles.length > 0 || recommendedEvents.length > 0 ? (
               <div className="text-xs text-foreground/50 text-center pt-2">
@@ -318,5 +319,5 @@ export function PersonalRecommendationsWidget({
         </CardContent>
       </Card>
     </WidgetContainer>
-  )
+  );
 }

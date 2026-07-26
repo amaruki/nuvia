@@ -6,13 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { 
-  X, 
-  Download, 
-  Share2, 
-  Edit, 
-  Trash2, 
-  Eye, 
+import {
+  X,
+  Download,
+  Share2,
+  Edit,
+  Trash2,
+  Eye,
   Copy,
   Calendar,
   User,
@@ -34,7 +34,7 @@ import {
   RotateCw,
   DownloadCloud,
   Link,
-  Settings
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Media, MediaVersion, MediaUsage, MediaPermission } from "@/types/media.types";
@@ -50,15 +50,15 @@ interface MediaDetailsModalProps {
   onVersionRestore?: (mediaId: string, versionId: string) => void;
 }
 
-export function MediaDetailsModal({ 
-  media, 
-  isOpen, 
-  onClose, 
+export function MediaDetailsModal({
+  media,
+  isOpen,
+  onClose,
   onEdit,
   onDelete,
   onDownload,
   onShare,
-  onVersionRestore
+  onVersionRestore,
 }: MediaDetailsModalProps) {
   const [activeTab, setActiveTab] = useState("details");
   const [selectedVersion, setSelectedVersion] = useState<MediaVersion | null>(null);
@@ -66,96 +66,102 @@ export function MediaDetailsModal({
   const [rotation, setRotation] = useState(0);
 
   // Mock data for versions, usage, and permissions
-  const mockVersions: MediaVersion[] = media ? [
-    {
-      id: `${media.id}-v3`,
-      mediaId: media.id,
-      version: 3,
-      url: media.url,
-      thumbnailUrl: media.thumbnailUrl,
-      metadata: media.metadata,
-      changelog: "Updated metadata and optimized file size",
-      createdBy: "John Doe",
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      isActive: true,
-      size: media.metadata.size
-    },
-    {
-      id: `${media.id}-v2`,
-      mediaId: media.id,
-      version: 2,
-      url: media.url,
-      thumbnailUrl: media.thumbnailUrl,
-      metadata: { ...media.metadata },
-      changelog: "Added tags and description",
-      createdBy: "Jane Smith",
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      isActive: false,
-      size: Math.floor(media.metadata.size * 1.2)
-    },
-    {
-      id: `${media.id}-v1`,
-      mediaId: media.id,
-      version: 1,
-      url: media.url,
-      thumbnailUrl: media.thumbnailUrl,
-      metadata: { ...media.metadata },
-      changelog: "Initial upload",
-      createdBy: "Mike Johnson",
-      createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-      isActive: false,
-      size: Math.floor(media.metadata.size * 1.5)
-    }
-  ] : [];
+  const mockVersions: MediaVersion[] = media
+    ? [
+        {
+          id: `${media.id}-v3`,
+          mediaId: media.id,
+          version: 3,
+          url: media.url,
+          thumbnailUrl: media.thumbnailUrl,
+          metadata: media.metadata,
+          changelog: "Updated metadata and optimized file size",
+          createdBy: "John Doe",
+          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+          isActive: true,
+          size: media.metadata.size,
+        },
+        {
+          id: `${media.id}-v2`,
+          mediaId: media.id,
+          version: 2,
+          url: media.url,
+          thumbnailUrl: media.thumbnailUrl,
+          metadata: { ...media.metadata },
+          changelog: "Added tags and description",
+          createdBy: "Jane Smith",
+          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+          isActive: false,
+          size: Math.floor(media.metadata.size * 1.2),
+        },
+        {
+          id: `${media.id}-v1`,
+          mediaId: media.id,
+          version: 1,
+          url: media.url,
+          thumbnailUrl: media.thumbnailUrl,
+          metadata: { ...media.metadata },
+          changelog: "Initial upload",
+          createdBy: "Mike Johnson",
+          createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+          isActive: false,
+          size: Math.floor(media.metadata.size * 1.5),
+        },
+      ]
+    : [];
 
-  const mockUsage: MediaUsage[] = media ? [
-    {
-      id: "usage-1",
-      mediaId: media.id,
-      entityType: "article",
-      entityId: "article-1",
-      entityTitle: "Getting Started with Our Platform",
-      usageType: "featured_image",
-      url: media.url,
-      addedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      addedBy: "John Doe"
-    },
-    {
-      id: "usage-2",
-      mediaId: media.id,
-      entityType: "announcement",
-      entityId: "announcement-1",
-      entityTitle: "Community Update - December 2024",
-      usageType: "attachment",
-      url: media.url,
-      addedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-      addedBy: "Jane Smith"
-    }
-  ] : [];
+  const mockUsage: MediaUsage[] = media
+    ? [
+        {
+          id: "usage-1",
+          mediaId: media.id,
+          entityType: "article",
+          entityId: "article-1",
+          entityTitle: "Getting Started with Our Platform",
+          usageType: "featured_image",
+          url: media.url,
+          addedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+          addedBy: "John Doe",
+        },
+        {
+          id: "usage-2",
+          mediaId: media.id,
+          entityType: "announcement",
+          entityId: "announcement-1",
+          entityTitle: "Community Update - December 2024",
+          usageType: "attachment",
+          url: media.url,
+          addedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+          addedBy: "Jane Smith",
+        },
+      ]
+    : [];
 
-  const mockPermissions: MediaPermission[] = media ? [
-    {
-      id: "perm-1",
-      mediaId: media.id,
-      entityType: "user",
-      entityId: "user-1",
-      entityName: "John Doe",
-      permissions: ["view", "download", "edit"],
-      grantedBy: "Admin",
-      grantedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-    },
-    {
-      id: "perm-2",
-      mediaId: media.id,
-      entityType: "role",
-      entityId: "role-1",
-      entityName: "Content Editors",
-      permissions: ["view", "download"],
-      grantedBy: "Admin",
-      grantedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
-    }
-  ] : [];
+  const mockPermissions: MediaPermission[] = media
+    ? [
+        {
+          id: "perm-1",
+          mediaId: media.id,
+          entityType: "user",
+          entityId: "user-1",
+          entityName: "John Doe",
+          permissions: ["view", "download", "edit"],
+          grantedBy: "Admin",
+          grantedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        },
+        {
+          id: "perm-2",
+          mediaId: media.id,
+          entityType: "role",
+          entityId: "role-1",
+          entityName: "Content Editors",
+          permissions: ["view", "download"],
+          grantedBy: "Admin",
+          grantedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+        },
+      ]
+    : [];
 
   useEffect(() => {
     if (media && mockVersions.length > 0) {
@@ -164,17 +170,17 @@ export function MediaDetailsModal({
   }, [media]);
 
   const getMediaIcon = (type: string) => {
-    if (type.startsWith('image/')) return ImageIcon;
-    if (type.startsWith('video/')) return Video;
-    if (type.startsWith('audio/')) return Music;
-    if (type.includes('pdf') || type.includes('zip')) return Archive;
+    if (type.startsWith("image/")) return ImageIcon;
+    if (type.startsWith("video/")) return Video;
+    if (type.startsWith("audio/")) return Music;
+    if (type.includes("pdf") || type.includes("zip")) return Archive;
     return FileText;
   };
 
   const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) return "0 B";
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const sizes = ["B", "KB", "MB", "GB", "TB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     const idx = Math.min(i, sizes.length - 1);
     return `${parseFloat((bytes / Math.pow(k, idx)).toFixed(2))} ${sizes[idx]}`;
@@ -182,16 +188,20 @@ export function MediaDetailsModal({
 
   const getVisibilityIcon = (visibility: string) => {
     switch (visibility) {
-      case 'public': return <Globe className="h-4 w-4" />;
-      case 'private': return <Lock className="h-4 w-4" />;
-      case 'restricted': return <Users className="h-4 w-4" />;
-      default: return <Lock className="h-4 w-4" />;
+      case "public":
+        return <Globe className="h-4 w-4" />;
+      case "private":
+        return <Lock className="h-4 w-4" />;
+      case "restricted":
+        return <Users className="h-4 w-4" />;
+      default:
+        return <Lock className="h-4 w-4" />;
     }
   };
 
-  const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 25, 200));
-  const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 25, 50));
-  const handleRotate = () => setRotation(prev => (prev + 90) % 360);
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 25, 200));
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 25, 50));
+  const handleRotate = () => setRotation((prev) => (prev + 90) % 360);
   const handleReset = () => {
     setZoomLevel(100);
     setRotation(0);
@@ -218,35 +228,23 @@ export function MediaDetailsModal({
               <p className="text-sm text-gray-600">{media.metadata.fileName}</p>
             </div>
           </DialogTitle>
-          
+
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onDownload?.(media)}
-            >
+            <Button variant="outline" size="sm" onClick={() => onDownload?.(media)}>
               <Download className="h-4 w-4 mr-2" />
               Download
             </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onShare?.(media)}
-            >
+
+            <Button variant="outline" size="sm" onClick={() => onShare?.(media)}>
               <Share2 className="h-4 w-4 mr-2" />
               Share
             </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onEdit?.(media)}
-            >
+
+            <Button variant="outline" size="sm" onClick={() => onEdit?.(media)}>
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
-            
+
             <Button
               variant="outline"
               size="sm"
@@ -256,12 +254,8 @@ export function MediaDetailsModal({
               <Trash2 className="h-4 w-4 mr-2" />
               Delete
             </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-            >
+
+            <Button variant="ghost" size="sm" onClick={onClose}>
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -290,34 +284,34 @@ export function MediaDetailsModal({
                       <span className="text-sm font-medium">Title</span>
                       <span className="text-sm">{media.title}</span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Description</span>
                       <span className="text-sm text-right max-w-xs truncate">
-                        {media.description || 'No description'}
+                        {media.description || "No description"}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">File Name</span>
                       <span className="text-sm">{media.metadata.fileName}</span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">File Size</span>
                       <span className="text-sm">{formatFileSize(media.metadata.size)}</span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Type</span>
                       <Badge variant="secondary">{media.type}</Badge>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Visibility</span>
                       <div className="flex items-center gap-2">
                         {getVisibilityIcon(media.visibility)}
-                        <Badge variant={media.visibility === 'public' ? 'default' : 'secondary'}>
+                        <Badge variant={media.visibility === "public" ? "default" : "secondary"}>
                           {media.visibility}
                         </Badge>
                       </div>
@@ -338,7 +332,7 @@ export function MediaDetailsModal({
                         <span className="text-sm">{media.createdBy}</span>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Created At</span>
                       <div className="flex items-center gap-2">
@@ -346,7 +340,7 @@ export function MediaDetailsModal({
                         <span className="text-sm">{media.createdAt.toLocaleDateString()}</span>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Last Modified</span>
                       <div className="flex items-center gap-2">
@@ -354,7 +348,7 @@ export function MediaDetailsModal({
                         <span className="text-sm">{media.updatedAt.toLocaleDateString()}</span>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Storage Location</span>
                       <div className="flex items-center gap-2">
@@ -362,20 +356,24 @@ export function MediaDetailsModal({
                         <span className="text-sm">{media.storageType}</span>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Views</span>
                       <div className="flex items-center gap-2">
                         <Eye className="h-4 w-4" />
-                        <span className="text-sm">{media.analytics.reduce((sum, a) => sum + a.views, 0)}</span>
+                        <span className="text-sm">
+                          {media.analytics.reduce((sum, a) => sum + a.views, 0)}
+                        </span>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Downloads</span>
                       <div className="flex items-center gap-2">
                         <Download className="h-4 w-4" />
-                        <span className="text-sm">{media.analytics.reduce((sum, a) => sum + a.downloads, 0)}</span>
+                        <span className="text-sm">
+                          {media.analytics.reduce((sum, a) => sum + a.downloads, 0)}
+                        </span>
                       </div>
                     </div>
                   </CardContent>
@@ -412,15 +410,11 @@ export function MediaDetailsModal({
                         <p className="text-sm font-medium">Media URL</p>
                         <p className="text-xs text-gray-600 truncate">{media.url}</p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(media.url)}
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard(media.url)}>
                         <Copy className="h-4 w-4" />
                       </Button>
                     </div>
-                    
+
                     {media.thumbnailUrl && (
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex-1 min-w-0">
@@ -430,7 +424,7 @@ export function MediaDetailsModal({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => copyToClipboard(media.thumbnailUrl || '')}
+                          onClick={() => copyToClipboard(media.thumbnailUrl || "")}
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -466,7 +460,7 @@ export function MediaDetailsModal({
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-center min-h-[400px] bg-gray-50 rounded-lg overflow-hidden">
-                    {media.type === 'image' ? (
+                    {media.type === "image" ? (
                       <img
                         src={media.url}
                         alt={media.title}
@@ -475,18 +469,10 @@ export function MediaDetailsModal({
                           transform: `scale(${zoomLevel / 100}) rotate(${rotation}deg)`,
                         }}
                       />
-                    ) : media.type === 'video' ? (
-                      <video
-                        src={media.url}
-                        controls
-                        className="max-w-full max-h-[600px]"
-                      />
-                    ) : media.type === 'audio' ? (
-                      <audio
-                        src={media.url}
-                        controls
-                        className="w-full max-w-md"
-                      />
+                    ) : media.type === "video" ? (
+                      <video src={media.url} controls className="max-w-full max-h-[600px]" />
+                    ) : media.type === "audio" ? (
+                      <audio src={media.url} controls className="w-full max-w-md" />
                     ) : (
                       <div className="text-center p-8">
                         <Icon className="h-16 w-16 mx-auto mb-4 text-gray-400" />
@@ -523,7 +509,7 @@ export function MediaDetailsModal({
                           "p-4 border rounded-lg cursor-pointer transition-colors",
                           selectedVersion?.id === version.id
                             ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200 hover:border-gray-300"
+                            : "border-gray-200 hover:border-gray-300",
                         )}
                         onClick={() => setSelectedVersion(version)}
                       >
@@ -555,7 +541,7 @@ export function MediaDetailsModal({
                               </div>
                             </div>
                           </div>
-                          
+
                           {!version.isActive && (
                             <Button
                               variant="outline"

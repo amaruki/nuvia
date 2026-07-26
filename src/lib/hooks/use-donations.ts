@@ -1,18 +1,18 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { 
-  Donation, 
-  DonationCampaign, 
-  DonationPayment, 
-  DonationStatistics, 
-  DonationFilterOptions 
+import {
+  Donation,
+  DonationCampaign,
+  DonationPayment,
+  DonationStatistics,
+  DonationFilterOptions,
 } from "@/types/finance.types";
-import { 
-  mockDonations, 
-  mockDonationCampaigns, 
-  mockDonationPayments, 
-  mockDonationStatistics 
+import {
+  mockDonations,
+  mockDonationCampaigns,
+  mockDonationPayments,
+  mockDonationStatistics,
 } from "@/lib/data/mock-donation-data";
 
 export function useDonations() {
@@ -30,8 +30,8 @@ export function useDonations() {
       try {
         setLoading(true);
         // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         setDonations(mockDonations);
         setCampaigns(mockDonationCampaigns);
         setPayments(mockDonationPayments);
@@ -53,24 +53,24 @@ export function useDonations() {
     let filtered = [...donations];
 
     if (filters.status && filters.status.length > 0) {
-      filtered = filtered.filter(d => filters.status!.includes(d.status));
+      filtered = filtered.filter((d) => filters.status!.includes(d.status));
     }
 
     if (filters.donorType && filters.donorType.length > 0) {
-      filtered = filtered.filter(d => filters.donorType!.includes(d.donorType));
+      filtered = filtered.filter((d) => filters.donorType!.includes(d.donorType));
     }
 
     if (filters.donationType && filters.donationType.length > 0) {
-      filtered = filtered.filter(d => filters.donationType!.includes(d.donationType));
+      filtered = filtered.filter((d) => filters.donationType!.includes(d.donationType));
     }
 
     if (filters.campaign && filters.campaign.length > 0) {
-      filtered = filtered.filter(d => d.campaign && filters.campaign!.includes(d.campaign));
+      filtered = filtered.filter((d) => d.campaign && filters.campaign!.includes(d.campaign));
     }
 
     if (filters.dateRange) {
       const { start, end } = filters.dateRange;
-      filtered = filtered.filter(d => {
+      filtered = filtered.filter((d) => {
         const donationDate = new Date(d.donationDate);
         return donationDate >= start && donationDate <= end;
       });
@@ -78,16 +78,17 @@ export function useDonations() {
 
     if (filters.amountRange) {
       const { min, max } = filters.amountRange;
-      filtered = filtered.filter(d => d.amount >= min && d.amount <= max);
+      filtered = filtered.filter((d) => d.amount >= min && d.amount <= max);
     }
 
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(d => 
-        d.donorName.toLowerCase().includes(searchTerm) ||
-        d.donorEmail.toLowerCase().includes(searchTerm) ||
-        (d.campaign && d.campaign.toLowerCase().includes(searchTerm)) ||
-        (d.notes && d.notes.toLowerCase().includes(searchTerm))
+      filtered = filtered.filter(
+        (d) =>
+          d.donorName.toLowerCase().includes(searchTerm) ||
+          d.donorEmail.toLowerCase().includes(searchTerm) ||
+          (d.campaign && d.campaign.toLowerCase().includes(searchTerm)) ||
+          (d.notes && d.notes.toLowerCase().includes(searchTerm)),
       );
     }
 
@@ -95,19 +96,15 @@ export function useDonations() {
   }, [donations, filters]);
 
   // Update donation status
-  const updateDonationStatus = async (donationId: string, status: Donation['status']) => {
+  const updateDonationStatus = async (donationId: string, status: Donation["status"]) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      setDonations(prev => 
-        prev.map(d => 
-          d.id === donationId 
-            ? { ...d, status, updatedAt: new Date() }
-            : d
-        )
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      setDonations((prev) =>
+        prev.map((d) => (d.id === donationId ? { ...d, status, updatedAt: new Date() } : d)),
       );
-      
+
       return true;
     } catch (err) {
       console.error("Error updating donation status:", err);
@@ -119,8 +116,8 @@ export function useDonations() {
   const recordPayment = async (donationId: string, amount: number, paymentMethod: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       const newPayment: DonationPayment = {
         id: `payment-${Date.now()}`,
         donationId,
@@ -132,17 +129,18 @@ export function useDonations() {
         processedBy: "current-user",
         createdAt: new Date(),
       };
-      
-      setPayments(prev => [...prev, newPayment]);
-      
+
+      setPayments((prev) => [...prev, newPayment]);
+
       // Update donation status if fully paid
-      setDonations(prev =>
-        prev.map(d => {
+      setDonations((prev) =>
+        prev.map((d) => {
           if (d.id === donationId) {
-            const totalPaid = payments
-              .filter(p => p.donationId === donationId)
-              .reduce((sum, p) => sum + p.amount, 0) + amount;
-            
+            const totalPaid =
+              payments
+                .filter((p) => p.donationId === donationId)
+                .reduce((sum, p) => sum + p.amount, 0) + amount;
+
             return {
               ...d,
               status: totalPaid >= d.amount ? "completed" : "pending",
@@ -152,9 +150,9 @@ export function useDonations() {
             };
           }
           return d;
-        })
+        }),
       );
-      
+
       return true;
     } catch (err) {
       console.error("Error recording payment:", err);
@@ -166,16 +164,14 @@ export function useDonations() {
   const sendReceipt = async (donationId: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      setDonations(prev => 
-        prev.map(d => 
-          d.id === donationId 
-            ? { ...d, receiptSent: true, updatedAt: new Date() }
-            : d
-        )
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      setDonations((prev) =>
+        prev.map((d) =>
+          d.id === donationId ? { ...d, receiptSent: true, updatedAt: new Date() } : d,
+        ),
       );
-      
+
       return true;
     } catch (err) {
       console.error("Error sending receipt:", err);
@@ -187,13 +183,18 @@ export function useDonations() {
   const addDonation = async (data: any) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       const newDonation: Donation = {
         id: `donation-${Date.now()}`,
         donorId: data.donorId,
-        donorName: data.donorType === "anonymous" ? "Anonymous" : data.donorId.includes('@') ? data.donorId.split('@')[0] : data.donorId,
-        donorEmail: data.donorId.includes('@') ? data.donorId : `${data.donorId}@example.com`,
+        donorName:
+          data.donorType === "anonymous"
+            ? "Anonymous"
+            : data.donorId.includes("@")
+              ? data.donorId.split("@")[0]
+              : data.donorId,
+        donorEmail: data.donorId.includes("@") ? data.donorId : `${data.donorId}@example.com`,
         donorType: data.donorType,
         donationType: data.donationType,
         campaign: data.campaign === "general" ? undefined : data.campaign,
@@ -208,18 +209,18 @@ export function useDonations() {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      
-      setDonations(prev => [newDonation, ...prev]);
-      
+
+      setDonations((prev) => [newDonation, ...prev]);
+
       // Simulate sending receipt and thank you if requested
       if (data.sendReceipt) {
         console.log("Receipt sent to:", newDonation.donorEmail);
       }
-      
+
       if (data.sendThankYou) {
         console.log("Thank you message sent to:", newDonation.donorEmail);
       }
-      
+
       return true;
     } catch (err) {
       console.error("Error adding donation:", err);
@@ -232,8 +233,8 @@ export function useDonations() {
     try {
       setLoading(true);
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       setDonations(mockDonations);
       setCampaigns(mockDonationCampaigns);
       setPayments(mockDonationPayments);
@@ -249,7 +250,7 @@ export function useDonations() {
 
   // Update filters
   const updateFilters = (newFilters: Partial<DonationFilterOptions>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    setFilters((prev) => ({ ...prev, ...newFilters }));
   };
 
   // Clear all filters

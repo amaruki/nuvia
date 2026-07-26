@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -100,7 +100,7 @@ export function GatewayDetailsModal({
       testing: "outline" as const,
       error: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -133,13 +133,9 @@ export function GatewayDetailsModal({
     await onSetDefault(gateway);
   };
 
-  const recentTransactions = transactions
-    .filter(t => t.gatewayId === gateway.id)
-    .slice(0, 10);
+  const recentTransactions = transactions.filter((t) => t.gatewayId === gateway.id).slice(0, 10);
 
-  const recentTestResults = testResults
-    .filter(t => t.gatewayId === gateway.id)
-    .slice(0, 5);
+  const recentTestResults = testResults.filter((t) => t.gatewayId === gateway.id).slice(0, 5);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -158,7 +154,7 @@ export function GatewayDetailsModal({
             Detailed information and configuration for this payment gateway
           </DialogDescription>
         </DialogHeader>
-        
+
         <Separator />
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -190,7 +186,7 @@ export function GatewayDetailsModal({
                       <div>{getEnvironmentBadge(gateway.environment)}</div>
                     </div>
                   </div>
-                  
+
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Status</p>
@@ -214,7 +210,7 @@ export function GatewayDetailsModal({
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Currencies</p>
                     <div className="flex flex-wrap gap-1">
-                      {gateway.currencies.map(currency => (
+                      {gateway.currencies.map((currency) => (
                         <Badge key={currency} variant="outline" className="text-xs">
                           {currency}
                         </Badge>
@@ -242,7 +238,9 @@ export function GatewayDetailsModal({
                 <CardContent className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Total Transactions</p>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Total Transactions
+                      </p>
                       <p className="text-2xl font-bold">
                         {gateway.statistics.totalTransactions.toLocaleString()}
                       </p>
@@ -259,10 +257,15 @@ export function GatewayDetailsModal({
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Success Rate</p>
                       <div className="flex items-center gap-2">
-                        <p className={`text-2xl font-bold ${
-                          gateway.statistics.successRate >= 95 ? "text-green-600" :
-                          gateway.statistics.successRate >= 90 ? "text-yellow-600" : "text-red-600"
-                        }`}>
+                        <p
+                          className={`text-2xl font-bold ${
+                            gateway.statistics.successRate >= 95
+                              ? "text-green-600"
+                              : gateway.statistics.successRate >= 90
+                                ? "text-yellow-600"
+                                : "text-red-600"
+                          }`}
+                        >
                           {formatPercentage(gateway.statistics.successRate)}
                         </p>
                         {gateway.statistics.errorRates.length > 0 && (
@@ -287,15 +290,11 @@ export function GatewayDetailsModal({
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Refunds</p>
-                      <p className="text-xl font-bold">
-                        {gateway.statistics.refundCount}
-                      </p>
+                      <p className="text-xl font-bold">{gateway.statistics.refundCount}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Chargebacks</p>
-                      <p className="text-xl font-bold">
-                        {gateway.statistics.chargebackCount}
-                      </p>
+                      <p className="text-xl font-bold">{gateway.statistics.chargebackCount}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -320,11 +319,11 @@ export function GatewayDetailsModal({
                       <div>
                         <p className="font-medium">{method.displayName}</p>
                         <p className="text-sm text-muted-foreground capitalize">
-                          {method.type.replace('_', ' ')}
+                          {method.type.replace("_", " ")}
                         </p>
                         {method.supportedNetworks && (
                           <p className="text-xs text-muted-foreground">
-                            Networks: {method.supportedNetworks.join(', ')}
+                            Networks: {method.supportedNetworks.join(", ")}
                           </p>
                         )}
                       </div>
@@ -363,17 +362,21 @@ export function GatewayDetailsModal({
                       </Badge>
                     </div>
                   </div>
-                  
+
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Fraud Detection</span>
-                      <Badge variant={gateway.configuration.fraudDetection ? "default" : "secondary"}>
+                      <Badge
+                        variant={gateway.configuration.fraudDetection ? "default" : "secondary"}
+                      >
                         {gateway.configuration.fraudDetection ? "Enabled" : "Disabled"}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Dispute Management</span>
-                      <Badge variant={gateway.configuration.disputeManagement ? "default" : "secondary"}>
+                      <Badge
+                        variant={gateway.configuration.disputeManagement ? "default" : "secondary"}
+                      >
                         {gateway.configuration.disputeManagement ? "Enabled" : "Disabled"}
                       </Badge>
                     </div>
@@ -399,22 +402,32 @@ export function GatewayDetailsModal({
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Partial Payments</span>
-                      <Badge variant={gateway.configuration.allowPartialPayments ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          gateway.configuration.allowPartialPayments ? "default" : "secondary"
+                        }
+                      >
                         {gateway.configuration.allowPartialPayments ? "Allowed" : "Not Allowed"}
                       </Badge>
                     </div>
                   </div>
-                  
+
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Recurring Payments</span>
-                      <Badge variant={gateway.configuration.recurringPayments ? "default" : "secondary"}>
+                      <Badge
+                        variant={gateway.configuration.recurringPayments ? "default" : "secondary"}
+                      >
                         {gateway.configuration.recurringPayments ? "Supported" : "Not Supported"}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Subscription Support</span>
-                      <Badge variant={gateway.configuration.subscriptionSupport ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          gateway.configuration.subscriptionSupport ? "default" : "secondary"
+                        }
+                      >
                         {gateway.configuration.subscriptionSupport ? "Supported" : "Not Supported"}
                       </Badge>
                     </div>
@@ -445,7 +458,7 @@ export function GatewayDetailsModal({
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Daily Limit</p>
@@ -490,24 +503,18 @@ export function GatewayDetailsModal({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Timeout Duration</p>
-                    <p className="text-lg font-bold">
-                      {gateway.configuration.timeoutDuration}s
-                    </p>
+                    <p className="text-lg font-bold">{gateway.configuration.timeoutDuration}s</p>
                   </div>
                 </div>
-                
+
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Webhook Retries</p>
-                    <p className="text-lg font-bold">
-                      {gateway.configuration.webhookRetries}
-                    </p>
+                    <p className="text-lg font-bold">{gateway.configuration.webhookRetries}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Settlement Delay</p>
-                    <p className="text-lg font-bold">
-                      {gateway.configuration.settlementDelay}h
-                    </p>
+                    <p className="text-lg font-bold">{gateway.configuration.settlementDelay}h</p>
                   </div>
                 </div>
               </CardContent>
@@ -526,7 +533,10 @@ export function GatewayDetailsModal({
                 {recentTransactions.length > 0 ? (
                   <div className="space-y-3">
                     {recentTransactions.map((transaction) => (
-                      <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={transaction.id}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div className="min-w-0 flex-1 mr-2">
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-primary"></div>
@@ -539,13 +549,16 @@ export function GatewayDetailsModal({
                           </div>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-sm font-bold">
-                            {formatCurrency(transaction.amount)}
-                          </p>
-                          <Badge variant={
-                            transaction.status === "completed" ? "default" :
-                            transaction.status === "failed" ? "destructive" : "secondary"
-                          }>
+                          <p className="text-sm font-bold">{formatCurrency(transaction.amount)}</p>
+                          <Badge
+                            variant={
+                              transaction.status === "completed"
+                                ? "default"
+                                : transaction.status === "failed"
+                                  ? "destructive"
+                                  : "secondary"
+                            }
+                          >
                             {transaction.status}
                           </Badge>
                         </div>
@@ -577,18 +590,24 @@ export function GatewayDetailsModal({
                 {recentTestResults.length > 0 ? (
                   <div className="space-y-3">
                     {recentTestResults.map((test, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div className="min-w-0 flex-1 mr-2">
                           <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              test.status === "success" ? "bg-green-500" :
-                              test.status === "failed" ? "bg-red-500" : "bg-yellow-500"
-                            }`}></div>
+                            <div
+                              className={`w-2 h-2 rounded-full ${
+                                test.status === "success"
+                                  ? "bg-green-500"
+                                  : test.status === "failed"
+                                    ? "bg-red-500"
+                                    : "bg-yellow-500"
+                              }`}
+                            ></div>
                             <div>
                               <p className="text-sm font-medium">{test.testType}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {test.message}
-                              </p>
+                              <p className="text-xs text-muted-foreground">{test.message}</p>
                             </div>
                           </div>
                         </div>
@@ -596,10 +615,15 @@ export function GatewayDetailsModal({
                           <p className="text-xs text-muted-foreground">
                             {formatDistanceToNow(test.testedAt, { addSuffix: true })}
                           </p>
-                          <Badge variant={
-                            test.status === "success" ? "default" :
-                            test.status === "failed" ? "destructive" : "secondary"
-                          }>
+                          <Badge
+                            variant={
+                              test.status === "success"
+                                ? "default"
+                                : test.status === "failed"
+                                  ? "destructive"
+                                  : "secondary"
+                            }
+                          >
                             {test.status}
                           </Badge>
                         </div>
@@ -621,24 +645,15 @@ export function GatewayDetailsModal({
         </Tabs>
 
         <div className="flex justify-end space-x-2 pt-6 border-t">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>
-          <Button
-            onClick={handleTest}
-            disabled={testing}
-          >
+          <Button onClick={handleTest} disabled={testing}>
             <TestTube className="mr-2 h-4 w-4" />
             {testing ? "Testing..." : "Test Connection"}
           </Button>
           {!gateway.isDefault && (
-            <Button
-              variant="outline"
-              onClick={handleSetDefault}
-            >
+            <Button variant="outline" onClick={handleSetDefault}>
               <Star className="mr-2 h-4 w-4" />
               Set as Default
             </Button>

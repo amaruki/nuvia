@@ -1,3 +1,3 @@
 export default function AnalyticsCustom() {
-  return <h1>AnalyticsCustom page</h1>
+  return <h1>AnalyticsCustom page</h1>;
 }

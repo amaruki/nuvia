@@ -151,7 +151,11 @@ export default function FinanceDonations() {
             <RefreshCw className="mr-2 h-4 w-4" />
             <span className="hidden sm:inline">Refresh</span>
           </Button>
-          <Button size="sm" className="flex-1 sm:flex-none" onClick={() => setShowAddDonation(true)}>
+          <Button
+            size="sm"
+            className="flex-1 sm:flex-none"
+            onClick={() => setShowAddDonation(true)}
+          >
             <Plus className="mr-2 h-4 w-4" />
             <span className="hidden sm:inline">Add Donation</span>
             <span className="sm:hidden">Add</span>
@@ -173,16 +177,20 @@ export default function FinanceDonations() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="donations" className="text-xs sm:text-sm py-2 px-2">All Donations</TabsTrigger>
-          <TabsTrigger value="campaigns" className="text-xs sm:text-sm py-2 px-2">Campaigns</TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">Analytics</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="donations" className="text-xs sm:text-sm py-2 px-2">
+            All Donations
+          </TabsTrigger>
+          <TabsTrigger value="campaigns" className="text-xs sm:text-sm py-2 px-2">
+            Campaigns
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">
+            Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -196,27 +204,22 @@ export default function FinanceDonations() {
               <CardContent>
                 <div className="space-y-3">
                   {donations.slice(0, 5).map((donation) => (
-                    <div
-                      key={donation.id}
-                      className="flex items-center justify-between"
-                    >
+                    <div key={donation.id} className="flex items-center justify-between">
                       <div className="min-w-0 flex-1 mr-2">
                         <p className="text-sm font-medium truncate">{donation.donorName}</p>
                         <p className="text-xs text-muted-foreground truncate">
-                          {donation.donorType} • {donation.donationType.replace('_', ' ')}
+                          {donation.donorType} • {donation.donationType.replace("_", " ")}
                         </p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-medium">
-                          {formatCurrency(donation.amount)}
-                        </p>
+                        <p className="text-sm font-medium">{formatCurrency(donation.amount)}</p>
                         <Badge
                           variant={
                             donation.status === "completed"
                               ? "default"
                               : donation.status === "failed"
-                              ? "destructive"
-                              : "secondary"
+                                ? "destructive"
+                                : "secondary"
                           }
                           className="text-xs"
                         >
@@ -233,15 +236,14 @@ export default function FinanceDonations() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base sm:text-lg">Top Campaigns</CardTitle>
-                <CardDescription className="text-sm">Best performing fundraising campaigns</CardDescription>
+                <CardDescription className="text-sm">
+                  Best performing fundraising campaigns
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {campaigns.slice(0, 5).map((campaign) => (
-                    <div
-                      key={campaign.id}
-                      className="flex items-center justify-between"
-                    >
+                    <div key={campaign.id} className="flex items-center justify-between">
                       <div className="min-w-0 flex-1 mr-2">
                         <p className="text-sm font-medium truncate">{campaign.name}</p>
                         <p className="text-xs text-muted-foreground truncate">
@@ -279,12 +281,8 @@ export default function FinanceDonations() {
                         <TrendingUp className="h-4 w-4 text-muted-foreground shrink-0" />
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-medium">
-                          {formatCurrency(month.amount)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {month.count} donations
-                        </p>
+                        <p className="text-sm font-medium">{formatCurrency(month.amount)}</p>
+                        <p className="text-xs text-muted-foreground">{month.count} donations</p>
                       </div>
                     </div>
                   ))}
@@ -323,12 +321,16 @@ export default function FinanceDonations() {
                     <div>
                       <div className="flex justify-between text-sm mb-2">
                         <span>Progress</span>
-                        <span>{Math.round((campaign.raisedAmount / campaign.goalAmount) * 100)}%</span>
+                        <span>
+                          {Math.round((campaign.raisedAmount / campaign.goalAmount) * 100)}%
+                        </span>
                       </div>
                       <div className="w-full bg-secondary rounded-full h-2">
                         <div
                           className="bg-primary h-2 rounded-full"
-                          style={{ width: `${Math.min((campaign.raisedAmount / campaign.goalAmount) * 100, 100)}%` }}
+                          style={{
+                            width: `${Math.min((campaign.raisedAmount / campaign.goalAmount) * 100, 100)}%`,
+                          }}
                         ></div>
                       </div>
                     </div>
@@ -343,7 +345,9 @@ export default function FinanceDonations() {
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">End Date</span>
                       <span className="font-medium">
-                        {campaign.endDate ? new Date(campaign.endDate).toLocaleDateString() : "Ongoing"}
+                        {campaign.endDate
+                          ? new Date(campaign.endDate).toLocaleDateString()
+                          : "Ongoing"}
                       </span>
                     </div>
                   </div>
@@ -365,22 +369,18 @@ export default function FinanceDonations() {
                 <CardContent>
                   <div className="space-y-3">
                     {statistics.donorTypeBreakdown.map((donorType, index) => (
-                      <div
-                        key={donorType.donorType}
-                        className="flex items-center justify-between"
-                      >
+                      <div key={donorType.donorType} className="flex items-center justify-between">
                         <div className="min-w-0 flex-1 mr-2">
-                          <p className="text-sm font-medium capitalize truncate">{donorType.donorType}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {donorType.count} donors
+                          <p className="text-sm font-medium capitalize truncate">
+                            {donorType.donorType}
                           </p>
+                          <p className="text-xs text-muted-foreground">{donorType.count} donors</p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-sm font-medium">
-                            {formatCurrency(donorType.amount)}
-                          </p>
+                          <p className="text-sm font-medium">{formatCurrency(donorType.amount)}</p>
                           <p className="text-xs text-muted-foreground">
-                            {Math.round((donorType.amount / statistics.totalAmount) * 100)}% of total
+                            {Math.round((donorType.amount / statistics.totalAmount) * 100)}% of
+                            total
                           </p>
                         </div>
                       </div>
@@ -414,11 +414,10 @@ export default function FinanceDonations() {
                             </p>
                           </div>
                           <div className="text-right shrink-0">
-                            <p className="text-sm font-medium">
-                              {formatCurrency(campaign.amount)}
-                            </p>
+                            <p className="text-sm font-medium">{formatCurrency(campaign.amount)}</p>
                             <p className="text-xs text-muted-foreground">
-                              {Math.round((campaign.amount / statistics.totalAmount) * 100)}% of total
+                              {Math.round((campaign.amount / statistics.totalAmount) * 100)}% of
+                              total
                             </p>
                           </div>
                         </div>

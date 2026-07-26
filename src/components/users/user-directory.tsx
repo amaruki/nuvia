@@ -1,19 +1,30 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { UserCard } from "./user-card"
-import { UserTable } from "./user-table"
-import { UserStats } from "./user-stats"
-import { UserFilter } from "./user-filter"
-import { UserActions } from "./user-actions"
-import { UserProfile, UserFilter as UserFilterType, UserSort, UserStats as UserStatsType } from "@/types/user-management.types"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { EmptyState } from "@/components/ui/empty-state"
-import { Separator } from "@/components/ui/separator"
-import LoadingSkeleton  from "@/components/ui/loading-skeleton"
+import { useState } from "react";
+import { UserCard } from "./user-card";
+import { UserTable } from "./user-table";
+import { UserStats } from "./user-stats";
+import { UserFilter } from "./user-filter";
+import { UserActions } from "./user-actions";
+import {
+  UserProfile,
+  UserFilter as UserFilterType,
+  UserSort,
+  UserStats as UserStatsType,
+} from "@/types/user-management.types";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Separator } from "@/components/ui/separator";
+import LoadingSkeleton from "@/components/ui/loading-skeleton";
 import {
   Users,
   ArrowUpDown,
@@ -24,22 +35,22 @@ import {
   X,
   Loader2,
   Search,
-  Settings
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+  Settings,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface UserDirectoryProps {
-  users: UserProfile[]
-  total: number
-  stats: UserStatsType
-  filters: UserFilterType
-  sort: UserSort
-  isLoading: boolean
-  onFilterChange: (filters: UserFilterType) => void
-  onSortChange: (sort: UserSort) => void
-  onClearFilters?: () => void
-  currentUserRole?: string
-  className?: string
+  users: UserProfile[];
+  total: number;
+  stats: UserStatsType;
+  filters: UserFilterType;
+  sort: UserSort;
+  isLoading: boolean;
+  onFilterChange: (filters: UserFilterType) => void;
+  onSortChange: (sort: UserSort) => void;
+  onClearFilters?: () => void;
+  currentUserRole?: string;
+  className?: string;
 }
 
 const SORT_OPTIONS = [
@@ -52,12 +63,12 @@ const SORT_OPTIONS = [
   { value: "status-asc", label: "Status ↑", icon: "🔵" },
   { value: "status-desc", label: "Status ↓", icon: "🔵" },
   { value: "lastLoginAt-desc", label: "Recent Login", icon: "🕐" },
-  { value: "lastLoginAt-asc", label: "Last Login", icon: "🕐" }
-]
+  { value: "lastLoginAt-asc", label: "Last Login", icon: "🕐" },
+];
 
 function parseSortValue(value: string): UserSort {
-  const [field, direction] = value.split("-") as [UserSort["field"], "asc" | "desc"]
-  return { field, direction }
+  const [field, direction] = value.split("-") as [UserSort["field"], "asc" | "desc"];
+  return { field, direction };
 }
 
 export function UserDirectory({
@@ -71,53 +82,49 @@ export function UserDirectory({
   onSortChange,
   onClearFilters,
   currentUserRole,
-  className
+  className,
 }: UserDirectoryProps) {
-  const [isGridView, setIsGridView] = useState(true)
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-  const [showFilters, setShowFilters] = useState(false)
+  const [isGridView, setIsGridView] = useState(true);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
 
   const handleSortChange = (value: string) => {
-    onSortChange(parseSortValue(value))
-  }
+    onSortChange(parseSortValue(value));
+  };
 
   const getSortValue = () => {
-    return `${sort.field}-${sort.direction}`
-  }
+    return `${sort.field}-${sort.direction}`;
+  };
 
   const getActiveFiltersCount = () => {
-    let count = 0
-    if (filters.search) count++
-    if (filters.roles?.length) count++
-    if (filters.statuses?.length) count++
-    if (filters.authStatuses?.length) count++
-    if (filters.emailVerified !== undefined) count++
-    if (filters.phoneVerified !== undefined) count++
-    if (filters.locations?.length) count++
-    if (filters.registrationDateRange) count++
-    if (filters.lastLoginRange) count++
-    return count
-  }
+    let count = 0;
+    if (filters.search) count++;
+    if (filters.roles?.length) count++;
+    if (filters.statuses?.length) count++;
+    if (filters.authStatuses?.length) count++;
+    if (filters.emailVerified !== undefined) count++;
+    if (filters.phoneVerified !== undefined) count++;
+    if (filters.locations?.length) count++;
+    if (filters.registrationDateRange) count++;
+    if (filters.lastLoginRange) count++;
+    return count;
+  };
 
-  const activeFiltersCount = getActiveFiltersCount()
+  const activeFiltersCount = getActiveFiltersCount();
 
   const handleUserSelect = (userId: string, checked: boolean) => {
-    setSelectedUsers(prev =>
-      checked
-        ? [...prev, userId]
-        : prev.filter(id => id !== userId)
-    )
-  }
+    setSelectedUsers((prev) => (checked ? [...prev, userId] : prev.filter((id) => id !== userId)));
+  };
 
   const handleSelectAll = (checked: boolean) => {
-    setSelectedUsers(checked ? users.map(user => user.id) : [])
-  }
+    setSelectedUsers(checked ? users.map((user) => user.id) : []);
+  };
 
   const handleClearSelection = () => {
-    setSelectedUsers([])
-  }
+    setSelectedUsers([]);
+  };
 
-  const isAdmin = currentUserRole === "admin" || currentUserRole === "moderator"
+  const isAdmin = currentUserRole === "admin" || currentUserRole === "moderator";
 
   if (isLoading && users.length === 0) {
     return (
@@ -179,7 +186,7 @@ export function UserDirectory({
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -194,7 +201,7 @@ export function UserDirectory({
             <div>
               <h2 className="text-2xl font-bold tracking-tight">User Directory</h2>
               <p className="text-sm text-muted-foreground">
-                {total.toLocaleString()} {total === 1 ? 'user' : 'users'} total
+                {total.toLocaleString()} {total === 1 ? "user" : "users"} total
               </p>
             </div>
           </div>
@@ -256,10 +263,7 @@ export function UserDirectory({
                 variant={isGridView ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setIsGridView(true)}
-                className={cn(
-                  "h-10 px-3 rounded-r-none border-r",
-                  isGridView && "shadow-sm"
-                )}
+                className={cn("h-10 px-3 rounded-r-none border-r", isGridView && "shadow-sm")}
                 aria-label="Grid view"
               >
                 <Grid3X3 className="size-4 mr-2" />
@@ -269,10 +273,7 @@ export function UserDirectory({
                 variant={!isGridView ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setIsGridView(false)}
-                className={cn(
-                  "h-10 px-3 rounded-l-none",
-                  !isGridView && "shadow-sm"
-                )}
+                className={cn("h-10 px-3 rounded-l-none", !isGridView && "shadow-sm")}
                 aria-label="Table view"
               >
                 <List className="size-4 mr-2" />
@@ -343,11 +344,7 @@ export function UserDirectory({
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">Filters</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowFilters(false)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setShowFilters(false)}>
                 <X className="size-4" />
               </Button>
             </div>
@@ -371,11 +368,13 @@ export function UserDirectory({
 
       {/* User Grid/Table */}
       {users.length > 0 ? (
-        <div className={cn(
-          isGridView
-            ? "grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            : "space-y-0"
-        )}>
+        <div
+          className={cn(
+            isGridView
+              ? "grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              : "space-y-0",
+          )}
+        >
           {isGridView ? (
             // Grid View
             users.map((user) => (
@@ -451,5 +450,5 @@ export function UserDirectory({
         </div>
       )}
     </div>
-  )
+  );
 }

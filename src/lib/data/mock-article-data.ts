@@ -1,7 +1,7 @@
-import { 
-  Article, 
-  ArticleStatistics, 
-  ArticleAuthor, 
+import {
+  Article,
+  ArticleStatistics,
+  ArticleAuthor,
   ArticleTag,
   ArticleType,
   ArticleCategory,
@@ -12,7 +12,7 @@ import {
   ARTICLE_CATEGORIES,
   ARTICLE_STATUSES,
   ARTICLE_DIFFICULTIES,
-  ARTICLE_FORMATS
+  ARTICLE_FORMATS,
 } from "@/types/article.types";
 
 // Mock authors
@@ -26,7 +26,7 @@ const mockAuthors: ArticleAuthor[] = [
     role: "Research Director",
     chapter: "San Francisco Bay Area",
     committee: "Technology Committee",
-    expertise: ["artificial intelligence", "machine learning", "data science"]
+    expertise: ["artificial intelligence", "machine learning", "data science"],
   },
   {
     id: "author_2",
@@ -37,7 +37,7 @@ const mockAuthors: ArticleAuthor[] = [
     role: "Business Analyst",
     chapter: "New York Metro",
     committee: "Business Development",
-    expertise: ["business strategy", "management", "digital transformation"]
+    expertise: ["business strategy", "management", "digital transformation"],
   },
   {
     id: "author_3",
@@ -48,7 +48,7 @@ const mockAuthors: ArticleAuthor[] = [
     role: "Education Lead",
     chapter: "Austin",
     committee: "Education Committee",
-    expertise: ["education", "curriculum development", "online learning"]
+    expertise: ["education", "curriculum development", "online learning"],
   },
   {
     id: "author_4",
@@ -59,7 +59,7 @@ const mockAuthors: ArticleAuthor[] = [
     role: "Industry Analyst",
     chapter: "Chicago",
     committee: "Research Committee",
-    expertise: ["industry analysis", "market research", "trend forecasting"]
+    expertise: ["industry analysis", "market research", "trend forecasting"],
   },
   {
     id: "author_5",
@@ -69,8 +69,8 @@ const mockAuthors: ArticleAuthor[] = [
     bio: "Chapter president and community organizer",
     role: "Chapter President",
     chapter: "Seattle",
-    expertise: ["community management", "leadership", "member engagement"]
-  }
+    expertise: ["community management", "leadership", "member engagement"],
+  },
 ];
 
 // Mock tags
@@ -89,7 +89,7 @@ const mockTags: ArticleTag[] = [
   { id: "tag_12", name: "career-development", color: "#F59E0B", count: 15 },
   { id: "tag_13", name: "community", color: "#8B5CF6", count: 29 },
   { id: "tag_14", name: "technology", color: "#3B82F6", count: 33 },
-  { id: "tag_15", name: "tutorial", color: "#10B981", count: 26 }
+  { id: "tag_15", name: "tutorial", color: "#10B981", count: 26 },
 ];
 
 // Mock articles
@@ -98,8 +98,10 @@ const mockArticles: Article[] = [
     id: "article_1",
     title: "Getting Started with React Hooks: A Comprehensive Tutorial",
     slug: "getting-started-react-hooks-tutorial",
-    excerpt: "Learn everything you need to know about React Hooks with this comprehensive tutorial covering useState, useEffect, and custom hooks.",
-    content: "React Hooks revolutionized how we write React components. In this comprehensive tutorial, we'll explore the fundamentals of React Hooks, starting with the basic hooks like useState and useEffect, then moving on to more advanced concepts like custom hooks and performance optimization. You'll learn through practical examples and real-world scenarios...",
+    excerpt:
+      "Learn everything you need to know about React Hooks with this comprehensive tutorial covering useState, useEffect, and custom hooks.",
+    content:
+      "React Hooks revolutionized how we write React components. In this comprehensive tutorial, we'll explore the fundamentals of React Hooks, starting with the basic hooks like useState and useEffect, then moving on to more advanced concepts like custom hooks and performance optimization. You'll learn through practical examples and real-world scenarios...",
     type: "tutorial",
     category: "technology",
     status: "published",
@@ -117,9 +119,10 @@ const mockArticles: Article[] = [
     estimatedReadingSpeed: 200,
     seo: {
       title: "Getting Started with React Hooks: Complete Tutorial | Nuvia",
-      description: "Comprehensive React Hooks tutorial covering useState, useEffect, and custom hooks with practical examples.",
+      description:
+        "Comprehensive React Hooks tutorial covering useState, useEffect, and custom hooks with practical examples.",
       keywords: ["React", "React Hooks", "useState", "useEffect", "tutorial", "frontend"],
-      ogImage: "/images/react-hooks-og.jpg"
+      ogImage: "/images/react-hooks-og.jpg",
     },
     metrics: {
       views: 2450,
@@ -131,7 +134,7 @@ const mockArticles: Article[] = [
       averageReadTime: 12.5,
       completionRate: 77.2,
       engagementScore: 85,
-      bounceRate: 22.8
+      bounceRate: 22.8,
     },
     visibility: "public",
     version: 1,
@@ -141,14 +144,16 @@ const mockArticles: Article[] = [
     downloadEnabled: true,
     isFeatured: true,
     isPinned: false,
-    priority: 8
+    priority: 8,
   },
   {
     id: "article_2",
     title: "The Future of Remote Work: Business Strategy Insights",
     slug: "future-remote-work-business-strategy",
-    excerpt: "Explore how remote work is transforming business strategies and what organizations need to do to adapt to this new reality.",
-    content: "Remote work has fundamentally transformed how businesses operate. This comprehensive analysis explores the latest trends in remote work, from technology infrastructure to cultural changes. We examine successful case studies, identify common challenges, and provide actionable strategies for organizations looking to optimize their remote work policies...",
+    excerpt:
+      "Explore how remote work is transforming business strategies and what organizations need to do to adapt to this new reality.",
+    content:
+      "Remote work has fundamentally transformed how businesses operate. This comprehensive analysis explores the latest trends in remote work, from technology infrastructure to cultural changes. We examine successful case studies, identify common challenges, and provide actionable strategies for organizations looking to optimize their remote work policies...",
     type: "opinion",
     category: "business",
     status: "published",
@@ -164,8 +169,9 @@ const mockArticles: Article[] = [
     estimatedReadingSpeed: 200,
     seo: {
       title: "Future of Remote Work: Business Strategy | Nuvia Insights",
-      description: "Business strategy insights on the future of remote work and organizational adaptation.",
-      keywords: ["remote work", "business strategy", "future of work", "organizational change"]
+      description:
+        "Business strategy insights on the future of remote work and organizational adaptation.",
+      keywords: ["remote work", "business strategy", "future of work", "organizational change"],
     },
     metrics: {
       views: 1680,
@@ -177,7 +183,7 @@ const mockArticles: Article[] = [
       averageReadTime: 10.2,
       completionRate: 79.8,
       engagementScore: 78,
-      bounceRate: 20.2
+      bounceRate: 20.2,
     },
     visibility: "members_only",
     version: 1,
@@ -187,14 +193,16 @@ const mockArticles: Article[] = [
     downloadEnabled: true,
     isFeatured: false,
     isPinned: false,
-    priority: 5
+    priority: 5,
   },
   {
     id: "article_3",
     title: "Building Effective Online Learning Communities: Best Practices Guide",
     slug: "effective-online-learning-communities-guide",
-    excerpt: "A comprehensive guide to creating and managing thriving online learning communities that drive engagement and knowledge sharing.",
-    content: "Online learning communities are essential for modern education. This guide covers everything from platform selection and community design to engagement strategies and measurement. Learn how to create spaces where members actively participate, share knowledge, and support each other's learning journey...",
+    excerpt:
+      "A comprehensive guide to creating and managing thriving online learning communities that drive engagement and knowledge sharing.",
+    content:
+      "Online learning communities are essential for modern education. This guide covers everything from platform selection and community design to engagement strategies and measurement. Learn how to create spaces where members actively participate, share knowledge, and support each other's learning journey...",
     type: "guide",
     category: "education",
     status: "published",
@@ -210,8 +218,9 @@ const mockArticles: Article[] = [
     estimatedReadingSpeed: 200,
     seo: {
       title: "Building Online Learning Communities: Best Practices | Nuvia",
-      description: "Comprehensive guide to creating effective online learning communities with proven strategies.",
-      keywords: ["online learning", "community building", "education", "best practices"]
+      description:
+        "Comprehensive guide to creating effective online learning communities with proven strategies.",
+      keywords: ["online learning", "community building", "education", "best practices"],
     },
     metrics: {
       views: 1920,
@@ -223,7 +232,7 @@ const mockArticles: Article[] = [
       averageReadTime: 14.8,
       completionRate: 81.3,
       engagementScore: 82,
-      bounceRate: 18.7
+      bounceRate: 18.7,
     },
     visibility: "public",
     version: 1,
@@ -233,14 +242,16 @@ const mockArticles: Article[] = [
     downloadEnabled: true,
     isFeatured: true,
     isPinned: true,
-    priority: 7
+    priority: 7,
   },
   {
     id: "article_4",
     title: "Industry Trends Report: AI Adoption in 2024",
     slug: "ai-adoption-trends-2024-report",
-    excerpt: "Comprehensive analysis of artificial intelligence adoption trends across industries in 2024 with key insights and predictions.",
-    content: "Our annual AI adoption report provides deep insights into how organizations are implementing artificial intelligence across different sectors. This 2024 edition covers adoption rates, implementation challenges, ROI measurements, and future predictions based on survey data from over 500 organizations...",
+    excerpt:
+      "Comprehensive analysis of artificial intelligence adoption trends across industries in 2024 with key insights and predictions.",
+    content:
+      "Our annual AI adoption report provides deep insights into how organizations are implementing artificial intelligence across different sectors. This 2024 edition covers adoption rates, implementation challenges, ROI measurements, and future predictions based on survey data from over 500 organizations...",
     type: "research_summary",
     category: "research",
     status: "published",
@@ -256,8 +267,8 @@ const mockArticles: Article[] = [
         name: "AI-Adoption-2024-Full-Report.pdf",
         url: "/files/ai-adoption-2024.pdf",
         size: 3456789,
-        type: "application/pdf"
-      }
+        type: "application/pdf",
+      },
     ],
     publishedAt: new Date("2024-11-01T08:00:00Z"),
     lastModified: new Date("2024-10-31T17:30:00Z"),
@@ -267,7 +278,7 @@ const mockArticles: Article[] = [
     seo: {
       title: "AI Adoption Trends 2024: Industry Report | Nuvia Research",
       description: "Comprehensive analysis of AI adoption trends across industries in 2024.",
-      keywords: ["AI adoption", "artificial intelligence", "industry trends", "2024 report"]
+      keywords: ["AI adoption", "artificial intelligence", "industry trends", "2024 report"],
     },
     metrics: {
       views: 2890,
@@ -279,7 +290,7 @@ const mockArticles: Article[] = [
       averageReadTime: 18.5,
       completionRate: 77.2,
       engagementScore: 88,
-      bounceRate: 22.8
+      bounceRate: 22.8,
     },
     visibility: "premium_only",
     version: 1,
@@ -289,14 +300,16 @@ const mockArticles: Article[] = [
     downloadEnabled: true,
     isFeatured: true,
     isPinned: false,
-    priority: 9
+    priority: 9,
   },
   {
     id: "article_5",
     title: "Member Spotlight: From Junior Developer to Tech Lead",
     slug: "member-spotlight-junior-to-tech-lead",
-    excerpt: "An inspiring interview with Sarah Chen about her journey from junior developer to technology team lead in just 5 years.",
-    content: "Sarah Chen's career journey is nothing short of inspiring. Starting as a junior developer with no formal computer science degree, she worked her way up to become a technology team lead at a major tech company. In this exclusive interview, Sarah shares her strategies for continuous learning, overcoming imposter syndrome, and leading technical teams effectively...",
+    excerpt:
+      "An inspiring interview with Sarah Chen about her journey from junior developer to technology team lead in just 5 years.",
+    content:
+      "Sarah Chen's career journey is nothing short of inspiring. Starting as a junior developer with no formal computer science degree, she worked her way up to become a technology team lead at a major tech company. In this exclusive interview, Sarah shares her strategies for continuous learning, overcoming imposter syndrome, and leading technical teams effectively...",
     type: "interview",
     category: "member_stories",
     status: "published",
@@ -313,8 +326,9 @@ const mockArticles: Article[] = [
     estimatedReadingSpeed: 200,
     seo: {
       title: "Member Spotlight: Junior Developer to Tech Lead | Nuvia",
-      description: "Interview with Sarah Chen about her career journey from junior developer to tech lead.",
-      keywords: ["career development", "tech lead", "interview", "member story"]
+      description:
+        "Interview with Sarah Chen about her career journey from junior developer to tech lead.",
+      keywords: ["career development", "tech lead", "interview", "member story"],
     },
     metrics: {
       views: 1340,
@@ -326,7 +340,7 @@ const mockArticles: Article[] = [
       averageReadTime: 8.5,
       completionRate: 83.6,
       engagementScore: 76,
-      bounceRate: 16.4
+      bounceRate: 16.4,
     },
     visibility: "public",
     version: 1,
@@ -336,14 +350,16 @@ const mockArticles: Article[] = [
     downloadEnabled: false,
     isFeatured: false,
     isPinned: false,
-    priority: 4
+    priority: 4,
   },
   {
     id: "article_6",
     title: "10 Best Practices for Remote Team Management",
     slug: "best-practices-remote-team-management",
-    excerpt: "Essential strategies and best practices for effectively managing remote teams in today's distributed work environment.",
-    content: "Managing remote teams requires a different approach than traditional office management. This comprehensive guide covers 10 essential practices that successful remote team managers use to maintain productivity, engagement, and team cohesion. From communication strategies to performance measurement, learn proven techniques...",
+    excerpt:
+      "Essential strategies and best practices for effectively managing remote teams in today's distributed work environment.",
+    content:
+      "Managing remote teams requires a different approach than traditional office management. This comprehensive guide covers 10 essential practices that successful remote team managers use to maintain productivity, engagement, and team cohesion. From communication strategies to performance measurement, learn proven techniques...",
     type: "opinion",
     category: "best_practices",
     status: "review",
@@ -359,8 +375,9 @@ const mockArticles: Article[] = [
     estimatedReadingSpeed: 200,
     seo: {
       title: "10 Best Practices for Remote Team Management | Nuvia",
-      description: "Essential strategies for effectively managing remote teams in distributed environments.",
-      keywords: ["remote management", "team leadership", "best practices", "distributed teams"]
+      description:
+        "Essential strategies for effectively managing remote teams in distributed environments.",
+      keywords: ["remote management", "team leadership", "best practices", "distributed teams"],
     },
     metrics: {
       views: 0,
@@ -372,7 +389,7 @@ const mockArticles: Article[] = [
       averageReadTime: 0,
       completionRate: 0,
       engagementScore: 0,
-      bounceRate: 0
+      bounceRate: 0,
     },
     visibility: "public",
     version: 1,
@@ -382,14 +399,16 @@ const mockArticles: Article[] = [
     downloadEnabled: false,
     isFeatured: false,
     isPinned: false,
-    priority: 6
+    priority: 6,
   },
   {
     id: "article_7",
     title: "Seattle Chapter Launches Mentorship Program",
     slug: "seattle-chapter-mentorship-program",
-    excerpt: "Exciting news from our Seattle chapter as they launch an innovative mentorship program connecting experienced members with newcomers.",
-    content: "The Seattle chapter is proud to announce the launch of our new mentorship program designed to foster connections between experienced members and those new to our community. The program includes monthly meetups, skill-sharing workshops, and one-on-one mentoring sessions. Learn how you can participate as either a mentor or mentee...",
+    excerpt:
+      "Exciting news from our Seattle chapter as they launch an innovative mentorship program connecting experienced members with newcomers.",
+    content:
+      "The Seattle chapter is proud to announce the launch of our new mentorship program designed to foster connections between experienced members and those new to our community. The program includes monthly meetups, skill-sharing workshops, and one-on-one mentoring sessions. Learn how you can participate as either a mentor or mentee...",
     type: "news",
     category: "chapter_news",
     status: "published",
@@ -406,7 +425,7 @@ const mockArticles: Article[] = [
     seo: {
       title: "Seattle Chapter Mentorship Program | Nuvia News",
       description: "Seattle chapter launches innovative mentorship program for community members.",
-      keywords: ["Seattle chapter", "mentorship program", "community news", "member development"]
+      keywords: ["Seattle chapter", "mentorship program", "community news", "member development"],
     },
     metrics: {
       views: 789,
@@ -418,7 +437,7 @@ const mockArticles: Article[] = [
       averageReadTime: 6.8,
       completionRate: 81.8,
       engagementScore: 72,
-      bounceRate: 18.2
+      bounceRate: 18.2,
     },
     visibility: "chapter_only",
     allowedChapters: ["seattle"],
@@ -429,14 +448,16 @@ const mockArticles: Article[] = [
     downloadEnabled: true,
     isFeatured: false,
     isPinned: false,
-    priority: 3
+    priority: 3,
   },
   {
     id: "article_8",
     title: "Advanced Machine Learning Techniques for Community Analytics",
     slug: "advanced-ml-community-analytics",
-    excerpt: "Deep dive into sophisticated machine learning approaches for analyzing community engagement and predicting member behavior.",
-    content: "This advanced technical article explores cutting-edge machine learning techniques specifically applied to community analytics. We cover neural networks for engagement prediction, natural language processing for sentiment analysis, and clustering algorithms for member segmentation. Includes code examples and implementation strategies...",
+    excerpt:
+      "Deep dive into sophisticated machine learning approaches for analyzing community engagement and predicting member behavior.",
+    content:
+      "This advanced technical article explores cutting-edge machine learning techniques specifically applied to community analytics. We cover neural networks for engagement prediction, natural language processing for sentiment analysis, and clustering algorithms for member segmentation. Includes code examples and implementation strategies...",
     type: "tutorial",
     category: "technology",
     status: "scheduled",
@@ -452,8 +473,9 @@ const mockArticles: Article[] = [
     estimatedReadingSpeed: 200,
     seo: {
       title: "Advanced ML for Community Analytics | Nuvia Technical",
-      description: "Sophisticated machine learning techniques for community engagement analysis and prediction.",
-      keywords: ["machine learning", "community analytics", "neural networks", "NLP"]
+      description:
+        "Sophisticated machine learning techniques for community engagement analysis and prediction.",
+      keywords: ["machine learning", "community analytics", "neural networks", "NLP"],
     },
     metrics: {
       views: 0,
@@ -465,7 +487,7 @@ const mockArticles: Article[] = [
       averageReadTime: 0,
       completionRate: 0,
       engagementScore: 0,
-      bounceRate: 0
+      bounceRate: 0,
     },
     visibility: "premium_only",
     version: 1,
@@ -475,14 +497,16 @@ const mockArticles: Article[] = [
     downloadEnabled: true,
     isFeatured: false,
     isPinned: false,
-    priority: 7
+    priority: 7,
   },
   {
     id: "article_9",
     title: "Draft: Innovation Framework for Digital Communities",
     slug: "innovation-framework-digital-communities",
-    excerpt: "A structured approach to fostering innovation within digital community organizations and measuring its impact on growth.",
-    content: "This is a draft article exploring innovation frameworks specifically designed for digital communities. The content is still being developed and will include case studies, implementation guides, and measurement strategies for fostering innovation in online community settings...",
+    excerpt:
+      "A structured approach to fostering innovation within digital community organizations and measuring its impact on growth.",
+    content:
+      "This is a draft article exploring innovation frameworks specifically designed for digital communities. The content is still being developed and will include case studies, implementation guides, and measurement strategies for fostering innovation in online community settings...",
     type: "guide",
     category: "business",
     status: "draft",
@@ -496,8 +520,9 @@ const mockArticles: Article[] = [
     estimatedReadingSpeed: 200,
     seo: {
       title: "Innovation Framework for Digital Communities | Nuvia Draft",
-      description: "Structured approach to fostering innovation in digital community organizations.",
-      keywords: ["innovation", "digital communities", "framework", "strategy"]
+      description:
+        "Structured approach to fostering innovation in digital community organizations.",
+      keywords: ["innovation", "digital communities", "framework", "strategy"],
     },
     metrics: {
       views: 0,
@@ -509,7 +534,7 @@ const mockArticles: Article[] = [
       averageReadTime: 0,
       completionRate: 0,
       engagementScore: 0,
-      bounceRate: 0
+      bounceRate: 0,
     },
     visibility: "public",
     version: 1,
@@ -519,14 +544,16 @@ const mockArticles: Article[] = [
     downloadEnabled: false,
     isFeatured: false,
     isPinned: false,
-    priority: 2
+    priority: 2,
   },
   {
     id: "article_10",
     title: "Archived: 2023 Community Engagement Annual Report",
     slug: "2023-community-engagement-annual-report",
-    excerpt: "Complete annual report for 2023 including community engagement statistics, member participation metrics, and strategic achievements.",
-    content: "This archived report provides a comprehensive overview of our community's engagement performance in 2023. While some information may be outdated, it serves as an important historical record of our achievements, challenges, and growth patterns. The report includes detailed metrics on member participation, content engagement, event attendance, and community health indicators...",
+    excerpt:
+      "Complete annual report for 2023 including community engagement statistics, member participation metrics, and strategic achievements.",
+    content:
+      "This archived report provides a comprehensive overview of our community's engagement performance in 2023. While some information may be outdated, it serves as an important historical record of our achievements, challenges, and growth patterns. The report includes detailed metrics on member participation, content engagement, event attendance, and community health indicators...",
     type: "research_summary",
     category: "announcements",
     status: "archived",
@@ -542,8 +569,9 @@ const mockArticles: Article[] = [
     estimatedReadingSpeed: 200,
     seo: {
       title: "2023 Community Engagement Annual Report | Nuvia Archives",
-      description: "Complete annual report for 2023 with community engagement statistics and achievements.",
-      keywords: ["annual report", "2023", "community engagement", "archived"]
+      description:
+        "Complete annual report for 2023 with community engagement statistics and achievements.",
+      keywords: ["annual report", "2023", "community engagement", "archived"],
     },
     metrics: {
       views: 1560,
@@ -555,7 +583,7 @@ const mockArticles: Article[] = [
       averageReadTime: 20.5,
       completionRate: 78.8,
       engagementScore: 81,
-      bounceRate: 21.2
+      bounceRate: 21.2,
     },
     visibility: "public",
     version: 1,
@@ -565,18 +593,18 @@ const mockArticles: Article[] = [
     downloadEnabled: true,
     isFeatured: false,
     isPinned: false,
-    priority: 1
-  }
+    priority: 1,
+  },
 ];
 
 // Mock statistics
 const mockStatistics: ArticleStatistics = {
   totalArticles: mockArticles.length,
-  publishedArticles: mockArticles.filter(a => a.status === 'published').length,
-  draftArticles: mockArticles.filter(a => a.status === 'draft').length,
-  scheduledArticles: mockArticles.filter(a => a.status === 'scheduled').length,
-  archivedArticles: mockArticles.filter(a => a.status === 'archived').length,
-  
+  publishedArticles: mockArticles.filter((a) => a.status === "published").length,
+  draftArticles: mockArticles.filter((a) => a.status === "draft").length,
+  scheduledArticles: mockArticles.filter((a) => a.status === "scheduled").length,
+  archivedArticles: mockArticles.filter((a) => a.status === "archived").length,
+
   totalViews: mockArticles.reduce((sum, a) => sum + a.metrics.views, 0),
   totalReads: mockArticles.reduce((sum, a) => sum + a.metrics.reads, 0),
   totalShares: mockArticles.reduce((sum, a) => sum + a.metrics.shares, 0),
@@ -584,58 +612,72 @@ const mockStatistics: ArticleStatistics = {
   totalLikes: mockArticles.reduce((sum, a) => sum + a.metrics.likes, 0),
   totalBookmarks: mockArticles.reduce((sum, a) => sum + a.metrics.bookmarks, 0),
   averageEngagementScore: Math.round(
-    mockArticles.reduce((sum, a) => sum + a.metrics.engagementScore, 0) / mockArticles.length
+    mockArticles.reduce((sum, a) => sum + a.metrics.engagementScore, 0) / mockArticles.length,
   ),
   averageReadTime: Math.round(
-    mockArticles.reduce((sum, a) => sum + a.metrics.averageReadTime, 0) / mockArticles.length
+    mockArticles.reduce((sum, a) => sum + a.metrics.averageReadTime, 0) / mockArticles.length,
   ),
   averageCompletionRate: Math.round(
-    mockArticles.reduce((sum, a) => sum + a.metrics.completionRate, 0) / mockArticles.length
+    mockArticles.reduce((sum, a) => sum + a.metrics.completionRate, 0) / mockArticles.length,
   ),
-  
-  articlesByType: ARTICLE_TYPES.map(type => ({
+
+  articlesByType: ARTICLE_TYPES.map((type) => ({
     type,
-    count: mockArticles.filter(a => a.type === type).length,
-    views: mockArticles.filter(a => a.type === type).reduce((sum, a) => sum + a.metrics.views, 0),
-    reads: mockArticles.filter(a => a.type === type).reduce((sum, a) => sum + a.metrics.reads, 0),
+    count: mockArticles.filter((a) => a.type === type).length,
+    views: mockArticles.filter((a) => a.type === type).reduce((sum, a) => sum + a.metrics.views, 0),
+    reads: mockArticles.filter((a) => a.type === type).reduce((sum, a) => sum + a.metrics.reads, 0),
     engagement: Math.round(
-      mockArticles.filter(a => a.type === type).reduce((sum, a) => sum + a.metrics.engagementScore, 0) / 
-      Math.max(1, mockArticles.filter(a => a.type === type).length)
-    )
+      mockArticles
+        .filter((a) => a.type === type)
+        .reduce((sum, a) => sum + a.metrics.engagementScore, 0) /
+        Math.max(1, mockArticles.filter((a) => a.type === type).length),
+    ),
   })),
-  
-  articlesByCategory: ARTICLE_CATEGORIES.map(category => ({
+
+  articlesByCategory: ARTICLE_CATEGORIES.map((category) => ({
     category,
-    count: mockArticles.filter(a => a.category === category).length,
-    views: mockArticles.filter(a => a.category === category).reduce((sum, a) => sum + a.metrics.views, 0),
-    reads: mockArticles.filter(a => a.category === category).reduce((sum, a) => sum + a.metrics.reads, 0),
+    count: mockArticles.filter((a) => a.category === category).length,
+    views: mockArticles
+      .filter((a) => a.category === category)
+      .reduce((sum, a) => sum + a.metrics.views, 0),
+    reads: mockArticles
+      .filter((a) => a.category === category)
+      .reduce((sum, a) => sum + a.metrics.reads, 0),
     engagement: Math.round(
-      mockArticles.filter(a => a.category === category).reduce((sum, a) => sum + a.metrics.engagementScore, 0) / 
-      Math.max(1, mockArticles.filter(a => a.category === category).length)
-    )
+      mockArticles
+        .filter((a) => a.category === category)
+        .reduce((sum, a) => sum + a.metrics.engagementScore, 0) /
+        Math.max(1, mockArticles.filter((a) => a.category === category).length),
+    ),
   })),
-  
-  articlesByDifficulty: ARTICLE_DIFFICULTIES.map(difficulty => ({
+
+  articlesByDifficulty: ARTICLE_DIFFICULTIES.map((difficulty) => ({
     difficulty,
-    count: mockArticles.filter(a => a.difficulty === difficulty).length,
-    views: mockArticles.filter(a => a.difficulty === difficulty).reduce((sum, a) => sum + a.metrics.views, 0),
-    reads: mockArticles.filter(a => a.difficulty === difficulty).reduce((sum, a) => sum + a.metrics.reads, 0),
+    count: mockArticles.filter((a) => a.difficulty === difficulty).length,
+    views: mockArticles
+      .filter((a) => a.difficulty === difficulty)
+      .reduce((sum, a) => sum + a.metrics.views, 0),
+    reads: mockArticles
+      .filter((a) => a.difficulty === difficulty)
+      .reduce((sum, a) => sum + a.metrics.reads, 0),
     engagement: Math.round(
-      mockArticles.filter(a => a.difficulty === difficulty).reduce((sum, a) => sum + a.metrics.engagementScore, 0) / 
-      Math.max(1, mockArticles.filter(a => a.difficulty === difficulty).length)
-    )
+      mockArticles
+        .filter((a) => a.difficulty === difficulty)
+        .reduce((sum, a) => sum + a.metrics.engagementScore, 0) /
+        Math.max(1, mockArticles.filter((a) => a.difficulty === difficulty).length),
+    ),
   })),
-  
-  articlesByStatus: ARTICLE_STATUSES.map(status => ({
+
+  articlesByStatus: ARTICLE_STATUSES.map((status) => ({
     status,
-    count: mockArticles.filter(a => a.status === status).length
+    count: mockArticles.filter((a) => a.status === status).length,
   })),
-  
+
   topPerformingArticles: mockArticles
-    .filter(a => a.status === 'published')
+    .filter((a) => a.status === "published")
     .sort((a, b) => b.metrics.engagementScore - a.metrics.engagementScore)
     .slice(0, 5)
-    .map(a => ({
+    .map((a) => ({
       articleId: a.id,
       title: a.title,
       author: a.author.name,
@@ -644,9 +686,9 @@ const mockStatistics: ArticleStatistics = {
       engagementScore: a.metrics.engagementScore,
       completionRate: a.metrics.completionRate,
       type: a.type,
-      category: a.category
+      category: a.category,
     })),
-  
+
   recentActivity: [
     {
       id: "activity_1",
@@ -654,7 +696,7 @@ const mockStatistics: ArticleStatistics = {
       title: "10 Best Practices for Remote Team Management",
       action: "updated",
       author: "Michael Chen",
-      timestamp: new Date("2024-11-16T10:30:00Z")
+      timestamp: new Date("2024-11-16T10:30:00Z"),
     },
     {
       id: "activity_2",
@@ -662,7 +704,7 @@ const mockStatistics: ArticleStatistics = {
       title: "Innovation Framework for Digital Communities",
       action: "created",
       author: "Michael Chen",
-      timestamp: new Date("2024-11-16T09:45:00Z")
+      timestamp: new Date("2024-11-16T09:45:00Z"),
     },
     {
       id: "activity_3",
@@ -670,7 +712,7 @@ const mockStatistics: ArticleStatistics = {
       title: "Advanced Machine Learning Techniques for Community Analytics",
       action: "created",
       author: "Dr. Sarah Johnson",
-      timestamp: new Date("2024-11-15T11:20:00Z")
+      timestamp: new Date("2024-11-15T11:20:00Z"),
     },
     {
       id: "activity_4",
@@ -678,7 +720,7 @@ const mockStatistics: ArticleStatistics = {
       title: "Getting Started with React Hooks: A Comprehensive Tutorial",
       action: "published",
       author: "Dr. Sarah Johnson",
-      timestamp: new Date("2024-11-15T10:00:00Z")
+      timestamp: new Date("2024-11-15T10:00:00Z"),
     },
     {
       id: "activity_5",
@@ -686,10 +728,10 @@ const mockStatistics: ArticleStatistics = {
       title: "Seattle Chapter Launches Mentorship Program",
       action: "published",
       author: "Lisa Thompson",
-      timestamp: new Date("2024-11-12T16:00:00Z")
-    }
+      timestamp: new Date("2024-11-12T16:00:00Z"),
+    },
   ],
-  
+
   monthlyTrend: [
     {
       month: "November 2024",
@@ -697,7 +739,7 @@ const mockStatistics: ArticleStatistics = {
       articlesPublished: 3,
       totalViews: 6234,
       totalReads: 4890,
-      totalEngagement: 398
+      totalEngagement: 398,
     },
     {
       month: "October 2024",
@@ -705,7 +747,7 @@ const mockStatistics: ArticleStatistics = {
       articlesPublished: 2,
       totalViews: 4567,
       totalReads: 3678,
-      totalEngagement: 298
+      totalEngagement: 298,
     },
     {
       month: "September 2024",
@@ -713,7 +755,7 @@ const mockStatistics: ArticleStatistics = {
       articlesPublished: 4,
       totalViews: 5234,
       totalReads: 4123,
-      totalEngagement: 387
+      totalEngagement: 387,
     },
     {
       month: "August 2024",
@@ -721,7 +763,7 @@ const mockStatistics: ArticleStatistics = {
       articlesPublished: 3,
       totalViews: 5890,
       totalReads: 4678,
-      totalEngagement: 445
+      totalEngagement: 445,
     },
     {
       month: "July 2024",
@@ -729,7 +771,7 @@ const mockStatistics: ArticleStatistics = {
       articlesPublished: 4,
       totalViews: 5123,
       totalReads: 4012,
-      totalEngagement: 398
+      totalEngagement: 398,
     },
     {
       month: "June 2024",
@@ -737,10 +779,10 @@ const mockStatistics: ArticleStatistics = {
       articlesPublished: 2,
       totalViews: 4789,
       totalReads: 3789,
-      totalEngagement: 356
-    }
+      totalEngagement: 356,
+    },
   ],
-  
+
   readingPatterns: {
     peakReadingHours: [9, 10, 14, 19, 20, 21],
     averageSessionDuration: 12.5,
@@ -748,9 +790,9 @@ const mockStatistics: ArticleStatistics = {
     deviceBreakdown: {
       desktop: 65,
       mobile: 28,
-      tablet: 7
-    }
-  }
+      tablet: 7,
+    },
+  },
 };
 
 // Mock announcements (articles with category 'announcements')
@@ -759,8 +801,10 @@ const mockAnnouncements = [
     id: "announcement_1",
     title: "Community Platform Maintenance Scheduled",
     slug: "community-platform-maintenance-scheduled",
-    excerpt: "Scheduled maintenance for the community platform this weekend. Please save your work and log out before the maintenance window.",
-    content: "We will be performing scheduled maintenance on the community platform this weekend from Saturday 10 PM to Sunday 2 AM EST. During this time, the platform will be unavailable for all users. Please save any ongoing work and log out before the maintenance window begins. We apologize for any inconvenience and appreciate your patience as we work to improve our platform.",
+    excerpt:
+      "Scheduled maintenance for the community platform this weekend. Please save your work and log out before the maintenance window.",
+    content:
+      "We will be performing scheduled maintenance on the community platform this weekend from Saturday 10 PM to Sunday 2 AM EST. During this time, the platform will be unavailable for all users. Please save any ongoing work and log out before the maintenance window begins. We apologize for any inconvenience and appreciate your patience as we work to improve our platform.",
     type: "maintenance",
     category: "announcements",
     status: "published",
@@ -778,7 +822,7 @@ const mockAnnouncements = [
       title: "Community Platform Maintenance | Nuvia",
       description: "Scheduled maintenance announcement for Nuvia community platform",
       keywords: ["maintenance", "platform", "downtime", "update"],
-      ogImage: "/images/maintenance-og.jpg"
+      ogImage: "/images/maintenance-og.jpg",
     },
     metrics: {
       views: 1250,
@@ -790,7 +834,7 @@ const mockAnnouncements = [
       averageReadTime: 2.8,
       completionRate: 78.4,
       engagementScore: 82,
-      bounceRate: 21.6
+      bounceRate: 21.6,
     },
     visibility: "public",
     version: 1,
@@ -809,14 +853,16 @@ const mockAnnouncements = [
     sendEmailNotification: true,
     sendPushNotification: true,
     displayOnHomepage: true,
-    displayInDashboard: true
+    displayInDashboard: true,
   },
   {
     id: "announcement_2",
     title: "New Chapter Leadership Program Launch",
     slug: "new-chapter-leadership-program-launch",
-    excerpt: "Exciting news! We're launching a comprehensive chapter leadership development program to empower our local chapter leaders.",
-    content: "We are thrilled to announce the launch of our new Chapter Leadership Development Program! This comprehensive initiative is designed to empower our local chapter leaders with the skills, resources, and support they need to build thriving local communities. The program includes leadership training, resource sharing, best practices documentation, and mentorship opportunities. Applications are now open for chapter presidents, vice presidents, and committee chairs who want to take their leadership to the next level.",
+    excerpt:
+      "Exciting news! We're launching a comprehensive chapter leadership development program to empower our local chapter leaders.",
+    content:
+      "We are thrilled to announce the launch of our new Chapter Leadership Development Program! This comprehensive initiative is designed to empower our local chapter leaders with the skills, resources, and support they need to build thriving local communities. The program includes leadership training, resource sharing, best practices documentation, and mentorship opportunities. Applications are now open for chapter presidents, vice presidents, and committee chairs who want to take their leadership to the next level.",
     type: "feature",
     category: "announcements",
     status: "published",
@@ -834,7 +880,7 @@ const mockAnnouncements = [
       title: "Chapter Leadership Program Launch | Nuvia",
       description: "New chapter leadership development program announcement",
       keywords: ["leadership", "chapters", "development", "program"],
-      ogImage: "/images/leadership-og.jpg"
+      ogImage: "/images/leadership-og.jpg",
     },
     metrics: {
       views: 890,
@@ -846,7 +892,7 @@ const mockAnnouncements = [
       averageReadTime: 6.5,
       completionRate: 80.9,
       engagementScore: 78,
-      bounceRate: 19.1
+      bounceRate: 19.1,
     },
     visibility: "members_only",
     allowedRoles: ["chapter_admin", "chapter_president", "committee_chair"],
@@ -866,14 +912,16 @@ const mockAnnouncements = [
     sendEmailNotification: true,
     sendPushNotification: true,
     displayOnHomepage: false,
-    displayInDashboard: true
+    displayInDashboard: true,
   },
   {
     id: "announcement_3",
     title: "Security Update: Two-Factor Authentication Now Required",
     slug: "security-update-two-factor-authentication-required",
-    excerpt: "Important security update: Two-factor authentication is now required for all admin and staff accounts to enhance platform security.",
-    content: "As part of our ongoing commitment to platform security, we are implementing mandatory two-factor authentication (2FA) for all admin and staff accounts effective immediately. This additional security layer helps protect your accounts and our community data from unauthorized access. Please set up 2FA on your account before your next login. Step-by-step instructions are available in our help center. Contact support if you need assistance with the setup process.",
+    excerpt:
+      "Important security update: Two-factor authentication is now required for all admin and staff accounts to enhance platform security.",
+    content:
+      "As part of our ongoing commitment to platform security, we are implementing mandatory two-factor authentication (2FA) for all admin and staff accounts effective immediately. This additional security layer helps protect your accounts and our community data from unauthorized access. Please set up 2FA on your account before your next login. Step-by-step instructions are available in our help center. Contact support if you need assistance with the setup process.",
     type: "security",
     category: "announcements",
     status: "published",
@@ -891,7 +939,7 @@ const mockAnnouncements = [
       title: "Security Update: 2FA Required | Nuvia",
       description: "Two-factor authentication now required for admin accounts",
       keywords: ["security", "2FA", "authentication", "safety"],
-      ogImage: "/images/security-og.jpg"
+      ogImage: "/images/security-og.jpg",
     },
     metrics: {
       views: 2100,
@@ -903,7 +951,7 @@ const mockAnnouncements = [
       averageReadTime: 4.2,
       completionRate: 88.1,
       engagementScore: 91,
-      bounceRate: 11.9
+      bounceRate: 11.9,
     },
     visibility: "staff_only",
     allowedRoles: ["admin", "staff"],
@@ -923,14 +971,16 @@ const mockAnnouncements = [
     sendEmailNotification: true,
     sendPushNotification: true,
     displayOnHomepage: true,
-    displayInDashboard: true
+    displayInDashboard: true,
   },
   {
     id: "announcement_4",
     title: "Annual Community Awards Nominations Open",
     slug: "annual-community-awards-nominations-open",
-    excerpt: "Nominations are now open for our annual community awards! Help us recognize outstanding members and their contributions.",
-    content: "It's that time of year again! Nominations for our Annual Community Awards are now open. This is your opportunity to recognize and celebrate the outstanding members who have made significant contributions to our community. Awards categories include Member of the Year, Rising Star, Community Builder, Innovation Leader, and Lifetime Achievement. Submit your nominations by December 15th with a detailed description of the nominee's contributions and impact.",
+    excerpt:
+      "Nominations are now open for our annual community awards! Help us recognize outstanding members and their contributions.",
+    content:
+      "It's that time of year again! Nominations for our Annual Community Awards are now open. This is your opportunity to recognize and celebrate the outstanding members who have made significant contributions to our community. Awards categories include Member of the Year, Rising Star, Community Builder, Innovation Leader, and Lifetime Achievement. Submit your nominations by December 15th with a detailed description of the nominee's contributions and impact.",
     type: "celebration",
     category: "announcements",
     status: "published",
@@ -948,7 +998,7 @@ const mockAnnouncements = [
       title: "Community Awards Nominations Open | Nuvia",
       description: "Annual community awards nominations now open",
       keywords: ["awards", "nominations", "recognition", "celebration"],
-      ogImage: "/images/awards-og.jpg"
+      ogImage: "/images/awards-og.jpg",
     },
     metrics: {
       views: 1560,
@@ -960,7 +1010,7 @@ const mockAnnouncements = [
       averageReadTime: 5.1,
       completionRate: 85.9,
       engagementScore: 87,
-      bounceRate: 14.1
+      bounceRate: 14.1,
     },
     visibility: "public",
     version: 1,
@@ -979,14 +1029,16 @@ const mockAnnouncements = [
     sendEmailNotification: true,
     sendPushNotification: true,
     displayOnHomepage: true,
-    displayInDashboard: true
+    displayInDashboard: true,
   },
   {
     id: "announcement_5",
     title: "Emergency: Platform Downtime Resolved",
     slug: "emergency-platform-downtime-resolved",
-    excerpt: "Update: The platform downtime has been resolved. All services are now operational. Thank you for your patience.",
-    content: "Good news! The unexpected platform downtime we experienced earlier today has been fully resolved. All services are now operational and performing normally. We apologize for the disruption this caused to your activities. Our team has implemented additional monitoring to prevent similar issues in the future. Thank you for your patience and understanding during this outage.",
+    excerpt:
+      "Update: The platform downtime has been resolved. All services are now operational. Thank you for your patience.",
+    content:
+      "Good news! The unexpected platform downtime we experienced earlier today has been fully resolved. All services are now operational and performing normally. We apologize for the disruption this caused to your activities. Our team has implemented additional monitoring to prevent similar issues in the future. Thank you for your patience and understanding during this outage.",
     type: "emergency",
     category: "announcements",
     status: "published",
@@ -1004,7 +1056,7 @@ const mockAnnouncements = [
       title: "Platform Downtime Resolved | Nuvia",
       description: "Emergency announcement about platform downtime resolution",
       keywords: ["emergency", "downtime", "resolved", "operational"],
-      ogImage: "/images/emergency-og.jpg"
+      ogImage: "/images/emergency-og.jpg",
     },
     metrics: {
       views: 3200,
@@ -1016,7 +1068,7 @@ const mockAnnouncements = [
       averageReadTime: 1.8,
       completionRate: 90.3,
       engagementScore: 94,
-      bounceRate: 9.7
+      bounceRate: 9.7,
     },
     visibility: "public",
     version: 1,
@@ -1035,14 +1087,16 @@ const mockAnnouncements = [
     sendEmailNotification: true,
     sendPushNotification: true,
     displayOnHomepage: true,
-    displayInDashboard: true
+    displayInDashboard: true,
   },
   {
     id: "announcement_6",
     title: "Holiday Season: Special Membership Benefits",
     slug: "holiday-season-special-membership-benefits",
-    excerpt: "Celebrate the holiday season with exclusive membership benefits and special offers available until December 31st.",
-    content: "This holiday season, we're excited to offer our members exclusive benefits and special offers! From December 15th through December 31st, all active members can enjoy premium content access, exclusive webinars, special discounts on event registrations, and complimentary chapter transfers. It's our way of saying thank you for being part of our community this year. Log in to your member dashboard to claim your benefits and make the most of this special holiday offer!",
+    excerpt:
+      "Celebrate the holiday season with exclusive membership benefits and special offers available until December 31st.",
+    content:
+      "This holiday season, we're excited to offer our members exclusive benefits and special offers! From December 15th through December 31st, all active members can enjoy premium content access, exclusive webinars, special discounts on event registrations, and complimentary chapter transfers. It's our way of saying thank you for being part of our community this year. Log in to your member dashboard to claim your benefits and make the most of this special holiday offer!",
     type: "banner",
     category: "announcements",
     status: "published",
@@ -1060,7 +1114,7 @@ const mockAnnouncements = [
       title: "Holiday Season Membership Benefits | Nuvia",
       description: "Special holiday membership benefits and exclusive offers for community members",
       keywords: ["holiday", "benefits", "membership", "special offers"],
-      ogImage: "/images/holiday-benefits-og.jpg"
+      ogImage: "/images/holiday-benefits-og.jpg",
     },
     metrics: {
       views: 450,
@@ -1072,7 +1126,7 @@ const mockAnnouncements = [
       averageReadTime: 3.2,
       completionRate: 84.4,
       engagementScore: 76,
-      bounceRate: 15.6
+      bounceRate: 15.6,
     },
     visibility: "public",
     version: 1,
@@ -1091,8 +1145,8 @@ const mockAnnouncements = [
     sendEmailNotification: true,
     sendPushNotification: false,
     displayOnHomepage: false,
-    displayInDashboard: false
-  }
+    displayInDashboard: false,
+  },
 ];
 
 export { mockArticles, mockStatistics, mockAuthors, mockTags, mockAnnouncements };

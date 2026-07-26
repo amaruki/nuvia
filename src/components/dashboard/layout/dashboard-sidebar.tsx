@@ -3,10 +3,7 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-  Sidebar,
-  SidebarRail,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarRail } from "@/components/ui/sidebar";
 import { UserRole } from "@/types/dashboard.types";
 import { useSession } from "@/hooks/use-session";
 
@@ -39,10 +36,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     if (pathname.startsWith(path + "/")) {
       // Check if there's a more specific navigation item that also matches
       // This prevents parent paths from being active when a child path is active
-      const hasMoreSpecificMatch = filteredNavigationItems.some(item => {
+      const hasMoreSpecificMatch = filteredNavigationItems.some((item) => {
         // Skip current path being checked
         if (item.path === path) return false;
-        
+
         // Only check items that are children of the current path
         if (item.path.startsWith(path + "/")) {
           // Check if this child path matches the current pathname exactly or as a prefix
@@ -50,7 +47,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
         }
         return false;
       });
-      
+
       // Only mark as active if there's no more specific match
       return !hasMoreSpecificMatch;
     }
@@ -73,7 +70,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
       groups[category].push(item);
       return groups;
     },
-    {} as Record<string, NavigationItem[]>
+    {} as Record<string, NavigationItem[]>,
   );
 
   return (

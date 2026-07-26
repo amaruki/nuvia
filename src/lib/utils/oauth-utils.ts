@@ -11,7 +11,8 @@ export interface OAuthErrorInfo {
  * OAuth error codes and their default messages
  */
 const OAUTH_ERROR_MESSAGES: Record<string, string> = {
-  oauth_conflict: "This email is already registered with a different authentication method. Please sign in using the same method you used to register.",
+  oauth_conflict:
+    "This email is already registered with a different authentication method. Please sign in using the same method you used to register.",
   oauth_callback_error: "Authentication was cancelled or failed. Please try again.",
   access_denied: "Access was denied. Please grant the necessary permissions to continue.",
   authentication_failed: "Authentication failed. Please try again.",
@@ -77,7 +78,7 @@ export function cleanOAuthUrlParams(): void {
     const url = new URL(window.location.href);
     const paramsToRemove = ["error", "error_description", "provider", "code", "state"];
 
-    paramsToRemove.forEach(param => url.searchParams.delete(param));
+    paramsToRemove.forEach((param) => url.searchParams.delete(param));
 
     // Update URL without parameters
     window.history.replaceState({}, document.title, url.pathname + url.search);

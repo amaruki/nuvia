@@ -13,16 +13,8 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronRight } from "lucide-react";
 import { NavigationItem } from "./navigation-config";
 
@@ -36,7 +28,9 @@ export function NavigationItemComponent({ item, isActive }: NavigationItemCompon
   const hasSubItems = item.subItems && item.subItems.length > 0;
 
   if (hasSubItems) {
-    return <CollapsibleNavigationItem item={item} isActive={isActive} isItemActive={isItemActive} />;
+    return (
+      <CollapsibleNavigationItem item={item} isActive={isActive} isItemActive={isItemActive} />
+    );
   }
 
   return <RegularNavigationItem item={item} isItemActive={isItemActive} />;
@@ -48,13 +42,18 @@ interface CollapsibleNavigationItemProps {
   isItemActive: boolean;
 }
 
-function CollapsibleSubItemsPopover({ item, isActive, isItemActive }: CollapsibleNavigationItemProps) {
-  const hasActiveSubItem = item.subItems?.some(subItem => isActive(subItem.path));
-  const totalBadgeCount = item.subItems?.reduce((sum, subItem) => {
-    const count = parseInt(subItem.badge || '0');
-    return sum + (isNaN(count) ? 0 : count);
-  }, 0) || 0;
-  
+function CollapsibleSubItemsPopover({
+  item,
+  isActive,
+  isItemActive,
+}: CollapsibleNavigationItemProps) {
+  const hasActiveSubItem = item.subItems?.some((subItem) => isActive(subItem.path));
+  const totalBadgeCount =
+    item.subItems?.reduce((sum, subItem) => {
+      const count = parseInt(subItem.badge || "0");
+      return sum + (isNaN(count) ? 0 : count);
+    }, 0) || 0;
+
   return (
     <Popover key={item.id}>
       <PopoverTrigger asChild>
@@ -65,7 +64,7 @@ function CollapsibleSubItemsPopover({ item, isActive, isItemActive }: Collapsibl
             className={cn(
               "relative h-15 w-15 p-0 mx-auto",
               "flex items-center justify-center",
-              "transition-colors duration-200"
+              "transition-colors duration-200",
             )}
           >
             {item.icon}
@@ -91,7 +90,7 @@ function CollapsibleSubItemsPopover({ item, isActive, isItemActive }: Collapsibl
               className={cn(
                 "flex items-center justify-between gap-2 p-2 text-sm rounded-md",
                 "hover:bg-accent transition-colors",
-                isActive(subItem.path) && "bg-accent text-accent-foreground"
+                isActive(subItem.path) && "bg-accent text-accent-foreground",
               )}
             >
               <span className="flex items-center gap-2">
@@ -111,13 +110,19 @@ function CollapsibleSubItemsPopover({ item, isActive, isItemActive }: Collapsibl
   );
 }
 
-function CollapsibleNavigationItem({ item, isActive, isItemActive }: CollapsibleNavigationItemProps) {
+function CollapsibleNavigationItem({
+  item,
+  isActive,
+  isItemActive,
+}: CollapsibleNavigationItemProps) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
-  const hasActiveSubItem = item.subItems?.some(subItem => isActive(subItem.path));
+  const hasActiveSubItem = item.subItems?.some((subItem) => isActive(subItem.path));
 
   if (isCollapsed) {
-    return <CollapsibleSubItemsPopover item={item} isActive={isActive} isItemActive={isItemActive} />;
+    return (
+      <CollapsibleSubItemsPopover item={item} isActive={isActive} isItemActive={isItemActive} />
+    );
   }
 
   return (
@@ -144,11 +149,7 @@ function CollapsibleNavigationItem({ item, isActive, isItemActive }: Collapsible
         <CollapsibleContent>
           <SidebarMenuSub>
             {item.subItems!.map((subItem) => (
-              <SubNavigationItem
-                key={subItem.id}
-                subItem={subItem}
-                isActive={isActive}
-              />
+              <SubNavigationItem key={subItem.id} subItem={subItem} isActive={isActive} />
             ))}
           </SidebarMenuSub>
         </CollapsibleContent>
@@ -163,15 +164,11 @@ interface RegularNavigationItemProps {
 }
 
 function RegularNavigationItem({ item, isItemActive }: RegularNavigationItemProps) {
-  const tooltipString = `${item.title}${item.category ? ` (${item.category})` : ''}${item.badge ? ` - ${item.badge} new` : ''}`;
+  const tooltipString = `${item.title}${item.category ? ` (${item.category})` : ""}${item.badge ? ` - ${item.badge} new` : ""}`;
 
   return (
     <SidebarMenuItem key={item.id}>
-      <SidebarMenuButton
-        tooltip={tooltipString}
-        isActive={isItemActive}
-        asChild
-      >
+      <SidebarMenuButton tooltip={tooltipString} isActive={isItemActive} asChild>
         <Link href={item.path} prefetch={false}>
           {item.icon}
           <span>{item.title}</span>

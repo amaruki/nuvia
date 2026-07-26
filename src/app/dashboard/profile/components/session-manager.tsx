@@ -8,12 +8,23 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 
 import {
-  Smartphone, Monitor, Tablet,
-  CheckCircle, AlertCircle, Trash2, Loader2,
-  Clock, Shield, Eye
+  Smartphone,
+  Monitor,
+  Tablet,
+  CheckCircle,
+  AlertCircle,
+  Trash2,
+  Loader2,
+  Clock,
+  Shield,
+  Eye,
 } from "lucide-react";
 
-import { getUserSessionsAction, revokeSessionAction, revokeAllOtherSessionsAction } from "@/lib/actions/auth.actions";
+import {
+  getUserSessionsAction,
+  revokeSessionAction,
+  revokeAllOtherSessionsAction,
+} from "@/lib/actions/auth.actions";
 
 interface SessionManagerProps {
   user: any;
@@ -64,7 +75,7 @@ export function SessionManager({ user }: SessionManagerProps) {
             createdAt: new Date(sessionData.createdAt),
             lastAccessedAt: new Date(sessionData.lastAccessedAt || sessionData.createdAt),
             token: sessionData.token || sessionId,
-            isCurrent: sessionData.isCurrent || false
+            isCurrent: sessionData.isCurrent || false,
           };
         });
 
@@ -97,7 +108,7 @@ export function SessionManager({ user }: SessionManagerProps) {
 
       if (result.success) {
         setIsSuccess(true);
-        setSessions(sessions.filter(s => s.id !== sessionId));
+        setSessions(sessions.filter((s) => s.id !== sessionId));
         setTimeout(() => setIsSuccess(false), 3000);
       } else {
         setError(result.message || "Failed to revoke session");
@@ -111,13 +122,17 @@ export function SessionManager({ user }: SessionManagerProps) {
   };
 
   const handleRevokeAllOtherSessions = async () => {
-    if (confirm("Are you sure you want to revoke all other sessions? This will sign you out from all other devices.")) {
+    if (
+      confirm(
+        "Are you sure you want to revoke all other sessions? This will sign you out from all other devices.",
+      )
+    ) {
       try {
         const result = await revokeAllOtherSessionsAction();
         if (result.success) {
           setIsSuccess(true);
           // Keep only the current session
-          setSessions(sessions.filter(s => s.isCurrent));
+          setSessions(sessions.filter((s) => s.isCurrent));
           setTimeout(() => setIsSuccess(false), 3000);
         } else {
           setError(result.message || "Failed to revoke other sessions");
@@ -129,49 +144,49 @@ export function SessionManager({ user }: SessionManagerProps) {
   };
 
   const getDeviceInfo = (userAgent?: string) => {
-    if (!userAgent) return { type: 'unknown', name: 'Unknown Device', icon: Monitor };
+    if (!userAgent) return { type: "unknown", name: "Unknown Device", icon: Monitor };
 
     const ua = userAgent.toLowerCase();
 
-    if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
+    if (ua.includes("mobile") || ua.includes("android") || ua.includes("iphone")) {
       return {
-        type: 'mobile',
-        name: 'Mobile Device',
-        icon: Smartphone
+        type: "mobile",
+        name: "Mobile Device",
+        icon: Smartphone,
       };
     }
 
-    if (ua.includes('tablet') || ua.includes('ipad')) {
+    if (ua.includes("tablet") || ua.includes("ipad")) {
       return {
-        type: 'tablet',
-        name: 'Tablet',
-        icon: Tablet
+        type: "tablet",
+        name: "Tablet",
+        icon: Tablet,
       };
     }
 
     return {
-      type: 'desktop',
-      name: 'Desktop',
-      icon: Monitor
+      type: "desktop",
+      name: "Desktop",
+      icon: Monitor,
     };
   };
 
   const getBrowserInfo = (userAgent?: string) => {
-    if (!userAgent) return 'Unknown Browser';
+    if (!userAgent) return "Unknown Browser";
 
     const ua = userAgent.toLowerCase();
 
-    if (ua.includes('chrome')) return 'Chrome';
-    if (ua.includes('firefox')) return 'Firefox';
-    if (ua.includes('safari')) return 'Safari';
-    if (ua.includes('edge')) return 'Edge';
-    if (ua.includes('opera')) return 'Opera';
+    if (ua.includes("chrome")) return "Chrome";
+    if (ua.includes("firefox")) return "Firefox";
+    if (ua.includes("safari")) return "Safari";
+    if (ua.includes("edge")) return "Edge";
+    if (ua.includes("opera")) return "Opera";
 
-    return 'Unknown Browser';
+    return "Unknown Browser";
   };
 
   const getLocationInfo = (ipAddress?: string) => {
-    if (!ipAddress) return 'Unknown Location';
+    if (!ipAddress) return "Unknown Location";
     return `IP: ${ipAddress}`;
   };
 
@@ -179,14 +194,14 @@ export function SessionManager({ user }: SessionManagerProps) {
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 60) return "Just now";
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
     return `${Math.floor(diffInSeconds / 86400)} days ago`;
   };
 
-  const currentSessionData = sessions.find(session => session.isCurrent);
-  const otherSessions = sessions.filter(session => !session.isCurrent);
+  const currentSessionData = sessions.find((session) => session.isCurrent);
+  const otherSessions = sessions.filter((session) => !session.isCurrent);
 
   if (isLoading) {
     return (
@@ -218,9 +233,7 @@ export function SessionManager({ user }: SessionManagerProps) {
       {isSuccess && (
         <Alert className="border-green-200 bg-green-50 text-green-800">
           <CheckCircle className="h-4 w-4" />
-          <AlertDescription>
-            Session(s) revoked successfully!
-          </AlertDescription>
+          <AlertDescription>Session(s) revoked successfully!</AlertDescription>
         </Alert>
       )}
 
@@ -228,9 +241,7 @@ export function SessionManager({ user }: SessionManagerProps) {
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            {error}
-          </AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
@@ -256,7 +267,8 @@ export function SessionManager({ user }: SessionManagerProps) {
                   })()}
                   <div>
                     <p className="font-medium">
-                      {getDeviceInfo(currentSessionData.userAgent).name} • {getBrowserInfo(currentSessionData.userAgent)}
+                      {getDeviceInfo(currentSessionData.userAgent).name} •{" "}
+                      {getBrowserInfo(currentSessionData.userAgent)}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {getLocationInfo(currentSessionData.ipAddress)}
@@ -273,9 +285,7 @@ export function SessionManager({ user }: SessionManagerProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <Eye className="h-4 w-4 text-muted-foreground" />
-                    <span>
-                      Expires: {currentSessionData.expiresAt.toLocaleDateString()}
-                    </span>
+                    <span>Expires: {currentSessionData.expiresAt.toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
@@ -319,7 +329,10 @@ export function SessionManager({ user }: SessionManagerProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             {otherSessions.map((session) => (
-              <div key={session.id} className="flex items-start justify-between p-4 border rounded-lg">
+              <div
+                key={session.id}
+                className="flex items-start justify-between p-4 border rounded-lg"
+              >
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center gap-3">
                     {(() => {
@@ -328,7 +341,8 @@ export function SessionManager({ user }: SessionManagerProps) {
                     })()}
                     <div>
                       <p className="font-medium">
-                        {getDeviceInfo(session.userAgent).name} • {getBrowserInfo(session.userAgent)}
+                        {getDeviceInfo(session.userAgent).name} •{" "}
+                        {getBrowserInfo(session.userAgent)}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {getLocationInfo(session.ipAddress)}
@@ -339,15 +353,11 @@ export function SessionManager({ user }: SessionManagerProps) {
                   <div className="grid gap-3 sm:grid-cols-2 text-sm">
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span>
-                        Last active: {formatTimeAgo(new Date(session.lastAccessedAt))}
-                      </span>
+                      <span>Last active: {formatTimeAgo(new Date(session.lastAccessedAt))}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Eye className="h-4 w-4 text-muted-foreground" />
-                      <span>
-                        Expires: {session.expiresAt.toLocaleDateString()}
-                      </span>
+                      <span>Expires: {session.expiresAt.toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>

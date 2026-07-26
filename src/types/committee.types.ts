@@ -141,7 +141,7 @@ export interface CommitteeFormData {
   purpose: string;
   status: CommitteeStatus;
   type: CommitteeType;
-  charter: Omit<CommitteeCharter, 'approvalDate' | 'lastReviewed' | 'nextReview'>;
+  charter: Omit<CommitteeCharter, "approvalDate" | "lastReviewed" | "nextReview">;
   contactInfo: CommitteeContactInfo;
   parentCommitteeId?: string;
 }
@@ -224,7 +224,14 @@ export interface WorkspacePermission {
   permissions: Permission[];
 }
 
-export type Permission = "view" | "edit" | "delete" | "upload" | "download" | "manage_members" | "manage_settings";
+export type Permission =
+  | "view"
+  | "edit"
+  | "delete"
+  | "upload"
+  | "download"
+  | "manage_members"
+  | "manage_settings";
 
 export interface WorkspaceMember {
   id: string;
@@ -401,7 +408,13 @@ export interface MeetingAttendee {
 
 export type AttendeeRole = "organizer" | "presenter" | "attendee";
 
-export type AttendeeStatus = "invited" | "accepted" | "declined" | "tentative" | "attended" | "absent";
+export type AttendeeStatus =
+  | "invited"
+  | "accepted"
+  | "declined"
+  | "tentative"
+  | "attended"
+  | "absent";
 
 export interface MeetingAgendaItem {
   id: string;

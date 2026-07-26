@@ -43,7 +43,7 @@ export function EventCertificate({
             Certificate of Completion
           </CardTitle>
         </CardHeader>
-        
+
         <CardContent className="p-0">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
             {/* Certificate Preview */}
@@ -65,7 +65,7 @@ export function EventCertificate({
                   </div>
                 )}
               </div>
-              
+
               <div className="flex space-x-2">
                 <Button
                   onClick={() => onDownload?.(certificate.certificateUrl)}
@@ -75,37 +75,37 @@ export function EventCertificate({
                   <Download className="h-4 w-4 mr-2" />
                   Download
                 </Button>
-                <Button
-                  onClick={() => onShare?.(certificate)}
-                  variant="outline"
-                  className="flex-1"
-                >
+                <Button onClick={() => onShare?.(certificate)} variant="outline" className="flex-1">
                   <Share2 className="h-4 w-4 mr-2" />
                   Share
                 </Button>
               </div>
             </div>
-            
+
             {/* Certificate Details */}
             <div className="p-6 space-y-6">
               <div>
-                <h4 className="text-lg font-semibold text-foreground/90 mb-4">Certificate Details</h4>
-                
+                <h4 className="text-lg font-semibold text-foreground/90 mb-4">
+                  Certificate Details
+                </h4>
+
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm text-foreground/50">Recipient</p>
                     <p className="font-medium text-foreground/90">
-                      {certificate.user?.displayName || certificate.user?.username || "Certificate Holder"}
+                      {certificate.user?.displayName ||
+                        certificate.user?.username ||
+                        "Certificate Holder"}
                     </p>
                   </div>
-                  
+
                   {event && (
                     <>
                       <div>
                         <p className="text-sm text-foreground/50">Event</p>
                         <p className="font-medium text-foreground/90">{event.title}</p>
                       </div>
-                      
+
                       <div>
                         <p className="text-sm text-foreground/50">Event Date</p>
                         <p className="font-medium text-foreground/90">
@@ -114,14 +114,14 @@ export function EventCertificate({
                       </div>
                     </>
                   )}
-                  
+
                   <div>
                     <p className="text-sm text-foreground/50">Issued On</p>
                     <p className="font-medium text-foreground/90">
                       {formatDate(certificate.issuedAt)}
                     </p>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm text-foreground/50">Verification Code</p>
                     <div className="flex items-center space-x-2">
@@ -139,14 +139,15 @@ export function EventCertificate({
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-chart-2/10 border border-success/30 text-success p-4 rounded-lg">
                 <div className="flex">
                   <CheckCircle className="h-5 w-5 text-success mr-2 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Verified Certificate</p>
                     <p className="text-sm mt-1">
-                      This certificate has been issued and can be verified using the verification code.
+                      This certificate has been issued and can be verified using the verification
+                      code.
                     </p>
                   </div>
                 </div>
@@ -179,7 +180,7 @@ export function EventCertificateList({
   className = "",
 }: EventCertificateListProps) {
   const getEventForCertificate = (certificate: EventCertificate) => {
-    return events.find(event => event.id === certificate.eventId);
+    return events.find((event) => event.id === certificate.eventId);
   };
 
   if (certificates.length === 0) {
@@ -188,7 +189,8 @@ export function EventCertificateList({
         <Award className="h-16 w-16 mx-auto text-foreground/40 mb-4" />
         <h3 className="text-lg font-medium text-foreground/90 mb-2">No Certificates Yet</h3>
         <p className="text-foreground/50 max-w-md mx-auto">
-          Certificates will be awarded after you attend and complete events. Check back here after participating in events.
+          Certificates will be awarded after you attend and complete events. Check back here after
+          participating in events.
         </p>
       </div>
     );
@@ -201,7 +203,7 @@ export function EventCertificateList({
           Your Certificates ({certificates.length})
         </h2>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {certificates.map((certificate) => {
           const event = getEventForCertificate(certificate);
@@ -215,12 +217,10 @@ export function EventCertificateList({
                   <h3 className="text-white font-medium truncate">
                     {event?.title || "Certificate"}
                   </h3>
-                  <p className="text-white/80 text-sm">
-                    Issued {formatDate(certificate.issuedAt)}
-                  </p>
+                  <p className="text-white/80 text-sm">Issued {formatDate(certificate.issuedAt)}</p>
                 </div>
               </div>
-              
+
               <CardContent className="p-4">
                 <div className="space-y-3">
                   <div>
@@ -229,7 +229,7 @@ export function EventCertificateList({
                       {certificate.verificationCode}
                     </p>
                   </div>
-                  
+
                   <div className="flex space-x-2">
                     <Button
                       onClick={() => onDownload?.(certificate.certificateUrl)}

@@ -77,10 +77,7 @@ interface AsyncBoundaryState {
   error?: Error;
 }
 
-class AsyncBoundary extends React.Component<
-  AsyncBoundaryProps,
-  AsyncBoundaryState
-> {
+class AsyncBoundary extends React.Component<AsyncBoundaryProps, AsyncBoundaryState> {
   constructor(props: AsyncBoundaryProps) {
     super(props);
     this.state = { hasError: false };

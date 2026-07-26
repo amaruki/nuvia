@@ -54,7 +54,8 @@ export default function OrganizationCommittees() {
   useEffect(() => {
     setHeader({
       title: "Committees Management",
-      description: "Manage functional and special interest groups, committee leadership, and performance metrics",
+      description:
+        "Manage functional and special interest groups, committee leadership, and performance metrics",
     });
 
     return () => {
@@ -91,7 +92,11 @@ export default function OrganizationCommittees() {
   };
 
   const handleDelete = async (committee: Committee) => {
-    if (confirm(`Are you sure you want to delete "${committee.displayName}"? This action cannot be undone.`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete "${committee.displayName}"? This action cannot be undone.`,
+      )
+    ) {
       try {
         await deleteCommittee(committee.id);
       } catch (error) {
@@ -195,16 +200,20 @@ export default function OrganizationCommittees() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="committees" className="text-xs sm:text-sm py-2 px-2">Committees</TabsTrigger>
-          <TabsTrigger value="leadership" className="text-xs sm:text-sm py-2 px-2">Leadership</TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">Analytics</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="committees" className="text-xs sm:text-sm py-2 px-2">
+            Committees
+          </TabsTrigger>
+          <TabsTrigger value="leadership" className="text-xs sm:text-sm py-2 px-2">
+            Leadership
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">
+            Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -214,7 +223,10 @@ export default function OrganizationCommittees() {
               <h3 className="text-lg font-semibold">Committee Status Summary</h3>
               <div className="space-y-3">
                 {committees.map((committee) => (
-                  <div key={committee.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={committee.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
                         <Briefcase className="h-4 w-4 text-primary" />
@@ -222,16 +234,22 @@ export default function OrganizationCommittees() {
                       <div>
                         <p className="font-medium">{committee.displayName}</p>
                         <p className="text-sm text-muted-foreground">
-                          {committee.type.replace('_', ' ')}
+                          {committee.type.replace("_", " ")}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge variant={
-                        committee.status === "active" ? "default" :
-                        committee.status === "inactive" ? "secondary" :
-                        committee.status === "pending" ? "outline" : "destructive"
-                      }>
+                      <Badge
+                        variant={
+                          committee.status === "active"
+                            ? "default"
+                            : committee.status === "inactive"
+                              ? "secondary"
+                              : committee.status === "pending"
+                                ? "outline"
+                                : "destructive"
+                        }
+                      >
                         {committee.status}
                       </Badge>
                     </div>
@@ -244,29 +262,28 @@ export default function OrganizationCommittees() {
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Performance Highlights</h3>
               <div className="space-y-3">
-                {statistics?.topPerformingCommittees
-                  .slice(0, 3)
-                  .map((committee) => (
-                    <div key={committee.committeeId} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                          <Target className="h-4 w-4 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{committee.committeeName}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {committee.type.replace('_', ' ')} • {committee.memberCount} members
-                          </p>
-                        </div>
+                {statistics?.topPerformingCommittees.slice(0, 3).map((committee) => (
+                  <div
+                    key={committee.committeeId}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                        <Target className="h-4 w-4 text-primary" />
                       </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold">{committee.impactScore.toFixed(1)}</p>
-                        <p className="text-xs text-muted-foreground">
-                          impact score
+                      <div>
+                        <p className="font-medium">{committee.committeeName}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {committee.type.replace("_", " ")} • {committee.memberCount} members
                         </p>
                       </div>
                     </div>
-                  ))}
+                    <div className="text-right">
+                      <p className="text-lg font-bold">{committee.impactScore.toFixed(1)}</p>
+                      <p className="text-xs text-muted-foreground">impact score</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -277,49 +294,56 @@ export default function OrganizationCommittees() {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Goal Completion</h3>
                 <div className="space-y-3">
-                  {statistics.topPerformingCommittees
-                    .slice(0, 3)
-                    .map((committee) => (
-                      <div key={committee.committeeId} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="min-w-0 flex-1 mr-2">
-                          <p className="font-medium">{committee.committeeName}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {committee.memberCount} members • {committee.deliverablesCount} deliverables
-                          </p>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className={`text-lg font-bold ${
-                            committee.goalCompletionRate >= 80 ? "text-emerald-600" : "text-amber-600"
-                          }`}>
-                            {committee.goalCompletionRate.toFixed(1)}%
-                          </p>
-                        </div>
+                  {statistics.topPerformingCommittees.slice(0, 3).map((committee) => (
+                    <div
+                      key={committee.committeeId}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
+                      <div className="min-w-0 flex-1 mr-2">
+                        <p className="font-medium">{committee.committeeName}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {committee.memberCount} members • {committee.deliverablesCount}{" "}
+                          deliverables
+                        </p>
                       </div>
-                    ))}
+                      <div className="text-right shrink-0">
+                        <p
+                          className={`text-lg font-bold ${
+                            committee.goalCompletionRate >= 80
+                              ? "text-emerald-600"
+                              : "text-amber-600"
+                          }`}
+                        >
+                          {committee.goalCompletionRate.toFixed(1)}%
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Meeting Attendance</h3>
                 <div className="space-y-3">
-                  {statistics.topPerformingCommittees
-                    .slice(0, 3)
-                    .map((committee) => (
-                      <div key={committee.committeeId} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="min-w-0 flex-1 mr-2">
-                          <p className="font-medium">{committee.committeeName}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {committee.type.replace('_', ' ')} • {committee.memberCount} members
-                          </p>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-lg font-bold">{committee.meetingAttendanceRate.toFixed(1)}%</p>
-                          <p className="text-xs text-muted-foreground">
-                            attendance rate
-                          </p>
-                        </div>
+                  {statistics.topPerformingCommittees.slice(0, 3).map((committee) => (
+                    <div
+                      key={committee.committeeId}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
+                      <div className="min-w-0 flex-1 mr-2">
+                        <p className="font-medium">{committee.committeeName}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {committee.type.replace("_", " ")} • {committee.memberCount} members
+                        </p>
                       </div>
-                    ))}
+                      <div className="text-right shrink-0">
+                        <p className="text-lg font-bold">
+                          {committee.meetingAttendanceRate.toFixed(1)}%
+                        </p>
+                        <p className="text-xs text-muted-foreground">attendance rate</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -377,7 +401,10 @@ export default function OrganizationCommittees() {
               <h3 className="text-lg font-semibold">Committee Performance</h3>
               <div className="space-y-3">
                 {statistics?.topPerformingCommittees.map((committee) => (
-                  <div key={committee.committeeId} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={committee.committeeId}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <p className="font-medium">{committee.committeeName}</p>
                       <p className="text-sm text-muted-foreground">
@@ -385,12 +412,8 @@ export default function OrganizationCommittees() {
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-lg font-bold">
-                        {committee.impactScore.toFixed(1)}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        impact score
-                      </p>
+                      <p className="text-lg font-bold">{committee.impactScore.toFixed(1)}</p>
+                      <p className="text-xs text-muted-foreground">impact score</p>
                     </div>
                   </div>
                 ))}
@@ -402,22 +425,19 @@ export default function OrganizationCommittees() {
               <h3 className="text-lg font-semibold">Committee Types</h3>
               <div className="space-y-3">
                 {statistics?.typeBreakdown.map((type) => (
-                  <div key={type.type} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={type.type}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
-                      <p className="font-medium capitalize">
-                        {type.type.replace('_', ' ')}
-                      </p>
+                      <p className="font-medium capitalize">{type.type.replace("_", " ")}</p>
                       <p className="text-sm text-muted-foreground">
                         {type.committeeCount} committees
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-lg font-bold">
-                        {type.averageImpactScore.toFixed(1)}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        avg impact score
-                      </p>
+                      <p className="text-lg font-bold">{type.averageImpactScore.toFixed(1)}</p>
+                      <p className="text-xs text-muted-foreground">avg impact score</p>
                     </div>
                   </div>
                 ))}
@@ -431,7 +451,10 @@ export default function OrganizationCommittees() {
               <h3 className="text-lg font-semibold">Monthly Trends</h3>
               <div className="space-y-3">
                 {statistics.monthlyTrend.slice(0, 6).map((trend, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <p className="font-medium">{trend.month}</p>
                       <p className="text-sm text-muted-foreground">
@@ -439,12 +462,8 @@ export default function OrganizationCommittees() {
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-lg font-bold">
-                        {trend.goalsCompleted}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        goals completed
-                      </p>
+                      <p className="text-lg font-bold">{trend.goalsCompleted}</p>
+                      <p className="text-xs text-muted-foreground">goals completed</p>
                     </div>
                   </div>
                 ))}
@@ -462,7 +481,6 @@ export default function OrganizationCommittees() {
         initialData={editingCommittee || undefined}
         isEditing={!!editingCommittee}
       />
-
     </div>
   );
 }

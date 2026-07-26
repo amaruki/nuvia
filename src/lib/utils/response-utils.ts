@@ -5,17 +5,14 @@
  * @param message - Optional success message
  * @returns Formatted success response
  */
-export function createSuccessResponse<T = any>(
-  data: T,
-  message: string = 'Success'
-) {
+export function createSuccessResponse<T = any>(data: T, message: string = "Success") {
   return {
     success: true,
     message,
     data,
     meta: {
       timestamp: new Date(),
-      version: 'v1',
+      version: "v1",
     },
   };
 }
@@ -30,8 +27,8 @@ export function createSuccessResponse<T = any>(
  */
 export function createErrorResponse(
   message: string,
-  code: string = 'UNKNOWN_ERROR',
-  errors?: Record<string, string[]> | Array<{ field: string; message: string }>
+  code: string = "UNKNOWN_ERROR",
+  errors?: Record<string, string[]> | Array<{ field: string; message: string }>,
 ) {
   return {
     success: false,
@@ -40,24 +37,24 @@ export function createErrorResponse(
     errors: errors ? normalizeErrors(errors) : undefined,
     meta: {
       timestamp: new Date(),
-      version: 'v1',
+      version: "v1",
     },
   };
 }
 
 /**
  * Normalize errors to the expected format
- * 
+ *
  * @param errors - Errors in various formats
  * @returns Normalized errors
  */
 function normalizeErrors(
-  errors: Record<string, string[]> | Array<{ field: string; message: string }>
+  errors: Record<string, string[]> | Array<{ field: string; message: string }>,
 ): Record<string, string[]> {
   if (Array.isArray(errors)) {
     // Convert array of field errors to record
     const normalized: Record<string, string[]> = {};
-    errors.forEach(error => {
+    errors.forEach((error) => {
       if (!normalized[error.field]) {
         normalized[error.field] = [];
       }

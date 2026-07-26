@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { 
-  Committee, 
-  CommitteeOverallStatistics, 
-  CommitteeFilterOptions 
+import {
+  Committee,
+  CommitteeOverallStatistics,
+  CommitteeFilterOptions,
 } from "@/types/committee.types";
 import { mockCommittees, mockCommitteeStatistics } from "@/lib/data/mock-committee-data";
 
@@ -19,43 +19,43 @@ export function useCommittees() {
   const fetchCommittees = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
       // Apply filters
       let filteredCommittees = [...mockCommittees];
-      
+
       if (filters.status && filters.status.length > 0) {
-        filteredCommittees = filteredCommittees.filter(committee => 
-          filters.status!.includes(committee.status)
+        filteredCommittees = filteredCommittees.filter((committee) =>
+          filters.status!.includes(committee.status),
         );
       }
-      
+
       if (filters.type && filters.type.length > 0) {
-        filteredCommittees = filteredCommittees.filter(committee => 
-          filters.type!.includes(committee.type)
+        filteredCommittees = filteredCommittees.filter((committee) =>
+          filters.type!.includes(committee.type),
         );
       }
-      
+
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase();
-        filteredCommittees = filteredCommittees.filter(committee =>
-          committee.displayName.toLowerCase().includes(searchTerm) ||
-          committee.description?.toLowerCase().includes(searchTerm) ||
-          committee.purpose.toLowerCase().includes(searchTerm)
+        filteredCommittees = filteredCommittees.filter(
+          (committee) =>
+            committee.displayName.toLowerCase().includes(searchTerm) ||
+            committee.description?.toLowerCase().includes(searchTerm) ||
+            committee.purpose.toLowerCase().includes(searchTerm),
         );
       }
-      
+
       if (filters.memberCountRange) {
-        filteredCommittees = filteredCommittees.filter(committee => {
+        filteredCommittees = filteredCommittees.filter((committee) => {
           const count = committee.metrics.memberCount;
-          return count >= filters.memberCountRange!.min &&
-                 count <= filters.memberCountRange!.max;
+          return count >= filters.memberCountRange!.min && count <= filters.memberCountRange!.max;
         });
       }
-      
+
       setCommittees(filteredCommittees);
       setStatistics(mockCommitteeStatistics);
     } catch (err) {
@@ -77,7 +77,7 @@ export function useCommittees() {
   }, [filters]);
 
   const updateFilters = (newFilters: Partial<CommitteeFilterOptions>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    setFilters((prev) => ({ ...prev, ...newFilters }));
   };
 
   const clearFilters = () => {
@@ -88,20 +88,22 @@ export function useCommittees() {
     fetchCommittees();
   };
 
-  const addCommittee = async (committeeData: Omit<Committee, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {
+  const addCommittee = async (
+    committeeData: Omit<Committee, "id" | "createdAt" | "updatedAt" | "createdBy">,
+  ) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       const newCommittee: Committee = {
         ...committeeData,
         id: `com_${Date.now()}`,
         createdAt: new Date(),
         updatedAt: new Date(),
-        createdBy: "current-user" // TODO: Get from auth context
+        createdBy: "current-user", // TODO: Get from auth context
       };
-      
-      setCommittees(prev => [...prev, newCommittee]);
+
+      setCommittees((prev) => [...prev, newCommittee]);
       return newCommittee;
     } catch (err) {
       setError("Failed to add committee. Please try again.");
@@ -112,13 +114,15 @@ export function useCommittees() {
   const updateCommittee = async (id: string, updates: Partial<Committee>) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setCommittees(prev => prev.map(committee => 
-        committee.id === id 
-          ? { ...committee, ...updates, updatedAt: new Date(), updatedBy: "current-user" }
-          : committee
-      ));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setCommittees((prev) =>
+        prev.map((committee) =>
+          committee.id === id
+            ? { ...committee, ...updates, updatedAt: new Date(), updatedBy: "current-user" }
+            : committee,
+        ),
+      );
     } catch (err) {
       setError("Failed to update committee. Please try again.");
       throw err;
@@ -128,9 +132,9 @@ export function useCommittees() {
   const deleteCommittee = async (id: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setCommittees(prev => prev.filter(committee => committee.id !== id));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setCommittees((prev) => prev.filter((committee) => committee.id !== id));
     } catch (err) {
       setError("Failed to delete committee. Please try again.");
       throw err;
@@ -140,13 +144,15 @@ export function useCommittees() {
   const toggleCommitteeStatus = async (id: string, status: "active" | "inactive") => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      setCommittees(prev => prev.map(committee => 
-        committee.id === id 
-          ? { ...committee, status, updatedAt: new Date(), updatedBy: "current-user" }
-          : committee
-      ));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      setCommittees((prev) =>
+        prev.map((committee) =>
+          committee.id === id
+            ? { ...committee, status, updatedAt: new Date(), updatedBy: "current-user" }
+            : committee,
+        ),
+      );
     } catch (err) {
       setError("Failed to update committee status. Please try again.");
       throw err;
@@ -154,19 +160,19 @@ export function useCommittees() {
   };
 
   // Computed values
-  const activeCommittees = useMemo(() => 
-    committees.filter(committee => committee.status === "active"), 
-    [committees]
+  const activeCommittees = useMemo(
+    () => committees.filter((committee) => committee.status === "active"),
+    [committees],
   );
 
-  const inactiveCommittees = useMemo(() => 
-    committees.filter(committee => committee.status === "inactive"), 
-    [committees]
+  const inactiveCommittees = useMemo(
+    () => committees.filter((committee) => committee.status === "inactive"),
+    [committees],
   );
 
-  const pendingCommittees = useMemo(() => 
-    committees.filter(committee => committee.status === "pending"), 
-    [committees]
+  const pendingCommittees = useMemo(
+    () => committees.filter((committee) => committee.status === "pending"),
+    [committees],
   );
 
   return {
@@ -176,12 +182,12 @@ export function useCommittees() {
     loading,
     error,
     filters,
-    
+
     // Computed
     activeCommittees,
     inactiveCommittees,
     pendingCommittees,
-    
+
     // Actions
     updateFilters,
     clearFilters,

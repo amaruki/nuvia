@@ -1,3 +1,3 @@
 export default function ToolsBackup() {
-  return <h1>Tools Backup page</h1>
+  return <h1>Tools Backup page</h1>;
 }

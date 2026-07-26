@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { ValidationError } from '../errors';
+import { z } from "zod";
+import { ValidationError } from "../errors";
 
 /**
  * Validate data against a Zod schema
@@ -15,13 +15,13 @@ export function validateWithSchema<T>(schema: z.ZodSchema<T>, data: unknown): T 
     if (error instanceof z.ZodError) {
       // Convert Zod error to our ValidationError format
       const fields = error.issues.map((err) => ({
-        field: err.path.join('.'),
+        field: err.path.join("."),
         message: err.message,
       }));
-      
+
       throw new ValidationError(fields);
     }
-    
+
     // Re-throw non-Zod errors
     throw error;
   }
@@ -37,13 +37,13 @@ export function validateWithSchema<T>(schema: z.ZodSchema<T>, data: unknown): T 
 export function validateFormData<T>(schema: z.ZodSchema<T>, formData: FormData): T {
   // Convert FormData to a plain object
   const data: Record<string, unknown> = {};
-  
+
   // Use a traditional for loop to iterate through FormData entries
   const entries = formData.entries();
   let entry = entries.next();
   while (!entry.done) {
     const [key, value] = entry.value;
-    
+
     // Handle multiple values for the same key (e.g., checkboxes)
     if (data[key] !== undefined) {
       // If we already have a value for this key, convert it to an array
@@ -55,10 +55,10 @@ export function validateFormData<T>(schema: z.ZodSchema<T>, formData: FormData):
     } else {
       data[key] = value;
     }
-    
+
     entry = entries.next();
   }
-  
+
   return validateWithSchema(schema, data);
 }
 
@@ -83,7 +83,7 @@ export function validateRequestBody<T>(schema: z.ZodSchema<T>, body: unknown): T
 export function validateQueryParams<T>(schema: z.ZodSchema<T>, searchParams: URLSearchParams): T {
   // Convert URLSearchParams to a plain object
   const data: Record<string, unknown> = {};
-  
+
   // Use Array.from to convert the iterator to an array
   Array.from(searchParams.entries()).forEach(([key, value]) => {
     // Handle multiple values for the same key
@@ -98,7 +98,7 @@ export function validateQueryParams<T>(schema: z.ZodSchema<T>, searchParams: URL
       data[key] = value;
     }
   });
-  
+
   return validateWithSchema(schema, data);
 }
 
@@ -109,10 +109,10 @@ export function validateQueryParams<T>(schema: z.ZodSchema<T>, searchParams: URL
  */
 export function createValidationError(error: z.ZodError): ValidationError {
   const fields = error.issues.map((err) => ({
-    field: err.path.join('.'),
+    field: err.path.join("."),
     message: err.message,
   }));
-  
+
   return new ValidationError(fields);
 }
 
@@ -123,14 +123,14 @@ export function createValidationError(error: z.ZodError): ValidationError {
  */
 export function formatValidationErrors(error: ValidationError): Record<string, string[]> {
   const errors: Record<string, string[]> = {};
-  
+
   error.fields.forEach((field) => {
     if (!errors[field.field]) {
       errors[field.field] = [];
     }
     errors[field.field].push(field.message);
   });
-  
+
   return errors;
 }
 
@@ -143,7 +143,6 @@ export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
-
 
 /**
  * Check if a username meets requirements
@@ -164,11 +163,11 @@ export function isValidUsername(username: string): boolean {
 export function sanitizeInput(input: string): string {
   // Replace HTML special characters with their entities
   return input
-    .replace(/&/g, '&')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
+    .replace(/&/g, "&")
+    .replace(/</g, "<")
+    .replace(/>/g, ">")
     .replace(/"/g, '"')
-    .replace(/'/g, '&#039;');
+    .replace(/'/g, "&#039;");
 }
 
 /**
@@ -184,29 +183,25 @@ export function validateStringField(
   value: unknown,
   fieldName: string,
   required: boolean = true,
-  maxLength: number = 255
+  maxLength: number = 255,
 ): string {
-  if (value === undefined || value === null || value === '') {
+  if (value === undefined || value === null || value === "") {
     if (required) {
-      throw new ValidationError([
-        { field: fieldName, message: `${fieldName} is required` },
-      ]);
+      throw new ValidationError([{ field: fieldName, message: `${fieldName} is required` }]);
     }
-    return '';
+    return "";
   }
-  
-  if (typeof value !== 'string') {
-    throw new ValidationError([
-      { field: fieldName, message: `${fieldName} must be a string` },
-    ]);
+
+  if (typeof value !== "string") {
+    throw new ValidationError([{ field: fieldName, message: `${fieldName} must be a string` }]);
   }
-  
+
   if (value.length > maxLength) {
     throw new ValidationError([
       { field: fieldName, message: `${fieldName} must be at most ${maxLength} characters` },
     ]);
   }
-  
+
   return sanitizeInput(value.trim());
 }
 
@@ -225,37 +220,33 @@ export function validateNumberField(
   fieldName: string,
   required: boolean = true,
   min?: number,
-  max?: number
+  max?: number,
 ): number {
-  if (value === undefined || value === null || value === '') {
+  if (value === undefined || value === null || value === "") {
     if (required) {
-      throw new ValidationError([
-        { field: fieldName, message: `${fieldName} is required` },
-      ]);
+      throw new ValidationError([{ field: fieldName, message: `${fieldName} is required` }]);
     }
     return 0;
   }
-  
+
   const num = Number(value);
-  
+
   if (isNaN(num)) {
-    throw new ValidationError([
-      { field: fieldName, message: `${fieldName} must be a number` },
-    ]);
+    throw new ValidationError([{ field: fieldName, message: `${fieldName} must be a number` }]);
   }
-  
+
   if (min !== undefined && num < min) {
     throw new ValidationError([
       { field: fieldName, message: `${fieldName} must be at least ${min}` },
     ]);
   }
-  
+
   if (max !== undefined && num > max) {
     throw new ValidationError([
       { field: fieldName, message: `${fieldName} must be at most ${max}` },
     ]);
   }
-  
+
   return num;
 }
 
@@ -269,31 +260,29 @@ export function validateNumberField(
 export function validateBooleanField(
   value: unknown,
   fieldName: string,
-  defaultValue: boolean = false
+  defaultValue: boolean = false,
 ): boolean {
-  if (value === undefined || value === null || value === '') {
+  if (value === undefined || value === null || value === "") {
     return defaultValue;
   }
-  
-  if (typeof value === 'boolean') {
+
+  if (typeof value === "boolean") {
     return value;
   }
-  
-  if (typeof value === 'string') {
+
+  if (typeof value === "string") {
     const lowerValue = value.toLowerCase();
-    if (lowerValue === 'true' || lowerValue === '1' || lowerValue === 'yes') {
+    if (lowerValue === "true" || lowerValue === "1" || lowerValue === "yes") {
       return true;
     }
-    if (lowerValue === 'false' || lowerValue === '0' || lowerValue === 'no') {
+    if (lowerValue === "false" || lowerValue === "0" || lowerValue === "no") {
       return false;
     }
   }
-  
-  if (typeof value === 'number') {
+
+  if (typeof value === "number") {
     return value === 1;
   }
-  
-  throw new ValidationError([
-    { field: fieldName, message: `${fieldName} must be a boolean` },
-  ]);
+
+  throw new ValidationError([{ field: fieldName, message: `${fieldName} must be a boolean` }]);
 }

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -19,13 +19,8 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
   Upload,
   X,
   Calendar,
@@ -43,13 +38,13 @@ import {
   Briefcase,
   ChevronLeft,
 } from "lucide-react";
-import { 
+import {
   PublicationFormData,
   PublicationType,
   PublicationCategory,
   PUBLICATION_TYPES,
   PUBLICATION_CATEGORIES,
-  PUBLICATION_STATUSES
+  PUBLICATION_STATUSES,
 } from "@/types/publication.types";
 import { mockAuthors } from "@/lib/data/mock-publication-data";
 import { cn } from "@/lib/utils";
@@ -58,7 +53,10 @@ import { cn } from "@/lib/utils";
 const formSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
   slug: z.string().optional(),
-  excerpt: z.string().min(10, "Excerpt must be at least 10 characters").max(500, "Excerpt must be less than 500 characters"),
+  excerpt: z
+    .string()
+    .min(10, "Excerpt must be at least 10 characters")
+    .max(500, "Excerpt must be less than 500 characters"),
   content: z.string().min(50, "Content must be at least 50 characters"),
   type: z.enum(PUBLICATION_TYPES),
   category: z.enum(PUBLICATION_CATEGORIES),
@@ -75,8 +73,14 @@ const formSchema = z.object({
   isPinned: z.boolean(),
   priority: z.number().min(0).max(10),
   seo: z.object({
-    title: z.string().min(1, "SEO title is required").max(60, "SEO title must be less than 60 characters"),
-    description: z.string().min(1, "SEO description is required").max(160, "SEO description must be less than 160 characters"),
+    title: z
+      .string()
+      .min(1, "SEO title is required")
+      .max(60, "SEO title must be less than 60 characters"),
+    description: z
+      .string()
+      .min(1, "SEO description is required")
+      .max(160, "SEO description must be less than 160 characters"),
     keywords: z.array(z.string()).optional(),
     ogImage: z.string().optional(),
   }),
@@ -88,10 +92,10 @@ interface PublicationPageFormProps {
   isEditing?: boolean;
 }
 
-export default function PublicationPageForm({ 
-  onSubmit, 
+export default function PublicationPageForm({
+  onSubmit,
   initialData,
-  isEditing = false 
+  isEditing = false,
 }: PublicationPageFormProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
@@ -124,9 +128,9 @@ export default function PublicationPageForm({
         title: "",
         description: "",
         keywords: [],
-        ogImage: ""
+        ogImage: "",
       },
-      ...initialData
+      ...initialData,
     },
   });
 
@@ -143,14 +147,14 @@ export default function PublicationPageForm({
       ...data,
       featuredImage,
       gallery,
-      attachments
+      attachments,
     };
     onSubmit(formDataWithMedia);
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => setFeaturedImage(e.target?.result as string);
       reader.readAsDataURL(file);
@@ -159,17 +163,21 @@ export default function PublicationPageForm({
 
   const handleGalleryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    files.forEach(file => {
-      if (file.type.startsWith('image/')) {
+    files.forEach((file) => {
+      if (file.type.startsWith("image/")) {
         const reader = new FileReader();
-        reader.onload = (e) => setGallery(prev => [...prev, e.target?.result as string]);
+        reader.onload = (e) => setGallery((prev) => [...prev, e.target?.result as string]);
         reader.readAsDataURL(file);
       }
     });
   };
 
   const generateSlug = (title: string) => {
-    return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
   };
 
   const watchTitle = form.watch("title");
@@ -180,9 +188,9 @@ export default function PublicationPageForm({
       {/* Page Header */}
       <div className="flex flex-col gap-4 mb-8 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             className="pl-0 text-muted-foreground hover:text-primary"
             onClick={() => router.back()}
           >
@@ -193,16 +201,17 @@ export default function PublicationPageForm({
             {isEditing ? "Edit Publication" : "Create New Publication"}
           </h1>
           <p className="text-muted-foreground">
-            {isEditing 
+            {isEditing
               ? "Update the details and metadata for your existing publication."
-              : "Fill in the information below to create a new publication."
-            }
+              : "Fill in the information below to create a new publication."}
           </p>
         </div>
-        
+
         {/* Top Actions (Optional for desktop convenience) */}
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={() => router.back()}>Cancel</Button>
+          <Button variant="outline" onClick={() => router.back()}>
+            Cancel
+          </Button>
           <Button onClick={form.handleSubmit(handleSubmit)} disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? "Saving..." : isEditing ? "Update" : "Publish"}
           </Button>
@@ -231,7 +240,9 @@ export default function PublicationPageForm({
                     className={cn(form.formState.errors.title && "border-destructive")}
                   />
                   {form.formState.errors.title && (
-                    <p className="text-sm text-destructive">{form.formState.errors.title.message as string}</p>
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.title.message as string}
+                    </p>
                   )}
                 </div>
 
@@ -257,7 +268,9 @@ export default function PublicationPageForm({
                   className={cn(form.formState.errors.excerpt && "border-destructive")}
                 />
                 {form.formState.errors.excerpt && (
-                  <p className="text-sm text-destructive">{form.formState.errors.excerpt.message as string}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.excerpt.message as string}
+                  </p>
                 )}
               </div>
 
@@ -285,7 +298,9 @@ export default function PublicationPageForm({
                   <Label htmlFor="category">Category *</Label>
                   <Select
                     value={form.watch("category")}
-                    onValueChange={(value) => form.setValue("category", value as PublicationCategory)}
+                    onValueChange={(value) =>
+                      form.setValue("category", value as PublicationCategory)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Category" />
@@ -328,7 +343,9 @@ export default function PublicationPageForm({
                     </SelectTrigger>
                     <SelectContent>
                       {mockAuthors.map((author) => (
-                        <SelectItem key={author.id} value={author.id}>{author.name}</SelectItem>
+                        <SelectItem key={author.id} value={author.id}>
+                          {author.name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -374,7 +391,11 @@ export default function PublicationPageForm({
                   <Label>Featured Image</Label>
                   {featuredImage ? (
                     <div className="relative group">
-                      <img src={featuredImage} alt="Featured" className="w-full h-48 object-cover rounded-lg border" />
+                      <img
+                        src={featuredImage}
+                        alt="Featured"
+                        className="w-full h-48 object-cover rounded-lg border"
+                      />
                       <Button
                         type="button"
                         variant="destructive"
@@ -388,10 +409,18 @@ export default function PublicationPageForm({
                   ) : (
                     <div className="border-2 border-dashed rounded-lg p-10 flex flex-col items-center justify-center bg-muted/30">
                       <ImageIcon className="h-10 w-10 text-muted-foreground mb-4" />
-                      <Input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="f-upload" />
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="f-upload"
+                      />
                       <Label htmlFor="f-upload" className="cursor-pointer">
                         <Button type="button" variant="secondary" size="sm" asChild>
-                          <span><Upload className="h-4 w-4 mr-2" /> Upload Image</span>
+                          <span>
+                            <Upload className="h-4 w-4 mr-2" /> Upload Image
+                          </span>
                         </Button>
                       </Label>
                     </div>
@@ -410,7 +439,11 @@ export default function PublicationPageForm({
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="seo.description">Meta Description</Label>
-                  <Textarea {...form.register("seo.description")} rows={4} placeholder="Description for search results..." />
+                  <Textarea
+                    {...form.register("seo.description")}
+                    rows={4}
+                    placeholder="Description for search results..."
+                  />
                 </div>
               </div>
             </TabsContent>
@@ -421,20 +454,26 @@ export default function PublicationPageForm({
                 <div className="space-y-4">
                   <h3 className="text-sm font-medium">Access & Visibility</h3>
                   <div className="space-y-4">
-                     <Select
-                        value={form.watch("visibility")}
-                        onValueChange={(value) => form.setValue("visibility", value as any)}
-                      >
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="public">Public</SelectItem>
-                          <SelectItem value="members_only">Members Only</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="isFeatured" checked={form.watch("isFeatured")} onCheckedChange={(c) => form.setValue("isFeatured", !!c)} />
-                        <Label htmlFor="isFeatured">Feature this publication</Label>
-                      </div>
+                    <Select
+                      value={form.watch("visibility")}
+                      onValueChange={(value) => form.setValue("visibility", value as any)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="public">Public</SelectItem>
+                        <SelectItem value="members_only">Members Only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="isFeatured"
+                        checked={form.watch("isFeatured")}
+                        onCheckedChange={(c) => form.setValue("isFeatured", !!c)}
+                      />
+                      <Label htmlFor="isFeatured">Feature this publication</Label>
+                    </div>
                   </div>
                 </div>
 
@@ -442,11 +481,19 @@ export default function PublicationPageForm({
                   <h3 className="text-sm font-medium">Capabilities</h3>
                   <div className="grid gap-3">
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="comments" checked={form.watch("commentsEnabled")} onCheckedChange={(c) => form.setValue("commentsEnabled", !!c)} />
+                      <Checkbox
+                        id="comments"
+                        checked={form.watch("commentsEnabled")}
+                        onCheckedChange={(c) => form.setValue("commentsEnabled", !!c)}
+                      />
                       <Label htmlFor="comments">Enable comments</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="sharing" checked={form.watch("sharingEnabled")} onCheckedChange={(c) => form.setValue("sharingEnabled", !!c)} />
+                      <Checkbox
+                        id="sharing"
+                        checked={form.watch("sharingEnabled")}
+                        onCheckedChange={(c) => form.setValue("sharingEnabled", !!c)}
+                      />
                       <Label htmlFor="sharing">Enable social sharing</Label>
                     </div>
                   </div>
@@ -458,20 +505,20 @@ export default function PublicationPageForm({
 
         {/* Bottom Sticky Actions */}
         <div className="flex items-center justify-end gap-4 pt-6 border-t">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-          >
+          <Button type="button" variant="outline" onClick={() => router.back()}>
             Discard Changes
           </Button>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             size="lg"
             disabled={form.formState.isSubmitting}
             className="min-w-[150px]"
           >
-            {form.formState.isSubmitting ? "Saving..." : isEditing ? "Save Changes" : "Create Publication"}
+            {form.formState.isSubmitting
+              ? "Saving..."
+              : isEditing
+                ? "Save Changes"
+                : "Create Publication"}
           </Button>
         </div>
       </form>

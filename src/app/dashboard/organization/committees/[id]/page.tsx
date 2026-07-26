@@ -9,13 +9,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
+import {
   Committee,
   CommitteeLeadership,
   CommitteeMember,
-  CommitteeMeeting 
+  CommitteeMeeting,
 } from "@/types/committee.types";
-import { 
+import {
   ArrowLeft,
   Mail,
   Phone,
@@ -66,9 +66,9 @@ export default function CommitteeDetailPage() {
       setLoading(true);
       try {
         // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        const foundCommittee = mockCommittees.find(c => c.id === committeeId);
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        const foundCommittee = mockCommittees.find((c) => c.id === committeeId);
         setCommittee(foundCommittee || null);
       } catch (error) {
         console.error("Error fetching committee:", error);
@@ -87,7 +87,7 @@ export default function CommitteeDetailPage() {
       pending: "outline" as const,
       suspended: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -103,10 +103,15 @@ export default function CommitteeDetailPage() {
       ad_hoc: "bg-orange-100 text-orange-800 border-orange-200",
       standing: "bg-indigo-100 text-indigo-800 border-indigo-200",
     };
-    
+
     return (
-      <Badge variant="outline" className={colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"}>
-        {type.replace('_', ' ').charAt(0).toUpperCase() + type.replace('_', ' ').slice(1)}
+      <Badge
+        variant="outline"
+        className={
+          colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"
+        }
+      >
+        {type.replace("_", " ").charAt(0).toUpperCase() + type.replace("_", " ").slice(1)}
       </Badge>
     );
   };
@@ -118,7 +123,7 @@ export default function CommitteeDetailPage() {
       operational: "outline" as const,
       advisory: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[authority as keyof typeof variants] || "secondary"}>
         {authority.charAt(0).toUpperCase() + authority.slice(1)}
@@ -191,7 +196,7 @@ export default function CommitteeDetailPage() {
             <p className="text-sm text-muted-foreground">Total Members</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6 text-center">
             <CheckSquare className="h-8 w-8 mx-auto mb-2 text-emerald-500" />
@@ -199,19 +204,23 @@ export default function CommitteeDetailPage() {
             <p className="text-sm text-muted-foreground">Active Members</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6 text-center">
             <Calendar className="h-8 w-8 mx-auto mb-2 text-purple-500" />
-            <div className="text-2xl font-bold">{formatPercentage(committee.metrics.meetingAttendanceRate)}</div>
+            <div className="text-2xl font-bold">
+              {formatPercentage(committee.metrics.meetingAttendanceRate)}
+            </div>
             <p className="text-sm text-muted-foreground">Meeting Attendance</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6 text-center">
             <Target className="h-8 w-8 mx-auto mb-2 text-orange-500" />
-            <div className="text-2xl font-bold">{formatPercentage(committee.metrics.goalCompletionRate)}</div>
+            <div className="text-2xl font-bold">
+              {formatPercentage(committee.metrics.goalCompletionRate)}
+            </div>
             <p className="text-sm text-muted-foreground">Goal Completion</p>
           </CardContent>
         </Card>
@@ -239,24 +248,24 @@ export default function CommitteeDetailPage() {
                   <span className="text-sm font-medium">Status</span>
                   {getStatusBadge(committee.status)}
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Type</span>
                   {getTypeBadge(committee.type)}
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Authority Level</span>
                   {getAuthorityBadge(committee.charter.authorityLevel)}
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Created</span>
                   <span className="text-sm text-muted-foreground">
                     {formatDistanceToNow(committee.createdAt, { addSuffix: true })}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Last Updated</span>
                   <span className="text-sm text-muted-foreground">
@@ -279,15 +288,17 @@ export default function CommitteeDetailPage() {
                   </div>
                   <span className="font-semibold">{committee.metrics.impactScore.toFixed(1)}</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-indigo-500" />
                     <span className="text-sm font-medium">Satisfaction Score</span>
                   </div>
-                  <span className="font-semibold">{formatPercentage(committee.metrics.satisfactionScore)}</span>
+                  <span className="font-semibold">
+                    {formatPercentage(committee.metrics.satisfactionScore)}
+                  </span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Target className="h-4 w-4 text-orange-500" />
@@ -309,9 +320,9 @@ export default function CommitteeDetailPage() {
                 <h4 className="text-sm font-medium mb-2">Purpose</h4>
                 <p className="text-sm text-muted-foreground">{committee.purpose}</p>
               </div>
-              
+
               <Separator />
-              
+
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-3">
                   <h4 className="text-sm font-medium">Contact Information</h4>
@@ -319,32 +330,43 @@ export default function CommitteeDetailPage() {
                     {committee.contactInfo.email && (
                       <div className="flex items-center gap-2 text-sm">
                         <Mail className="h-4 w-4 text-muted-foreground" />
-                        <a href={`mailto:${committee.contactInfo.email}`} className="text-blue-600 hover:underline">
+                        <a
+                          href={`mailto:${committee.contactInfo.email}`}
+                          className="text-blue-600 hover:underline"
+                        >
                           {committee.contactInfo.email}
                         </a>
                       </div>
                     )}
-                    
+
                     {committee.contactInfo.phone && (
                       <div className="flex items-center gap-2 text-sm">
                         <Phone className="h-4 w-4 text-muted-foreground" />
-                        <a href={`tel:${committee.contactInfo.phone}`} className="text-blue-600 hover:underline">
+                        <a
+                          href={`tel:${committee.contactInfo.phone}`}
+                          className="text-blue-600 hover:underline"
+                        >
                           {committee.contactInfo.phone}
                         </a>
                       </div>
                     )}
-                    
+
                     {committee.contactInfo.meetingLocation && (
                       <div className="flex items-center gap-2 text-sm">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
                         <span>{committee.contactInfo.meetingLocation}</span>
                       </div>
                     )}
-                    
+
                     {committee.contactInfo.website && (
                       <div className="flex items-center gap-2 text-sm">
                         <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                        <a href={committee.contactInfo.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        <a
+                          href={committee.contactInfo.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
                           Visit Website
                         </a>
                       </div>
@@ -406,48 +428,63 @@ export default function CommitteeDetailPage() {
             <CardContent className="space-y-6">
               <div>
                 <h4 className="text-sm font-medium mb-2">Mission Statement</h4>
-                <p className="text-sm text-muted-foreground">{committee.charter.missionStatement}</p>
+                <p className="text-sm text-muted-foreground">
+                  {committee.charter.missionStatement}
+                </p>
               </div>
-              
+
               <div>
                 <h4 className="text-sm font-medium mb-2">Responsibilities</h4>
                 <ul className="space-y-1">
                   {committee.charter.responsibilities.map((responsibility, index) => (
-                    <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
+                    <li
+                      key={index}
+                      className="text-sm text-muted-foreground flex items-start gap-2"
+                    >
                       <span className="text-primary">•</span>
                       {responsibility}
                     </li>
                   ))}
                 </ul>
               </div>
-              
+
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <h4 className="text-sm font-medium mb-2">Decision Making Process</h4>
-                  <p className="text-sm text-muted-foreground">{committee.charter.decisionMakingProcess}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {committee.charter.decisionMakingProcess}
+                  </p>
                 </div>
-                
+
                 <div>
                   <h4 className="text-sm font-medium mb-2">Reporting Structure</h4>
-                  <p className="text-sm text-muted-foreground">{committee.charter.reportingStructure}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {committee.charter.reportingStructure}
+                  </p>
                 </div>
               </div>
-              
+
               {committee.charter.termLimits && (
                 <div>
                   <h4 className="text-sm font-medium mb-2">Term Limits</h4>
                   <div className="grid gap-4 md:grid-cols-3 text-sm">
                     <div>
                       <span className="text-muted-foreground">Chair Term:</span>
-                      <span className="ml-2 font-medium">{committee.charter.termLimits.chairTerm} months</span>
+                      <span className="ml-2 font-medium">
+                        {committee.charter.termLimits.chairTerm} months
+                      </span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Member Term:</span>
-                      <span className="ml-2 font-medium">{committee.charter.termLimits.memberTerm} months</span>
+                      <span className="ml-2 font-medium">
+                        {committee.charter.termLimits.memberTerm} months
+                      </span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Max Terms:</span>
-                      <span className="ml-2 font-medium">{committee.charter.termLimits.maxTerms}</span>
+                      <span className="ml-2 font-medium">
+                        {committee.charter.termLimits.maxTerms}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -488,7 +525,10 @@ function LeadershipCard({ leader }: { leader: CommitteeLeadership }) {
         <Avatar className="h-10 w-10">
           <AvatarImage src={leader.avatar} alt={leader.name} />
           <AvatarFallback>
-            {leader.name.split(' ').map(n => n[0]).join('')}
+            {leader.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")}
           </AvatarFallback>
         </Avatar>
         <div>
@@ -515,7 +555,10 @@ function MemberCard({ member }: { member: CommitteeMember }) {
         <Avatar className="h-10 w-10">
           <AvatarImage src={member.avatar} alt={member.name} />
           <AvatarFallback>
-            {member.name.split(' ').map(n => n[0]).join('')}
+            {member.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")}
           </AvatarFallback>
         </Avatar>
         <div>

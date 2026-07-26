@@ -3,7 +3,7 @@
  * Defines membership profiles, filters, and sorting options
  */
 
-import { UserProfile, UserRole } from "./dashboard.types"
+import { UserProfile, UserRole } from "./dashboard.types";
 
 export enum MembershipTier {
   BASIC = "basic",
@@ -11,7 +11,7 @@ export enum MembershipTier {
   CORPORATE = "corporate",
   STUDENT = "student",
   VIP = "vip",
-  PREMIUM = "premium"
+  PREMIUM = "premium",
 }
 
 export enum MembershipStatus {
@@ -19,105 +19,111 @@ export enum MembershipStatus {
   EXPIRED = "expired",
   PENDING = "pending",
   SUSPENDED = "suspended",
-  CANCELLED = "cancelled"
+  CANCELLED = "cancelled",
 }
 
 export interface MembershipProfile extends UserProfile {
   /** Membership tier information */
-  membershipTier: MembershipTier
+  membershipTier: MembershipTier;
   /** Current membership status */
-  membershipStatus: MembershipStatus
+  membershipStatus: MembershipStatus;
   /** Date when membership started */
-  membershipStartDate: Date
+  membershipStartDate: Date;
   /** Date when membership expires or null for lifetime */
-  membershipEndDate: Date | null
+  membershipEndDate: Date | null;
   /** Chapter or local organization affiliation */
-  chapter?: string
+  chapter?: string;
   /** Geographic location */
-  location: string
+  location: string;
   /** Company or organization */
-  company?: string
+  company?: string;
   /** Job title or position */
-  jobTitle?: string
+  jobTitle?: string;
   /** Professional bio */
-  bio?: string
+  bio?: string;
   /** Membership application date */
-  applicationDate: Date
+  applicationDate: Date;
   /** Last renewal date */
-  lastRenewalDate?: Date
+  lastRenewalDate?: Date;
   /** Member ID number */
-  memberId: string
+  memberId: string;
   /** Profile photo URL */
-  avatar?: string
+  avatar?: string;
   /** Contact information */
-  phone?: string
+  phone?: string;
   /** Social links */
-  linkedin?: string
-  website?: string
+  linkedin?: string;
+  website?: string;
   /** Skills or expertise */
-  skills?: string[]
+  skills?: string[];
   /** Interests for networking */
-  interests?: string[]
+  interests?: string[];
   /** Committee memberships */
-  committees?: string[]
+  committees?: string[];
 }
 
 export interface MembershipFilter {
   /** Search query for name, email, company */
-  search?: string
+  search?: string;
   /** Filter by membership tiers */
-  tiers?: MembershipTier[]
+  tiers?: MembershipTier[];
   /** Filter by membership status */
-  statuses?: MembershipStatus[]
+  statuses?: MembershipStatus[];
   /** Filter by location/chapter */
-  locations?: string[]
+  locations?: string[];
   /** Filter by committees */
-  committees?: string[]
+  committees?: string[];
   /** Date range for membership start */
   startDateRange?: {
-    from: Date
-    to: Date
-  }
+    from: Date;
+    to: Date;
+  };
   /** Date range for membership end */
   endDateRange?: {
-    from: Date
-    to: Date
-  }
+    from: Date;
+    to: Date;
+  };
   /** Filter by skills */
-  skills?: string[]
+  skills?: string[];
 }
 
 export interface MembershipSort {
-  field: "name" | "membershipStartDate" | "membershipEndDate" | "membershipTier" | "location" | "company"
-  direction: "asc" | "desc"
+  field:
+    | "name"
+    | "membershipStartDate"
+    | "membershipEndDate"
+    | "membershipTier"
+    | "location"
+    | "company";
+  direction: "asc" | "desc";
 }
 
 export interface MembershipDirectoryResponse {
-  members: MembershipProfile[]
-  total: number
-  page: number
-  pageSize: number
-  hasMore: boolean
+  members: MembershipProfile[];
+  total: number;
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
 }
 
 export interface MembershipStats {
-  totalMembers: number
-  activeMembers: number
-  expiredMembers: number
-  pendingMembers: number
-  tierDistribution: Record<MembershipTier, number>
-  newMembersThisMonth: number
-  renewalRate: number
+  totalMembers: number;
+  activeMembers: number;
+  expiredMembers: number;
+  pendingMembers: number;
+  tierDistribution: Record<MembershipTier, number>;
+  newMembersThisMonth: number;
+  renewalRate: number;
 }
 
 export interface MembershipApplication {
-  id: string
-  userId: string
-  requestedTier: MembershipTier
-  status: "pending" | "approved" | "rejected" | "withdrawn"
-  applicationDate: Date
-  reviewDate?: Date
-  reviewedBy?: string
-  rejectionReason?: string
-  notes?: string
+  id: string;
+  userId: string;
+  requestedTier: MembershipTier;
+  status: "pending" | "approved" | "rejected" | "withdrawn";
+  applicationDate: Date;
+  reviewDate?: Date;
+  reviewedBy?: string;
+  rejectionReason?: string;
+  notes?: string;
 }

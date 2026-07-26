@@ -1,19 +1,37 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Search, Filter, X, RotateCcw, Check, Briefcase, Users, Calendar, MapPin } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog"
-import { type MembershipFilter, MembershipTier, MembershipStatus } from "@/types/membership.types"
+import { useState } from "react";
+import {
+  Search,
+  Filter,
+  X,
+  RotateCcw,
+  Check,
+  Briefcase,
+  Users,
+  Calendar,
+  MapPin,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { type MembershipFilter, MembershipTier, MembershipStatus } from "@/types/membership.types";
 
 interface MembershipFilterProps {
-  filters: MembershipFilter
-  onFiltersChange: (filters: MembershipFilter) => void
-  isLoading?: boolean
+  filters: MembershipFilter;
+  onFiltersChange: (filters: MembershipFilter) => void;
+  isLoading?: boolean;
 }
 
 const MEMBERSHIP_TIERS = [
@@ -22,16 +40,16 @@ const MEMBERSHIP_TIERS = [
   { value: MembershipTier.CORPORATE, label: "Corporate" },
   { value: MembershipTier.STUDENT, label: "Student" },
   { value: MembershipTier.VIP, label: "VIP" },
-  { value: MembershipTier.PREMIUM, label: "Premium" }
-]
+  { value: MembershipTier.PREMIUM, label: "Premium" },
+];
 
 const MEMBERSHIP_STATUSES = [
   { value: MembershipStatus.ACTIVE, label: "Active" },
   { value: MembershipStatus.EXPIRED, label: "Expired" },
   { value: MembershipStatus.PENDING, label: "Pending" },
   { value: MembershipStatus.SUSPENDED, label: "Suspended" },
-  { value: MembershipStatus.CANCELLED, label: "Cancelled" }
-]
+  { value: MembershipStatus.CANCELLED, label: "Cancelled" },
+];
 
 const SAMPLE_LOCATIONS = [
   "New York, NY",
@@ -43,8 +61,8 @@ const SAMPLE_LOCATIONS = [
   "San Antonio, TX",
   "San Diego, CA",
   "Dallas, TX",
-  "San Jose, CA"
-]
+  "San Jose, CA",
+];
 
 const SAMPLE_COMMITTEES = [
   "Events",
@@ -55,84 +73,82 @@ const SAMPLE_COMMITTEES = [
   "Student Outreach",
   "Diversity & Inclusion",
   "Technology",
-  "Community Service"
-]
+  "Community Service",
+];
 
 export function MembershipFilter({ filters, onFiltersChange, isLoading }: MembershipFilterProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleSearchChange = (value: string) => {
     onFiltersChange({
       ...filters,
-      search: value || undefined
-    })
-  }
+      search: value || undefined,
+    });
+  };
 
   const handleTierChange = (tier: MembershipTier, checked: boolean) => {
-    const currentTiers = filters.tiers || []
-    const newTiers = checked
-      ? [...currentTiers, tier]
-      : currentTiers.filter(t => t !== tier)
+    const currentTiers = filters.tiers || [];
+    const newTiers = checked ? [...currentTiers, tier] : currentTiers.filter((t) => t !== tier);
 
     onFiltersChange({
       ...filters,
-      tiers: newTiers.length > 0 ? newTiers : undefined
-    })
-  }
+      tiers: newTiers.length > 0 ? newTiers : undefined,
+    });
+  };
 
   const handleStatusChange = (status: MembershipStatus, checked: boolean) => {
-    const currentStatuses = filters.statuses || []
+    const currentStatuses = filters.statuses || [];
     const newStatuses = checked
       ? [...currentStatuses, status]
-      : currentStatuses.filter(s => s !== status)
+      : currentStatuses.filter((s) => s !== status);
 
     onFiltersChange({
       ...filters,
-      statuses: newStatuses.length > 0 ? newStatuses : undefined
-    })
-  }
+      statuses: newStatuses.length > 0 ? newStatuses : undefined,
+    });
+  };
 
   const handleLocationChange = (location: string, checked: boolean) => {
-    const currentLocations = filters.locations || []
+    const currentLocations = filters.locations || [];
     const newLocations = checked
       ? [...currentLocations, location]
-      : currentLocations.filter(l => l !== location)
+      : currentLocations.filter((l) => l !== location);
 
     onFiltersChange({
       ...filters,
-      locations: newLocations.length > 0 ? newLocations : undefined
-    })
-  }
+      locations: newLocations.length > 0 ? newLocations : undefined,
+    });
+  };
 
   const handleCommitteeChange = (committee: string, checked: boolean) => {
-    const currentCommittees = filters.committees || []
+    const currentCommittees = filters.committees || [];
     const newCommittees = checked
       ? [...currentCommittees, committee]
-      : currentCommittees.filter(c => c !== committee)
+      : currentCommittees.filter((c) => c !== committee);
 
     onFiltersChange({
       ...filters,
-      committees: newCommittees.length > 0 ? newCommittees : undefined
-    })
-  }
+      committees: newCommittees.length > 0 ? newCommittees : undefined,
+    });
+  };
 
   const clearAllFilters = () => {
-    onFiltersChange({})
-  }
+    onFiltersChange({});
+  };
 
   const getActiveFilterCount = () => {
-    let count = 0
-    if (filters.search) count++
-    if (filters.tiers?.length) count++
-    if (filters.statuses?.length) count++
-    if (filters.locations?.length) count++
-    if (filters.committees?.length) count++
-    if (filters.startDateRange) count++
-    if (filters.endDateRange) count++
-    return count
-  }
+    let count = 0;
+    if (filters.search) count++;
+    if (filters.tiers?.length) count++;
+    if (filters.statuses?.length) count++;
+    if (filters.locations?.length) count++;
+    if (filters.committees?.length) count++;
+    if (filters.startDateRange) count++;
+    if (filters.endDateRange) count++;
+    return count;
+  };
 
-  const activeFiltersCount = getActiveFilterCount()
+  const activeFiltersCount = getActiveFilterCount();
 
   return (
     <div className="flex flex-col space-y-4">
@@ -200,7 +216,9 @@ export function MembershipFilter({ filters, onFiltersChange, isLoading }: Member
                         key={tier.value}
                         variant={filters.tiers?.includes(tier.value) ? "default" : "outline"}
                         className="cursor-pointer hover:bg-primary/10"
-                        onClick={() => handleTierChange(tier.value, !filters.tiers?.includes(tier.value))}
+                        onClick={() =>
+                          handleTierChange(tier.value, !filters.tiers?.includes(tier.value))
+                        }
                       >
                         {tier.label}
                       </Badge>
@@ -217,7 +235,12 @@ export function MembershipFilter({ filters, onFiltersChange, isLoading }: Member
                         key={status.value}
                         variant={filters.statuses?.includes(status.value) ? "default" : "outline"}
                         className="cursor-pointer hover:bg-primary/10"
-                        onClick={() => handleStatusChange(status.value, !filters.statuses?.includes(status.value))}
+                        onClick={() =>
+                          handleStatusChange(
+                            status.value,
+                            !filters.statuses?.includes(status.value),
+                          )
+                        }
                       >
                         {status.label}
                       </Badge>
@@ -232,16 +255,21 @@ export function MembershipFilter({ filters, onFiltersChange, isLoading }: Member
                     <Input
                       type="date"
                       placeholder="From"
-                      value={filters.startDateRange?.from ? new Date(filters.startDateRange.from).toISOString().split('T')[0] : ''}
+                      value={
+                        filters.startDateRange?.from
+                          ? new Date(filters.startDateRange.from).toISOString().split("T")[0]
+                          : ""
+                      }
                       onChange={(e) => {
                         const fromDate = e.target.value ? new Date(e.target.value) : undefined;
                         onFiltersChange({
                           ...filters,
-                          startDateRange: fromDate && filters.startDateRange?.to
-                            ? { from: fromDate, to: filters.startDateRange.to }
-                            : fromDate
-                              ? { from: fromDate, to: new Date() }
-                              : undefined
+                          startDateRange:
+                            fromDate && filters.startDateRange?.to
+                              ? { from: fromDate, to: filters.startDateRange.to }
+                              : fromDate
+                                ? { from: fromDate, to: new Date() }
+                                : undefined,
                         });
                       }}
                       disabled={isLoading}
@@ -250,16 +278,21 @@ export function MembershipFilter({ filters, onFiltersChange, isLoading }: Member
                     <Input
                       type="date"
                       placeholder="To"
-                      value={filters.startDateRange?.to ? new Date(filters.startDateRange.to).toISOString().split('T')[0] : ''}
+                      value={
+                        filters.startDateRange?.to
+                          ? new Date(filters.startDateRange.to).toISOString().split("T")[0]
+                          : ""
+                      }
                       onChange={(e) => {
                         const toDate = e.target.value ? new Date(e.target.value) : undefined;
                         onFiltersChange({
                           ...filters,
-                          startDateRange: toDate && filters.startDateRange?.from
-                            ? { from: filters.startDateRange.from, to: toDate }
-                            : toDate && filters.startDateRange?.from
+                          startDateRange:
+                            toDate && filters.startDateRange?.from
                               ? { from: filters.startDateRange.from, to: toDate }
-                              : undefined
+                              : toDate && filters.startDateRange?.from
+                                ? { from: filters.startDateRange.from, to: toDate }
+                                : undefined,
                         });
                       }}
                       disabled={isLoading}
@@ -270,11 +303,7 @@ export function MembershipFilter({ filters, onFiltersChange, isLoading }: Member
               </div>
 
               <DialogFooter className="pt-4">
-                <Button
-                  onClick={() => setIsOpen(false)}
-                  disabled={isLoading}
-                  className="w-full"
-                >
+                <Button onClick={() => setIsOpen(false)} disabled={isLoading} className="w-full">
                   Done
                 </Button>
               </DialogFooter>
@@ -283,5 +312,5 @@ export function MembershipFilter({ filters, onFiltersChange, isLoading }: Member
         </div>
       </div>
     </div>
-  )
+  );
 }

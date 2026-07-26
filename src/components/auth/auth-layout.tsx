@@ -34,13 +34,7 @@ function AuthLoading() {
  * Auth layout wrapper component
  * Provides consistent layout and styling across auth pages
  */
-export function AuthLayout({
-  children,
-  title,
-  subtitle,
-  footerText,
-  footerLink
-}: AuthLayoutProps) {
+export function AuthLayout({ children, title, subtitle, footerText, footerLink }: AuthLayoutProps) {
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
       <div className="w-full max-w-md">
@@ -56,27 +50,18 @@ export function AuthLayout({
               priority
             />
           </div>
-          <h1 className="text-2xl font-semibold text-foreground">
-            {title}
-          </h1>
-          <p className="text-sm mt-1 text-muted-foreground">
-            {subtitle}
-          </p>
+          <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
+          <p className="text-sm mt-1 text-muted-foreground">{subtitle}</p>
         </div>
 
         {/* Main content */}
-        <div className="rounded-2xl border p-8 shadow-sm bg-card border-border">
-          {children}
-        </div>
+        <div className="rounded-2xl border p-8 shadow-sm bg-card border-border">{children}</div>
 
         {/* Footer */}
         {footerText && footerLink && (
           <p className="text-center text-sm text-muted-foreground mt-6">
             {footerText}{" "}
-            <Link
-              href={footerLink.href}
-              className="font-medium hover:underline text-primary"
-            >
+            <Link href={footerLink.href} className="font-medium hover:underline text-primary">
               {footerLink.text}
             </Link>
           </p>

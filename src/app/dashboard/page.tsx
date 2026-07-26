@@ -112,9 +112,7 @@ export default function DashboardPage() {
         <AlertCircle className="h-12 w-12 text-muted-foreground" />
         <Alert variant="destructive" className="max-w-md">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            You must be logged in to access the dashboard.
-          </AlertDescription>
+          <AlertDescription>You must be logged in to access the dashboard.</AlertDescription>
         </Alert>
         <div className="flex gap-4">
           <button
@@ -191,11 +189,10 @@ export default function DashboardPage() {
       <div className="xl:col-span-2">
         <GlobalSearchWidget />
       </div>
-      
+
       <div className="xl:col-span-2">
         <QuickNavigationWidget />
       </div>
-
     </div>
   );
 }

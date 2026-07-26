@@ -29,19 +29,25 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  MoreHorizontal, 
-  Mail, 
-  CreditCard, 
-  Eye, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  MoreHorizontal,
+  Mail,
+  CreditCard,
+  Eye,
   CheckCircle,
   AlertCircle,
   Clock,
   XCircle,
   Send,
   FileText,
-  Download
+  Download,
 } from "lucide-react";
 import { Invoice, InvoicePayment } from "@/types/finance.types";
 import { InvoiceDetailsModal } from "./invoice-details-modal";
@@ -50,18 +56,18 @@ interface InvoicesTableProps {
   invoices: Invoice[];
   payments: InvoicePayment[];
   onRecordPayment: (invoiceId: string, amount: number, paymentMethod: string) => void;
-  onSendReminder: (invoiceId: string, type: 'email' | 'sms' | 'in_app') => void;
-  onUpdateStatus: (invoiceId: string, status: Invoice['status']) => void;
+  onSendReminder: (invoiceId: string, type: "email" | "sms" | "in_app") => void;
+  onUpdateStatus: (invoiceId: string, status: Invoice["status"]) => void;
   onSendInvoice: (invoiceId: string) => void;
 }
 
-export function InvoicesTable({ 
-  invoices, 
-  payments, 
-  onRecordPayment, 
-  onSendReminder, 
+export function InvoicesTable({
+  invoices,
+  payments,
+  onRecordPayment,
+  onSendReminder,
   onUpdateStatus,
-  onSendInvoice 
+  onSendInvoice,
 }: InvoicesTableProps) {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -70,30 +76,30 @@ export function InvoicesTable({
   const [paymentMethod, setPaymentMethod] = useState("");
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
   };
 
-  const getStatusBadge = (status: Invoice['status']) => {
+  const getStatusBadge = (status: Invoice["status"]) => {
     switch (status) {
-      case 'paid':
-        return { variant: 'default' as const, icon: CheckCircle, text: 'Paid' };
-      case 'sent':
-        return { variant: 'secondary' as const, icon: Send, text: 'Sent' };
-      case 'overdue':
-        return { variant: 'destructive' as const, icon: AlertCircle, text: 'Overdue' };
-      case 'draft':
-        return { variant: 'outline' as const, icon: FileText, text: 'Draft' };
-      case 'cancelled':
-        return { variant: 'outline' as const, icon: XCircle, text: 'Cancelled' };
-      case 'refunded':
-        return { variant: 'outline' as const, icon: CreditCard, text: 'Refunded' };
+      case "paid":
+        return { variant: "default" as const, icon: CheckCircle, text: "Paid" };
+      case "sent":
+        return { variant: "secondary" as const, icon: Send, text: "Sent" };
+      case "overdue":
+        return { variant: "destructive" as const, icon: AlertCircle, text: "Overdue" };
+      case "draft":
+        return { variant: "outline" as const, icon: FileText, text: "Draft" };
+      case "cancelled":
+        return { variant: "outline" as const, icon: XCircle, text: "Cancelled" };
+      case "refunded":
+        return { variant: "outline" as const, icon: CreditCard, text: "Refunded" };
       default:
-        return { variant: 'secondary' as const, icon: Clock, text: status };
+        return { variant: "secondary" as const, icon: Clock, text: status };
     }
   };
 
@@ -119,8 +125,8 @@ export function InvoicesTable({
     }
   };
 
-  const isOverdue = (dueDate: Date, status: Invoice['status']) => {
-    return status === 'sent' && new Date(dueDate) < new Date();
+  const isOverdue = (dueDate: Date, status: Invoice["status"]) => {
+    return status === "sent" && new Date(dueDate) < new Date();
   };
 
   const getBalanceAmount = (invoice: Invoice) => {
@@ -132,9 +138,7 @@ export function InvoicesTable({
       <Card>
         <CardHeader>
           <CardTitle>Invoices</CardTitle>
-          <CardDescription>
-            Manage client invoices and billing
-          </CardDescription>
+          <CardDescription>Manage client invoices and billing</CardDescription>
         </CardHeader>
         <CardContent>
           {/* Desktop Table View */}
@@ -157,7 +161,7 @@ export function InvoicesTable({
                   const statusBadge = getStatusBadge(invoice.status);
                   const StatusIcon = statusBadge.icon;
                   const balanceAmount = getBalanceAmount(invoice);
-                  
+
                   return (
                     <TableRow key={invoice.id}>
                       <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
@@ -173,7 +177,11 @@ export function InvoicesTable({
                         {formatCurrency(balanceAmount)}
                       </TableCell>
                       <TableCell>
-                        <div className={isOverdue(invoice.dueDate, invoice.status) ? "text-red-600" : ""}>
+                        <div
+                          className={
+                            isOverdue(invoice.dueDate, invoice.status) ? "text-red-600" : ""
+                          }
+                        >
                           {new Date(invoice.dueDate).toLocaleDateString()}
                           {isOverdue(invoice.dueDate, invoice.status) && (
                             <div className="text-xs">Overdue</div>
@@ -181,7 +189,10 @@ export function InvoicesTable({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={statusBadge.variant} className="flex items-center gap-1 w-fit">
+                        <Badge
+                          variant={statusBadge.variant}
+                          className="flex items-center gap-1 w-fit"
+                        >
                           <StatusIcon className="h-3 w-3" />
                           {statusBadge.text}
                         </Badge>
@@ -198,32 +209,36 @@ export function InvoicesTable({
                               <Eye className="mr-2 h-4 w-4" />
                               View Details
                             </DropdownMenuItem>
-                            
-                            {invoice.status === 'draft' && (
+
+                            {invoice.status === "draft" && (
                               <DropdownMenuItem onClick={() => onSendInvoice(invoice.id)}>
                                 <Send className="mr-2 h-4 w-4" />
                                 Send Invoice
                               </DropdownMenuItem>
                             )}
-                            
-                            {invoice.status !== 'paid' && invoice.status !== 'cancelled' && invoice.status !== 'refunded' && (
-                              <>
-                                <DropdownMenuItem onClick={() => handleRecordPayment(invoice)}>
-                                  <CreditCard className="mr-2 h-4 w-4" />
-                                  Record Payment
-                                </DropdownMenuItem>
-                                
-                                <DropdownMenuSeparator />
-                                
-                                <DropdownMenuItem onClick={() => onSendReminder(invoice.id, 'email')}>
-                                  <Mail className="mr-2 h-4 w-4" />
-                                  Send Reminder
-                                </DropdownMenuItem>
-                              </>
-                            )}
-                            
+
+                            {invoice.status !== "paid" &&
+                              invoice.status !== "cancelled" &&
+                              invoice.status !== "refunded" && (
+                                <>
+                                  <DropdownMenuItem onClick={() => handleRecordPayment(invoice)}>
+                                    <CreditCard className="mr-2 h-4 w-4" />
+                                    Record Payment
+                                  </DropdownMenuItem>
+
+                                  <DropdownMenuSeparator />
+
+                                  <DropdownMenuItem
+                                    onClick={() => onSendReminder(invoice.id, "email")}
+                                  >
+                                    <Mail className="mr-2 h-4 w-4" />
+                                    Send Reminder
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+
                             <DropdownMenuSeparator />
-                            
+
                             <DropdownMenuItem>
                               <Download className="mr-2 h-4 w-4" />
                               Download PDF
@@ -244,7 +259,7 @@ export function InvoicesTable({
               const statusBadge = getStatusBadge(invoice.status);
               const StatusIcon = statusBadge.icon;
               const balanceAmount = getBalanceAmount(invoice);
-              
+
               return (
                 <Card key={invoice.id} className="p-4">
                   <div className="flex justify-between items-start mb-3">
@@ -252,12 +267,15 @@ export function InvoicesTable({
                       <p className="font-medium text-sm truncate">{invoice.invoiceNumber}</p>
                       <p className="text-sm text-muted-foreground truncate">{invoice.clientName}</p>
                     </div>
-                    <Badge variant={statusBadge.variant} className="flex items-center gap-1 ml-2 shrink-0">
+                    <Badge
+                      variant={statusBadge.variant}
+                      className="flex items-center gap-1 ml-2 shrink-0"
+                    >
                       <StatusIcon className="h-3 w-3" />
                       {statusBadge.text}
                     </Badge>
                   </div>
-                  
+
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Amount:</span>
@@ -275,7 +293,9 @@ export function InvoicesTable({
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Due:</span>
-                      <span className={isOverdue(invoice.dueDate, invoice.status) ? "text-red-600" : ""}>
+                      <span
+                        className={isOverdue(invoice.dueDate, invoice.status) ? "text-red-600" : ""}
+                      >
                         {new Date(invoice.dueDate).toLocaleDateString()}
                         {isOverdue(invoice.dueDate, invoice.status) && (
                           <span className="block text-xs">Overdue</span>
@@ -283,7 +303,7 @@ export function InvoicesTable({
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2 mt-4">
                     <Button
                       size="sm"
@@ -294,8 +314,8 @@ export function InvoicesTable({
                       <Eye className="h-4 w-4 mr-1" />
                       View
                     </Button>
-                    
-                    {invoice.status === 'draft' && (
+
+                    {invoice.status === "draft" && (
                       <Button
                         size="sm"
                         variant="outline"
@@ -306,19 +326,21 @@ export function InvoicesTable({
                         Send
                       </Button>
                     )}
-                    
-                    {invoice.status !== 'paid' && invoice.status !== 'cancelled' && invoice.status !== 'refunded' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => handleRecordPayment(invoice)}
-                      >
-                        <CreditCard className="h-4 w-4 mr-1" />
-                        Pay
-                      </Button>
-                    )}
-                    
+
+                    {invoice.status !== "paid" &&
+                      invoice.status !== "cancelled" &&
+                      invoice.status !== "refunded" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => handleRecordPayment(invoice)}
+                        >
+                          <CreditCard className="h-4 w-4 mr-1" />
+                          Pay
+                        </Button>
+                      )}
+
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="px-2">
@@ -326,38 +348,40 @@ export function InvoicesTable({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        {invoice.status !== 'draft' && (
+                        {invoice.status !== "draft" && (
                           <DropdownMenuItem onClick={() => handleViewDetails(invoice)}>
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                           </DropdownMenuItem>
                         )}
-                        
-                        {invoice.status === 'draft' && (
+
+                        {invoice.status === "draft" && (
                           <DropdownMenuItem onClick={() => onSendInvoice(invoice.id)}>
                             <Send className="mr-2 h-4 w-4" />
                             Send Invoice
                           </DropdownMenuItem>
                         )}
-                        
-                        {invoice.status !== 'paid' && invoice.status !== 'cancelled' && invoice.status !== 'refunded' && (
-                          <>
-                            <DropdownMenuItem onClick={() => handleRecordPayment(invoice)}>
-                              <CreditCard className="mr-2 h-4 w-4" />
-                              Record Payment
-                            </DropdownMenuItem>
-                            
-                            <DropdownMenuSeparator />
-                            
-                            <DropdownMenuItem onClick={() => onSendReminder(invoice.id, 'email')}>
-                              <Mail className="mr-2 h-4 w-4" />
-                              Send Reminder
-                            </DropdownMenuItem>
-                          </>
-                        )}
-                        
+
+                        {invoice.status !== "paid" &&
+                          invoice.status !== "cancelled" &&
+                          invoice.status !== "refunded" && (
+                            <>
+                              <DropdownMenuItem onClick={() => handleRecordPayment(invoice)}>
+                                <CreditCard className="mr-2 h-4 w-4" />
+                                Record Payment
+                              </DropdownMenuItem>
+
+                              <DropdownMenuSeparator />
+
+                              <DropdownMenuItem onClick={() => onSendReminder(invoice.id, "email")}>
+                                <Mail className="mr-2 h-4 w-4" />
+                                Send Reminder
+                              </DropdownMenuItem>
+                            </>
+                          )}
+
                         <DropdownMenuSeparator />
-                        
+
                         <DropdownMenuItem>
                           <Download className="mr-2 h-4 w-4" />
                           Download PDF
@@ -381,7 +405,7 @@ export function InvoicesTable({
               Record a payment for {selectedInvoice?.clientName}
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -401,7 +425,7 @@ export function InvoicesTable({
                   </p>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="paymentMethod">Payment Method</Label>
                 <Select value={paymentMethod} onValueChange={setPaymentMethod}>
@@ -419,7 +443,7 @@ export function InvoicesTable({
               </div>
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setPaymentDialogOpen(false)}>
               Cancel

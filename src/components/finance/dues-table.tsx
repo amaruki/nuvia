@@ -29,7 +29,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   MoreHorizontal,
   Mail,
@@ -38,7 +44,7 @@ import {
   CheckCircle,
   AlertCircle,
   Clock,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import { MemberDue, DuePayment } from "@/types/finance.types";
 import { DueDetailsModal } from "@/components/finance/due-details-modal";
@@ -47,11 +53,17 @@ interface DuesTableProps {
   dues: MemberDue[];
   payments: DuePayment[];
   onRecordPayment: (dueId: string, amount: number, paymentMethod: string) => void;
-  onSendReminder: (dueId: string, type: 'email' | 'sms' | 'in_app') => void;
-  onUpdateStatus: (dueId: string, status: MemberDue['status']) => void;
+  onSendReminder: (dueId: string, type: "email" | "sms" | "in_app") => void;
+  onUpdateStatus: (dueId: string, status: MemberDue["status"]) => void;
 }
 
-export function DuesTable({ dues, payments, onRecordPayment, onSendReminder, onUpdateStatus }: DuesTableProps) {
+export function DuesTable({
+  dues,
+  payments,
+  onRecordPayment,
+  onSendReminder,
+  onUpdateStatus,
+}: DuesTableProps) {
   const [selectedDue, setSelectedDue] = useState<MemberDue | null>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
@@ -59,28 +71,28 @@ export function DuesTable({ dues, payments, onRecordPayment, onSendReminder, onU
   const [paymentMethod, setPaymentMethod] = useState("");
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
   };
 
-  const getStatusBadge = (status: MemberDue['status']) => {
+  const getStatusBadge = (status: MemberDue["status"]) => {
     switch (status) {
-      case 'paid':
-        return { variant: 'default' as const, icon: CheckCircle, text: 'Paid' };
-      case 'pending':
-        return { variant: 'secondary' as const, icon: Clock, text: 'Pending' };
-      case 'overdue':
-        return { variant: 'destructive' as const, icon: AlertCircle, text: 'Overdue' };
-      case 'partial':
-        return { variant: 'outline' as const, icon: CreditCard, text: 'Partial' };
-      case 'cancelled':
-        return { variant: 'outline' as const, icon: XCircle, text: 'Cancelled' };
+      case "paid":
+        return { variant: "default" as const, icon: CheckCircle, text: "Paid" };
+      case "pending":
+        return { variant: "secondary" as const, icon: Clock, text: "Pending" };
+      case "overdue":
+        return { variant: "destructive" as const, icon: AlertCircle, text: "Overdue" };
+      case "partial":
+        return { variant: "outline" as const, icon: CreditCard, text: "Partial" };
+      case "cancelled":
+        return { variant: "outline" as const, icon: XCircle, text: "Cancelled" };
       default:
-        return { variant: 'secondary' as const, icon: Clock, text: status };
+        return { variant: "secondary" as const, icon: Clock, text: status };
     }
   };
 
@@ -105,8 +117,8 @@ export function DuesTable({ dues, payments, onRecordPayment, onSendReminder, onU
     }
   };
 
-  const isOverdue = (dueDate: Date, status: MemberDue['status']) => {
-    return status === 'pending' && new Date(dueDate) < new Date();
+  const isOverdue = (dueDate: Date, status: MemberDue["status"]) => {
+    return status === "pending" && new Date(dueDate) < new Date();
   };
 
   return (
@@ -114,9 +126,7 @@ export function DuesTable({ dues, payments, onRecordPayment, onSendReminder, onU
       <Card>
         <CardHeader>
           <CardTitle>Member Dues</CardTitle>
-          <CardDescription>
-            Manage and track membership fee payments
-          </CardDescription>
+          <CardDescription>Manage and track membership fee payments</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -136,7 +146,7 @@ export function DuesTable({ dues, payments, onRecordPayment, onSendReminder, onU
               {dues.map((due) => {
                 const statusBadge = getStatusBadge(due.status);
                 const StatusIcon = statusBadge.icon;
-                
+
                 return (
                   <TableRow key={due.id}>
                     <TableCell>
@@ -162,7 +172,10 @@ export function DuesTable({ dues, payments, onRecordPayment, onSendReminder, onU
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={statusBadge.variant} className="flex items-center gap-1 w-fit">
+                      <Badge
+                        variant={statusBadge.variant}
+                        className="flex items-center gap-1 w-fit"
+                      >
                         <StatusIcon className="h-3 w-3" />
                         {statusBadge.text}
                       </Badge>
@@ -179,33 +192,33 @@ export function DuesTable({ dues, payments, onRecordPayment, onSendReminder, onU
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                           </DropdownMenuItem>
-                          
-                          {due.status !== 'paid' && due.status !== 'cancelled' && (
+
+                          {due.status !== "paid" && due.status !== "cancelled" && (
                             <>
                               <DropdownMenuItem onClick={() => handleRecordPayment(due)}>
                                 <CreditCard className="mr-2 h-4 w-4" />
                                 Record Payment
                               </DropdownMenuItem>
-                              
+
                               <DropdownMenuSeparator />
-                              
-                              <DropdownMenuItem onClick={() => onSendReminder(due.id, 'email')}>
+
+                              <DropdownMenuItem onClick={() => onSendReminder(due.id, "email")}>
                                 <Mail className="mr-2 h-4 w-4" />
                                 Send Email Reminder
                               </DropdownMenuItem>
                             </>
                           )}
-                          
+
                           {/* TODO: Implement status change actions in future */}
-                          {due.status === 'pending' && (
-                            <DropdownMenuItem onClick={() => onUpdateStatus(due.id, 'overdue')}>
+                          {due.status === "pending" && (
+                            <DropdownMenuItem onClick={() => onUpdateStatus(due.id, "overdue")}>
                               <AlertCircle className="mr-2 h-4 w-4" />
                               Mark as Overdue
                             </DropdownMenuItem>
                           )}
-                          
-                          {due.status === 'overdue' && (
-                            <DropdownMenuItem onClick={() => onUpdateStatus(due.id, 'pending')}>
+
+                          {due.status === "overdue" && (
+                            <DropdownMenuItem onClick={() => onUpdateStatus(due.id, "pending")}>
                               <Clock className="mr-2 h-4 w-4" />
                               Mark as Pending
                             </DropdownMenuItem>
@@ -226,11 +239,9 @@ export function DuesTable({ dues, payments, onRecordPayment, onSendReminder, onU
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Record Payment</DialogTitle>
-            <DialogDescription>
-              Record a payment for {selectedDue?.memberName}
-            </DialogDescription>
+            <DialogDescription>Record a payment for {selectedDue?.memberName}</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -250,7 +261,7 @@ export function DuesTable({ dues, payments, onRecordPayment, onSendReminder, onU
                   </p>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="paymentMethod">Payment Method</Label>
                 <Select value={paymentMethod} onValueChange={setPaymentMethod}>
@@ -268,7 +279,7 @@ export function DuesTable({ dues, payments, onRecordPayment, onSendReminder, onU
               </div>
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setPaymentDialogOpen(false)}>
               Cancel

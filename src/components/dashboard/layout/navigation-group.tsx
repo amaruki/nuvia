@@ -25,20 +25,18 @@ export function NavigationGroup({ category, title, items, isActive }: Navigation
 
   return (
     <SidebarGroup key={category}>
-      <SidebarGroupLabel className={cn(
-        "group-data-[collapsible=icon]:opacity-0 transition-opacity duration-200",
-        "text-xs font-semibold text-muted-foreground uppercase tracking-wider"
-      )}>
+      <SidebarGroupLabel
+        className={cn(
+          "group-data-[collapsible=icon]:opacity-0 transition-opacity duration-200",
+          "text-xs font-semibold text-muted-foreground uppercase tracking-wider",
+        )}
+      >
         {title}
       </SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
-            <NavigationItemComponent
-              key={item.id}
-              item={item}
-              isActive={isActive}
-            />
+            <NavigationItemComponent key={item.id} item={item} isActive={isActive} />
           ))}
         </SidebarMenu>
       </SidebarGroupContent>

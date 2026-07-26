@@ -1,3 +1,3 @@
 export default function OrganizationBudget() {
-  return <h1>OrganizationBudget page</h1>
+  return <h1>OrganizationBudget page</h1>;
 }

@@ -1,3 +1,3 @@
 export default function AnalyticsEvents() {
-  return <h1>AnalyticsEvents page</h1>
+  return <h1>AnalyticsEvents page</h1>;
 }

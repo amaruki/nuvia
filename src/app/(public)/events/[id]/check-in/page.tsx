@@ -14,7 +14,7 @@ export default function EventCheckInPage() {
   const params = useParams();
   const router = useRouter();
   const eventId = params.id as string;
-  
+
   const [event, setEvent] = React.useState<Event | null>(null);
   const [registration, setRegistration] = React.useState<EventRegistration | null>(null);
   const [searchResults, setSearchResults] = React.useState<EventRegistration[]>([]);
@@ -28,11 +28,11 @@ export default function EventCheckInPage() {
     const fetchEventData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch event details
         const eventResponse = await getEventById(eventId);
         setEvent(eventResponse.event);
-        
+
         // Check if user is registered
         if (eventResponse.isRegistered && eventResponse.registration) {
           setRegistration(eventResponse.registration);
@@ -49,18 +49,23 @@ export default function EventCheckInPage() {
     }
   }, [eventId]);
 
-  const handleCheckIn = async (data: { eventId: string; registrationId?: string; checkInMethod: string; verificationCode?: string }) => {
+  const handleCheckIn = async (data: {
+    eventId: string;
+    registrationId?: string;
+    checkInMethod: string;
+    verificationCode?: string;
+  }) => {
     try {
       setIsSubmitting(true);
       setCheckInError(null);
-      
+
       const response = await checkInToEvent({
         eventId: data.eventId,
         registrationId: data.registrationId,
         checkInMethod: data.checkInMethod as "qr" | "manual" | "app",
         verificationCode: data.verificationCode,
       });
-      
+
       if (response.success) {
         setCheckInSuccess(true);
         // Refresh registration data
@@ -137,10 +142,7 @@ export default function EventCheckInPage() {
   // If event is not today, show a message
   if (!isEventToday(event.startDate)) {
     return (
-      <EventLayout
-        event={event}
-        showActions={false}
-      >
+      <EventLayout event={event} showActions={false}>
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
@@ -156,7 +158,8 @@ export default function EventCheckInPage() {
                   Check-in is only available on the day of the event
                 </h3>
                 <p className="text-foreground/60 mb-6">
-                  This event is scheduled for {formatDate(event.startDate)}. Please return on that day to check in.
+                  This event is scheduled for {formatDate(event.startDate)}. Please return on that
+                  day to check in.
                 </p>
                 <div className="flex justify-center space-x-4">
                   <Button onClick={() => router.push(`/events/${eventId}`)}>
@@ -177,10 +180,7 @@ export default function EventCheckInPage() {
   // If user is already checked in, show success message
   if (registration?.checkedInAt) {
     return (
-      <EventLayout
-        event={event}
-        showActions={false}
-      >
+      <EventLayout event={event} showActions={false}>
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
@@ -196,7 +196,8 @@ export default function EventCheckInPage() {
                   You're Checked In!
                 </h3>
                 <p className="text-foreground/60 mb-6">
-                  You have already checked in for {event.title} at {registration.checkedInAt.toLocaleTimeString()}.
+                  You have already checked in for {event.title} at{" "}
+                  {registration.checkedInAt.toLocaleTimeString()}.
                 </p>
                 <div className="flex justify-center space-x-4">
                   <Button onClick={() => router.push(`/events/${eventId}`)}>
@@ -217,10 +218,7 @@ export default function EventCheckInPage() {
   // If check-in was successful, show success message
   if (checkInSuccess) {
     return (
-      <EventLayout
-        event={event}
-        showActions={false}
-      >
+      <EventLayout event={event} showActions={false}>
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
@@ -255,10 +253,7 @@ export default function EventCheckInPage() {
   }
 
   return (
-    <EventLayout
-      event={event}
-      showActions={false}
-    >
+    <EventLayout event={event} showActions={false}>
       <div className="max-w-2xl mx-auto">
         {checkInError && (
           <div className="mb-6 bg-destructive/10 border border-destructive/30 text-destructive p-4 rounded-lg">

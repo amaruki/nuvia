@@ -12,9 +12,9 @@ interface BudgetAnalyticsProps {
 
 export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
@@ -25,16 +25,16 @@ export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
   };
 
   const getVarianceColor = (variance: number) => {
-    if (variance < 0) return 'text-destructive';
-    if (variance < 10) return 'text-yellow-600';
-    return 'text-green-600';
+    if (variance < 0) return "text-destructive";
+    if (variance < 10) return "text-yellow-600";
+    return "text-green-600";
   };
 
   const getVarianceBadge = (variance: number) => {
-    if (variance < -10) return { variant: 'destructive' as const, text: 'Over Budget' };
-    if (variance < 0) return { variant: 'secondary' as const, text: 'Slightly Over' };
-    if (variance < 10) return { variant: 'outline' as const, text: 'On Track' };
-    return { variant: 'default' as const, text: 'Under Budget' };
+    if (variance < -10) return { variant: "destructive" as const, text: "Over Budget" };
+    if (variance < 0) return { variant: "secondary" as const, text: "Slightly Over" };
+    if (variance < 10) return { variant: "outline" as const, text: "On Track" };
+    return { variant: "default" as const, text: "Under Budget" };
   };
 
   return (
@@ -48,13 +48,11 @@ export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
           <CardContent>
             <div className="text-2xl font-bold">
               {formatCurrency(
-                analytics.spendingTrends.reduce((sum, trend) => sum + trend.amount, 0) / 
-                analytics.spendingTrends.filter(t => t.amount > 0).length || 0
+                analytics.spendingTrends.reduce((sum, trend) => sum + trend.amount, 0) /
+                  analytics.spendingTrends.filter((t) => t.amount > 0).length || 0,
               )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Last 6 months average
-            </p>
+            <p className="text-xs text-muted-foreground">Last 6 months average</p>
           </CardContent>
         </Card>
 
@@ -66,13 +64,11 @@ export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
           <CardContent>
             <div className="text-2xl font-bold">
               {formatPercentage(
-                analytics.varianceAnalysis.reduce((sum, v) => sum + v.variancePercentage, 0) / 
-                analytics.varianceAnalysis.length || 0
+                analytics.varianceAnalysis.reduce((sum, v) => sum + v.variancePercentage, 0) /
+                  analytics.varianceAnalysis.length || 0,
               )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Average variance across categories
-            </p>
+            <p className="text-xs text-muted-foreground">Average variance across categories</p>
           </CardContent>
         </Card>
 
@@ -83,7 +79,7 @@ export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {analytics.categoryBreakdown[0]?.category || 'N/A'}
+              {analytics.categoryBreakdown[0]?.category || "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">
               {formatPercentage(analytics.categoryBreakdown[0]?.percentage || 0)} of total spend
@@ -99,15 +95,19 @@ export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
           <CardContent>
             <div className="text-2xl font-bold">
               {(() => {
-                const currentYear = analytics.monthlyComparison.reduce((sum, m) => sum + m.currentYear, 0);
-                const previousYear = analytics.monthlyComparison.reduce((sum, m) => sum + m.previousYear, 0);
+                const currentYear = analytics.monthlyComparison.reduce(
+                  (sum, m) => sum + m.currentYear,
+                  0,
+                );
+                const previousYear = analytics.monthlyComparison.reduce(
+                  (sum, m) => sum + m.previousYear,
+                  0,
+                );
                 const change = ((currentYear - previousYear) / previousYear) * 100;
                 return formatPercentage(change);
               })()}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Year over year comparison
-            </p>
+            <p className="text-xs text-muted-foreground">Year over year comparison</p>
           </CardContent>
         </Card>
       </div>
@@ -123,13 +123,12 @@ export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
               <div key={index} className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>{trend.month}</span>
-                  <span>{formatCurrency(trend.amount)} / {formatCurrency(trend.budget)}</span>
+                  <span>
+                    {formatCurrency(trend.amount)} / {formatCurrency(trend.budget)}
+                  </span>
                 </div>
                 <div className="space-y-1">
-                  <Progress 
-                    value={(trend.amount / trend.budget) * 100} 
-                    className="h-2"
-                  />
+                  <Progress value={(trend.amount / trend.budget) * 100} className="h-2" />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>{formatPercentage((trend.amount / trend.budget) * 100)} used</span>
                     <span>{formatCurrency(trend.budget - trend.amount)} remaining</span>
@@ -150,7 +149,9 @@ export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
               <div key={index} className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>{category.category}</span>
-                  <span>{formatCurrency(category.amount)} ({formatPercentage(category.percentage)})</span>
+                  <span>
+                    {formatCurrency(category.amount)} ({formatPercentage(category.percentage)})
+                  </span>
                 </div>
                 <Progress value={category.percentage} className="h-2" />
               </div>
@@ -169,7 +170,10 @@ export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
             {analytics.varianceAnalysis.map((variance, index) => {
               const badge = getVarianceBadge(variance.variancePercentage);
               return (
-                <div key={index} className="grid grid-cols-5 items-center gap-4 p-3 border rounded-lg">
+                <div
+                  key={index}
+                  className="grid grid-cols-5 items-center gap-4 p-3 border rounded-lg"
+                >
                   <div className="font-medium">{variance.category}</div>
                   <div className="text-right">
                     <div className="text-sm">{formatCurrency(variance.budgeted)}</div>
@@ -181,7 +185,8 @@ export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
                   </div>
                   <div className="text-right">
                     <div className={`text-sm font-medium ${getVarianceColor(variance.variance)}`}>
-                      {variance.variance > 0 ? '+' : ''}{formatCurrency(variance.variance)}
+                      {variance.variance > 0 ? "+" : ""}
+                      {formatCurrency(variance.variance)}
                     </div>
                     <div className="text-xs text-muted-foreground">Variance</div>
                   </div>
@@ -205,9 +210,12 @@ export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
             {analytics.monthlyComparison.map((month, index) => {
               const change = ((month.currentYear - month.previousYear) / month.previousYear) * 100;
               const isPositive = change >= 0;
-              
+
               return (
-                <div key={index} className="grid grid-cols-4 items-center gap-4 p-3 border rounded-lg">
+                <div
+                  key={index}
+                  className="grid grid-cols-4 items-center gap-4 p-3 border rounded-lg"
+                >
                   <div className="font-medium">{month.month}</div>
                   <div className="text-right">
                     <div className="text-sm">{formatCurrency(month.previousYear)}</div>
@@ -223,8 +231,11 @@ export function BudgetAnalyticsComponent({ analytics }: BudgetAnalyticsProps) {
                     ) : (
                       <TrendingDown className="h-4 w-4 text-red-600" />
                     )}
-                    <span className={`text-sm font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                      {isPositive ? '+' : ''}{formatPercentage(change)}
+                    <span
+                      className={`text-sm font-medium ${isPositive ? "text-green-600" : "text-red-600"}`}
+                    >
+                      {isPositive ? "+" : ""}
+                      {formatPercentage(change)}
                     </span>
                   </div>
                 </div>

@@ -83,15 +83,15 @@ function dashboardReducer(state: DashboardState, action: DashboardAction): Dashb
     case "MARK_NOTIFICATION_READ":
       return {
         ...state,
-        notifications: state.notifications.map(notif =>
-          notif.id === action.payload ? { ...notif, read: true } : notif
+        notifications: state.notifications.map((notif) =>
+          notif.id === action.payload ? { ...notif, read: true } : notif,
         ),
       };
 
     case "MARK_ALL_NOTIFICATIONS_READ":
       return {
         ...state,
-        notifications: state.notifications.map(notif => ({ ...notif, read: true })),
+        notifications: state.notifications.map((notif) => ({ ...notif, read: true })),
       };
 
     case "SET_MEMBER_STATS":
@@ -200,9 +200,7 @@ export function DashboardProvider({ children }: DashboardProviderProps) {
   }, [state.theme, state.sidebarCollapsed]);
 
   return (
-    <DashboardContext.Provider value={{ state, dispatch }}>
-      {children}
-    </DashboardContext.Provider>
+    <DashboardContext.Provider value={{ state, dispatch }}>{children}</DashboardContext.Provider>
   );
 }
 
@@ -218,25 +216,31 @@ export function useDashboard() {
 export function useNotifications() {
   const { state, dispatch } = useDashboard();
 
-  const markAsRead = React.useCallback((id: string) => {
-    dispatch({ type: "MARK_NOTIFICATION_READ", payload: id });
-  }, [dispatch]);
+  const markAsRead = React.useCallback(
+    (id: string) => {
+      dispatch({ type: "MARK_NOTIFICATION_READ", payload: id });
+    },
+    [dispatch],
+  );
 
   const markAllAsRead = React.useCallback(() => {
     dispatch({ type: "MARK_ALL_NOTIFICATIONS_READ" });
   }, [dispatch]);
 
-  const addNotification = React.useCallback((notification: Omit<DashboardNotification, "id" | "timestamp">) => {
-    const newNotification: DashboardNotification = {
-      ...notification,
-      id: Math.random().toString(36).substr(2, 9),
-      timestamp: new Date(),
-    };
-    dispatch({ type: "ADD_NOTIFICATION", payload: newNotification });
-  }, [dispatch]);
+  const addNotification = React.useCallback(
+    (notification: Omit<DashboardNotification, "id" | "timestamp">) => {
+      const newNotification: DashboardNotification = {
+        ...notification,
+        id: Math.random().toString(36).substr(2, 9),
+        timestamp: new Date(),
+      };
+      dispatch({ type: "ADD_NOTIFICATION", payload: newNotification });
+    },
+    [dispatch],
+  );
 
   const unreadCount = React.useMemo(() => {
-    return state.notifications.filter(n => !n.read).length;
+    return state.notifications.filter((n) => !n.read).length;
   }, [state.notifications]);
 
   return {
@@ -251,13 +255,19 @@ export function useNotifications() {
 export function useDashboardStats() {
   const { state, dispatch } = useDashboard();
 
-  const updateMemberStats = React.useCallback((stats: DashboardState["memberStats"]) => {
-    dispatch({ type: "SET_MEMBER_STATS", payload: stats });
-  }, [dispatch]);
+  const updateMemberStats = React.useCallback(
+    (stats: DashboardState["memberStats"]) => {
+      dispatch({ type: "SET_MEMBER_STATS", payload: stats });
+    },
+    [dispatch],
+  );
 
-  const updateEventStats = React.useCallback((stats: DashboardState["eventStats"]) => {
-    dispatch({ type: "SET_EVENT_STATS", payload: stats });
-  }, [dispatch]);
+  const updateEventStats = React.useCallback(
+    (stats: DashboardState["eventStats"]) => {
+      dispatch({ type: "SET_EVENT_STATS", payload: stats });
+    },
+    [dispatch],
+  );
 
   return {
     memberStats: state.memberStats,
@@ -272,13 +282,12 @@ export function useDashboardStats() {
 export function useHeader() {
   const { state, dispatch } = useDashboard();
 
-  const setHeader = React.useCallback((header: {
-    title?: string;
-    description?: string;
-    actions?: React.ReactNode;
-  }) => {
-    dispatch({ type: "SET_HEADER", payload: header });
-  }, [dispatch]);
+  const setHeader = React.useCallback(
+    (header: { title?: string; description?: string; actions?: React.ReactNode }) => {
+      dispatch({ type: "SET_HEADER", payload: header });
+    },
+    [dispatch],
+  );
 
   const clearHeader = React.useCallback(() => {
     dispatch({ type: "CLEAR_HEADER" });

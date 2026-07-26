@@ -1,19 +1,27 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { WidgetContainer } from "../../ui/widget-container"
-import { Card, CardContent } from "../../ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "../../ui/badge"
-import { DollarSign, TrendingUp, TrendingDown, CreditCard, Users, Calendar, ExternalLink } from "lucide-react"
+import * as React from "react";
+import { WidgetContainer } from "../../ui/widget-container";
+import { Card, CardContent } from "../../ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "../../ui/badge";
+import {
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  CreditCard,
+  Users,
+  Calendar,
+  ExternalLink,
+} from "lucide-react";
 
 interface FinanceWidgetProps {
-  totalRevenue?: number
-  monthlyRevenue?: number
-  pendingPayments?: number
-  activeSubscriptions?: number
-  onExportData?: () => void
-  onViewAllTransactions?: () => void
+  totalRevenue?: number;
+  monthlyRevenue?: number;
+  pendingPayments?: number;
+  activeSubscriptions?: number;
+  onExportData?: () => void;
+  onViewAllTransactions?: () => void;
 }
 
 // Mock finance data - in a real app, this would come from an API
@@ -22,7 +30,7 @@ const mockFinanceData = {
   monthlyRevenue: 8450,
   pendingPayments: 1250,
   activeSubscriptions: 342,
-}
+};
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-US", {
@@ -30,16 +38,16 @@ const formatCurrency = (amount: number) => {
     currency: "USD",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(amount)
-}
+  }).format(amount);
+};
 
 const formatNumber = (num: number) => {
-  return new Intl.NumberFormat("en-US").format(num)
-}
+  return new Intl.NumberFormat("en-US").format(num);
+};
 
 const calculatePercentage = (part: number, total: number) => {
-  return Math.round((part / total) * 100)
-}
+  return Math.round((part / total) * 100);
+};
 
 export function FinanceWidget({
   totalRevenue = mockFinanceData.totalRevenue,
@@ -49,8 +57,8 @@ export function FinanceWidget({
   onExportData,
   onViewAllTransactions,
 }: FinanceWidgetProps) {
-  const pendingPercentage = calculatePercentage(pendingPayments, monthlyRevenue)
-  
+  const pendingPercentage = calculatePercentage(pendingPayments, monthlyRevenue);
+
   return (
     <WidgetContainer
       type="finance"
@@ -70,12 +78,7 @@ export function FinanceWidget({
                 </span>
               </div>
               <div className="flex space-x-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onExportData}
-                  className="text-xs"
-                >
+                <Button variant="ghost" size="sm" onClick={onExportData} className="text-xs">
                   Export
                 </Button>
                 <Button
@@ -88,7 +91,7 @@ export function FinanceWidget({
                 </Button>
               </div>
             </div>
-            
+
             {/* Finance cards */}
             <div className="grid grid-cols-2 gap-4">
               {/* Total Revenue */}
@@ -98,9 +101,7 @@ export function FinanceWidget({
                     <DollarSign className="h-5 w-5 text-chart-3" />
                     <span className="text-sm font-medium text-foreground/70">Total Revenue</span>
                   </div>
-                  <Badge className="bg-chart-3/20 text-chart-3">
-                    All Time
-                  </Badge>
+                  <Badge className="bg-chart-3/20 text-chart-3">All Time</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
                   {formatCurrency(totalRevenue)}
@@ -110,7 +111,7 @@ export function FinanceWidget({
                   <span>+12% from last quarter</span>
                 </div>
               </div>
-              
+
               {/* Monthly Revenue */}
               <div className="p-4 rounded-lg border bg-card border-border">
                 <div className="flex items-center justify-between mb-2">
@@ -118,9 +119,7 @@ export function FinanceWidget({
                     <DollarSign className="h-5 w-5 text-chart-1" />
                     <span className="text-sm font-medium text-foreground/70">Monthly Revenue</span>
                   </div>
-                  <Badge className="bg-chart-1/20 text-chart-1">
-                    This Month
-                  </Badge>
+                  <Badge className="bg-chart-1/20 text-chart-1">This Month</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
                   {formatCurrency(monthlyRevenue)}
@@ -130,7 +129,7 @@ export function FinanceWidget({
                   <span>+8% from last month</span>
                 </div>
               </div>
-              
+
               {/* Pending Payments */}
               <div className="p-4 rounded-lg border bg-card border-border">
                 <div className="flex items-center justify-between mb-2">
@@ -138,9 +137,7 @@ export function FinanceWidget({
                     <CreditCard className="h-5 w-5 text-chart-4" />
                     <span className="text-sm font-medium text-foreground/70">Pending</span>
                   </div>
-                  <Badge className="bg-chart-4/20 text-chart-4">
-                    {pendingPercentage}%
-                  </Badge>
+                  <Badge className="bg-chart-4/20 text-chart-4">{pendingPercentage}%</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
                   {formatCurrency(pendingPayments)}
@@ -150,7 +147,7 @@ export function FinanceWidget({
                   <span>+3% from last month</span>
                 </div>
               </div>
-              
+
               {/* Active Subscriptions */}
               <div className="p-4 rounded-lg border bg-card border-border">
                 <div className="flex items-center justify-between mb-2">
@@ -158,9 +155,7 @@ export function FinanceWidget({
                     <Users className="h-5 w-5 text-chart-2" />
                     <span className="text-sm font-medium text-foreground/70">Subscriptions</span>
                   </div>
-                  <Badge className="bg-chart-2/20 text-chart-2">
-                    Active
-                  </Badge>
+                  <Badge className="bg-chart-2/20 text-chart-2">Active</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
                   {formatNumber(activeSubscriptions)}
@@ -171,7 +166,7 @@ export function FinanceWidget({
                 </div>
               </div>
             </div>
-            
+
             {/* Progress bars */}
             <div className="space-y-3">
               <div>
@@ -180,13 +175,10 @@ export function FinanceWidget({
                   <span>84%</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div
-                    className="bg-chart-1 h-2 rounded-full"
-                    style={{ width: `84%` }}
-                  ></div>
+                  <div className="bg-chart-1 h-2 rounded-full" style={{ width: `84%` }}></div>
                 </div>
               </div>
-              
+
               <div>
                 <div className="flex justify-between text-xs text-foreground/50 mb-1">
                   <span>Pending Payments</span>
@@ -199,21 +191,18 @@ export function FinanceWidget({
                   ></div>
                 </div>
               </div>
-              
+
               <div>
                 <div className="flex justify-between text-xs text-foreground/50 mb-1">
                   <span>Subscription Renewal Rate</span>
                   <span>92%</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div
-                    className="bg-chart-3 h-2 rounded-full"
-                    style={{ width: `92%` }}
-                  ></div>
+                  <div className="bg-chart-3 h-2 rounded-full" style={{ width: `92%` }}></div>
                 </div>
               </div>
             </div>
-            
+
             {/* Summary */}
             <div className="text-xs text-foreground/50 text-center pt-2">
               Financial data updated daily. Last updated: Today at 8:00 AM
@@ -222,5 +211,5 @@ export function FinanceWidget({
         </CardContent>
       </Card>
     </WidgetContainer>
-  )
+  );
 }

@@ -10,17 +10,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Calendar, 
-  Mail, 
-  CreditCard, 
-  User, 
+import {
+  Calendar,
+  Mail,
+  CreditCard,
+  User,
   DollarSign,
   Clock,
   CheckCircle,
   AlertCircle,
   XCircle,
-  FileText
+  FileText,
 } from "lucide-react";
 import { MemberDue, DuePayment } from "@/types/finance.types";
 
@@ -30,40 +30,65 @@ interface DueDetailsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRecordPayment: (dueId: string, amount: number, paymentMethod: string) => void;
-  onSendReminder: (dueId: string, type: 'email' | 'sms' | 'in_app') => void;
+  onSendReminder: (dueId: string, type: "email" | "sms" | "in_app") => void;
 }
 
-export function DueDetailsModal({ 
-  due, 
-  payments, 
-  open, 
-  onOpenChange, 
-  onRecordPayment, 
-  onSendReminder 
+export function DueDetailsModal({
+  due,
+  payments,
+  open,
+  onOpenChange,
+  onRecordPayment,
+  onSendReminder,
 }: DueDetailsModalProps) {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
   };
 
-  const getStatusBadge = (status: MemberDue['status']) => {
+  const getStatusBadge = (status: MemberDue["status"]) => {
     switch (status) {
-      case 'paid':
-        return { variant: 'default' as const, icon: CheckCircle, text: 'Paid', color: 'text-green-600' };
-      case 'pending':
-        return { variant: 'secondary' as const, icon: Clock, text: 'Pending', color: 'text-yellow-600' };
-      case 'overdue':
-        return { variant: 'destructive' as const, icon: AlertCircle, text: 'Overdue', color: 'text-red-600' };
-      case 'partial':
-        return { variant: 'outline' as const, icon: CreditCard, text: 'Partial', color: 'text-blue-600' };
-      case 'cancelled':
-        return { variant: 'outline' as const, icon: XCircle, text: 'Cancelled', color: 'text-gray-600' };
+      case "paid":
+        return {
+          variant: "default" as const,
+          icon: CheckCircle,
+          text: "Paid",
+          color: "text-green-600",
+        };
+      case "pending":
+        return {
+          variant: "secondary" as const,
+          icon: Clock,
+          text: "Pending",
+          color: "text-yellow-600",
+        };
+      case "overdue":
+        return {
+          variant: "destructive" as const,
+          icon: AlertCircle,
+          text: "Overdue",
+          color: "text-red-600",
+        };
+      case "partial":
+        return {
+          variant: "outline" as const,
+          icon: CreditCard,
+          text: "Partial",
+          color: "text-blue-600",
+        };
+      case "cancelled":
+        return {
+          variant: "outline" as const,
+          icon: XCircle,
+          text: "Cancelled",
+          color: "text-gray-600",
+        };
       default:
-        return { variant: 'secondary' as const, icon: Clock, text: status, color: 'text-gray-600' };
+        return { variant: "secondary" as const, icon: Clock, text: status, color: "text-gray-600" };
     }
   };
 
@@ -71,8 +96,8 @@ export function DueDetailsModal({
 
   const statusBadge = getStatusBadge(due.status);
   const StatusIcon = statusBadge.icon;
-  const duePayments = payments.filter(payment => payment.dueId === due.id);
-  const isOverdue = due.status === 'pending' && new Date(due.dueDate) < new Date();
+  const duePayments = payments.filter((payment) => payment.dueId === due.id);
+  const isOverdue = due.status === "pending" && new Date(due.dueDate) < new Date();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -82,9 +107,7 @@ export function DueDetailsModal({
             <User className="h-5 w-5" />
             Member Due Details
           </DialogTitle>
-          <DialogDescription>
-            View detailed information about this membership due
-          </DialogDescription>
+          <DialogDescription>View detailed information about this membership due</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -144,7 +167,7 @@ export function DueDetailsModal({
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm font-medium">Due Date</span>
                 </div>
-                <p className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : ''}`}>
+                <p className={`text-sm ${isOverdue ? "text-red-600 font-medium" : ""}`}>
                   {new Date(due.dueDate).toLocaleDateString()}
                   {isOverdue && <span className="block text-xs">Overdue</span>}
                 </p>
@@ -154,19 +177,23 @@ export function DueDetailsModal({
                   <CreditCard className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm font-medium">Paid Amount</span>
                 </div>
-                <p className="text-lg font-semibold text-green-600">{formatCurrency(due.paidAmount)}</p>
+                <p className="text-lg font-semibold text-green-600">
+                  {formatCurrency(due.paidAmount)}
+                </p>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm font-medium">Balance</span>
                 </div>
-                <p className={`text-lg font-semibold ${due.balanceAmount > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                <p
+                  className={`text-lg font-semibold ${due.balanceAmount > 0 ? "text-red-600" : "text-green-600"}`}
+                >
                   {formatCurrency(due.balanceAmount)}
                 </p>
               </div>
             </div>
-            
+
             {due.paymentMethod && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -176,7 +203,7 @@ export function DueDetailsModal({
                 <p className="text-sm">{due.paymentMethod}</p>
               </div>
             )}
-            
+
             {due.transactionId && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -186,7 +213,7 @@ export function DueDetailsModal({
                 <p className="text-sm font-mono">{due.transactionId}</p>
               </div>
             )}
-            
+
             {due.notes && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -210,9 +237,7 @@ export function DueDetailsModal({
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">{payment.paymentMethod}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {payment.transactionId}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{payment.transactionId}</p>
                       </div>
                       <div className="text-right">
                         <p className="font-medium">{formatCurrency(payment.amount)}</p>
@@ -232,13 +257,13 @@ export function DueDetailsModal({
 
           {/* Actions */}
           <div className="flex gap-2 pt-4">
-            {due.status !== 'paid' && due.status !== 'cancelled' && (
+            {due.status !== "paid" && due.status !== "cancelled" && (
               <>
-                <Button onClick={() => onRecordPayment(due.id, due.balanceAmount, 'Credit Card')}>
+                <Button onClick={() => onRecordPayment(due.id, due.balanceAmount, "Credit Card")}>
                   <CreditCard className="h-4 w-4 mr-2" />
                   Record Payment
                 </Button>
-                <Button variant="outline" onClick={() => onSendReminder(due.id, 'email')}>
+                <Button variant="outline" onClick={() => onSendReminder(due.id, "email")}>
                   <Mail className="h-4 w-4 mr-2" />
                   Send Reminder
                 </Button>

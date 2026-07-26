@@ -1,20 +1,20 @@
 "use client";
 
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye, Edit, Trash2, Receipt } from "lucide-react";
 import { BudgetTransaction } from "@/types/finance.types";
@@ -26,50 +26,50 @@ interface BudgetTransactionTableProps {
   onDelete?: (transaction: BudgetTransaction) => void;
 }
 
-export function BudgetTransactionTable({ 
-  transactions, 
-  onView, 
-  onEdit, 
-  onDelete 
+export function BudgetTransactionTable({
+  transactions,
+  onView,
+  onEdit,
+  onDelete,
 }: BudgetTransactionTableProps) {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
   };
 
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     }).format(date);
   };
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'income':
-        return 'text-green-600';
-      case 'refund':
-        return 'text-blue-600';
+      case "income":
+        return "text-green-600";
+      case "refund":
+        return "text-blue-600";
       default:
-        return 'text-red-600';
+        return "text-red-600";
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'approved':
-        return { variant: 'default' as const, text: 'Approved' };
-      case 'pending':
-        return { variant: 'secondary' as const, text: 'Pending' };
-      case 'rejected':
-        return { variant: 'destructive' as const, text: 'Rejected' };
+      case "approved":
+        return { variant: "default" as const, text: "Approved" };
+      case "pending":
+        return { variant: "secondary" as const, text: "Pending" };
+      case "rejected":
+        return { variant: "destructive" as const, text: "Rejected" };
       default:
-        return { variant: 'outline' as const, text: status };
+        return { variant: "outline" as const, text: status };
     }
   };
 
@@ -90,12 +90,10 @@ export function BudgetTransactionTable({
         <TableBody>
           {transactions.map((transaction) => {
             const statusBadge = getStatusBadge(transaction.status);
-            
+
             return (
               <TableRow key={transaction.id}>
-                <TableCell className="font-medium">
-                  {formatDate(transaction.date)}
-                </TableCell>
+                <TableCell className="font-medium">{formatDate(transaction.date)}</TableCell>
                 <TableCell>
                   <div>
                     <p className="font-medium">{transaction.description}</p>
@@ -119,18 +117,14 @@ export function BudgetTransactionTable({
                   </div>
                 </TableCell>
                 <TableCell className={`font-medium ${getTypeColor(transaction.type)}`}>
-                  {transaction.type === 'income' || transaction.type === 'refund' ? '+' : '-'}
+                  {transaction.type === "income" || transaction.type === "refund" ? "+" : "-"}
                   {formatCurrency(transaction.amount)}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={statusBadge.variant}>
-                    {statusBadge.text}
-                  </Badge>
+                  <Badge variant={statusBadge.variant}>{statusBadge.text}</Badge>
                 </TableCell>
                 <TableCell>
-                  {transaction.vendor || (
-                    <span className="text-muted-foreground">N/A</span>
-                  )}
+                  {transaction.vendor || <span className="text-muted-foreground">N/A</span>}
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -159,7 +153,7 @@ export function BudgetTransactionTable({
                         </DropdownMenuItem>
                       )}
                       {onDelete && (
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => onDelete(transaction)}
                           className="text-destructive"
                         >

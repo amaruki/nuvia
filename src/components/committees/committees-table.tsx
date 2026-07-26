@@ -1,32 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
-import { 
-  MoreHorizontal, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Users, 
-  Power, 
+import {
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
+  Users,
+  Power,
   PowerOff,
   Calendar,
   Target,
@@ -83,7 +83,7 @@ export function CommitteesTable({
       pending: "outline" as const,
       suspended: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -99,10 +99,15 @@ export function CommitteesTable({
       ad_hoc: "bg-orange-100 text-orange-800 border-orange-200",
       standing: "bg-indigo-100 text-indigo-800 border-indigo-200",
     };
-    
+
     return (
-      <Badge variant="outline" className={colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"}>
-        {type.replace('_', ' ').charAt(0).toUpperCase() + type.replace('_', ' ').slice(1)}
+      <Badge
+        variant="outline"
+        className={
+          colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"
+        }
+      >
+        {type.replace("_", " ").charAt(0).toUpperCase() + type.replace("_", " ").slice(1)}
       </Badge>
     );
   };
@@ -114,7 +119,7 @@ export function CommitteesTable({
       operational: "outline" as const,
       advisory: "destructive" as const,
     };
-    
+
     return (
       <Badge variant={variants[authority as keyof typeof variants] || "secondary"}>
         {authority.charAt(0).toUpperCase() + authority.slice(1)}
@@ -203,7 +208,9 @@ export function CommitteesTable({
               </TableCell>
               <TableCell>
                 <div className="flex items-center space-x-2">
-                  <span className={`font-medium ${getGrowthColor(committee.metrics.meetingAttendanceRate - 80)}`}>
+                  <span
+                    className={`font-medium ${getGrowthColor(committee.metrics.meetingAttendanceRate - 80)}`}
+                  >
                     {formatPercentage(committee.metrics.meetingAttendanceRate)}
                   </span>
                 </div>
@@ -211,7 +218,9 @@ export function CommitteesTable({
               <TableCell>
                 <div className="flex items-center space-x-2">
                   {getGrowthIcon(committee.metrics.goalCompletionRate - 75)}
-                  <span className={`font-medium ${getGrowthColor(committee.metrics.goalCompletionRate - 75)}`}>
+                  <span
+                    className={`font-medium ${getGrowthColor(committee.metrics.goalCompletionRate - 75)}`}
+                  >
                     {formatPercentage(committee.metrics.goalCompletionRate)}
                   </span>
                 </div>
@@ -219,9 +228,7 @@ export function CommitteesTable({
               <TableCell>
                 <div>
                   <div className="font-medium">{committee.metrics.deliverablesCount}</div>
-                  <div className="text-sm text-muted-foreground">
-                    Total
-                  </div>
+                  <div className="text-sm text-muted-foreground">Total</div>
                 </div>
               </TableCell>
               <TableCell>
@@ -236,7 +243,10 @@ export function CommitteesTable({
                     <Avatar key={leader.id} className="h-6 w-6 border-2 border-background">
                       <AvatarImage src={leader.avatar} alt={leader.name} />
                       <AvatarFallback className="text-xs">
-                        {leader.name.split(' ').map(n => n[0]).join('')}
+                        {leader.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
                       </AvatarFallback>
                     </Avatar>
                   ))}
@@ -264,14 +274,23 @@ export function CommitteesTable({
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <a href={committee.contactInfo.website} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={committee.contactInfo.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <ExternalLink className="mr-2 h-4 w-4" />
                         Visit Website
                       </a>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={() => handleToggleStatus(committee, committee.status === "active" ? "inactive" : "active")}
+                    <DropdownMenuItem
+                      onClick={() =>
+                        handleToggleStatus(
+                          committee,
+                          committee.status === "active" ? "inactive" : "active",
+                        )
+                      }
                       disabled={togglingCommittee === committee.id}
                     >
                       {committee.status === "active" ? (
@@ -287,7 +306,7 @@ export function CommitteesTable({
                       )}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => onDelete(committee)}
                       className="text-destructive focus:text-destructive"
                     >

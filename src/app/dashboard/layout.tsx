@@ -101,7 +101,7 @@ function DashboardLayout({
   user,
   role = "member",
   className,
-}: Omit<DashboardLayoutProps, 'headerProps'>) {
+}: Omit<DashboardLayoutProps, "headerProps">) {
   return (
     <SidebarProvider>
       <DashboardProvider>
@@ -112,14 +112,12 @@ function DashboardLayout({
             <DashboardHeaderWrapper user={user} />
 
             <main className="flex-1 pb-20">
-              <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {children}
-              </div>
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</div>
             </main>
 
             <DashboardFooter />
           </div>
-          
+
           {/* Announcement Banner - Fixed at bottom */}
           <AnnouncementBanner />
         </SidebarInset>

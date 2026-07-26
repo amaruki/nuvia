@@ -24,9 +24,7 @@ export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string[]>
-  >({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
   const router = useRouter();
 
   const {
@@ -56,9 +54,7 @@ export default function ForgotPasswordPage() {
           router.push("/auth/login");
         }, 5000);
       } else {
-        setError(
-          result.message || "Failed to send password reset instructions"
-        );
+        setError(result.message || "Failed to send password reset instructions");
 
         // Set validation errors if they exist
         if (result.errors) {
@@ -107,9 +103,7 @@ export default function ForgotPasswordPage() {
                 className="rounded-md"
               />
             </div>
-            <h1 className="text-2xl font-semibold text-foreground">
-              Reset your password
-            </h1>
+            <h1 className="text-2xl font-semibold text-foreground">Reset your password</h1>
             <p className="text-sm mt-1 text-muted-foreground">
               {success
                 ? "Check your email for reset instructions"
@@ -135,10 +129,7 @@ export default function ForgotPasswordPage() {
               <>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                   <div className="space-y-3">
-                    <Label
-                      htmlFor="email"
-                      className="text-sm font-medium"
-                    >
+                    <Label htmlFor="email" className="text-sm font-medium">
                       Email Address
                     </Label>
                     <Input
@@ -152,22 +143,14 @@ export default function ForgotPasswordPage() {
                       })}
                     />
                     {errors.email && (
-                      <p className="text-sm text-destructive">
-                        {errors.email.message}
-                      </p>
+                      <p className="text-sm text-destructive">{errors.email.message}</p>
                     )}
                     {hasError("email") && (
-                      <p className="text-sm text-destructive">
-                        {getErrorMessage("email")}
-                      </p>
+                      <p className="text-sm text-destructive">{getErrorMessage("email")}</p>
                     )}
                   </div>
 
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full h-10"
-                  >
+                  <Button type="submit" disabled={isLoading} className="w-full h-10">
                     {isLoading ? "Sending Email..." : "Reset Password"}
                   </Button>
                 </form>
@@ -178,9 +161,7 @@ export default function ForgotPasswordPage() {
                     <div className="w-full border-t border-border"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="bg-card px-4 text-foreground">
-                      Or return to
-                    </span>
+                    <span className="bg-card px-4 text-foreground">Or return to</span>
                   </div>
                 </div>
               </>
@@ -194,9 +175,7 @@ export default function ForgotPasswordPage() {
                     <div className="w-full border-t border-border"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="bg-card px-4 text-foreground">
-                      Need more help?
-                    </span>
+                    <span className="bg-card px-4 text-foreground">Need more help?</span>
                   </div>
                 </div>
               </>
@@ -205,10 +184,7 @@ export default function ForgotPasswordPage() {
             {/* Back to login link */}
             <p className="text-center text-sm text-muted-foreground">
               Remember your password?{" "}
-              <Link
-                href="/auth/login"
-                className="font-medium hover:underline text-primary"
-              >
+              <Link href="/auth/login" className="font-medium hover:underline text-primary">
                 Sign in
               </Link>
             </p>

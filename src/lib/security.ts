@@ -5,24 +5,24 @@
  * rate limiting, and security monitoring.
  */
 
-import { headers } from 'next/headers';
-import { auth } from './auth';
-import { hasPermission, hasRole, getCurrentUser } from './rbac';
-import { Role, Permission } from '@/types/role.types';
+import { headers } from "next/headers";
+import { auth } from "./auth";
+import { hasPermission, hasRole, getCurrentUser } from "./rbac";
+import { Role, Permission } from "@/types/role.types";
 
 /**
  * Security event types for monitoring
  */
 export enum SecurityEventType {
-  AUTH_SUCCESS = 'auth_success',
-  AUTH_FAILURE = 'auth_failure',
-  ROLE_CHANGE = 'role_change',
-  PERMISSION_DENIED = 'permission_denied',
-  SUSPICIOUS_ACTIVITY = 'suspicious_activity',
-  RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded',
-  BRUTE_FORCE_ATTEMPT = 'brute_force_attempt',
-  PRIVILEGE_ESCALATION = 'privilege_escalation',
-  UNAUTHORIZED_ACCESS = 'unauthorized_access'
+  AUTH_SUCCESS = "auth_success",
+  AUTH_FAILURE = "auth_failure",
+  ROLE_CHANGE = "role_change",
+  PERMISSION_DENIED = "permission_denied",
+  SUSPICIOUS_ACTIVITY = "suspicious_activity",
+  RATE_LIMIT_EXCEEDED = "rate_limit_exceeded",
+  BRUTE_FORCE_ATTEMPT = "brute_force_attempt",
+  PRIVILEGE_ESCALATION = "privilege_escalation",
+  UNAUTHORIZED_ACCESS = "unauthorized_access",
 }
 
 /**
@@ -38,17 +38,16 @@ export async function logSecurityEvent(
     ipAddress?: string;
     userAgent?: string;
     metadata?: Record<string, any>;
-  }
+  },
 ) {
   try {
     const requestHeaders = await headers();
-    const ipAddress = details.ipAddress ||
-                     requestHeaders.get('x-forwarded-for') ||
-                     requestHeaders.get('x-real-ip') ||
-                     'unknown';
-    const userAgent = details.userAgent ||
-                     requestHeaders.get('user-agent') ||
-                     'unknown';
+    const ipAddress =
+      details.ipAddress ||
+      requestHeaders.get("x-forwarded-for") ||
+      requestHeaders.get("x-real-ip") ||
+      "unknown";
+    const userAgent = details.userAgent || requestHeaders.get("user-agent") || "unknown";
 
     const logEntry = {
       eventType,
@@ -59,11 +58,11 @@ export async function logSecurityEvent(
       action: details.action,
       ipAddress,
       userAgent,
-      metadata: details.metadata
+      metadata: details.metadata,
     };
 
     // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       console.log(`[SECURITY] ${eventType}:`, logEntry);
     }
 
@@ -72,7 +71,7 @@ export async function logSecurityEvent(
 
     return logEntry;
   } catch (error) {
-    console.error('Failed to log security event:', error);
+    console.error("Failed to log security event:", error);
   }
 }
 
@@ -81,25 +80,25 @@ export async function logSecurityEvent(
  */
 export async function authorizeApi(
   requiredRole?: Role,
-  requiredPermission?: Permission
+  requiredPermission?: Permission,
 ): Promise<{
-    authorized: boolean;
-    user?: any;
-    reason?: string;
-  }> {
+  authorized: boolean;
+  user?: any;
+  reason?: string;
+}> {
   try {
     const user = await getCurrentUser();
 
     if (!user) {
       await logSecurityEvent(SecurityEventType.UNAUTHORIZED_ACCESS, {
-        action: 'api_access_denied',
+        action: "api_access_denied",
         resource: requiredPermission || `role_${requiredRole}`,
-        metadata: { reason: 'no_session' }
+        metadata: { reason: "no_session" },
       });
 
       return {
         authorized: false,
-        reason: 'UNAUTHORIZED'
+        reason: "UNAUTHORIZED",
       };
     }
 
@@ -111,15 +110,15 @@ export async function authorizeApi(
         await logSecurityEvent(SecurityEventType.PERMISSION_DENIED, {
           userId: user.id,
           userRole: user.role,
-          action: 'role_check_failed',
+          action: "role_check_failed",
           resource: `role_${requiredRole}`,
-          metadata: { requiredRole, userRole: user.role }
+          metadata: { requiredRole, userRole: user.role },
         });
 
         return {
           authorized: false,
           user,
-          reason: 'INSUFFICIENT_ROLE'
+          reason: "INSUFFICIENT_ROLE",
         };
       }
     }
@@ -132,34 +131,34 @@ export async function authorizeApi(
         await logSecurityEvent(SecurityEventType.PERMISSION_DENIED, {
           userId: user.id,
           userRole: user.role,
-          action: 'permission_check_failed',
+          action: "permission_check_failed",
           resource: requiredPermission,
-          metadata: { requiredPermission, userRole: user.role }
+          metadata: { requiredPermission, userRole: user.role },
         });
 
         return {
           authorized: false,
           user,
-          reason: 'INSUFFICIENT_PERMISSION'
+          reason: "INSUFFICIENT_PERMISSION",
         };
       }
     }
 
     return {
       authorized: true,
-      user
+      user,
     };
   } catch (error) {
-    console.error('Authorization check failed:', error);
+    console.error("Authorization check failed:", error);
 
     await logSecurityEvent(SecurityEventType.SUSPICIOUS_ACTIVITY, {
-      action: 'authorization_error',
-      metadata: { error: error instanceof Error ? error.message : 'unknown' }
+      action: "authorization_error",
+      metadata: { error: error instanceof Error ? error.message : "unknown" },
     });
 
     return {
       authorized: false,
-      reason: 'INTERNAL_ERROR'
+      reason: "INTERNAL_ERROR",
     };
   }
 }
@@ -169,14 +168,14 @@ export async function authorizeApi(
  */
 export function canPerformSensitiveOperation(
   userRole: Role,
-  operation: 'change_own_role' | 'delete_own_account' | 'disable_2fa' | 'bypass_mfa'
+  operation: "change_own_role" | "delete_own_account" | "disable_2fa" | "bypass_mfa",
 ): boolean {
   // Prevent certain operations for users
   const restrictedOperations = {
-    'change_own_role': ['superadmin'], // Only superadmin can change roles
-    'delete_own_account': ['superadmin', 'admin'], // Only admins can delete accounts
-    'disable_2fa': [], // No one can disable 2FA once enabled (security best practice)
-    'bypass_mfa': ['superadmin'] // Only superadmin can bypass MFA
+    change_own_role: ["superadmin"], // Only superadmin can change roles
+    delete_own_account: ["superadmin", "admin"], // Only admins can delete accounts
+    disable_2fa: [], // No one can disable 2FA once enabled (security best practice)
+    bypass_mfa: ["superadmin"], // Only superadmin can bypass MFA
   };
 
   return (restrictedOperations[operation] as string[])?.includes(userRole as any) || false;
@@ -190,10 +189,12 @@ export class RateLimiter {
 
   constructor(
     private maxAttempts: number = 5,
-    private windowMs: number = 15 * 60 * 1000 // 15 minutes
+    private windowMs: number = 15 * 60 * 1000, // 15 minutes
   ) {}
 
-  async isAllowed(identifier: string): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
+  async isAllowed(
+    identifier: string,
+  ): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
     const now = Date.now();
     const existing = this.attempts.get(identifier);
 
@@ -201,32 +202,32 @@ export class RateLimiter {
       // Reset or create new window
       this.attempts.set(identifier, {
         count: 1,
-        resetTime: now + this.windowMs
+        resetTime: now + this.windowMs,
       });
 
       return {
         allowed: true,
         remaining: this.maxAttempts - 1,
-        resetTime: now + this.windowMs
+        resetTime: now + this.windowMs,
       };
     }
 
     // Check if limit exceeded
     if (existing.count >= this.maxAttempts) {
       await logSecurityEvent(SecurityEventType.RATE_LIMIT_EXCEEDED, {
-        action: 'rate_limit_exceeded',
+        action: "rate_limit_exceeded",
         resource: identifier,
         metadata: {
           attempts: existing.count,
           maxAttempts: this.maxAttempts,
-          windowMs: this.windowMs
-        }
+          windowMs: this.windowMs,
+        },
       });
 
       return {
         allowed: false,
         remaining: 0,
-        resetTime: existing.resetTime
+        resetTime: existing.resetTime,
       };
     }
 
@@ -236,7 +237,7 @@ export class RateLimiter {
     return {
       allowed: true,
       remaining: this.maxAttempts - existing.count,
-      resetTime: existing.resetTime
+      resetTime: existing.resetTime,
     };
   }
 
@@ -254,40 +255,40 @@ export async function detectSuspiciousLogin(
     ipAddress: string;
     userAgent: string;
     location?: string;
-  }
+  },
 ): Promise<{
-    isSuspicious: boolean;
-    riskScore: number;
-    reasons: string[];
-  }> {
+  isSuspicious: boolean;
+  riskScore: number;
+  reasons: string[];
+}> {
   const reasons: string[] = [];
   let riskScore = 0;
 
   // Check for new IP address
   const recentIps = await getRecentUserIps(user.id);
   if (!recentIps.includes(loginDetails.ipAddress)) {
-    reasons.push('New IP address');
+    reasons.push("New IP address");
     riskScore += 30;
   }
 
   // Check for unusual user agent
   const recentUserAgents = await getRecentUserAgents(user.id);
   if (!recentUserAgents.includes(loginDetails.userAgent)) {
-    reasons.push('New user agent');
+    reasons.push("New user agent");
     riskScore += 20;
   }
 
   // Check for suspicious time patterns
   const currentHour = new Date().getHours();
   if (currentHour < 6 || currentHour > 22) {
-    reasons.push('Unusual login time');
+    reasons.push("Unusual login time");
     riskScore += 15;
   }
 
   // Check for multiple failed attempts
   const recentFailures = await getRecentFailedLogins(loginDetails.ipAddress);
   if (recentFailures > 3) {
-    reasons.push('Multiple recent failures');
+    reasons.push("Multiple recent failures");
     riskScore += 40;
   }
 
@@ -297,19 +298,19 @@ export async function detectSuspiciousLogin(
     await logSecurityEvent(SecurityEventType.SUSPICIOUS_ACTIVITY, {
       userId: user.id,
       userRole: user.role,
-      action: 'suspicious_login_detected',
+      action: "suspicious_login_detected",
       metadata: {
         riskScore,
         reasons,
-        loginDetails
-      }
+        loginDetails,
+      },
     });
   }
 
   return {
     isSuspicious,
     riskScore,
-    reasons
+    reasons,
   };
 }
 
@@ -338,5 +339,5 @@ export const rateLimiters = {
   login: new RateLimiter(5, 15 * 60 * 1000), // 5 attempts per 15 minutes
   passwordReset: new RateLimiter(3, 60 * 60 * 1000), // 3 attempts per hour
   roleChange: new RateLimiter(10, 60 * 60 * 1000), // 10 role changes per hour
-  sensitiveAction: new RateLimiter(20, 60 * 60 * 1000) // 20 sensitive actions per hour
+  sensitiveAction: new RateLimiter(20, 60 * 60 * 1000), // 20 sensitive actions per hour
 };

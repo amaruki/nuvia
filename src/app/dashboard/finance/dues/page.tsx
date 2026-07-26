@@ -121,11 +121,7 @@ export default function FinanceDues() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowFilters(!showFilters)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)}>
             Filters
           </Button>
           <Button variant="outline" size="sm" onClick={refreshData}>
@@ -149,11 +145,7 @@ export default function FinanceDues() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="dues">All Dues</TabsTrigger>
@@ -172,10 +164,7 @@ export default function FinanceDues() {
               <CardContent>
                 <div className="space-y-3">
                   {dues.slice(0, 5).map((due) => (
-                    <div
-                      key={due.id}
-                      className="flex items-center justify-between"
-                    >
+                    <div key={due.id} className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium">{due.memberName}</p>
                         <p className="text-xs text-muted-foreground">
@@ -183,16 +172,14 @@ export default function FinanceDues() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">
-                          {formatCurrency(due.balanceAmount)}
-                        </p>
+                        <p className="text-sm font-medium">{formatCurrency(due.balanceAmount)}</p>
                         <Badge
                           variant={
                             due.status === "paid"
                               ? "default"
                               : due.status === "overdue"
-                              ? "destructive"
-                              : "secondary"
+                                ? "destructive"
+                                : "secondary"
                           }
                           className="text-xs"
                         >
@@ -217,25 +204,17 @@ export default function FinanceDues() {
                     .filter(
                       (due) =>
                         due.status === "pending" &&
-                        new Date(due.dueDate) <=
-                          new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                        new Date(due.dueDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
                     )
                     .slice(0, 5)
                     .map((due) => (
-                      <div
-                        key={due.id}
-                        className="flex items-center justify-between"
-                      >
+                      <div key={due.id} className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium">{due.memberName}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {due.membershipTier}
-                          </p>
+                          <p className="text-xs text-muted-foreground">{due.membershipTier}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-medium">
-                            {formatCurrency(due.dueAmount)}
-                          </p>
+                          <p className="text-sm font-medium">{formatCurrency(due.dueAmount)}</p>
                           <p className="text-xs text-muted-foreground">
                             {new Date(due.dueDate).toLocaleDateString()}
                           </p>
@@ -263,9 +242,7 @@ export default function FinanceDues() {
                         <TrendingUp className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">
-                          {formatCurrency(month.collected)}
-                        </p>
+                        <p className="text-sm font-medium">{formatCurrency(month.collected)}</p>
                         <p className="text-xs text-muted-foreground">
                           of {formatCurrency(month.amount)}
                         </p>
@@ -297,20 +274,13 @@ export default function FinanceDues() {
             <CardContent>
               <div className="space-y-3">
                 {payments.map((payment) => (
-                  <div
-                    key={payment.id}
-                    className="flex items-center justify-between"
-                  >
+                  <div key={payment.id} className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium">{payment.paymentMethod}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {payment.transactionId}
-                      </p>
+                      <p className="text-xs text-muted-foreground">{payment.transactionId}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium">
-                        {formatCurrency(payment.amount)}
-                      </p>
+                      <p className="text-sm font-medium">{formatCurrency(payment.amount)}</p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(payment.paymentDate).toLocaleDateString()}
                       </p>
@@ -331,10 +301,7 @@ export default function FinanceDues() {
             <CardContent>
               <div className="space-y-3">
                 {reminders.map((reminder) => (
-                  <div
-                    key={reminder.id}
-                    className="flex items-center justify-between"
-                  >
+                  <div key={reminder.id} className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium">{reminder.recipient}</p>
                       <p className="text-xs text-muted-foreground">
@@ -347,8 +314,8 @@ export default function FinanceDues() {
                           reminder.status === "sent"
                             ? "default"
                             : reminder.status === "failed"
-                            ? "destructive"
-                            : "secondary"
+                              ? "destructive"
+                              : "secondary"
                         }
                         className="text-xs"
                       >

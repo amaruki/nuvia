@@ -7,7 +7,7 @@ export interface BudgetCategory {
   spentAmount: number;
   remainingAmount: number;
   percentageUsed: number;
-  status: 'on-track' | 'warning' | 'over-budget';
+  status: "on-track" | "warning" | "over-budget";
   subcategories?: BudgetSubcategory[];
 }
 
@@ -28,7 +28,7 @@ export interface BudgetPeriod {
   totalBudget: number;
   totalSpent: number;
   totalRemaining: number;
-  status: 'active' | 'upcoming' | 'completed';
+  status: "active" | "upcoming" | "completed";
   categories: BudgetCategory[];
 }
 
@@ -39,8 +39,8 @@ export interface BudgetTransaction {
   description: string;
   amount: number;
   date: Date;
-  type: 'expense' | 'income' | 'refund';
-  status: 'pending' | 'approved' | 'rejected';
+  type: "expense" | "income" | "refund";
+  status: "pending" | "approved" | "rejected";
   vendor?: string;
   receiptUrl?: string;
   notes?: string;
@@ -123,7 +123,7 @@ export interface MemberDue {
   balanceAmount: number;
   dueDate: Date;
   paidDate?: Date;
-  status: 'pending' | 'paid' | 'overdue' | 'partial' | 'cancelled';
+  status: "pending" | "paid" | "overdue" | "partial" | "cancelled";
   paymentMethod?: string;
   transactionId?: string;
   notes?: string;
@@ -138,7 +138,7 @@ export interface DuePayment {
   paymentDate: Date;
   paymentMethod: string;
   transactionId: string;
-  status: 'completed' | 'pending' | 'failed' | 'refunded';
+  status: "completed" | "pending" | "failed" | "refunded";
   processedBy: string;
   notes?: string;
   createdAt: Date;
@@ -147,10 +147,10 @@ export interface DuePayment {
 export interface DueReminder {
   id: string;
   dueId: string;
-  reminderType: 'email' | 'sms' | 'in_app';
+  reminderType: "email" | "sms" | "in_app";
   scheduledDate: Date;
   sentDate?: Date;
-  status: 'scheduled' | 'sent' | 'failed';
+  status: "scheduled" | "sent" | "failed";
   template: string;
   recipient: string;
   createdAt: Date;
@@ -213,7 +213,7 @@ export interface Invoice {
   taxAmount: number;
   totalAmount: number;
   currency: string;
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled' | 'refunded';
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled" | "refunded";
   issueDate: Date;
   dueDate: Date;
   paidDate?: Date;
@@ -242,7 +242,7 @@ export interface InvoicePayment {
   paymentDate: Date;
   paymentMethod: string;
   transactionId: string;
-  status: 'completed' | 'pending' | 'failed' | 'refunded';
+  status: "completed" | "pending" | "failed" | "refunded";
   processedBy: string;
   notes?: string;
   createdAt: Date;
@@ -306,12 +306,12 @@ export interface Donation {
   donorId: string;
   donorName: string;
   donorEmail: string;
-  donorType: 'individual' | 'organization' | 'anonymous';
-  donationType: 'one_time' | 'recurring' | 'pledge';
+  donorType: "individual" | "organization" | "anonymous";
+  donationType: "one_time" | "recurring" | "pledge";
   campaign?: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'completed' | 'failed' | 'refunded' | 'pledged';
+  status: "pending" | "completed" | "failed" | "refunded" | "pledged";
   paymentMethod?: string;
   transactionId?: string;
   donationDate: Date;
@@ -329,7 +329,7 @@ export interface DonationCampaign {
   raisedAmount: number;
   startDate: Date;
   endDate?: Date;
-  status: 'active' | 'completed' | 'cancelled' | 'upcoming';
+  status: "active" | "completed" | "cancelled" | "upcoming";
   category: string;
   featured: boolean;
   createdAt: Date;
@@ -342,7 +342,7 @@ export interface DonationPayment {
   paymentDate: Date;
   paymentMethod: string;
   transactionId: string;
-  status: 'completed' | 'pending' | 'failed' | 'refunded';
+  status: "completed" | "pending" | "failed" | "refunded";
   processedBy: string;
   notes?: string;
   createdAt: Date;
@@ -393,8 +393,8 @@ export interface DonationFilterOptions {
 
 export interface DonationFormData {
   donorId: string;
-  donorType: 'individual' | 'organization' | 'anonymous';
-  donationType: 'one_time' | 'recurring' | 'pledge';
+  donorType: "individual" | "organization" | "anonymous";
+  donationType: "one_time" | "recurring" | "pledge";
   campaign?: string;
   amount: number;
   currency?: string;
@@ -408,11 +408,17 @@ export interface FinancialReport {
   id: string;
   title: string;
   description: string;
-  type: 'income_statement' | 'balance_sheet' | 'cash_flow' | 'budget_vs_actual' | 'tax_document' | 'audit_trail';
+  type:
+    | "income_statement"
+    | "balance_sheet"
+    | "cash_flow"
+    | "budget_vs_actual"
+    | "tax_document"
+    | "audit_trail";
   period: string;
   startDate: Date;
   endDate: Date;
-  status: 'draft' | 'pending_review' | 'approved' | 'published' | 'archived';
+  status: "draft" | "pending_review" | "approved" | "published" | "archived";
   generatedBy: string;
   generatedAt: Date;
   reviewedBy?: string;
@@ -432,7 +438,7 @@ export interface ReportSection {
   reportId: string;
   title: string;
   order: number;
-  type: 'table' | 'chart' | 'text' | 'summary';
+  type: "table" | "chart" | "text" | "summary";
   content: any; // Dynamic content based on type
   createdAt: Date;
 }
@@ -545,7 +551,7 @@ export interface BudgetVsActualData {
     actual: number;
     variance: number;
     variancePercentage: number;
-    status: 'under_budget' | 'on_track' | 'over_budget';
+    status: "under_budget" | "on_track" | "over_budget";
     subcategories?: Array<{
       name: string;
       budgeted: number;
@@ -568,7 +574,7 @@ export interface BudgetVsActualData {
 
 export interface TaxDocumentData {
   taxYear: number;
-  taxType: 'income_tax' | 'sales_tax' | 'property_tax' | 'payroll_tax' | 'other';
+  taxType: "income_tax" | "sales_tax" | "property_tax" | "payroll_tax" | "other";
   totalTaxableIncome: number;
   totalTax: number;
   taxPaid: number;
@@ -594,23 +600,23 @@ export interface AuditTrailData {
     endDate: Date;
   };
   auditedBy: string;
-  auditType: 'internal' | 'external' | 'compliance';
-  status: 'in_progress' | 'completed' | 'findings_identified' | 'resolved';
+  auditType: "internal" | "external" | "compliance";
+  status: "in_progress" | "completed" | "findings_identified" | "resolved";
   findings: Array<{
     id: string;
     category: string;
-    severity: 'low' | 'medium' | 'high' | 'critical';
+    severity: "low" | "medium" | "high" | "critical";
     description: string;
     recommendation: string;
-    status: 'open' | 'in_progress' | 'resolved';
+    status: "open" | "in_progress" | "resolved";
     resolvedAt?: Date;
   }>;
   complianceScore: number;
   riskAssessment: {
-    overall: 'low' | 'medium' | 'high';
-    financial: 'low' | 'medium' | 'high';
-    operational: 'low' | 'medium' | 'high';
-    compliance: 'low' | 'medium' | 'high';
+    overall: "low" | "medium" | "high";
+    financial: "low" | "medium" | "high";
+    operational: "low" | "medium" | "high";
+    compliance: "low" | "medium" | "high";
   };
   reportUrl?: string;
 }
@@ -662,7 +668,13 @@ export interface ReportFilterOptions {
 export interface ReportFormData {
   title: string;
   description: string;
-  type: 'income_statement' | 'balance_sheet' | 'cash_flow' | 'budget_vs_actual' | 'tax_document' | 'audit_trail';
+  type:
+    | "income_statement"
+    | "balance_sheet"
+    | "cash_flow"
+    | "budget_vs_actual"
+    | "tax_document"
+    | "audit_trail";
   period: string;
   startDate: Date;
   endDate: Date;
@@ -674,11 +686,11 @@ export interface ReportFormData {
 export interface PaymentGateway {
   id: string;
   name: string;
-  provider: 'stripe' | 'paypal' | 'square' | 'adyen' | 'razorpay' | 'mollie' | 'other';
+  provider: "stripe" | "paypal" | "square" | "adyen" | "razorpay" | "mollie" | "other";
   displayName: string;
   description?: string;
-  status: 'active' | 'inactive' | 'testing' | 'error';
-  environment: 'sandbox' | 'production';
+  status: "active" | "inactive" | "testing" | "error";
+  environment: "sandbox" | "production";
   currencies: string[];
   supportedPaymentMethods: PaymentMethod[];
   transactionFees: TransactionFee[];
@@ -700,7 +712,13 @@ export interface PaymentGateway {
 
 export interface PaymentMethod {
   id: string;
-  type: 'credit_card' | 'debit_card' | 'bank_transfer' | 'digital_wallet' | 'cryptocurrency' | 'buy_now_pay_later';
+  type:
+    | "credit_card"
+    | "debit_card"
+    | "bank_transfer"
+    | "digital_wallet"
+    | "cryptocurrency"
+    | "buy_now_pay_later";
   name: string;
   displayName: string;
   isEnabled: boolean;
@@ -710,7 +728,7 @@ export interface PaymentMethod {
 
 export interface TransactionFee {
   id: string;
-  type: 'fixed' | 'percentage' | 'tiered' | 'mixed';
+  type: "fixed" | "percentage" | "tiered" | "mixed";
   name: string;
   description?: string;
   amount?: number; // For fixed fees
@@ -727,7 +745,7 @@ export interface FeeTier {
   fromAmount: number;
   toAmount?: number;
   fee: number;
-  feeType: 'fixed' | 'percentage';
+  feeType: "fixed" | "percentage";
 }
 
 export interface GatewayConfiguration {
@@ -736,7 +754,7 @@ export interface GatewayConfiguration {
   require3ds: boolean;
   autoCapture: boolean;
   settlementDelay: number; // in hours
-  refundPolicy: 'full' | 'partial' | 'none';
+  refundPolicy: "full" | "partial" | "none";
   disputeManagement: boolean;
   fraudDetection: boolean;
   recurringPayments: boolean;
@@ -787,7 +805,14 @@ export interface GatewayTransaction {
   externalTransactionId?: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled' | 'refunded' | 'chargeback';
+  status:
+    | "pending"
+    | "processing"
+    | "completed"
+    | "failed"
+    | "cancelled"
+    | "refunded"
+    | "chargeback";
   paymentMethod: string;
   paymentMethodType: string;
   customerEmail?: string;
@@ -805,8 +830,8 @@ export interface GatewayTransaction {
 
 export interface GatewayTestResult {
   gatewayId: string;
-  testType: 'connection' | 'payment' | 'webhook' | 'refund';
-  status: 'success' | 'failed' | 'warning';
+  testType: "connection" | "payment" | "webhook" | "refund";
+  status: "success" | "failed" | "warning";
   message: string;
   details?: any;
   testedAt: Date;
@@ -860,10 +885,10 @@ export interface GatewayFilterOptions {
 
 export interface GatewayFormData {
   name: string;
-  provider: 'stripe' | 'paypal' | 'square' | 'adyen' | 'razorpay' | 'mollie' | 'other';
+  provider: "stripe" | "paypal" | "square" | "adyen" | "razorpay" | "mollie" | "other";
   displayName: string;
   description?: string;
-  environment: 'sandbox' | 'production';
+  environment: "sandbox" | "production";
   currencies: string[];
   apiKey?: string;
   apiSecret?: string;

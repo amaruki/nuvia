@@ -4,7 +4,7 @@
 
 export class ValidationError extends Error {
   public fields: Array<{ field: string; message: string }>;
-  
+
   constructor(fields: Array<{ field: string; message: string }>) {
     super("Validation failed");
     this.name = "ValidationError";
@@ -15,7 +15,7 @@ export class ValidationError extends Error {
 export class NotFoundError extends Error {
   public resource: string;
   public id: string;
-  
+
   constructor(resource: string, id: string) {
     super(`${resource} with id ${id} not found`);
     this.name = "NotFoundError";
@@ -33,7 +33,7 @@ export class AuthorizationError extends Error {
 
 export class BusinessLogicError extends Error {
   public code: string;
-  
+
   constructor(message: string, code: string) {
     super(message);
     this.name = "BusinessLogicError";
@@ -43,7 +43,7 @@ export class BusinessLogicError extends Error {
 
 export class RateLimitError extends Error {
   public retryAfter: number;
-  
+
   constructor(message: string = "Rate limit exceeded", retryAfter: number = 60) {
     super(message);
     this.name = "RateLimitError";
@@ -60,7 +60,7 @@ export class AuthenticationError extends Error {
 
 export class DatabaseError extends Error {
   public originalError?: Error;
-  
+
   constructor(message: string, originalError?: Error) {
     super(message);
     this.name = "DatabaseError";
@@ -77,7 +77,7 @@ export class EmailError extends Error {
 
 export class ExternalServiceError extends Error {
   public service: string;
-  
+
   constructor(message: string, service: string) {
     super(message);
     this.name = "ExternalServiceError";
@@ -93,16 +93,19 @@ export class ExternalServiceError extends Error {
 export function createErrorResponse(error: Error) {
   let statusCode = 500;
   let errors: Record<string, string[]> = {};
-  
+
   if (error instanceof ValidationError) {
     statusCode = 400;
-    errors = error.fields.reduce((acc, field) => {
-      if (!acc[field.field]) {
-        acc[field.field] = [];
-      }
-      acc[field.field].push(field.message);
-      return acc;
-    }, {} as Record<string, string[]>);
+    errors = error.fields.reduce(
+      (acc, field) => {
+        if (!acc[field.field]) {
+          acc[field.field] = [];
+        }
+        acc[field.field].push(field.message);
+        return acc;
+      },
+      {} as Record<string, string[]>,
+    );
   } else if (error instanceof NotFoundError) {
     statusCode = 404;
     errors = {
@@ -149,7 +152,7 @@ export function createErrorResponse(error: Error) {
       oauth: [error.message],
     };
   }
-  
+
   return {
     success: false,
     data: undefined,
@@ -186,9 +189,7 @@ export function createSuccessResponse(data: any, message: string = "Success") {
  * @param fn - The async function to wrap
  * @returns Wrapped function with error handling
  */
-export function asyncHandler<T extends any[], R>(
-  fn: (...args: T) => Promise<R>
-) {
+export function asyncHandler<T extends any[], R>(fn: (...args: T) => Promise<R>) {
   return async (...args: T): Promise<R> => {
     try {
       return await fn(...args);
@@ -209,15 +210,15 @@ export function asyncHandler<T extends any[], R>(
  */
 export function validateEnvironmentVariables(requiredVars: string[]): void {
   const missingVars: string[] = [];
-  
+
   for (const varName of requiredVars) {
     if (!process.env[varName]) {
       missingVars.push(varName);
     }
   }
-  
+
   if (missingVars.length > 0) {
-    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+    throw new Error(`Missing required environment variables: ${missingVars.join(", ")}`);
   }
 }
 
@@ -242,14 +243,12 @@ export class OAuthConflictError extends Error {
   public email: string;
   public existingMethod: string;
   public attemptedMethod: string;
-  
-  constructor(
-    email: string,
-    existingMethod: string,
-    attemptedMethod: string,
-    message?: string
-  ) {
-    super(message || `Email ${email} is already registered with ${existingMethod}. Cannot use ${attemptedMethod}.`);
+
+  constructor(email: string, existingMethod: string, attemptedMethod: string, message?: string) {
+    super(
+      message ||
+        `Email ${email} is already registered with ${existingMethod}. Cannot use ${attemptedMethod}.`,
+    );
     this.name = "OAuthConflictError";
     this.email = email;
     this.existingMethod = existingMethod;

@@ -1,3 +1,3 @@
 export default function SettingsGeneral() {
-  return <h1>SettingsGeneral page</h1>
+  return <h1>SettingsGeneral page</h1>;
 }

@@ -9,11 +9,11 @@ import { ArrowLeft, BarChart3 } from "lucide-react";
 import Link from "next/link";
 
 export default function MediaAnalyticsPage() {
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y' | 'all'>('30d');
+  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "1y" | "all">("30d");
   const { statistics, loading, error } = useMedia();
 
   const handleTimeRangeChange = (range: string) => {
-    setTimeRange(range as '7d' | '30d' | '90d' | '1y' | 'all');
+    setTimeRange(range as "7d" | "30d" | "90d" | "1y" | "all");
   };
 
   return (
@@ -34,11 +34,11 @@ export default function MediaAnalyticsPage() {
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <BarChart3 className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">
-            {statistics ? `${statistics.totalMedia} media items analyzed` : 'Loading...'}
+            {statistics ? `${statistics.totalMedia} media items analyzed` : "Loading..."}
           </span>
         </div>
       </div>
@@ -65,7 +65,7 @@ export default function MediaAnalyticsPage() {
         statistics={statistics}
         timeRange={timeRange}
         onTimeRangeChange={handleTimeRangeChange}
-        className={loading ? 'opacity-50' : ''}
+        className={loading ? "opacity-50" : ""}
       />
 
       {/* Loading Overlay */}

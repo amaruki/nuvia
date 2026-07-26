@@ -129,9 +129,15 @@ export function DonationsOverviewCards({ statistics }: DonationsOverviewCardsPro
             {statistics.donorTypeBreakdown.map((donorType, index) => (
               <div key={donorType.donorType} className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  {donorType.donorType === "individual" && <Users className="h-4 w-4 text-muted-foreground" />}
-                  {donorType.donorType === "organization" && <Target className="h-4 w-4 text-muted-foreground" />}
-                  {donorType.donorType === "anonymous" && <Gift className="h-4 w-4 text-muted-foreground" />}
+                  {donorType.donorType === "individual" && (
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  {donorType.donorType === "organization" && (
+                    <Target className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  {donorType.donorType === "anonymous" && (
+                    <Gift className="h-4 w-4 text-muted-foreground" />
+                  )}
                   <span className="text-sm font-medium capitalize">{donorType.donorType}</span>
                 </div>
                 <div className="text-right">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -15,7 +15,12 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Search, Filter } from "lucide-react";
-import { CommitteeFilterOptions, CommitteeStatus, CommitteeType, CommitteeAuthorityLevel } from "@/types/committee.types";
+import {
+  CommitteeFilterOptions,
+  CommitteeStatus,
+  CommitteeType,
+  CommitteeAuthorityLevel,
+} from "@/types/committee.types";
 
 interface CommitteesFiltersProps {
   filters: CommitteeFilterOptions;
@@ -56,17 +61,15 @@ export function CommitteesFilters({
     const currentStatuses = filters.status || [];
     const newStatuses = checked
       ? [...currentStatuses, status]
-      : currentStatuses.filter(s => s !== status);
-    
+      : currentStatuses.filter((s) => s !== status);
+
     onFiltersChange({ status: newStatuses.length > 0 ? newStatuses : undefined });
   };
 
   const handleTypeChange = (type: CommitteeType, checked: boolean) => {
     const currentTypes = filters.type || [];
-    const newTypes = checked
-      ? [...currentTypes, type]
-      : currentTypes.filter(t => t !== type);
-    
+    const newTypes = checked ? [...currentTypes, type] : currentTypes.filter((t) => t !== type);
+
     onFiltersChange({ type: newTypes.length > 0 ? newTypes : undefined });
   };
 
@@ -74,20 +77,20 @@ export function CommitteesFilters({
     const currentAuthorities = filters.authorityLevel || [];
     const newAuthorities = checked
       ? [...currentAuthorities, authority]
-      : currentAuthorities.filter(a => a !== authority);
-    
+      : currentAuthorities.filter((a) => a !== authority);
+
     onFiltersChange({ authorityLevel: newAuthorities.length > 0 ? newAuthorities : undefined });
   };
 
   const handleMemberCountRangeChange = (field: "min" | "min" | "max", value: string) => {
     const numValue = parseInt(value) || 0;
     const currentRange = filters.memberCountRange || { min: 0, max: 100 };
-    
+
     onFiltersChange({
       memberCountRange: {
         ...currentRange,
-        [field]: numValue
-      }
+        [field]: numValue,
+      },
     });
   };
 
@@ -119,17 +122,13 @@ export function CommitteesFilters({
                 Clear All
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
               {isExpanded ? "Collapse" : "Expand"}
             </Button>
           </div>
         </div>
       </CardHeader>
-      
+
       {isExpanded && (
         <CardContent className="space-y-6">
           {/* Search */}
@@ -157,11 +156,11 @@ export function CommitteesFilters({
                     <Checkbox
                       id={`status-${option.value}`}
                       checked={filters.status?.includes(option.value) || false}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         handleStatusChange(option.value, checked as boolean)
                       }
                     />
-                    <Label 
+                    <Label
                       htmlFor={`status-${option.value}`}
                       className="text-sm font-normal cursor-pointer"
                     >
@@ -181,11 +180,11 @@ export function CommitteesFilters({
                     <Checkbox
                       id={`type-${option.value}`}
                       checked={filters.type?.includes(option.value) || false}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         handleTypeChange(option.value, checked as boolean)
                       }
                     />
-                    <Label 
+                    <Label
                       htmlFor={`type-${option.value}`}
                       className="text-sm font-normal cursor-pointer"
                     >
@@ -205,11 +204,11 @@ export function CommitteesFilters({
                     <Checkbox
                       id={`authority-${option.value}`}
                       checked={filters.authorityLevel?.includes(option.value) || false}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         handleAuthorityChange(option.value, checked as boolean)
                       }
                     />
-                    <Label 
+                    <Label
                       htmlFor={`authority-${option.value}`}
                       className="text-sm font-normal cursor-pointer"
                     >
@@ -265,8 +264,8 @@ export function CommitteesFilters({
                 {filters.search && (
                   <Badge variant="secondary" className="gap-1">
                     Search: "{filters.search}"
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
+                    <X
+                      className="h-3 w-3 cursor-pointer"
                       onClick={() => onFiltersChange({ search: undefined })}
                     />
                   </Badge>
@@ -274,17 +273,17 @@ export function CommitteesFilters({
                 {filters.status?.map((status) => (
                   <Badge key={status} variant="secondary" className="gap-1">
                     Status: {status}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
+                    <X
+                      className="h-3 w-3 cursor-pointer"
                       onClick={() => handleStatusChange(status, false)}
                     />
                   </Badge>
                 ))}
                 {filters.type?.map((type) => (
                   <Badge key={type} variant="secondary" className="gap-1">
-                    Type: {type.replace('_', ' ')}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
+                    Type: {type.replace("_", " ")}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
                       onClick={() => handleTypeChange(type, false)}
                     />
                   </Badge>
@@ -292,8 +291,8 @@ export function CommitteesFilters({
                 {filters.authorityLevel?.map((authority) => (
                   <Badge key={authority} variant="secondary" className="gap-1">
                     Authority: {authority}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
+                    <X
+                      className="h-3 w-3 cursor-pointer"
                       onClick={() => handleAuthorityChange(authority, false)}
                     />
                   </Badge>
@@ -301,8 +300,8 @@ export function CommitteesFilters({
                 {filters.memberCountRange && (
                   <Badge variant="secondary" className="gap-1">
                     Members: {filters.memberCountRange.min}-{filters.memberCountRange.max}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
+                    <X
+                      className="h-3 w-3 cursor-pointer"
                       onClick={() => onFiltersChange({ memberCountRange: undefined })}
                     />
                   </Badge>

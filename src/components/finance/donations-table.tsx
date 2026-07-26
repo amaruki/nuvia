@@ -40,7 +40,7 @@ interface DonationsTableProps {
   onViewDetails?: (donation: Donation) => void;
   onRecordPayment?: (donationId: string, amount: number, paymentMethod: string) => void;
   onSendReceipt?: (donationId: string) => void;
-  onUpdateStatus?: (donationId: string, status: Donation['status']) => void;
+  onUpdateStatus?: (donationId: string, status: Donation["status"]) => void;
 }
 
 export function DonationsTable({
@@ -62,7 +62,7 @@ export function DonationsTable({
     }).format(amount);
   };
 
-  const getStatusIcon = (status: Donation['status']) => {
+  const getStatusIcon = (status: Donation["status"]) => {
     switch (status) {
       case "completed":
         return <CheckCircle className="h-4 w-4 text-green-600" />;
@@ -79,7 +79,7 @@ export function DonationsTable({
     }
   };
 
-  const getStatusVariant = (status: Donation['status']) => {
+  const getStatusVariant = (status: Donation["status"]) => {
     switch (status) {
       case "completed":
         return "default";
@@ -96,7 +96,7 @@ export function DonationsTable({
     }
   };
 
-  const getDonorTypeIcon = (donorType: Donation['donorType']) => {
+  const getDonorTypeIcon = (donorType: Donation["donorType"]) => {
     switch (donorType) {
       case "individual":
         return <span className="text-xs">👤</span>;
@@ -109,7 +109,7 @@ export function DonationsTable({
     }
   };
 
-  const getDonationTypeIcon = (donationType: Donation['donationType']) => {
+  const getDonationTypeIcon = (donationType: Donation["donationType"]) => {
     switch (donationType) {
       case "one_time":
         return <span className="text-xs">💵</span>;
@@ -159,7 +159,9 @@ export function DonationsTable({
                   <TableCell>
                     <div className="flex items-center space-x-1">
                       {getDonationTypeIcon(donation.donationType)}
-                      <span className="text-sm capitalize">{donation.donationType.replace('_', ' ')}</span>
+                      <span className="text-sm capitalize">
+                        {donation.donationType.replace("_", " ")}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -188,9 +190,7 @@ export function DonationsTable({
                       ) : (
                         <Clock className="h-4 w-4 text-yellow-600" />
                       )}
-                      <span className="text-sm">
-                        {donation.receiptSent ? "Sent" : "Pending"}
-                      </span>
+                      <span className="text-sm">{donation.receiptSent ? "Sent" : "Pending"}</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
@@ -203,25 +203,23 @@ export function DonationsTable({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                          onClick={() => onViewDetails?.(donation)}
-                        >
+                        <DropdownMenuItem onClick={() => onViewDetails?.(donation)}>
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         {donation.status !== "completed" && (
                           <DropdownMenuItem
-                            onClick={() => onRecordPayment?.(donation.id, donation.amount, "Credit Card")}
+                            onClick={() =>
+                              onRecordPayment?.(donation.id, donation.amount, "Credit Card")
+                            }
                           >
                             <CreditCard className="mr-2 h-4 w-4" />
                             Record Payment
                           </DropdownMenuItem>
                         )}
                         {!donation.receiptSent && (
-                          <DropdownMenuItem
-                            onClick={() => onSendReceipt?.(donation.id)}
-                          >
+                          <DropdownMenuItem onClick={() => onSendReceipt?.(donation.id)}>
                             <Mail className="mr-2 h-4 w-4" />
                             Send Receipt
                           </DropdownMenuItem>
@@ -249,9 +247,7 @@ export function DonationsTable({
                           </DropdownMenuItem>
                         )}
                         {donation.status !== "failed" && (
-                          <DropdownMenuItem
-                            onClick={() => onUpdateStatus?.(donation.id, "failed")}
-                          >
+                          <DropdownMenuItem onClick={() => onUpdateStatus?.(donation.id, "failed")}>
                             <XCircle className="mr-2 h-4 w-4" />
                             Mark as Failed
                           </DropdownMenuItem>

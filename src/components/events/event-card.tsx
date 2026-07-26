@@ -18,7 +18,7 @@ import {
   isEventTomorrow,
   formatEventType,
   formatEventStatus,
-  formatEventTimeRange
+  formatEventTimeRange,
 } from "@/lib/utils/event-utils";
 
 interface EventCardProps {
@@ -43,18 +43,21 @@ const EventCard = React.memo(function EventCard({
   const tomorrow = isEventTomorrow(event.startDate);
 
   // Memoize event details to prevent unnecessary recalculations
-  const eventDetails = React.useMemo(() => ({
-    formattedDate: formatDate(event.startDate),
-    formattedTimeRange: formatEventTimeRange(event.startDate, event.endDate),
-    eventTypeColor: getEventTypeColor(event.eventType),
-    eventStatusColor: getEventStatusColor(event.status),
-    formattedEventType: formatEventType(event.eventType),
-    formattedEventStatus: formatEventStatus(event.status),
-    attendeeText: event.maxAttendees 
-      ? `${event.currentAttendees} of ${event.maxAttendees} attendees` 
-      : null,
-    canRegister: upcoming && !isRegistered && event.status === EventStatus.PUBLISHED,
-  }), [event, upcoming, isRegistered]);
+  const eventDetails = React.useMemo(
+    () => ({
+      formattedDate: formatDate(event.startDate),
+      formattedTimeRange: formatEventTimeRange(event.startDate, event.endDate),
+      eventTypeColor: getEventTypeColor(event.eventType),
+      eventStatusColor: getEventStatusColor(event.status),
+      formattedEventType: formatEventType(event.eventType),
+      formattedEventStatus: formatEventStatus(event.status),
+      attendeeText: event.maxAttendees
+        ? `${event.currentAttendees} of ${event.maxAttendees} attendees`
+        : null,
+      canRegister: upcoming && !isRegistered && event.status === EventStatus.PUBLISHED,
+    }),
+    [event, upcoming, isRegistered],
+  );
 
   // Memoize badge elements
   const badges = React.useMemo(() => {
@@ -71,7 +74,7 @@ const EventCard = React.memo(function EventCard({
       badgesArray.push(
         <Badge key="today" className="bg-chart-1/20 text-chart-1">
           Today
-        </Badge>
+        </Badge>,
       );
     }
 
@@ -79,7 +82,7 @@ const EventCard = React.memo(function EventCard({
       badgesArray.push(
         <Badge key="tomorrow" className="bg-chart-2/20 text-chart-2">
           Tomorrow
-        </Badge>
+        </Badge>,
       );
     }
 
@@ -100,7 +103,7 @@ const EventCard = React.memo(function EventCard({
       tags.push(
         <Badge key="more" variant="outline" className="text-xs">
           +{event.tags.length - 3} more
-        </Badge>
+        </Badge>,
       );
     }
 
@@ -144,23 +147,17 @@ const EventCard = React.memo(function EventCard({
           aria-label={`Register for ${event.title}`}
         >
           Register
-        </Button>
+        </Button>,
       );
     }
 
     buttons.push(
-      <Button
-        key="details"
-        variant="outline"
-        size="sm"
-        asChild
-        className="w-full sm:w-auto"
-      >
+      <Button key="details" variant="outline" size="sm" asChild className="w-full sm:w-auto">
         <Link href={`/events/${event.id}`} aria-label={`View details for ${event.title}`}>
           <ExternalLink className="h-3 w-3 mr-1" />
           Details
         </Link>
-      </Button>
+      </Button>,
     );
 
     return (
@@ -171,7 +168,9 @@ const EventCard = React.memo(function EventCard({
   }, [eventDetails.canRegister, onRegister, event.title, onViewDetails]);
 
   return (
-    <Card className={`py-0 overflow-hidden transition-all duration-200 hover:shadow-lg ${className}`}>
+    <Card
+      className={`py-0 overflow-hidden transition-all duration-200 hover:shadow-lg ${className}`}
+    >
       {/* Event Cover Image */}
       <div className="relative h-48 w-full sm:h-56 md:h-64 bg-primary/10">
         {event.coverImage ? (
@@ -188,23 +187,17 @@ const EventCard = React.memo(function EventCard({
           </div>
         )}
         <div className="absolute inset-0" />
-        <div className="absolute top-3 left-3 flex flex-wrap gap-2 max-w-[90%]">
-          {badges}
-        </div>
+        <div className="absolute top-3 left-3 flex flex-wrap gap-2 max-w-[90%]">{badges}</div>
       </div>
 
       <CardContent className="p-4 sm:p-5">
         <div className="space-y-3">
           {/* Event Title */}
-          <h5 className="text-lg font-semibold text-foreground line-clamp-2">
-            {event.title}
-          </h5>
+          <h5 className="text-lg font-semibold text-foreground line-clamp-2">{event.title}</h5>
 
           {/* Event Short Description */}
           {event.shortDescription && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {event.shortDescription}
-            </p>
+            <p className="text-sm text-muted-foreground line-clamp-2">{event.shortDescription}</p>
           )}
 
           {/* Event Details */}
@@ -213,12 +206,12 @@ const EventCard = React.memo(function EventCard({
               <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-primary" aria-hidden="true" />
               <span>{eventDetails.formattedDate}</span>
             </div>
-            
+
             <div className="flex items-center text-sm text-muted-foreground">
               <Clock className="h-4 w-4 mr-2 flex-shrink-0 text-primary" aria-hidden="true" />
               <span>{eventDetails.formattedTimeRange}</span>
             </div>
-            
+
             <div className="flex items-center text-sm text-muted-foreground">
               <MapPin className="h-4 w-4 mr-2 flex-shrink-0 text-primary" aria-hidden="true" />
               <span className="line-clamp-1">{event.location}</span>

@@ -14,7 +14,18 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 
-import { User, Shield, Link, Settings, Camera, Key, Smartphone, Trash2, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  User,
+  Shield,
+  Link,
+  Settings,
+  Camera,
+  Key,
+  Smartphone,
+  Trash2,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 
 import { ProfileForm } from "./components/profile-form";
 import { SecurityForm } from "./components/security-form";
@@ -27,29 +38,29 @@ const profileTabs = [
     id: "profile",
     label: "Profile Information",
     icon: User,
-    description: "Manage your basic profile information and photo"
+    description: "Manage your basic profile information and photo",
   },
   {
     id: "security",
     label: "Security",
     icon: Shield,
-    description: "Password, authentication, and account security"
+    description: "Password, authentication, and account security",
   },
   {
     id: "social",
     label: "Social Links",
     icon: Link,
-    description: "Manage your social media and external links"
+    description: "Manage your social media and external links",
   },
   {
     id: "sessions",
     label: "Active Sessions",
     icon: Smartphone,
-    description: "View and manage your active sessions"
-  }
+    description: "View and manage your active sessions",
+  },
 ] as const;
 
-type TabId = typeof profileTabs[number]["id"];
+type TabId = (typeof profileTabs)[number]["id"];
 
 export default function ProfileSettingsPage() {
   const params = useParams();
@@ -63,12 +74,12 @@ export default function ProfileSettingsPage() {
     // Set the header
     setHeader({
       title: "Profile Settings",
-      description: "Manage your account settings and preferences"
+      description: "Manage your account settings and preferences",
     });
 
     // Set active tab from URL parameter
     if (params.tab && typeof params.tab === "string") {
-      const validTab = profileTabs.find(tab => tab.id === params.tab);
+      const validTab = profileTabs.find((tab) => tab.id === params.tab);
       if (validTab) {
         setActiveTab(validTab.id as TabId);
       }
@@ -108,11 +119,9 @@ export default function ProfileSettingsPage() {
   if (!status && !user) {
     return (
       <div className="space-y-6">
-                <Alert variant="destructive">
+        <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            You must be logged in to access profile settings.
-          </AlertDescription>
+          <AlertDescription>You must be logged in to access profile settings.</AlertDescription>
         </Alert>
       </div>
     );
@@ -151,9 +160,7 @@ export default function ProfileSettingsPage() {
                   <User className="h-5 w-5" />
                   Basic Information
                 </CardTitle>
-                <CardDescription>
-                  Your name, bio, and other profile details
-                </CardDescription>
+                <CardDescription>Your name, bio, and other profile details</CardDescription>
               </CardHeader>
               <CardContent>
                 <ProfileForm user={user!} />
@@ -166,9 +173,7 @@ export default function ProfileSettingsPage() {
                   <Camera className="h-5 w-5" />
                   Profile Photo
                 </CardTitle>
-                <CardDescription>
-                  Upload or change your profile picture
-                </CardDescription>
+                <CardDescription>Upload or change your profile picture</CardDescription>
               </CardHeader>
               <CardContent>
                 <ProfilePhotoUpload user={user!} />
@@ -193,9 +198,7 @@ export default function ProfileSettingsPage() {
                   <Key className="h-5 w-5" />
                   Change Password
                 </CardTitle>
-                <CardDescription>
-                  Update your password to keep your account secure
-                </CardDescription>
+                <CardDescription>Update your password to keep your account secure</CardDescription>
               </CardHeader>
               <CardContent>
                 <SecurityForm user={user!} />
@@ -208,9 +211,7 @@ export default function ProfileSettingsPage() {
                   <Shield className="h-5 w-5" />
                   Two-Factor Authentication
                 </CardTitle>
-                <CardDescription>
-                  Add an extra layer of security to your account
-                </CardDescription>
+                <CardDescription>Add an extra layer of security to your account</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -237,15 +238,14 @@ export default function ProfileSettingsPage() {
                 <Trash2 className="h-5 w-5" />
                 Account Actions
               </CardTitle>
-              <CardDescription>
-                Irreversible actions for your account
-              </CardDescription>
+              <CardDescription>Irreversible actions for your account</CardDescription>
             </CardHeader>
             <CardContent>
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Account deletion is permanent and cannot be undone. This feature will be available soon.
+                  Account deletion is permanent and cannot be undone. This feature will be available
+                  soon.
                 </AlertDescription>
               </Alert>
               <Button variant="destructive" disabled className="mt-4">

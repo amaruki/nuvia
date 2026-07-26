@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,7 +44,7 @@ interface ReportsTableProps {
   onDownload: (report: FinancialReport) => void;
   onEdit: (report: FinancialReport) => void;
   onDelete: (report: FinancialReport) => void;
-  onUpdateStatus: (report: FinancialReport, status: FinancialReport['status']) => void;
+  onUpdateStatus: (report: FinancialReport, status: FinancialReport["status"]) => void;
 }
 
 export function ReportsTable({
@@ -54,7 +61,7 @@ export function ReportsTable({
     if (!bytes) return "N/A";
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + " " + sizes[i];
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + " " + sizes[i];
   };
 
   const formatDate = (date: Date) => {
@@ -67,34 +74,42 @@ export function ReportsTable({
 
   const getReportTypeIcon = (type: string) => {
     switch (type) {
-      case 'income_statement':
+      case "income_statement":
         return <BarChart3 className="h-4 w-4" />;
-      case 'balance_sheet':
+      case "balance_sheet":
         return <PieChart className="h-4 w-4" />;
-      case 'cash_flow':
+      case "cash_flow":
         return <DollarSign className="h-4 w-4" />;
-      case 'budget_vs_actual':
+      case "budget_vs_actual":
         return <TrendingUp className="h-4 w-4" />;
-      case 'tax_document':
+      case "tax_document":
         return <FileText className="h-4 w-4" />;
-      case 'audit_trail':
+      case "audit_trail":
         return <Shield className="h-4 w-4" />;
       default:
         return <FileText className="h-4 w-4" />;
     }
   };
 
-  const getStatusBadge = (status: FinancialReport['status']) => {
+  const getStatusBadge = (status: FinancialReport["status"]) => {
     switch (status) {
-      case 'draft':
+      case "draft":
         return <Badge variant="secondary">Draft</Badge>;
-      case 'pending_review':
-        return <Badge variant="outline" className="border-yellow-500 text-yellow-600">Pending Review</Badge>;
-      case 'approved':
-        return <Badge variant="outline" className="border-blue-500 text-blue-600">Approved</Badge>;
-      case 'published':
+      case "pending_review":
+        return (
+          <Badge variant="outline" className="border-yellow-500 text-yellow-600">
+            Pending Review
+          </Badge>
+        );
+      case "approved":
+        return (
+          <Badge variant="outline" className="border-blue-500 text-blue-600">
+            Approved
+          </Badge>
+        );
+      case "published":
         return <Badge variant="default">Published</Badge>;
-      case 'archived':
+      case "archived":
         return <Badge variant="outline">Archived</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
@@ -103,23 +118,23 @@ export function ReportsTable({
 
   const handleSelectReport = (reportId: string, checked: boolean) => {
     if (checked) {
-      setSelectedReports(prev => [...prev, reportId]);
+      setSelectedReports((prev) => [...prev, reportId]);
     } else {
-      setSelectedReports(prev => prev.filter(id => id !== reportId));
+      setSelectedReports((prev) => prev.filter((id) => id !== reportId));
     }
   };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedReports(reports.map(report => report.id));
+      setSelectedReports(reports.map((report) => report.id));
     } else {
       setSelectedReports([]);
     }
   };
 
   const handleBulkDownload = () => {
-    selectedReports.forEach(reportId => {
-      const report = reports.find(r => r.id === reportId);
+    selectedReports.forEach((reportId) => {
+      const report = reports.find((r) => r.id === reportId);
       if (report) {
         onDownload(report);
       }
@@ -128,8 +143,8 @@ export function ReportsTable({
   };
 
   const handleBulkDelete = () => {
-    selectedReports.forEach(reportId => {
-      const report = reports.find(r => r.id === reportId);
+    selectedReports.forEach((reportId) => {
+      const report = reports.find((r) => r.id === reportId);
       if (report) {
         onDelete(report);
       }
@@ -142,14 +157,14 @@ export function ReportsTable({
       <Card>
         <CardHeader>
           <CardTitle>No Reports Found</CardTitle>
-          <CardDescription>
-            There are no reports matching your current filters.
-          </CardDescription>
+          <CardDescription>There are no reports matching your current filters.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
             <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">Try adjusting your filters or generate a new report.</p>
+            <p className="text-muted-foreground">
+              Try adjusting your filters or generate a new report.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -244,9 +259,7 @@ export function ReportsTable({
                   <TableCell className="min-w-[120px]">
                     <div className="flex items-center gap-2">
                       {getReportTypeIcon(report.type)}
-                      <span className="capitalize text-sm">
-                        {report.type.replace('_', ' ')}
-                      </span>
+                      <span className="capitalize text-sm">{report.type.replace("_", " ")}</span>
                     </div>
                   </TableCell>
                   <TableCell className="min-w-[100px]">
@@ -255,9 +268,7 @@ export function ReportsTable({
                       <span className="text-sm">{report.period}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="min-w-[120px]">
-                    {getStatusBadge(report.status)}
-                  </TableCell>
+                  <TableCell className="min-w-[120px]">{getStatusBadge(report.status)}</TableCell>
                   <TableCell className="min-w-[120px] hidden sm:table-cell">
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
@@ -267,9 +278,7 @@ export function ReportsTable({
                     </div>
                   </TableCell>
                   <TableCell className="min-w-[100px] hidden md:table-cell">
-                    <div className="text-sm">
-                      {formatDate(report.generatedAt)}
-                    </div>
+                    <div className="text-sm">{formatDate(report.generatedAt)}</div>
                   </TableCell>
                   <TableCell className="min-w-[100px] hidden lg:table-cell">
                     <div className="flex items-center gap-2">
@@ -305,19 +314,21 @@ export function ReportsTable({
                             Update Status
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent>
-                            <DropdownMenuItem onClick={() => onUpdateStatus(report, 'draft')}>
+                            <DropdownMenuItem onClick={() => onUpdateStatus(report, "draft")}>
                               Draft
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onUpdateStatus(report, 'pending_review')}>
+                            <DropdownMenuItem
+                              onClick={() => onUpdateStatus(report, "pending_review")}
+                            >
                               Pending Review
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onUpdateStatus(report, 'approved')}>
+                            <DropdownMenuItem onClick={() => onUpdateStatus(report, "approved")}>
                               Approved
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onUpdateStatus(report, 'published')}>
+                            <DropdownMenuItem onClick={() => onUpdateStatus(report, "published")}>
                               Published
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onUpdateStatus(report, 'archived')}>
+                            <DropdownMenuItem onClick={() => onUpdateStatus(report, "archived")}>
                               Archived
                             </DropdownMenuItem>
                           </DropdownMenuSubContent>

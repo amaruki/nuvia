@@ -12,17 +12,21 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { resetPasswordAction } from "@/lib/actions/auth.actions";
 
-const resetPasswordSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number")
-    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
-  confirmPassword: z.string().min(1, "Please confirm your password"),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
@@ -32,9 +36,7 @@ function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string[]>
-  >({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -63,7 +65,7 @@ function ResetPasswordForm() {
 
       if (result.success) {
         setSuccess(
-          "Password has been reset successfully. You can now sign in with your new password."
+          "Password has been reset successfully. You can now sign in with your new password.",
         );
         // Redirect after a delay
         setTimeout(() => {
@@ -112,13 +114,21 @@ function ResetPasswordForm() {
             {/* Logo and title */}
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-foreground">
-                <svg className="w-6 h-6 text-background" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <svg
+                  className="w-6 h-6 text-background"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
                 </svg>
               </div>
-              <h1 className="text-2xl font-semibold text-foreground">
-                Invalid Request
-              </h1>
+              <h1 className="text-2xl font-semibold text-foreground">Invalid Request</h1>
               <p className="text-sm mt-1 text-muted-foreground">
                 The password reset link is invalid or has expired.
               </p>
@@ -134,23 +144,15 @@ function ResetPasswordForm() {
             {/* Reset password form */}
             <div className="rounded-2xl border p-8 shadow-sm bg-card border-border space-y-4">
               <div className="text-center">
-                <Button
-                  asChild
-                  className="w-full h-10"
-                >
-                  <Link href="/auth/forgot-password">
-                    Request New Reset Link
-                  </Link>
+                <Button asChild className="w-full h-10">
+                  <Link href="/auth/forgot-password">Request New Reset Link</Link>
                 </Button>
               </div>
 
               {/* Back to login link */}
               <p className="text-center text-sm text-muted-foreground">
                 Remember your password?{" "}
-                <Link
-                  href="/auth/login"
-                  className="font-medium hover:underline text-primary"
-                >
+                <Link href="/auth/login" className="font-medium hover:underline text-primary">
                   Sign in
                 </Link>
               </p>
@@ -168,16 +170,22 @@ function ResetPasswordForm() {
           {/* Logo and title */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-foreground">
-              <svg className="w-6 h-6 text-background" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+              <svg
+                className="w-6 h-6 text-background"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                ></path>
               </svg>
             </div>
-            <h1 className="text-2xl font-semibold text-foreground">
-              Reset Your Password
-            </h1>
-            <p className="text-sm mt-1 text-muted-foreground">
-              Enter your new password below
-            </p>
+            <h1 className="text-2xl font-semibold text-foreground">Reset Your Password</h1>
+            <p className="text-sm mt-1 text-muted-foreground">Enter your new password below</p>
           </div>
 
           {error && (
@@ -194,10 +202,7 @@ function ResetPasswordForm() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-3">
-              <Label
-                htmlFor="password"
-                className="text-sm font-medium"
-              >
+              <Label htmlFor="password" className="text-sm font-medium">
                 New Password
               </Label>
               <Input
@@ -212,22 +217,15 @@ function ResetPasswordForm() {
                 })}
               />
               {errors.password && (
-                <p className="text-sm text-destructive">
-                  {errors.password.message}
-                </p>
+                <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
               {hasError("password") && (
-                <p className="text-sm text-destructive">
-                  {getErrorMessage("password")}
-                </p>
+                <p className="text-sm text-destructive">{getErrorMessage("password")}</p>
               )}
             </div>
 
             <div className="space-y-3">
-              <Label
-                htmlFor="confirmPassword"
-                className="text-sm font-medium"
-              >
+              <Label htmlFor="confirmPassword" className="text-sm font-medium">
                 Confirm New Password
               </Label>
               <Input
@@ -242,22 +240,14 @@ function ResetPasswordForm() {
                 })}
               />
               {errors.confirmPassword && (
-                <p className="text-sm text-destructive">
-                  {errors.confirmPassword.message}
-                </p>
+                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
               )}
               {hasError("confirmPassword") && (
-                <p className="text-sm text-destructive">
-                  {getErrorMessage("confirmPassword")}
-                </p>
+                <p className="text-sm text-destructive">{getErrorMessage("confirmPassword")}</p>
               )}
             </div>
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full h-10"
-            >
+            <Button type="submit" disabled={isLoading} className="w-full h-10">
               {isLoading ? "Resetting Password" : "Reset Password"}
             </Button>
           </form>
@@ -268,19 +258,14 @@ function ResetPasswordForm() {
               <div className="w-full border-t border-border"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-card px-4 text-foreground">
-                Or return to
-              </span>
+              <span className="bg-card px-4 text-foreground">Or return to</span>
             </div>
           </div>
 
           {/* Back to login link */}
           <p className="text-center text-sm text-muted-foreground">
             Remember your password?{" "}
-            <Link
-              href="/auth/login"
-              className="font-medium hover:underline text-primary"
-            >
+            <Link href="/auth/login" className="font-medium hover:underline text-primary">
               Sign in
             </Link>
           </p>

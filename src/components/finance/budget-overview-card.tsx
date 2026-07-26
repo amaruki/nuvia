@@ -12,24 +12,24 @@ interface BudgetOverviewCardProps {
 
 export function BudgetOverviewCard({ overview }: BudgetOverviewCardProps) {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
   };
 
   const getStatusColor = (percentage: number) => {
-    if (percentage >= 90) return 'text-destructive';
-    if (percentage >= 75) return 'text-yellow-600';
-    return 'text-green-600';
+    if (percentage >= 90) return "text-destructive";
+    if (percentage >= 75) return "text-yellow-600";
+    return "text-green-600";
   };
 
   const getStatusBadge = (percentage: number) => {
-    if (percentage >= 90) return { variant: 'destructive' as const, text: 'Critical' };
-    if (percentage >= 75) return { variant: 'secondary' as const, text: 'Warning' };
-    return { variant: 'default' as const, text: 'On Track' };
+    if (percentage >= 90) return { variant: "destructive" as const, text: "Critical" };
+    if (percentage >= 75) return { variant: "secondary" as const, text: "Warning" };
+    return { variant: "default" as const, text: "On Track" };
   };
 
   const statusBadge = getStatusBadge(overview.percentageUsed);
@@ -43,9 +43,7 @@ export function BudgetOverviewCard({ overview }: BudgetOverviewCardProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(overview.totalBudget)}</div>
-          <p className="text-xs text-muted-foreground">
-            Current period allocation
-          </p>
+          <p className="text-xs text-muted-foreground">Current period allocation</p>
         </CardContent>
       </Card>
 
@@ -72,7 +70,7 @@ export function BudgetOverviewCard({ overview }: BudgetOverviewCardProps) {
             {formatCurrency(overview.totalRemaining)}
           </div>
           <p className="text-xs text-muted-foreground">
-            {overview.totalRemaining > 0 ? 'Available to spend' : 'Over budget'}
+            {overview.totalRemaining > 0 ? "Available to spend" : "Over budget"}
           </p>
         </CardContent>
       </Card>
@@ -88,7 +86,7 @@ export function BudgetOverviewCard({ overview }: BudgetOverviewCardProps) {
           </div>
           <Progress value={overview.percentageUsed} className="mt-2" />
           <p className="text-xs text-muted-foreground mt-1">
-            {overview.periodComparison.changePercentage > 0 ? '+' : ''}
+            {overview.periodComparison.changePercentage > 0 ? "+" : ""}
             {overview.periodComparison.changePercentage.toFixed(1)}% vs last period
           </p>
         </CardContent>

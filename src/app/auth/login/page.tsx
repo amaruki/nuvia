@@ -8,10 +8,7 @@ import { z } from "zod";
 import { animate } from "animejs";
 import { useSession } from "@/hooks/use-session";
 import { useOAuthLogin } from "@/hooks/use-oauth-login";
-import {
-  extractOAuthError,
-  cleanOAuthUrlParams,
-} from "@/lib/utils/oauth-utils";
+import { extractOAuthError, cleanOAuthUrlParams } from "@/lib/utils/oauth-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -167,9 +164,7 @@ function LoginForm() {
               className="h-10"
             />
             {errors.emailOrUsername && (
-              <p className="text-sm text-destructive">
-                {errors.emailOrUsername.message}
-              </p>
+              <p className="text-sm text-destructive">{errors.emailOrUsername.message}</p>
             )}
           </div>
 
@@ -178,10 +173,7 @@ function LoginForm() {
               <Label htmlFor="password" className="text-sm font-medium">
                 Password
               </Label>
-              <a
-                href="/auth/forgot-password"
-                className="text-sm hover:underline text-primary"
-              >
+              <a href="/auth/forgot-password" className="text-sm hover:underline text-primary">
                 Forgot your password?
               </a>
             </div>
@@ -193,18 +185,13 @@ function LoginForm() {
               className="h-10"
             />
             {errors.password && (
-              <p className="text-sm text-destructive">
-                {errors.password.message}
-              </p>
+              <p className="text-sm text-destructive">{errors.password.message}</p>
             )}
           </div>
 
           <div className="flex items-center space-x-2">
             <Checkbox id="rememberMe" {...register("rememberMe")} />
-            <Label
-              htmlFor="rememberMe"
-              className="text-sm font-normal cursor-pointer"
-            >
+            <Label htmlFor="rememberMe" className="text-sm font-normal cursor-pointer">
               Remember me
             </Label>
           </div>

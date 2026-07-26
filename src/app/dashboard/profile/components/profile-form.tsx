@@ -17,9 +17,16 @@ import { updateProfile } from "@/lib/client";
 
 // Simple form validation schema
 const profileFormSchema = z.object({
-  displayName: z.string().min(1, "Display name is required").max(50, "Display name must be less than 50 characters"),
+  displayName: z
+    .string()
+    .min(1, "Display name is required")
+    .max(50, "Display name must be less than 50 characters"),
   bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
-  username: z.string().min(3, "Username must be at least 3 characters").max(30, "Username must be less than 30 characters").optional(),
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(30, "Username must be less than 30 characters")
+    .optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileFormSchema>;
@@ -43,8 +50,8 @@ export function ProfileForm({ user }: ProfileFormProps) {
     defaultValues: {
       displayName: user.displayName || user.name || "",
       bio: user.bio || "",
-      username: user.username || ""
-    }
+      username: user.username || "",
+    },
   });
 
   const onSubmit = async (data: ProfileFormData) => {
@@ -76,9 +83,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
       {isSuccess && (
         <Alert className="border-green-200 bg-green-50 text-green-800">
           <CheckCircle className="h-4 w-4" />
-          <AlertDescription>
-            Profile updated successfully!
-          </AlertDescription>
+          <AlertDescription>Profile updated successfully!</AlertDescription>
         </Alert>
       )}
 
@@ -86,9 +91,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            {error}
-          </AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
@@ -102,9 +105,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           disabled={isSubmitting}
           className={errors.displayName ? "border-red-500" : ""}
         />
-        {errors.displayName && (
-          <p className="text-sm text-red-600">{errors.displayName.message}</p>
-        )}
+        {errors.displayName && <p className="text-sm text-red-600">{errors.displayName.message}</p>}
       </div>
 
       {/* Username */}
@@ -117,9 +118,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           disabled={isSubmitting}
           className={errors.username ? "border-red-500" : ""}
         />
-        {errors.username && (
-          <p className="text-sm text-red-600">{errors.username.message}</p>
-        )}
+        {errors.username && <p className="text-sm text-red-600">{errors.username.message}</p>}
         <p className="text-xs text-muted-foreground">
           This will be used for your profile URL and mentions.
         </p>
@@ -151,9 +150,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           disabled={isSubmitting}
           className={errors.bio ? "border-red-500" : ""}
         />
-        {errors.bio && (
-          <p className="text-sm text-red-600">{errors.bio.message}</p>
-        )}
+        {errors.bio && <p className="text-sm text-red-600">{errors.bio.message}</p>}
         <p className="text-xs text-muted-foreground">
           Brief description for your profile. {user.bio?.length || 0}/500 characters
         </p>
@@ -165,14 +162,16 @@ export function ProfileForm({ user }: ProfileFormProps) {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="font-medium">Account Type</p>
-              <p className="text-muted-foreground capitalize">{user.role?.toLowerCase() || "member"}</p>
+              <p className="text-muted-foreground capitalize">
+                {user.role?.toLowerCase() || "member"}
+              </p>
             </div>
             <div>
               <p className="font-medium">Member Since</p>
               <p className="text-muted-foreground">
                 {new Date(user.createdAt).toLocaleDateString("en-US", {
                   year: "numeric",
-                  month: "long"
+                  month: "long",
                 })}
               </p>
             </div>
@@ -182,11 +181,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
       {/* Submit Button */}
       <div className="flex justify-end pt-4">
-        <Button
-          type="submit"
-          disabled={!isDirty || isSubmitting}
-          className="min-w-32"
-        >
+        <Button type="submit" disabled={!isDirty || isSubmitting} className="min-w-32">
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

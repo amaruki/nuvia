@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { WidgetContainer } from "../../ui/widget-container"
-import { Card, CardContent } from "../../ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "../../ui/badge"
-import { Flag, MessageSquare, User, Clock, CheckCircle, XCircle, ExternalLink } from "lucide-react"
-import { ModerationItem } from "@/types/dashboard.types"
+import * as React from "react";
+import { WidgetContainer } from "../../ui/widget-container";
+import { Card, CardContent } from "../../ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "../../ui/badge";
+import { Flag, MessageSquare, User, Clock, CheckCircle, XCircle, ExternalLink } from "lucide-react";
+import { ModerationItem } from "@/types/dashboard.types";
 
 interface ModerationWidgetProps {
-  moderationItems?: ModerationItem[]
-  onApproveItem?: (itemId: string) => void
-  onRejectItem?: (itemId: string) => void
-  onViewItem?: (itemId: string) => void
-  onViewAllItems?: () => void
+  moderationItems?: ModerationItem[];
+  onApproveItem?: (itemId: string) => void;
+  onRejectItem?: (itemId: string) => void;
+  onViewItem?: (itemId: string) => void;
+  onViewAllItems?: () => void;
 }
 
 // Mock moderation items data - in a real app, this would come from an API
@@ -30,7 +30,8 @@ const mockModerationItems: ModerationItem[] = [
   {
     id: "2",
     type: "forum-thread",
-    content: "This forum thread contains spam links and promotional content unrelated to the discussion.",
+    content:
+      "This forum thread contains spam links and promotional content unrelated to the discussion.",
     reportedBy: "John Doe",
     reportReason: "Spam content",
     createdAt: new Date("2023-09-30T14:15:00"),
@@ -39,7 +40,8 @@ const mockModerationItems: ModerationItem[] = [
   {
     id: "3",
     type: "comment",
-    content: "This comment includes personal attacks and harassment towards other community members.",
+    content:
+      "This comment includes personal attacks and harassment towards other community members.",
     reportedBy: "Alex Johnson",
     reportReason: "Harassment",
     createdAt: new Date("2023-09-29T09:45:00"),
@@ -54,57 +56,57 @@ const mockModerationItems: ModerationItem[] = [
     createdAt: new Date("2023-09-28T16:20:00"),
     status: "resolved",
   },
-]
+];
 
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(date)
-}
+  }).format(date);
+};
 
 const formatTime = (date: Date) => {
   return new Intl.DateTimeFormat("en-US", {
     hour: "2-digit",
     minute: "2-digit",
-  }).format(date)
-}
+  }).format(date);
+};
 
 const getItemTypeColor = (type: string) => {
   switch (type) {
     case "comment":
-      return "bg-chart-1/20 text-chart-1"
+      return "bg-chart-1/20 text-chart-1";
     case "forum-thread":
-      return "bg-chart-2/20 text-chart-2"
+      return "bg-chart-2/20 text-chart-2";
     default:
-      return "bg-secondary text-secondary-foreground"
+      return "bg-secondary text-secondary-foreground";
   }
-}
+};
 
 const getStatusColor = (status: string) => {
   switch (status) {
     case "pending":
-      return "bg-chart-4/20 text-chart-4"
+      return "bg-chart-4/20 text-chart-4";
     case "reviewed":
-      return "bg-chart-1/20 text-chart-1"
+      return "bg-chart-1/20 text-chart-1";
     case "resolved":
-      return "bg-chart-3/20 text-chart-3"
+      return "bg-chart-3/20 text-chart-3";
     default:
-      return "bg-secondary text-secondary-foreground"
+      return "bg-secondary text-secondary-foreground";
   }
-}
+};
 
 const getItemTypeIcon = (type: string) => {
   switch (type) {
     case "comment":
-      return <MessageSquare className="h-4 w-4" />
+      return <MessageSquare className="h-4 w-4" />;
     case "forum-thread":
-      return <MessageSquare className="h-4 w-4" />
+      return <MessageSquare className="h-4 w-4" />;
     default:
-      return <Flag className="h-4 w-4" />
+      return <Flag className="h-4 w-4" />;
   }
-}
+};
 
 export function ModerationWidget({
   moderationItems = mockModerationItems,
@@ -115,17 +117,17 @@ export function ModerationWidget({
 }: ModerationWidgetProps) {
   // Sort items by creation date (newest first) and filter to only show pending and reviewed items
   const sortedItems = [...moderationItems]
-    .filter(item => item.status !== "resolved")
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  
-  const pendingItems = sortedItems.filter(item => item.status === "pending")
-  const reviewedItems = sortedItems.filter(item => item.status === "reviewed")
-  
+    .filter((item) => item.status !== "resolved")
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const pendingItems = sortedItems.filter((item) => item.status === "pending");
+  const reviewedItems = sortedItems.filter((item) => item.status === "reviewed");
+
   return (
     <WidgetContainer
       type="moderation"
       title="Content Moderation"
-      description={`${pendingItems.length} pending item${pendingItems.length !== 1 ? 's' : ''} to review`}
+      description={`${pendingItems.length} pending item${pendingItems.length !== 1 ? "s" : ""} to review`}
       size="large"
     >
       <Card className="border-0 shadow-none">
@@ -139,16 +141,11 @@ export function ModerationWidget({
                   {pendingItems.length} pending, {reviewedItems.length} reviewed
                 </span>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onViewAllItems}
-                className="text-xs"
-              >
+              <Button variant="ghost" size="sm" onClick={onViewAllItems} className="text-xs">
                 View all
               </Button>
             </div>
-            
+
             {/* Moderation items list */}
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {sortedItems.length === 0 ? (
@@ -165,15 +162,13 @@ export function ModerationWidget({
                       item.status === "pending"
                         ? "bg-chart-4/10 border-chart-4/30"
                         : item.status === "reviewed"
-                        ? "bg-chart-1/10 border-chart-1/30"
-                        : "bg-card border-border"
+                          ? "bg-chart-1/10 border-chart-1/30"
+                          : "bg-card border-border"
                     }`}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-start space-x-2">
-                        <div className="mt-0.5">
-                          {getItemTypeIcon(item.type)}
-                        </div>
+                        <div className="mt-0.5">{getItemTypeIcon(item.type)}</div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2 mb-1">
                             <h3 className="text-sm font-semibold text-foreground/90">
@@ -183,33 +178,39 @@ export function ModerationWidget({
                               {item.type === "comment" ? "Comment" : "Forum Thread"}
                             </Badge>
                             <Badge className={getStatusColor(item.status)}>
-                              {item.status === "pending" ? "Pending" : item.status === "reviewed" ? "Reviewed" : "Resolved"}
+                              {item.status === "pending"
+                                ? "Pending"
+                                : item.status === "reviewed"
+                                  ? "Reviewed"
+                                  : "Resolved"}
                             </Badge>
                           </div>
-                          
+
                           <p className="text-sm text-foreground/60 mb-2 line-clamp-2">
                             {item.content}
                           </p>
-                          
+
                           <div className="flex items-center text-xs text-foreground/50">
                             <div className="flex items-center space-x-1">
                               <User className="h-3 w-3" />
                               <span>Reported by {item.reportedBy}</span>
                             </div>
-                            
+
                             <div className="flex items-center space-x-1 ml-3">
                               <Clock className="h-3 w-3" />
-                              <span>{formatDate(item.createdAt)} at {formatTime(item.createdAt)}</span>
+                              <span>
+                                {formatDate(item.createdAt)} at {formatTime(item.createdAt)}
+                              </span>
                             </div>
                           </div>
-                          
+
                           <div className="text-xs text-foreground/50 mt-1">
                             Reason: {item.reportReason}
                           </div>
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Moderation actions */}
                     <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
                       <div className="flex space-x-2">
@@ -224,7 +225,7 @@ export function ModerationWidget({
                               <CheckCircle className="h-3 w-3 mr-1" />
                               Approve
                             </Button>
-                            
+
                             <Button
                               variant="outline"
                               size="sm"
@@ -236,14 +237,12 @@ export function ModerationWidget({
                             </Button>
                           </>
                         )}
-                        
+
                         {item.status === "reviewed" && (
-                          <Badge className="bg-chart-1/20 text-chart-1">
-                            Under review
-                          </Badge>
+                          <Badge className="bg-chart-1/20 text-chart-1">Under review</Badge>
                         )}
                       </div>
-                      
+
                       <Button
                         variant="ghost"
                         size="sm"
@@ -258,7 +257,7 @@ export function ModerationWidget({
                 ))
               )}
             </div>
-            
+
             {/* Summary */}
             <div className="text-xs text-foreground/50 text-center pt-2">
               Moderation queue updated in real-time. Last updated: Today at 10:45 AM
@@ -267,5 +266,5 @@ export function ModerationWidget({
         </CardContent>
       </Card>
     </WidgetContainer>
-  )
+  );
 }

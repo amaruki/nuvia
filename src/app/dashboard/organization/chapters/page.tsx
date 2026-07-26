@@ -54,7 +54,8 @@ export default function OrganizationChapters() {
   useEffect(() => {
     setHeader({
       title: "Chapters Management",
-      description: "Manage geographic and regional organizational structure, chapter leadership, and performance metrics",
+      description:
+        "Manage geographic and regional organizational structure, chapter leadership, and performance metrics",
     });
 
     return () => {
@@ -91,7 +92,11 @@ export default function OrganizationChapters() {
   };
 
   const handleDelete = async (chapter: Chapter) => {
-    if (confirm(`Are you sure you want to delete "${chapter.displayName}"? This action cannot be undone.`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete "${chapter.displayName}"? This action cannot be undone.`,
+      )
+    ) {
       try {
         await deleteChapter(chapter.id);
       } catch (error) {
@@ -195,16 +200,20 @@ export default function OrganizationChapters() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="chapters" className="text-xs sm:text-sm py-2 px-2">Chapters</TabsTrigger>
-          <TabsTrigger value="leadership" className="text-xs sm:text-sm py-2 px-2">Leadership</TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">Analytics</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="chapters" className="text-xs sm:text-sm py-2 px-2">
+            Chapters
+          </TabsTrigger>
+          <TabsTrigger value="leadership" className="text-xs sm:text-sm py-2 px-2">
+            Leadership
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">
+            Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -214,7 +223,10 @@ export default function OrganizationChapters() {
               <h3 className="text-lg font-semibold">Chapter Status Summary</h3>
               <div className="space-y-3">
                 {chapters.map((chapter) => (
-                  <div key={chapter.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={chapter.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
                         <Building2 className="h-4 w-4 text-primary" />
@@ -227,11 +239,17 @@ export default function OrganizationChapters() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge variant={
-                        chapter.status === "active" ? "default" :
-                        chapter.status === "inactive" ? "secondary" :
-                        chapter.status === "pending" ? "outline" : "destructive"
-                      }>
+                      <Badge
+                        variant={
+                          chapter.status === "active"
+                            ? "default"
+                            : chapter.status === "inactive"
+                              ? "secondary"
+                              : chapter.status === "pending"
+                                ? "outline"
+                                : "destructive"
+                        }
+                      >
                         {chapter.status}
                       </Badge>
                     </div>
@@ -245,7 +263,10 @@ export default function OrganizationChapters() {
               <h3 className="text-lg font-semibold">Regional Distribution</h3>
               <div className="space-y-3">
                 {statistics?.regionalBreakdown.map((region) => (
-                  <div key={region.region} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={region.region}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
                         <MapPin className="h-4 w-4 text-primary" />
@@ -259,9 +280,7 @@ export default function OrganizationChapters() {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold">{region.memberCount.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground">
-                        members
-                      </p>
+                      <p className="text-xs text-muted-foreground">members</p>
                     </div>
                   </div>
                 ))}
@@ -275,25 +294,28 @@ export default function OrganizationChapters() {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Top Performing Chapters</h3>
                 <div className="space-y-3">
-                  {statistics.topPerformingChapters
-                    .slice(0, 3)
-                    .map((chapter) => (
-                      <div key={chapter.chapterId} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="min-w-0 flex-1 mr-2">
-                          <p className="font-medium">{chapter.chapterName}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {chapter.location} • {chapter.memberCount} members
-                          </p>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className={`text-lg font-bold ${
-                            chapter.growthRate >= 0 ? "text-emerald-600" : "text-rose-600"
-                          }`}>
-                            {chapter.growthRate.toFixed(1)}%
-                          </p>
-                        </div>
+                  {statistics.topPerformingChapters.slice(0, 3).map((chapter) => (
+                    <div
+                      key={chapter.chapterId}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
+                      <div className="min-w-0 flex-1 mr-2">
+                        <p className="font-medium">{chapter.chapterName}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {chapter.location} • {chapter.memberCount} members
+                        </p>
                       </div>
-                    ))}
+                      <div className="text-right shrink-0">
+                        <p
+                          className={`text-lg font-bold ${
+                            chapter.growthRate >= 0 ? "text-emerald-600" : "text-rose-600"
+                          }`}
+                        >
+                          {chapter.growthRate.toFixed(1)}%
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -301,12 +323,13 @@ export default function OrganizationChapters() {
                 <h3 className="text-lg font-semibold">Member Growth</h3>
                 <div className="space-y-3">
                   {statistics.monthlyTrend.slice(0, 3).map((trend, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div className="min-w-0 flex-1 mr-2">
                         <p className="font-medium">{trend.month}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {trend.eventCount} events
-                        </p>
+                        <p className="text-sm text-muted-foreground">{trend.eventCount} events</p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="text-lg font-bold">{trend.memberCount.toLocaleString()}</p>
@@ -373,7 +396,10 @@ export default function OrganizationChapters() {
               <h3 className="text-lg font-semibold">Chapter Performance</h3>
               <div className="space-y-3">
                 {statistics?.topPerformingChapters.map((chapter) => (
-                  <div key={chapter.chapterId} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={chapter.chapterId}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <p className="font-medium">{chapter.chapterName}</p>
                       <p className="text-sm text-muted-foreground">
@@ -381,12 +407,8 @@ export default function OrganizationChapters() {
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-lg font-bold">
-                        {chapter.engagementScore.toFixed(1)}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        engagement score
-                      </p>
+                      <p className="text-lg font-bold">{chapter.engagementScore.toFixed(1)}</p>
+                      <p className="text-xs text-muted-foreground">engagement score</p>
                     </div>
                   </div>
                 ))}
@@ -398,7 +420,10 @@ export default function OrganizationChapters() {
               <h3 className="text-lg font-semibold">Regional Analytics</h3>
               <div className="space-y-3">
                 {statistics?.regionalBreakdown.map((region) => (
-                  <div key={region.region} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={region.region}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <p className="font-medium">{region.region}</p>
                       <p className="text-sm text-muted-foreground">
@@ -406,12 +431,8 @@ export default function OrganizationChapters() {
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-lg font-bold">
-                        {region.totalRevenue.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        total revenue
-                      </p>
+                      <p className="text-lg font-bold">{region.totalRevenue.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">total revenue</p>
                     </div>
                   </div>
                 ))}
@@ -425,7 +446,10 @@ export default function OrganizationChapters() {
               <h3 className="text-lg font-semibold">Monthly Trends</h3>
               <div className="space-y-3">
                 {statistics.monthlyTrend.slice(0, 6).map((trend, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <p className="font-medium">{trend.month}</p>
                       <p className="text-sm text-muted-foreground">
@@ -433,9 +457,7 @@ export default function OrganizationChapters() {
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-lg font-bold">
-                        ${trend.revenue.toLocaleString()}
-                      </p>
+                      <p className="text-lg font-bold">${trend.revenue.toLocaleString()}</p>
                       <p className="text-xs text-muted-foreground">
                         {trend.attendanceRate.toFixed(1)}% attendance
                       </p>

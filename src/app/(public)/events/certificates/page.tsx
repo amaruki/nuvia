@@ -18,15 +18,15 @@ export default function EventCertificatesPage() {
     const fetchCertificates = async () => {
       try {
         setIsLoading(true);
-        
+
         // In a real implementation, we would fetch certificates directly
         // For now, we'll fetch registrations and check for certificates
         const registrations = await getUserEventRegistrations("current-user-id");
-        
+
         // Filter for registrations with certificates
         const certs: EventCertificate[] = [];
         const evts: Event[] = [];
-        
+
         for (const registration of registrations) {
           if (registration.certificateIssued && registration.certificateUrl) {
             // Create a mock certificate object
@@ -40,14 +40,14 @@ export default function EventCertificatesPage() {
               createdAt: new Date(),
               updatedAt: new Date(),
             };
-            
+
             certs.push(certificate);
-            
+
             // If we have the event data, add it to our events array
             // In a real implementation, we would fetch event details for each certificate
           }
         }
-        
+
         setCertificates(certs);
         setEvents(evts);
       } catch (err) {
@@ -115,13 +115,16 @@ export default function EventCertificatesPage() {
         <h3 className="text-lg font-semibold text-info mb-3">About Certificates</h3>
         <div className="space-y-3 text-info">
           <p>
-            Certificates are automatically issued to attendees who check in to events and meet the participation requirements.
+            Certificates are automatically issued to attendees who check in to events and meet the
+            participation requirements.
           </p>
           <p>
-            Each certificate contains a unique verification code that can be used to confirm its authenticity.
+            Each certificate contains a unique verification code that can be used to confirm its
+            authenticity.
           </p>
           <p>
-            You can download your certificates as PDF files or share them directly on social media and professional networks.
+            You can download your certificates as PDF files or share them directly on social media
+            and professional networks.
           </p>
         </div>
       </div>

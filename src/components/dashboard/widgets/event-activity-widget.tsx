@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { WidgetContainer } from "../../ui/widget-container"
-import { Card, CardContent } from "../../ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "../../ui/badge"
-import { Calendar, Users, UserCheck, TrendingUp, TrendingDown, ExternalLink } from "lucide-react"
-import { EventActivity } from "@/types/dashboard.types"
+import * as React from "react";
+import { WidgetContainer } from "../../ui/widget-container";
+import { Card, CardContent } from "../../ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "../../ui/badge";
+import { Calendar, Users, UserCheck, TrendingUp, TrendingDown, ExternalLink } from "lucide-react";
+import { EventActivity } from "@/types/dashboard.types";
 
 interface EventActivityWidgetProps {
-  eventActivity?: EventActivity
-  onExportData?: () => void
-  onViewAllEvents?: () => void
+  eventActivity?: EventActivity;
+  onExportData?: () => void;
+  onViewAllEvents?: () => void;
 }
 
 // Mock event activity data - in a real app, this would come from an API
@@ -20,23 +20,26 @@ const mockEventActivity: EventActivity = {
   upcomingEvents: 5,
   registrationsThisMonth: 87,
   checkInsToday: 12,
-}
+};
 
 const formatNumber = (num: number) => {
-  return new Intl.NumberFormat("en-US").format(num)
-}
+  return new Intl.NumberFormat("en-US").format(num);
+};
 
 const calculatePercentage = (part: number, total: number) => {
-  return Math.round((part / total) * 100)
-}
+  return Math.round((part / total) * 100);
+};
 
 export function EventActivityWidget({
   eventActivity = mockEventActivity,
   onExportData,
   onViewAllEvents,
 }: EventActivityWidgetProps) {
-  const upcomingPercentage = calculatePercentage(eventActivity.upcomingEvents, eventActivity.totalEvents)
-  
+  const upcomingPercentage = calculatePercentage(
+    eventActivity.upcomingEvents,
+    eventActivity.totalEvents,
+  );
+
   return (
     <WidgetContainer
       type="event-activity"
@@ -56,25 +59,15 @@ export function EventActivityWidget({
                 </span>
               </div>
               <div className="flex space-x-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onExportData}
-                  className="text-xs"
-                >
+                <Button variant="ghost" size="sm" onClick={onExportData} className="text-xs">
                   Export
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onViewAllEvents}
-                  className="text-xs"
-                >
+                <Button variant="ghost" size="sm" onClick={onViewAllEvents} className="text-xs">
                   View all
                 </Button>
               </div>
             </div>
-            
+
             {/* Statistics cards */}
             <div className="grid grid-cols-2 gap-4">
               {/* Total Events */}
@@ -84,18 +77,14 @@ export function EventActivityWidget({
                     <Calendar className="h-5 w-5 text-chart-1" />
                     <span className="text-sm font-medium text-foreground/70">Total</span>
                   </div>
-                  <Badge className="bg-chart-1/20 text-chart-1">
-                    100%
-                  </Badge>
+                  <Badge className="bg-chart-1/20 text-chart-1">100%</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
                   {formatNumber(eventActivity.totalEvents)}
                 </div>
-                <div className="text-xs text-foreground/50 mt-1">
-                  All events to date
-                </div>
+                <div className="text-xs text-foreground/50 mt-1">All events to date</div>
               </div>
-              
+
               {/* Upcoming Events */}
               <div className="p-4 rounded-lg border bg-card border-border">
                 <div className="flex items-center justify-between mb-2">
@@ -103,9 +92,7 @@ export function EventActivityWidget({
                     <Calendar className="h-5 w-5 text-chart-2" />
                     <span className="text-sm font-medium text-foreground/70">Upcoming</span>
                   </div>
-                  <Badge className="bg-chart-2/20 text-chart-2">
-                    {upcomingPercentage}%
-                  </Badge>
+                  <Badge className="bg-chart-2/20 text-chart-2">{upcomingPercentage}%</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
                   {formatNumber(eventActivity.upcomingEvents)}
@@ -115,7 +102,7 @@ export function EventActivityWidget({
                   <span>+2 from last week</span>
                 </div>
               </div>
-              
+
               {/* Registrations This Month */}
               <div className="p-4 rounded-lg border bg-card border-border">
                 <div className="flex items-center justify-between mb-2">
@@ -123,9 +110,7 @@ export function EventActivityWidget({
                     <Users className="h-5 w-5 text-chart-3" />
                     <span className="text-sm font-medium text-foreground/70">Registrations</span>
                   </div>
-                  <Badge className="bg-chart-3/20 text-chart-3">
-                    This Month
-                  </Badge>
+                  <Badge className="bg-chart-3/20 text-chart-3">This Month</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
                   {formatNumber(eventActivity.registrationsThisMonth)}
@@ -135,7 +120,7 @@ export function EventActivityWidget({
                   <span>+15% from last month</span>
                 </div>
               </div>
-              
+
               {/* Check-ins Today */}
               <div className="p-4 rounded-lg border bg-card border-border">
                 <div className="flex items-center justify-between mb-2">
@@ -143,9 +128,7 @@ export function EventActivityWidget({
                     <UserCheck className="h-5 w-5 text-chart-4" />
                     <span className="text-sm font-medium text-foreground/70">Check-ins</span>
                   </div>
-                  <Badge className="bg-chart-4/20 text-chart-4">
-                    Today
-                  </Badge>
+                  <Badge className="bg-chart-4/20 text-chart-4">Today</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
                   {formatNumber(eventActivity.checkInsToday)}
@@ -156,7 +139,7 @@ export function EventActivityWidget({
                 </div>
               </div>
             </div>
-            
+
             {/* Progress bars */}
             <div className="space-y-3">
               <div>
@@ -171,34 +154,28 @@ export function EventActivityWidget({
                   ></div>
                 </div>
               </div>
-              
+
               <div>
                 <div className="flex justify-between text-xs text-foreground/50 mb-1">
                   <span>Registration Rate</span>
                   <span>78%</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div
-                    className="bg-chart-3 h-2 rounded-full"
-                    style={{ width: `78%` }}
-                  ></div>
+                  <div className="bg-chart-3 h-2 rounded-full" style={{ width: `78%` }}></div>
                 </div>
               </div>
-              
+
               <div>
                 <div className="flex justify-between text-xs text-foreground/50 mb-1">
                   <span>Attendance Rate</span>
                   <span>65%</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div
-                    className="bg-chart-4 h-2 rounded-full"
-                    style={{ width: `65%` }}
-                  ></div>
+                  <div className="bg-chart-4 h-2 rounded-full" style={{ width: `65%` }}></div>
                 </div>
               </div>
             </div>
-            
+
             {/* Summary */}
             <div className="text-xs text-foreground/50 text-center pt-2">
               Event data updated in real-time. Last updated: Today at 10:30 AM
@@ -207,5 +184,5 @@ export function EventActivityWidget({
         </CardContent>
       </Card>
     </WidgetContainer>
-  )
+  );
 }

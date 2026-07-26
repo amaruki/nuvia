@@ -17,23 +17,27 @@ import { Key, CheckCircle, AlertCircle, Eye, EyeOff, Loader2, Shield, Check } fr
 import { changePassword } from "@/lib/client";
 
 // Simple password validation schema
-const passwordFormSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: z.string()
-    .min(8, "Password must be at least 8 characters")
-    .max(100, "Password must be less than 100 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number")
-    .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character"),
-  confirmPassword: z.string().min(1, "Please confirm your password"),
-}).refine(data => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-}).refine(data => data.currentPassword !== data.newPassword, {
-  message: "New password must be different from current password",
-  path: ["newPassword"],
-});
+const passwordFormSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(100, "Password must be less than 100 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "New password must be different from current password",
+    path: ["newPassword"],
+  });
 
 type PasswordFormData = z.infer<typeof passwordFormSchema>;
 
@@ -59,8 +63,8 @@ export function SecurityForm({ user }: SecurityFormProps) {
     defaultValues: {
       currentPassword: "",
       newPassword: "",
-      confirmPassword: ""
-    }
+      confirmPassword: "",
+    },
   });
 
   const newPassword = watch("newPassword");
@@ -74,7 +78,7 @@ export function SecurityForm({ user }: SecurityFormProps) {
         hasLowercase: false,
         hasNumber: false,
         hasSpecialChar: false,
-        score: 0
+        score: 0,
       };
     }
 
@@ -83,7 +87,7 @@ export function SecurityForm({ user }: SecurityFormProps) {
       hasUppercase: /[A-Z]/.test(password),
       hasLowercase: /[a-z]/.test(password),
       hasNumber: /\d/.test(password),
-      hasSpecialChar: /[^a-zA-Z\d]/.test(password)
+      hasSpecialChar: /[^a-zA-Z\d]/.test(password),
     };
 
     const score = Object.values(requirements).filter(Boolean).length;
@@ -142,9 +146,7 @@ export function SecurityForm({ user }: SecurityFormProps) {
       {isSuccess && (
         <Alert className="border-green-200 bg-green-50 text-green-800">
           <CheckCircle className="h-4 w-4" />
-          <AlertDescription>
-            Password changed successfully!
-          </AlertDescription>
+          <AlertDescription>Password changed successfully!</AlertDescription>
         </Alert>
       )}
 
@@ -152,9 +154,7 @@ export function SecurityForm({ user }: SecurityFormProps) {
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            {error}
-          </AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
@@ -217,9 +217,7 @@ export function SecurityForm({ user }: SecurityFormProps) {
             )}
           </Button>
         </div>
-        {errors.newPassword && (
-          <p className="text-sm text-red-600">{errors.newPassword.message}</p>
-        )}
+        {errors.newPassword && <p className="text-sm text-red-600">{errors.newPassword.message}</p>}
 
         {/* Password Strength Indicator */}
         {newPassword && (
@@ -283,7 +281,9 @@ export function SecurityForm({ user }: SecurityFormProps) {
             Password Requirements:
           </h4>
           <ul className="text-xs text-muted-foreground space-y-1">
-            <li className={`flex items-center gap-2 ${passwordRequirements.minLength ? 'text-green-600' : ''}`}>
+            <li
+              className={`flex items-center gap-2 ${passwordRequirements.minLength ? "text-green-600" : ""}`}
+            >
               {passwordRequirements.minLength ? (
                 <Check className="h-3 w-3 text-green-600" />
               ) : (
@@ -291,7 +291,9 @@ export function SecurityForm({ user }: SecurityFormProps) {
               )}
               At least 8 characters long
             </li>
-            <li className={`flex items-center gap-2 ${passwordRequirements.hasUppercase ? 'text-green-600' : ''}`}>
+            <li
+              className={`flex items-center gap-2 ${passwordRequirements.hasUppercase ? "text-green-600" : ""}`}
+            >
               {passwordRequirements.hasUppercase ? (
                 <Check className="h-3 w-3 text-green-600" />
               ) : (
@@ -299,7 +301,9 @@ export function SecurityForm({ user }: SecurityFormProps) {
               )}
               Contains uppercase letter
             </li>
-            <li className={`flex items-center gap-2 ${passwordRequirements.hasLowercase ? 'text-green-600' : ''}`}>
+            <li
+              className={`flex items-center gap-2 ${passwordRequirements.hasLowercase ? "text-green-600" : ""}`}
+            >
               {passwordRequirements.hasLowercase ? (
                 <Check className="h-3 w-3 text-green-600" />
               ) : (
@@ -307,7 +311,9 @@ export function SecurityForm({ user }: SecurityFormProps) {
               )}
               Contains lowercase letter
             </li>
-            <li className={`flex items-center gap-2 ${passwordRequirements.hasNumber ? 'text-green-600' : ''}`}>
+            <li
+              className={`flex items-center gap-2 ${passwordRequirements.hasNumber ? "text-green-600" : ""}`}
+            >
               {passwordRequirements.hasNumber ? (
                 <Check className="h-3 w-3 text-green-600" />
               ) : (
@@ -315,7 +321,9 @@ export function SecurityForm({ user }: SecurityFormProps) {
               )}
               Contains number
             </li>
-            <li className={`flex items-center gap-2 ${passwordRequirements.hasSpecialChar ? 'text-green-600' : ''}`}>
+            <li
+              className={`flex items-center gap-2 ${passwordRequirements.hasSpecialChar ? "text-green-600" : ""}`}
+            >
               {passwordRequirements.hasSpecialChar ? (
                 <Check className="h-3 w-3 text-green-600" />
               ) : (
@@ -329,11 +337,7 @@ export function SecurityForm({ user }: SecurityFormProps) {
 
       {/* Submit Button */}
       <div className="flex justify-end pt-4">
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="min-w-32"
-        >
+        <Button type="submit" disabled={isSubmitting} className="min-w-32">
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

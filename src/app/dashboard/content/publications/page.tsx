@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   RefreshCw,
   AlertTriangle,
   Download,
@@ -65,7 +65,8 @@ export default function ContentPublications() {
   useEffect(() => {
     setHeader({
       title: "Publications Management",
-      description: "Manage articles, blogs, newsletters, and all content publications with comprehensive analytics and workflow controls",
+      description:
+        "Manage articles, blogs, newsletters, and all content publications with comprehensive analytics and workflow controls",
     });
 
     return () => {
@@ -85,9 +86,12 @@ export default function ContentPublications() {
     router.push(`/dashboard/content/publications/create`);
   };
 
-
   const handleDelete = async (publication: Publication) => {
-    if (confirm(`Are you sure you want to delete "${publication.title}"? This action cannot be undone.`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete "${publication.title}"? This action cannot be undone.`,
+      )
+    ) {
       try {
         await deletePublication(publication.id);
       } catch (error) {
@@ -130,8 +134,12 @@ export default function ContentPublications() {
 
   const handleBulkPublish = async () => {
     if (selectedPublications.length === 0) return;
-    
-    if (confirm(`Are you sure you want to publish ${selectedPublications.length} selected publications?`)) {
+
+    if (
+      confirm(
+        `Are you sure you want to publish ${selectedPublications.length} selected publications?`,
+      )
+    ) {
       try {
         await bulkPublish(selectedPublications);
         setSelectedPublications([]);
@@ -143,8 +151,12 @@ export default function ContentPublications() {
 
   const handleBulkArchive = async () => {
     if (selectedPublications.length === 0) return;
-    
-    if (confirm(`Are you sure you want to archive ${selectedPublications.length} selected publications?`)) {
+
+    if (
+      confirm(
+        `Are you sure you want to archive ${selectedPublications.length} selected publications?`,
+      )
+    ) {
       try {
         await bulkArchive(selectedPublications);
         setSelectedPublications([]);
@@ -156,8 +168,12 @@ export default function ContentPublications() {
 
   const handleBulkDelete = async () => {
     if (selectedPublications.length === 0) return;
-    
-    if (confirm(`Are you sure you want to delete ${selectedPublications.length} selected publications? This action cannot be undone.`)) {
+
+    if (
+      confirm(
+        `Are you sure you want to delete ${selectedPublications.length} selected publications? This action cannot be undone.`,
+      )
+    ) {
       try {
         await bulkDelete(selectedPublications);
         setSelectedPublications([]);
@@ -167,7 +183,7 @@ export default function ContentPublications() {
     }
   };
 
-  const handleExport = (format: 'csv' | 'json' | 'pdf') => {
+  const handleExport = (format: "csv" | "json" | "pdf") => {
     exportPublications(format);
   };
 
@@ -297,16 +313,20 @@ export default function ContentPublications() {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">Overview</TabsTrigger>
-          <TabsTrigger value="publications" className="text-xs sm:text-sm py-2 px-2">Publications</TabsTrigger>
-          <TabsTrigger value="drafts" className="text-xs sm:text-sm py-2 px-2">Drafts</TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">Analytics</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="publications" className="text-xs sm:text-sm py-2 px-2">
+            Publications
+          </TabsTrigger>
+          <TabsTrigger value="drafts" className="text-xs sm:text-sm py-2 px-2">
+            Drafts
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2 px-2">
+            Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -316,7 +336,10 @@ export default function ContentPublications() {
               <h3 className="text-lg font-semibold">Recent Activity</h3>
               <div className="space-y-3">
                 {statistics?.recentActivity.slice(0, 5).map((activity) => (
-                  <div key={activity.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={activity.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <div>
                         <p className="text-sm font-medium">{activity.title}</p>
@@ -358,7 +381,9 @@ export default function ContentPublications() {
                     <span className="text-sm font-medium">Avg Engagement</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold">{statistics?.averageEngagementScore.toFixed(1) || 0}%</p>
+                    <p className="text-lg font-bold">
+                      {statistics?.averageEngagementScore.toFixed(1) || 0}%
+                    </p>
                   </div>
                 </div>
               </div>
@@ -371,7 +396,10 @@ export default function ContentPublications() {
               <h3 className="text-lg font-semibold">Monthly Trends</h3>
               <div className="space-y-3">
                 {statistics.monthlyTrend.slice(0, 6).map((trend, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
                       <p className="font-medium">{trend.month}</p>
                       <p className="text-xs text-muted-foreground">
@@ -380,9 +408,7 @@ export default function ContentPublications() {
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-lg font-bold">{formatNumber(trend.totalViews)}</p>
-                      <p className="text-xs text-muted-foreground">
-                        views
-                      </p>
+                      <p className="text-xs text-muted-foreground">views</p>
                     </div>
                   </div>
                 ))}
@@ -404,7 +430,7 @@ export default function ContentPublications() {
             selectedPublications={selectedPublications}
             onSelectionChange={setSelectedPublications}
           />
-          
+
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-6">
@@ -435,28 +461,33 @@ export default function ContentPublications() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Draft Publications</h3>
             <div className="space-y-3">
-              {publications.filter(p => p.status === 'draft').map((publication) => (
-                <div key={publication.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="min-w-0 flex-1 mr-2">
-                    <p className="font-medium">{publication.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Last modified: {publication.lastModified.toLocaleDateString()}
-                    </p>
+              {publications
+                .filter((p) => p.status === "draft")
+                .map((publication) => (
+                  <div
+                    key={publication.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div className="min-w-0 flex-1 mr-2">
+                      <p className="font-medium">{publication.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Last modified: {publication.lastModified.toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleEdit(publication)}>
+                        <Settings className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
+                      <Button size="sm" onClick={() => handlePublish(publication)}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Publish
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEdit(publication)}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
-                    <Button size="sm" onClick={() => handlePublish(publication)}>
-                      <FileText className="mr-2 h-4 w-4" />
-                      Publish
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
-            {publications.filter(p => p.status === 'draft').length === 0 && (
+            {publications.filter((p) => p.status === "draft").length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 <FileText className="h-12 w-12 mx-auto mb-4 opacity-40" />
                 <h3 className="text-lg font-medium mb-2">No draft publications</h3>
@@ -475,12 +506,13 @@ export default function ContentPublications() {
               <h3 className="text-lg font-semibold">Performance by Type</h3>
               <div className="space-y-3">
                 {statistics?.publicationsByType.map((type) => (
-                  <div key={type.type} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={type.type}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
-                      <p className="font-medium">{type.type.replace('_', ' ')}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {type.count} publications
-                      </p>
+                      <p className="font-medium">{type.type.replace("_", " ")}</p>
+                      <p className="text-xs text-muted-foreground">{type.count} publications</p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-lg font-bold">{formatNumber(type.views)}</p>
@@ -498,12 +530,13 @@ export default function ContentPublications() {
               <h3 className="text-lg font-semibold">Performance by Category</h3>
               <div className="space-y-3">
                 {statistics?.publicationsByCategory.map((category) => (
-                  <div key={category.category} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={category.category}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="min-w-0 flex-1 mr-2">
-                      <p className="font-medium">{category.category.replace('_', ' ')}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {category.count} publications
-                      </p>
+                      <p className="font-medium">{category.category.replace("_", " ")}</p>
+                      <p className="text-xs text-muted-foreground">{category.count} publications</p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-lg font-bold">{formatNumber(category.views)}</p>
@@ -536,17 +569,16 @@ export default function ContentPublications() {
               Import
             </label>
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
+          <Button variant="outline" size="sm" onClick={() => handleExport("csv")}>
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleExport('json')}>
+          <Button variant="outline" size="sm" onClick={() => handleExport("json")}>
             <Download className="mr-2 h-4 w-4" />
             Export JSON
           </Button>
         </div>
       </div>
-
     </div>
   );
 }

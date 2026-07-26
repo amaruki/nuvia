@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   Download,
   Calendar,
   User,
@@ -33,14 +33,14 @@ import {
   Users,
   Activity,
 } from "lucide-react";
-import { 
+import {
   FinancialReport,
   IncomeStatementData,
   BalanceSheetData,
   CashFlowData,
   BudgetVsActualData,
   TaxDocumentData,
-  AuditTrailData
+  AuditTrailData,
 } from "@/types/finance.types";
 import { useReports } from "@/lib/hooks/use-reports";
 import { useHeader } from "@/contexts/dashboard-context";
@@ -88,39 +88,47 @@ export default function ReportDetailsPage() {
     if (!bytes) return "N/A";
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + " " + sizes[i];
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + " " + sizes[i];
   };
 
   const getReportTypeIcon = (type: string) => {
     switch (type) {
-      case 'income_statement':
+      case "income_statement":
         return <BarChart3 className="h-5 w-5" />;
-      case 'balance_sheet':
+      case "balance_sheet":
         return <PieChart className="h-5 w-5" />;
-      case 'cash_flow':
+      case "cash_flow":
         return <DollarSign className="h-5 w-5" />;
-      case 'budget_vs_actual':
+      case "budget_vs_actual":
         return <TrendingUp className="h-5 w-5" />;
-      case 'tax_document':
+      case "tax_document":
         return <FileText className="h-5 w-5" />;
-      case 'audit_trail':
+      case "audit_trail":
         return <Shield className="h-5 w-5" />;
       default:
         return <FileText className="h-5 w-5" />;
     }
   };
 
-  const getStatusBadge = (status: FinancialReport['status']) => {
+  const getStatusBadge = (status: FinancialReport["status"]) => {
     switch (status) {
-      case 'draft':
+      case "draft":
         return <Badge variant="secondary">Draft</Badge>;
-      case 'pending_review':
-        return <Badge variant="outline" className="border-yellow-500 text-yellow-600">Pending Review</Badge>;
-      case 'approved':
-        return <Badge variant="outline" className="border-blue-500 text-blue-600">Approved</Badge>;
-      case 'published':
+      case "pending_review":
+        return (
+          <Badge variant="outline" className="border-yellow-500 text-yellow-600">
+            Pending Review
+          </Badge>
+        );
+      case "approved":
+        return (
+          <Badge variant="outline" className="border-blue-500 text-blue-600">
+            Approved
+          </Badge>
+        );
+      case "published":
         return <Badge variant="default">Published</Badge>;
-      case 'archived':
+      case "archived":
         return <Badge variant="outline">Archived</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
@@ -147,7 +155,7 @@ export default function ReportDetailsPage() {
     }
   };
 
-  const handleUpdateStatus = (status: FinancialReport['status']) => {
+  const handleUpdateStatus = (status: FinancialReport["status"]) => {
     if (report) {
       updateReportStatus(report.id, status);
     }
@@ -167,7 +175,9 @@ export default function ReportDetailsPage() {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center pb-2 border-b">
                 <span className="text-sm font-medium">Total Revenue</span>
-                <span className="text-lg font-bold text-green-600">{formatCurrency(incomeStatementData.revenue.totalRevenue)}</span>
+                <span className="text-lg font-bold text-green-600">
+                  {formatCurrency(incomeStatementData.revenue.totalRevenue)}
+                </span>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between">
@@ -189,7 +199,9 @@ export default function ReportDetailsPage() {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center pb-2 border-b">
                 <span className="text-sm font-medium">Total Expenses</span>
-                <span className="text-lg font-bold text-red-600">{formatCurrency(incomeStatementData.expenses.totalExpenses)}</span>
+                <span className="text-lg font-bold text-red-600">
+                  {formatCurrency(incomeStatementData.expenses.totalExpenses)}
+                </span>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between">
@@ -214,21 +226,29 @@ export default function ReportDetailsPage() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Gross Profit</span>
-                  <span className="font-semibold">{formatCurrency(incomeStatementData.grossProfit)}</span>
+                  <span className="font-semibold">
+                    {formatCurrency(incomeStatementData.grossProfit)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Operating Income</span>
-                  <span className="font-semibold">{formatCurrency(incomeStatementData.operatingIncome)}</span>
+                  <span className="font-semibold">
+                    {formatCurrency(incomeStatementData.operatingIncome)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">EBITDA</span>
-                  <span className="font-semibold">{formatCurrency(incomeStatementData.ebitda)}</span>
+                  <span className="font-semibold">
+                    {formatCurrency(incomeStatementData.ebitda)}
+                  </span>
                 </div>
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between items-center pb-2 border-b">
                   <span className="text-sm font-medium">Net Income</span>
-                  <span className="text-xl font-bold text-green-600">{formatCurrency(incomeStatementData.netIncome)}</span>
+                  <span className="text-xl font-bold text-green-600">
+                    {formatCurrency(incomeStatementData.netIncome)}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">vs Previous Period</span>
@@ -237,11 +257,16 @@ export default function ReportDetailsPage() {
                   ) : (
                     <ArrowDown className="h-4 w-4 text-red-600" />
                   )}
-                  <span className={cn(
-                    "font-semibold",
-                    incomeStatementData.periodComparison.change >= 0 ? "text-green-600" : "text-red-600"
-                  )}>
-                    {formatCurrency(incomeStatementData.periodComparison.change)} ({incomeStatementData.periodComparison.changePercentage.toFixed(1)}%)
+                  <span
+                    className={cn(
+                      "font-semibold",
+                      incomeStatementData.periodComparison.change >= 0
+                        ? "text-green-600"
+                        : "text-red-600",
+                    )}
+                  >
+                    {formatCurrency(incomeStatementData.periodComparison.change)} (
+                    {incomeStatementData.periodComparison.changePercentage.toFixed(1)}%)
                   </span>
                 </div>
               </div>
@@ -266,7 +291,9 @@ export default function ReportDetailsPage() {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center pb-2 border-b">
                 <span className="text-sm font-medium">Total Assets</span>
-                <span className="text-lg font-bold">{formatCurrency(balanceSheetData.assets.totalAssets)}</span>
+                <span className="text-lg font-bold">
+                  {formatCurrency(balanceSheetData.assets.totalAssets)}
+                </span>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between">
@@ -288,7 +315,9 @@ export default function ReportDetailsPage() {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center pb-2 border-b">
                 <span className="text-sm font-medium">Total Liabilities</span>
-                <span className="text-lg font-bold">{formatCurrency(balanceSheetData.liabilities.totalLiabilities)}</span>
+                <span className="text-lg font-bold">
+                  {formatCurrency(balanceSheetData.liabilities.totalLiabilities)}
+                </span>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between">
@@ -310,7 +339,9 @@ export default function ReportDetailsPage() {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center pb-2 border-b">
                 <span className="text-sm font-medium">Total Equity</span>
-                <span className="text-lg font-bold">{formatCurrency(balanceSheetData.equity.totalEquity)}</span>
+                <span className="text-lg font-bold">
+                  {formatCurrency(balanceSheetData.equity.totalEquity)}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -342,13 +373,17 @@ export default function ReportDetailsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Working Capital Changes</span>
-                  <span>{formatCurrency(cashFlowData.operatingActivities.changesInWorkingCapital)}</span>
+                  <span>
+                    {formatCurrency(cashFlowData.operatingActivities.changesInWorkingCapital)}
+                  </span>
                 </div>
               </div>
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Net Cash from Operations</span>
-                <span className="font-bold text-green-600">{formatCurrency(cashFlowData.operatingActivities.netCashFromOperations)}</span>
+                <span className="font-bold text-green-600">
+                  {formatCurrency(cashFlowData.operatingActivities.netCashFromOperations)}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -361,17 +396,23 @@ export default function ReportDetailsPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Capital Expenditures</span>
-                  <span className="text-red-600">{formatCurrency(cashFlowData.investingActivities.capitalExpenditures)}</span>
+                  <span className="text-red-600">
+                    {formatCurrency(cashFlowData.investingActivities.capitalExpenditures)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Investments</span>
-                  <span className="text-red-600">{formatCurrency(cashFlowData.investingActivities.investments)}</span>
+                  <span className="text-red-600">
+                    {formatCurrency(cashFlowData.investingActivities.investments)}
+                  </span>
                 </div>
               </div>
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Net Cash from Investing</span>
-                <span className="font-bold text-red-600">{formatCurrency(cashFlowData.investingActivities.netCashFromInvesting)}</span>
+                <span className="font-bold text-red-600">
+                  {formatCurrency(cashFlowData.investingActivities.netCashFromInvesting)}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -384,25 +425,35 @@ export default function ReportDetailsPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Debt Issuance</span>
-                  <span className="text-green-600">{formatCurrency(cashFlowData.financingActivities.debtIssuance)}</span>
+                  <span className="text-green-600">
+                    {formatCurrency(cashFlowData.financingActivities.debtIssuance)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Debt Repayment</span>
-                  <span className="text-red-600">{formatCurrency(cashFlowData.financingActivities.debtRepayment)}</span>
+                  <span className="text-red-600">
+                    {formatCurrency(cashFlowData.financingActivities.debtRepayment)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Equity Issuance</span>
-                  <span className="text-green-600">{formatCurrency(cashFlowData.financingActivities.equityIssuance)}</span>
+                  <span className="text-green-600">
+                    {formatCurrency(cashFlowData.financingActivities.equityIssuance)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Dividends Paid</span>
-                  <span className="text-red-600">{formatCurrency(cashFlowData.financingActivities.dividendsPaid)}</span>
+                  <span className="text-red-600">
+                    {formatCurrency(cashFlowData.financingActivities.dividendsPaid)}
+                  </span>
                 </div>
               </div>
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Net Cash from Financing</span>
-                <span className="font-bold text-green-600">{formatCurrency(cashFlowData.financingActivities.netCashFromFinancing)}</span>
+                <span className="font-bold text-green-600">
+                  {formatCurrency(cashFlowData.financingActivities.netCashFromFinancing)}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -418,7 +469,9 @@ export default function ReportDetailsPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Net Change in Cash</span>
-                    <span className="font-semibold">{formatCurrency(cashFlowData.netChangeInCash)}</span>
+                    <span className="font-semibold">
+                      {formatCurrency(cashFlowData.netChangeInCash)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Cash at Beginning</span>
@@ -428,7 +481,9 @@ export default function ReportDetailsPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Cash at End</span>
-                    <span className="text-xl font-bold text-green-600">{formatCurrency(cashFlowData.cashAtEnd)}</span>
+                    <span className="text-xl font-bold text-green-600">
+                      {formatCurrency(cashFlowData.cashAtEnd)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -454,29 +509,39 @@ export default function ReportDetailsPage() {
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Total Budgeted</span>
-                  <span className="text-lg font-bold">{formatCurrency(budgetVsActualData.totalBudgeted)}</span>
+                  <span className="text-lg font-bold">
+                    {formatCurrency(budgetVsActualData.totalBudgeted)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Total Actual</span>
-                  <span className="text-lg font-bold">{formatCurrency(budgetVsActualData.totalActual)}</span>
+                  <span className="text-lg font-bold">
+                    {formatCurrency(budgetVsActualData.totalActual)}
+                  </span>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Total Variance</span>
-                  <span className={cn(
-                    "text-xl font-bold",
-                    budgetVsActualData.totalVariance >= 0 ? "text-green-600" : "text-red-600"
-                  )}>
+                  <span
+                    className={cn(
+                      "text-xl font-bold",
+                      budgetVsActualData.totalVariance >= 0 ? "text-green-600" : "text-red-600",
+                    )}
+                  >
                     {formatCurrency(budgetVsActualData.totalVariance)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">Variance Percentage</span>
-                  <span className={cn(
-                    "font-semibold",
-                    budgetVsActualData.totalVariancePercentage >= 0 ? "text-green-600" : "text-red-600"
-                  )}>
+                  <span
+                    className={cn(
+                      "font-semibold",
+                      budgetVsActualData.totalVariancePercentage >= 0
+                        ? "text-green-600"
+                        : "text-red-600",
+                    )}
+                  >
                     {budgetVsActualData.totalVariancePercentage.toFixed(1)}%
                   </span>
                 </div>
@@ -490,11 +555,16 @@ export default function ReportDetailsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>{category.name}</CardTitle>
-                  <Badge variant={
-                    category.status === 'under_budget' ? 'default' :
-                    category.status === 'on_track' ? 'secondary' : 'destructive'
-                  }>
-                    {category.status.replace('_', ' ')}
+                  <Badge
+                    variant={
+                      category.status === "under_budget"
+                        ? "default"
+                        : category.status === "on_track"
+                          ? "secondary"
+                          : "destructive"
+                    }
+                  >
+                    {category.status.replace("_", " ")}
                   </Badge>
                 </div>
               </CardHeader>
@@ -510,10 +580,12 @@ export default function ReportDetailsPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm font-medium">Variance</span>
-                    <span className={cn(
-                      "font-semibold",
-                      category.variance >= 0 ? "text-green-600" : "text-red-600"
-                    )}>
+                    <span
+                      className={cn(
+                        "font-semibold",
+                        category.variance >= 0 ? "text-green-600" : "text-red-600",
+                      )}
+                    >
                       {formatCurrency(category.variance)}
                     </span>
                   </div>
@@ -523,9 +595,9 @@ export default function ReportDetailsPage() {
                     <span>Variance</span>
                     <span>{Math.abs(category.variancePercentage).toFixed(1)}%</span>
                   </div>
-                  <Progress 
-                    value={Math.min(Math.abs(category.variancePercentage), 100)} 
-                    className="h-2" 
+                  <Progress
+                    value={Math.min(Math.abs(category.variancePercentage), 100)}
+                    className="h-2"
                   />
                 </div>
               </CardContent>
@@ -555,19 +627,25 @@ export default function ReportDetailsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Tax Type</span>
-                  <span className="font-semibold capitalize">{taxDocumentData.taxType.replace('_', ' ')}</span>
+                  <span className="font-semibold capitalize">
+                    {taxDocumentData.taxType.replace("_", " ")}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Filing Status</span>
                   <span className="font-semibold">
-                    {taxDocumentData.filedAt ? `Filed on ${formatDate(taxDocumentData.filedAt)}` : 'Not Filed'}
+                    {taxDocumentData.filedAt
+                      ? `Filed on ${formatDate(taxDocumentData.filedAt)}`
+                      : "Not Filed"}
                   </span>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Total Taxable Income</span>
-                  <span className="font-semibold">{formatCurrency(taxDocumentData.totalTaxableIncome)}</span>
+                  <span className="font-semibold">
+                    {formatCurrency(taxDocumentData.totalTaxableIncome)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Total Tax</span>
@@ -579,10 +657,12 @@ export default function ReportDetailsPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Tax Due</span>
-                  <span className={cn(
-                    "text-xl font-bold",
-                    taxDocumentData.taxDue > 0 ? "text-red-600" : "text-green-600"
-                  )}>
+                  <span
+                    className={cn(
+                      "text-xl font-bold",
+                      taxDocumentData.taxDue > 0 ? "text-red-600" : "text-green-600",
+                    )}
+                  >
                     {formatCurrency(taxDocumentData.taxDue)}
                   </span>
                 </div>
@@ -650,7 +730,8 @@ export default function ReportDetailsPage() {
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Audit Period</span>
                   <span className="font-semibold">
-                    {formatDate(auditTrailData.auditPeriod.startDate)} - {formatDate(auditTrailData.auditPeriod.endDate)}
+                    {formatDate(auditTrailData.auditPeriod.startDate)} -{" "}
+                    {formatDate(auditTrailData.auditPeriod.endDate)}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -669,11 +750,16 @@ export default function ReportDetailsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Status</span>
-                  <Badge variant={
-                    auditTrailData.status === 'completed' ? 'default' :
-                    auditTrailData.status === 'in_progress' ? 'secondary' : 'destructive'
-                  }>
-                    {auditTrailData.status.replace('_', ' ')}
+                  <Badge
+                    variant={
+                      auditTrailData.status === "completed"
+                        ? "default"
+                        : auditTrailData.status === "in_progress"
+                          ? "secondary"
+                          : "destructive"
+                    }
+                  >
+                    {auditTrailData.status.replace("_", " ")}
                   </Badge>
                 </div>
               </div>
@@ -688,17 +774,25 @@ export default function ReportDetailsPage() {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
               {[
-                { label: 'Overall Risk', value: auditTrailData.riskAssessment.overall },
-                { label: 'Financial Risk', value: auditTrailData.riskAssessment.financial },
-                { label: 'Operational Risk', value: auditTrailData.riskAssessment.operational },
-                { label: 'Compliance Risk', value: auditTrailData.riskAssessment.compliance },
+                { label: "Overall Risk", value: auditTrailData.riskAssessment.overall },
+                { label: "Financial Risk", value: auditTrailData.riskAssessment.financial },
+                { label: "Operational Risk", value: auditTrailData.riskAssessment.operational },
+                { label: "Compliance Risk", value: auditTrailData.riskAssessment.compliance },
               ].map((risk) => (
-                <div key={risk.label} className="flex justify-between items-center p-3 border rounded-lg">
+                <div
+                  key={risk.label}
+                  className="flex justify-between items-center p-3 border rounded-lg"
+                >
                   <span className="text-sm font-medium">{risk.label}</span>
-                  <Badge variant={
-                    risk.value === 'low' ? 'default' :
-                    risk.value === 'medium' ? 'secondary' : 'destructive'
-                  }>
+                  <Badge
+                    variant={
+                      risk.value === "low"
+                        ? "default"
+                        : risk.value === "medium"
+                          ? "secondary"
+                          : "destructive"
+                    }
+                  >
                     {risk.value}
                   </Badge>
                 </div>
@@ -718,18 +812,29 @@ export default function ReportDetailsPage() {
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-semibold">{finding.category}</h4>
                     <div className="flex items-center gap-2">
-                      <Badge variant={
-                        finding.severity === 'low' ? 'secondary' :
-                        finding.severity === 'medium' ? 'outline' :
-                        finding.severity === 'high' ? 'destructive' : 'destructive'
-                      }>
+                      <Badge
+                        variant={
+                          finding.severity === "low"
+                            ? "secondary"
+                            : finding.severity === "medium"
+                              ? "outline"
+                              : finding.severity === "high"
+                                ? "destructive"
+                                : "destructive"
+                        }
+                      >
                         {finding.severity}
                       </Badge>
-                      <Badge variant={
-                        finding.status === 'resolved' ? 'default' :
-                        finding.status === 'in_progress' ? 'secondary' : 'outline'
-                      }>
-                        {finding.status.replace('_', ' ')}
+                      <Badge
+                        variant={
+                          finding.status === "resolved"
+                            ? "default"
+                            : finding.status === "in_progress"
+                              ? "secondary"
+                              : "outline"
+                        }
+                      >
+                        {finding.status.replace("_", " ")}
                       </Badge>
                     </div>
                   </div>
@@ -751,17 +856,17 @@ export default function ReportDetailsPage() {
 
   const renderReportContent = () => {
     switch (report?.type) {
-      case 'income_statement':
+      case "income_statement":
         return renderIncomeStatement();
-      case 'balance_sheet':
+      case "balance_sheet":
         return renderBalanceSheet();
-      case 'cash_flow':
+      case "cash_flow":
         return renderCashFlow();
-      case 'budget_vs_actual':
+      case "budget_vs_actual":
         return renderBudgetVsActual();
-      case 'tax_document':
+      case "tax_document":
         return renderTaxDocument();
-      case 'audit_trail':
+      case "audit_trail":
         return renderAuditTrail();
       default:
         return (
@@ -850,7 +955,7 @@ export default function ReportDetailsPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Type</span>
-                  <span className="text-sm capitalize">{report.type.replace('_', ' ')}</span>
+                  <span className="text-sm capitalize">{report.type.replace("_", " ")}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Downloads</span>
@@ -888,7 +993,9 @@ export default function ReportDetailsPage() {
                 {report.publishedAt && (
                   <div className="space-y-2">
                     <p className="text-sm font-medium">Published</p>
-                    <p className="text-sm text-muted-foreground">{formatDate(report.publishedAt)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDate(report.publishedAt)}
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -956,7 +1063,9 @@ export default function ReportDetailsPage() {
                         <FileText className="h-4 w-4 text-muted-foreground" />
                         <div>
                           <p className="text-sm font-medium">Report Type</p>
-                          <p className="text-xs text-muted-foreground capitalize">{report.type.replace('_', ' ')}</p>
+                          <p className="text-xs text-muted-foreground capitalize">
+                            {report.type.replace("_", " ")}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
@@ -980,13 +1089,17 @@ export default function ReportDetailsPage() {
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
                         <Badge className="mr-2">{getStatusBadge(report.status)}</Badge>
-                        <span className="text-sm font-medium capitalize">{report.status.replace('_', ' ')}</span>
+                        <span className="text-sm font-medium capitalize">
+                          {report.status.replace("_", " ")}
+                        </span>
                       </div>
                       <div className="flex items-center gap-3">
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <div>
                           <p className="text-sm font-medium">Generated</p>
-                          <p className="text-xs text-muted-foreground">{formatDate(report.generatedAt)}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDate(report.generatedAt)}
+                          </p>
                         </div>
                       </div>
                       {report.reviewedBy && (
@@ -994,7 +1107,9 @@ export default function ReportDetailsPage() {
                           <CheckCircle className="h-4 w-4 text-muted-foreground" />
                           <div>
                             <p className="text-sm font-medium">Reviewed</p>
-                            <p className="text-xs text-muted-foreground">{formatDate(report.reviewedAt!)}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatDate(report.reviewedAt!)}
+                            </p>
                           </div>
                         </div>
                       )}
@@ -1003,7 +1118,9 @@ export default function ReportDetailsPage() {
                           <Eye className="h-4 w-4 text-muted-foreground" />
                           <div>
                             <p className="text-sm font-medium">Published</p>
-                            <p className="text-xs text-muted-foreground">{formatDate(report.publishedAt)}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatDate(report.publishedAt)}
+                            </p>
                           </div>
                         </div>
                       )}
@@ -1013,10 +1130,15 @@ export default function ReportDetailsPage() {
                 <div className="bg-muted/30 rounded-lg p-6">
                   <h3 className="text-lg font-semibold mb-4">Usage Guidelines</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    This financial report provides comprehensive insights into the organization's financial performance and position during the specified period. The report has been carefully prepared following standard accounting principles and internal controls.
+                    This financial report provides comprehensive insights into the organization's
+                    financial performance and position during the specified period. The report has
+                    been carefully prepared following standard accounting principles and internal
+                    controls.
                   </p>
                   <p className="text-sm text-muted-foreground leading-relaxed mt-3">
-                    This report is intended for internal management review, board presentation, and compliance purposes. It should be used in conjunction with other financial documents for complete financial analysis.
+                    This report is intended for internal management review, board presentation, and
+                    compliance purposes. It should be used in conjunction with other financial
+                    documents for complete financial analysis.
                   </p>
                 </div>
               </CardContent>
@@ -1054,7 +1176,8 @@ export default function ReportDetailsPage() {
                       <div className="flex-1">
                         <p className="text-sm font-medium">Report Reviewed</p>
                         <p className="text-xs text-muted-foreground">
-                          {report.reviewedBy} reviewed this report on {formatDate(report.reviewedAt!)}
+                          {report.reviewedBy} reviewed this report on{" "}
+                          {formatDate(report.reviewedAt!)}
                         </p>
                       </div>
                     </div>

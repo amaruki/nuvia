@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useHeader } from "@/contexts/dashboard-context";
-import { JobForm } from "../../_components/job-form";
+import { JobForm } from "../_components/job-form";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";

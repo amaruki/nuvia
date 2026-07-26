@@ -20,7 +20,8 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { EventFilter, EventStatus, EventType } from "@/types/event.types";
+import { EventStatus, EventType } from "@/types/event.types";
+import type { EventFilter } from "@/types/event.types";
 
 const eventFilterSchema = z.object({
   searchQuery: z.string().optional(),

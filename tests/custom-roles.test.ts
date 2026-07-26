@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { user, customRole } from "@/db/schema";
 import { getUserPermissions, getAllRoles } from "@/lib/rbac";

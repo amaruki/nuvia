@@ -231,13 +231,17 @@ landed as an isolated, revertible commit.
   Two more added along the way, not on the original list:
   `tests/dashboard-access.test.ts` (the new role-authorization gate) and
   `tests/custom-roles.test.ts`.
-- ☐ **One structured logger**, `no-console` enforced via oxlint once it
-  lands (300 bare `console.*` calls today, replacing
-  `services/logging.service.ts` and `errors.ts:logError` —
-  `security.ts:logSecurityEvent` no longer exists, the whole file was
-  deleted as dead code during the rate-limiter consolidation). W3C Trace
-  Context propagation and PII redaction rules go in
-  [`docs/observability.md`](docs/observability.md).
+- ☑ **One structured logger.** `src/lib/logger.ts` — JSON lines, severity
+  ladder, PII redaction by key name, optional top-level `traceId` (full
+  W3C Trace Context propagation is still the "later, once OTel lands"
+  item `docs/observability.md` already scoped it as). `errors.ts:logError`
+  and `services/logging.service.ts` rewritten to call it
+  (`security.ts:logSecurityEvent` no longer exists — deleted as dead code
+  during the rate-limiter consolidation). All 302 remaining bare
+  `console.*` call sites across `src/` migrated (105 files); `no-console`
+  enabled via `.oxlintrc.json`, with `scripts/**` exempted (a CLI setup
+  script printing human-readable progress isn't a JSON-log-aggregation
+  candidate, matching `env.ts`'s existing `scripts/*.ts` exception).
 - ☐ **Four major upgrades**, each its own commit, each verified with
   `bun run guard:heavy` before the next starts:
   1. `prisma` — **superseded**, Prisma is gone (see M1).

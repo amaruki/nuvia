@@ -254,15 +254,30 @@ landed as an isolated, revertible commit.
   actually exploitable in this configuration), SBOM (CycloneDX), SLSA
   provenance, a documented waiver-with-expiry mechanism, Renovate with a
   cooldown window.
-- ☐ **Duplicate dependencies** — six pairs doing the same job:
-  `sonner`+`react-hot-toast`, `resend`+`nodemailer`,
-  `tsx`+`ts-node` (☑ both removed — Bun runs TS natively),
-  `bcrypt`+better-auth's own hashing (☑ removed, unused),
-  `shadcn`+`shadcn-ui` (☑ deprecated `shadcn-ui` removed),
-  `animejs`+`tw-animate-css`. Remaining: pick one toast library and one mail
-  transport, and migrate every call site off the loser. **Good first issue**
-  once a canonical choice is made (needs an ADR first, since it touches
-  many files).
+- ☑ **Duplicate dependencies — re-examined, two of the three "remaining"
+  pairs weren't actually duplicates.** `tsx`+`ts-node` (both removed — Bun
+  runs TS natively), `bcrypt`+better-auth's own hashing (removed, unused),
+  and `shadcn`+`shadcn-ui` (deprecated `shadcn-ui` removed) were correctly
+  resolved already. Of the three flagged as still open:
+  - `sonner`+`react-hot-toast`: `react-hot-toast` had zero importers
+    anywhere in `src/` — removed from `package.json`, no migration needed
+    since nothing used it.
+  - `resend`+`nodemailer`: **not actually a duplicate.**
+    `src/lib/auth.ts` has its own inline `EmailService` class that
+    deliberately picks `resend` OR `nodemailer` OR neither based on which
+    env vars are configured (`RESEND_API_KEY` vs `EMAIL_HOST`+friends) —
+    a legitimate multi-provider design, not two competing
+    implementations. The actual duplication was
+    `src/lib/services/email.service.ts`, a _third_, fully unrelated
+    `EmailService` class (static `import nodemailer`) with zero importers
+    anywhere — deleted as dead code. No ADR was needed since there was no
+    real "pick a winner" decision once the dead file was out of the
+    picture.
+  - `animejs`+`tw-animate-css`: **not a duplicate either.** `animejs` is
+    a JS animation engine (imperative `.animate()` calls, 6 files);
+    `tw-animate-css` is a CSS-only Tailwind plugin providing `animate-*`
+    utility classes (`@import`ed once in `globals.css`, used via
+    className strings). Different jobs; both stay.
 - ☑ **Pre-existing type errors** (all 25, across the 8 files originally
   cataloged) fixed: the `job-form` import path, `Announcement`/
   `AnnouncementStatistics` type drift (fields the runtime data already

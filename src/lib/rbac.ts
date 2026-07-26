@@ -57,12 +57,16 @@ export interface RoleAssignmentChange {
 }
 
 /**
- * Get current user session with role and permissions
+ * Get current user session with role and permissions.
+ *
+ * `headersOverride` lets a caller pass request headers explicitly instead
+ * of relying on next/headers's ambient headers() — needed outside a live
+ * Next.js request lifecycle (e.g. bun:test calling this directly).
  */
-export async function getCurrentUser(): Promise<UserWithRole | null> {
+export async function getCurrentUser(headersOverride?: Headers): Promise<UserWithRole | null> {
   try {
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: headersOverride ?? (await headers()),
     });
 
     if (!session?.user) {
@@ -110,8 +114,11 @@ export async function getCurrentUser(): Promise<UserWithRole | null> {
 /**
  * Check if current user has specific permission
  */
-export async function hasPermission(permission: Permission): Promise<boolean> {
-  const currentUser = await getCurrentUser();
+export async function hasPermission(
+  permission: Permission,
+  headersOverride?: Headers,
+): Promise<boolean> {
+  const currentUser = await getCurrentUser(headersOverride);
 
   if (!currentUser) {
     return false;
@@ -129,8 +136,11 @@ export async function hasPermission(permission: Permission): Promise<boolean> {
 /**
  * Check if current user has any of the specified permissions
  */
-export async function hasAnyPermission(permissions: Permission[]): Promise<boolean> {
-  const currentUser = await getCurrentUser();
+export async function hasAnyPermission(
+  permissions: Permission[],
+  headersOverride?: Headers,
+): Promise<boolean> {
+  const currentUser = await getCurrentUser(headersOverride);
 
   if (!currentUser) {
     return false;
@@ -147,8 +157,11 @@ export async function hasAnyPermission(permissions: Permission[]): Promise<boole
 /**
  * Check if current user has all of the specified permissions
  */
-export async function hasAllPermissions(permissions: Permission[]): Promise<boolean> {
-  const currentUser = await getCurrentUser();
+export async function hasAllPermissions(
+  permissions: Permission[],
+  headersOverride?: Headers,
+): Promise<boolean> {
+  const currentUser = await getCurrentUser(headersOverride);
 
   if (!currentUser) {
     return false;
@@ -165,8 +178,11 @@ export async function hasAllPermissions(permissions: Permission[]): Promise<bool
 /**
  * Check if current user has specific role or higher privilege level
  */
-export async function hasRole(minRole: PredefinedRole): Promise<boolean> {
-  const currentUser = await getCurrentUser();
+export async function hasRole(
+  minRole: PredefinedRole,
+  headersOverride?: Headers,
+): Promise<boolean> {
+  const currentUser = await getCurrentUser(headersOverride);
 
   if (!currentUser) {
     return false;
@@ -186,13 +202,16 @@ export async function hasRole(minRole: PredefinedRole): Promise<boolean> {
 /**
  * Authorization middleware function
  */
-export async function requirePermission(permission: Permission): Promise<{
+export async function requirePermission(
+  permission: Permission,
+  headersOverride?: Headers,
+): Promise<{
   success: boolean;
   user?: UserWithRole;
   error?: ProblemDetails;
 }> {
   try {
-    const currentUser = await getCurrentUser();
+    const currentUser = await getCurrentUser(headersOverride);
 
     if (!currentUser) {
       return {
@@ -201,7 +220,7 @@ export async function requirePermission(permission: Permission): Promise<{
       };
     }
 
-    const hasRequiredPermission = await hasPermission(permission);
+    const hasRequiredPermission = await hasPermission(permission, headersOverride);
 
     if (!hasRequiredPermission) {
       return {
@@ -226,13 +245,16 @@ export async function requirePermission(permission: Permission): Promise<{
 /**
  * Authorization middleware for minimum role level
  */
-export async function requireRole(minRole: PredefinedRole): Promise<{
+export async function requireRole(
+  minRole: PredefinedRole,
+  headersOverride?: Headers,
+): Promise<{
   success: boolean;
   user?: UserWithRole;
   error?: ProblemDetails;
 }> {
   try {
-    const currentUser = await getCurrentUser();
+    const currentUser = await getCurrentUser(headersOverride);
 
     if (!currentUser) {
       return {
@@ -241,7 +263,7 @@ export async function requireRole(minRole: PredefinedRole): Promise<{
       };
     }
 
-    const hasRequiredRole = await hasRole(minRole);
+    const hasRequiredRole = await hasRole(minRole, headersOverride);
 
     if (!hasRequiredRole) {
       return {

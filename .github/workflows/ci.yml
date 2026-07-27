@@ -80,8 +80,7 @@ jobs:
         with:
           bun-version: "1.3.14"
       - run: bun install --frozen-lockfile
-      - run: bunx drizzle-kit push --force
-      - run: bun test
+      - run: bun run test:integration
       - run: bunx drizzle-kit check
       - run: bun run build
       - run: bun audit --prod

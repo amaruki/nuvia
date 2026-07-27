@@ -23,13 +23,15 @@ bun run dev
 
 ## The enforcement you will actually hit
 
-`bun install` installs [lefthook](https://lefthook.dev)'s git hooks automatically (`docs/adr/0010-ai-agent-commit-guard.md`) — you do not configure this yourself:
+Install Docker with Docker Compose before you run the integration tests.
+
+`bun install` installs [lefthook](https://lefthook.dev)'s git hooks automatically (`docs/adr/0010-ai-agent-commit-guard.md`). You do not configure the hooks:
 
 - **pre-commit**: `oxlint` and `oxfmt --check` on staged files. A failing check blocks the commit. Fix the code (`bun run lint:fix`, `bun run format`). Do not bypass it with `--no-verify`.
 - **commit-msg**: Conventional Commits format, with a hard block on any `Co-Authored-By:` trailer. This rule applies identically whether you are a human or an AI agent working in this repo.
-- **pre-push**: `bun run typecheck` and `bun test`.
+- **pre-push**: `bun run typecheck` and `bun run test:integration`.
 
-Run `bun run guard:heavy` locally before you open a PR. CI runs the same command.
+Run `bun run guard:heavy` locally before you open a PR. The integration test command starts an isolated PostgreSQL and Redis stack.
 
 ## Commit messages
 

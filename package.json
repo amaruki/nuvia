@@ -12,6 +12,7 @@
     "format:check": "oxfmt --check .",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
+    "test:integration": "bun run scripts/run-integration-tests.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -20,7 +21,7 @@
     "db:reset": "drizzle-kit push --force && bun run db:seed",
     "prepare": "lefthook install",
     "guard:light": "bun run lint && bun run format:check && bun run typecheck",
-    "guard:heavy": "bun run guard:light && bun test && bunx drizzle-kit check && bun run build && (bun audit --prod || true)",
+    "guard:heavy": "bun run guard:light && bun run test:integration && bunx drizzle-kit check && bun run build && (bun audit --prod || true)",
     "guard": "bun run guard:heavy"
   },
   "dependencies": {

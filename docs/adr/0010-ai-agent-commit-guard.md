@@ -12,7 +12,9 @@
 
 - The `pre-commit` hook in `lefthook.yml` runs `oxlint` and `oxfmt --check` on staged files. It blocks the commit on failure. This behavior is verified: it blocked this session's own first commit attempt for unformatted files.
 - The `commit-msg` hook runs `commitlint`, which enforces Conventional Commits. A second job in this hook rejects any commit whose message contains a `Co-Authored-By:` trailer, from a human or an AI.
-- The `pre-push` hook runs `bun run typecheck` and `bun test`.
+- The `pre-push` hook runs `bun run typecheck` and `bun run test:integration`.
+  The integration command starts isolated PostgreSQL and Redis containers,
+  applies the database schema, and runs `bun test`.
 
 **This ADR explicitly does not configure GitHub branch protection (a pull request, a review, and status checks required before merge to `main`).** Branch protection is the single mechanism that can actually prevent a repeat of the "220 commits straight to main" pattern. However, a change to real repository settings on a live GitHub remote is an outward-facing, semi-irreversible action. This action needs the repository owner's explicit go-ahead, not an agent's unilateral call. This ADR records branch protection here as the clear next step. This ADR does not silently skip it.
 

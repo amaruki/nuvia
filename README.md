@@ -33,8 +33,10 @@ This project does not use the four-layer Controller/Service/Manager/Data design 
 ### Prerequisites
 
 - [Bun](https://bun.sh) 1.3+
-- PostgreSQL
-- Redis (required in production, optional in development — `src/lib/env.ts` enforces this)
+- Docker with Docker Compose
+- PostgreSQL and Redis for application development
+
+The integration test command starts isolated PostgreSQL and Redis containers. It does not use the development database.
 
 ### Installation
 
@@ -101,7 +103,8 @@ This project does not use the four-layer Controller/Service/Manager/Data design 
 | `bun run lint` / `lint:fix`                                    | oxlint                                                                    |
 | `bun run format` / `format:check`                              | oxfmt                                                                     |
 | `bun run typecheck`                                            | `tsc --noEmit`                                                            |
-| `bun test`                                                     | Run tests                                                                 |
+| `bun test`                                                     | Run tests against services that are already available                     |
+| `bun run test:integration`                                     | Start isolated services, apply the schema, and run tests                  |
 | `bun run guard:light`                                          | lint + format + typecheck (fast)                                          |
 | `bun run guard:heavy`                                          | `guard:light` + test + migration-drift check + build + `bun audit --prod` |
 | `bun run db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle                                                                   |
@@ -111,8 +114,9 @@ This project does not use the four-layer Controller/Service/Manager/Data design 
 
 - **oxlint** and **oxfmt** replaced ESLint and Prettier ([ADR-0013](docs/adr/0013-oxlint-oxfmt-toolchain.md)). The previous ESLint config downgraded most rules to warnings. As a result, nothing actually blocked a build.
 - **TypeScript** runs in strict mode.
-- **bun test** runs the test suite. Test coverage is currently near zero. See [`TODO.md`](TODO.md) M2 for the first ten new tests and the reason the project needs them.
-- **lefthook** — pre-commit (lint + format), commit-msg (Conventional Commits, no `Co-Authored-By` trailers), pre-push (typecheck + test).
+- **bun test** runs the test suite against services that are already available.
+- **bun run test:integration** starts isolated services and applies the database schema before it runs the test suite.
+- **lefthook** — pre-commit (lint + format), commit-msg (Conventional Commits, no `Co-Authored-By` trailers), pre-push (typecheck + integration test).
 
 ### Project structure
 

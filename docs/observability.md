@@ -26,35 +26,16 @@ JSON lines, one per event:
 | `error` | Request failed               | Unhandled exception in a route       |
 | `fatal` | Process cannot continue      | DB connection pool exhausted at boot |
 
-`LOGGING_LEVEL` (already an env var, now validated by `src/lib/env.ts`)
-sets the minimum level emitted; production defaults to `info`.
+`LOGGING_LEVEL` is already an environment variable. `src/lib/env.ts` now validates it. `LOGGING_LEVEL` sets the minimum level that the logger emits. In production, the default value is `info`.
 
 ## Trace propagation
 
-[W3C Trace Context](https://www.w3.org/TR/trace-context/) — a `traceparent`
-header read on inbound requests (generated if absent) and propagated to
-every log line and DB audit-log write (`authLog.metadata.traceId`) for that
-request. The same ID appears in the RFC 9457 error response's `instance`
-extension, so a user-reported error can be traced end-to-end from the
-response they saw to the exact log lines and audit rows it produced.
-OpenTelemetry SDK wraps the propagation once `TODO.md` M2's logger lands;
-until then, a request-scoped ID generated in `proxy.ts` and threaded
-through via a header is sufficient and doesn't require the OTel dependency
-up front.
+Nuvia follows [W3C Trace Context](https://www.w3.org/TR/trace-context/). The server reads a `traceparent` header on each inbound request, and generates one if the request has none. The server then propagates this header to every log line and to the database audit-log write (`authLog.metadata.traceId`) for that request. The same ID appears in the `instance` extension of the RFC 9457 error response. As a result, a support engineer can trace a user-reported error end-to-end. The trace runs from the response the user saw to the exact log lines and audit rows that the request produced. Once `TODO.md` M2's logger lands, the OpenTelemetry SDK will wrap this propagation. Until then, a request-scoped ID that `proxy.ts` generates and passes through a header is enough, and this approach does not need the OpenTelemetry dependency yet.
 
 ## PII redaction
 
-Redaction happens in the logger itself, by key name pattern, not by
-convention at each call site — a call site that forgets to redact is a bug
-class, not an edge case. Redacted keys (non-exhaustive, extended as new
-PII-bearing fields are added): `email`, `ipAddress`, `password`,
-`passwordHash`, `token`, `*Token`, `ssn`, `taxId`. A field matching one of
-these patterns is replaced with `[REDACTED]` before serialization,
-regardless of nesting depth in the `context` object.
+The logger itself performs redaction, by key name pattern. Redaction does not depend on convention at each call site. A call site that forgets to redact a field is a bug class, not an edge case. The list of redacted keys is not exhaustive, and grows as developers add new PII-bearing fields: `email`, `ipAddress`, `password`, `passwordHash`, `token`, `*Token`, `ssn`, `taxId`. Before serialization, the logger replaces a field that matches one of these patterns with `[REDACTED]`, regardless of the field's nesting depth in the `context` object.
 
 ## What this replaces
 
-`src/lib/security.ts:logSecurityEvent`, `src/lib/services/logging.service.ts`'s
-console output, `src/lib/errors.ts:logError`, and 301 bare `console.*`
-calls across `src/` — see `TODO.md` M2 for the migration plan and the
-`no-console` ratchet.
+This logger replaces four things: `src/lib/security.ts:logSecurityEvent`, the console output of `src/lib/services/logging.service.ts`, `src/lib/errors.ts:logError`, and 301 bare `console.*` calls across `src/`. See `TODO.md` M2 for the migration plan and the `no-console` ratchet.

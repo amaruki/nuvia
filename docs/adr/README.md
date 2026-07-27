@@ -1,9 +1,6 @@
 # Architecture Decision Records
 
-One file per decision this codebase had — or has — more than one competing
-answer to. Format: Context / Decision / Consequences. A new ADR is
-warranted when a reviewer could reasonably ask "why not the other way?" and
-the answer isn't obvious from the code alone.
+This directory contains one ADR file for each decision. Each of these decisions has, or had, more than one competing answer in this codebase. Format: Context / Decision / Consequences. A new ADR is warranted when a reviewer could reasonably ask "why not the other way?" and the answer is not obvious from the code alone.
 
 | #                                               | Decision                                               | Status                                     |
 | ----------------------------------------------- | ------------------------------------------------------ | ------------------------------------------ |

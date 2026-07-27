@@ -2,74 +2,30 @@
 
 ## Versioning
 
-Semantic Versioning.
-`0.x` until M4 (`TODO.md`) is complete — breaking changes are expected and
-not called out specially during `0.x`.
-`1.0.0` is the first release this document's guarantees actually apply to.
+Nuvia follows Semantic Versioning. The version stays at `0.x` until `TODO.md` M4 is complete. During `0.x`, developers should expect breaking changes, and the changelog does not call each one out specially. `1.0.0` is the first release that this document's guarantees actually apply to.
 
 ## Changelog
 
-Keep a Changelog format, in `CHANGELOG.md`.
-Every user-visible change — not every commit — gets an entry, written for
-someone deciding whether to upgrade, not for someone who already read the
-diff.
+`CHANGELOG.md` follows the Keep a Changelog format. Every user-visible change gets an entry, not every commit. Write each entry for a reader who must decide whether to upgrade, not for a reader who already read the diff.
 
 ## Migration compatibility (expand/contract)
 
-**Not yet a real constraint** — there is no production data, and
-`db:reset` remains a normal development workflow (`docs/adr/0011-prisma-to-drizzle.md`).
-This section describes the discipline that starts applying the moment that
-stops being true, and names that transition explicitly rather than
-crossing it silently:
+**This is not yet a real constraint.** No production data exists yet, and `db:reset` remains a normal development workflow (`docs/adr/0011-prisma-to-drizzle.md`). This section describes the discipline that starts to apply the moment that changes. This document names that transition explicitly. It does not cross that transition silently:
 
-- **Expand**: add a nullable column, a new table, or a new index — always
-  safe, always backward-compatible with the previous application version.
-- **Migrate data**: backfill the new column from the old one, still with
-  both present.
-- **Contract**: drop the old column, only after the application version
-  that depended on it is no longer deployed anywhere.
+- **Expand**: add a nullable column, a new table, or a new index. This step is always safe, and always stays backward-compatible with the previous application version.
+- **Migrate data**: backfill the new column from the old one. Keep both columns present during this step.
+- **Contract**: drop the old column. Do this only after no deployment still runs the application version that depended on the old column.
 
-A migration that combines expand and contract in one step (renaming a
-column, dropping a column an old app version still reads) is unsafe the
-moment more than one application version might be running against the
-same database — which is every rolling deploy, not just a hypothetical.
-`drizzle-kit check` (already wired into `bun run guard:heavy`) catches
-migration-history inconsistency; it does not yet catch a destructive
-migration lacking an explicit override marker — that CI check is `TODO.md`
-M2 work.
+A migration that combines expand and contract in one step becomes unsafe under a condition. The condition is that more than one application version might run against the same database at the same time. For example, a migration might rename a column, or drop a column that an old application version still reads. This condition holds during every rolling deploy, not just in a hypothetical case. `drizzle-kit check` (already wired into `bun run guard:heavy`) catches an inconsistency in the migration history. It does not yet catch a destructive migration that lacks an explicit override marker. That CI check is `TODO.md` M2 work.
 
 ## Artifact signing
 
-Not yet implemented.
-Target: SLSA Build Level 2 (hosted GitHub Actions runner, signed
-provenance) via `actions/attest-build-provenance` and `cosign` keyless
-signing (OIDC, no long-lived signing key to leak).
-Level 3 (fully isolated, non-falsifiable build) is a stretch goal, not a
-1.0 requirement.
+Nuvia does not implement artifact signing yet. The target is SLSA Build Level 2: a hosted GitHub Actions runner with signed provenance. Nuvia reaches this through `actions/attest-build-provenance` and `cosign` keyless signing (OIDC, with no long-lived signing key to leak). Level 3 (a fully isolated, non-falsifiable build) is a stretch goal, not a requirement for `1.0`.
 
 ## Promotion
 
-Environments: local → staging → production.
-Not yet formalized as a pipeline — this document states the intended shape
-so the eventual CI/CD work has a target, not because the pipeline exists
-today.
-A build artifact is built once and promoted unchanged between
-environments; it is never rebuilt per environment, which would break the
-signed-provenance guarantee above (the thing that got signed and the thing
-that got deployed must be the same bytes).
+The environments are local, staging, and production, in that order. This pipeline is not yet formalized. This document states the intended shape, so that the eventual CI/CD work has a target. The pipeline does not exist today. The team builds a build artifact once, and promotes it unchanged between environments. The team never rebuilds the artifact per environment. A rebuild would break the signed-provenance guarantee above: the signed bytes and the deployed bytes must be the same bytes.
 
 ## Rollback
 
-Rolling back the application to a previous version is a redeploy of the
-previous signed artifact — no special procedure once artifact signing
-exists.
-Rolling back **across a migration that has already run** is the harder
-case and needs the expand/contract discipline above to even be possible:
-if the previous app version still works against the _current_ schema
-(true for an expand-only migration, false for a contract), rollback is
-safe.
-If the migration already contracted (dropped a column the old version
-needs), rollback requires restoring from a backup or re-adding the column
-— there is no automatic "undo migration" that's safe in general, and
-pretending otherwise is how rollbacks turn into data loss during an
-incident.
+A rollback of the application to a previous version is a redeploy of the previous signed artifact. This needs no special procedure, once artifact signing exists. A rollback **across a migration that has already run** is the harder case, and needs the expand/contract discipline above even to be possible. If the previous application version still works against the _current_ schema, rollback is safe. This condition is true for an expand-only migration, and false for a migration that already contracted. If the migration already contracted, for example if it dropped a column that the old version needs, rollback needs a different approach. The team must restore from a backup, or re-add the column. No automatic "undo migration" is safe in general. If engineers assume an "undo migration" is always safe, that assumption causes data loss during an incident.

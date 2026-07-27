@@ -1,57 +1,24 @@
 # Privacy
 
-Nuvia stores association member data — names, emails, event registrations,
-eventually dues and payment records once M3 lands.
-GDPR and comparable regimes apply to any deployer with EU members, and the
-same discipline is good practice regardless of jurisdiction.
+Nuvia stores association member data — names, emails, event registrations, and eventually dues and payment records once M3 lands. GDPR and comparable regimes apply to any deployer with EU members. The same discipline is good practice regardless of jurisdiction.
 
-## Lawful basis
+## Lawful Basis
 
-Membership data: contract (the member relationship with the association).
-Event registration: contract or consent, depending on the event.
-Marketing communications (newsletters, once built): consent, with an
-unsubscribe path — not yet implemented, since the newsletter module is
-mock-only (`docs/adr/0008-module-maturity-gate.md`).
+Membership data uses contract as its lawful basis (the member relationship with the association). Event registration uses contract or consent, depending on the event. Marketing communications (newsletters, once built) will use consent, with an unsubscribe path. This path is not yet implemented, since the newsletter module is mock-only (`docs/adr/0008-module-maturity-gate.md`).
 
 ## Retention
 
-Not yet defined per data category — this is a real gap, not an oversight
-being glossed over.
-`TODO.md` M4 tracks writing an actual retention schedule (how long login
-activity logs, audit logs, and inactive-member records are kept) before
-1.0.
-The `authLog` table already has a `cleanupOldLogs(daysToKeep = 90)` function
-(`src/lib/services/logging.service.ts`) — the default exists, but no
-scheduled job calls it yet.
+The project has not yet defined a retention period per data category. This is a real gap, not an oversight that this document hides. `TODO.md` M4 tracks writing an actual retention schedule before 1.0. This schedule will state how long the project keeps login activity logs, audit logs, and inactive-member records. The `authLog` table already has a `cleanupOldLogs(daysToKeep = 90)` function (`src/lib/services/logging.service.ts`). This default exists, but no scheduled job calls it yet.
 
 ## Data Subject Access Requests (DSAR)
 
-Not implemented.
-A member has no self-service way to export their own data today.
-Tracked in `TODO.md` M4, likely as an authenticated endpoint that assembles
-the requesting user's own rows across `users`, `event_registrations`,
-`membership_subscriptions` (once real), and `auth_logs`, returned as a
-downloadable JSON or CSV.
+Not implemented. A member has no self-service way to export their own data today. `TODO.md` M4 tracks this gap, likely as an authenticated endpoint. This endpoint would assemble the requesting user's own rows across `users`, `event_registrations`, `membership_subscriptions` (once real), and `auth_logs`. The endpoint would return these rows as a downloadable JSON or CSV file.
 
 ## Erasure
 
-**This is currently broken, not just unimplemented.**
-`DELETE /api/v1/auth/delete-account` authenticates the caller, does
-nothing, and returns `"Account deleted successfully"`
-(`src/app/api/v1/auth/delete-account/route.ts:29-44`, a self-admitted
-placeholder).
-A deployer relying on this endpoint to honor an erasure request is
-violating that request without knowing it.
-Fixing this is `TODO.md` M1's highest-priority open item after the
-authorization gaps.
-The fix needs a decision this document doesn't make unilaterally: hard
-delete (removes the row) vs. anonymization (retains a row for referential
-integrity — e.g. a forum post's author — with PII scrubbed).
-Anonymization is usually the right choice for a system with foreign-key
-references to the user row (forum posts, event registrations, audit logs)
-that shouldn't disappear when a member leaves.
+**This function is currently broken, not just unimplemented.** `DELETE /api/v1/auth/delete-account` authenticates the caller, does nothing further, and returns `"Account deleted successfully"` (`src/app/api/v1/auth/delete-account/route.ts:29-44`, a self-admitted placeholder). A deployer that relies on this endpoint to honor an erasure request violates that request without knowing it. Fixing this is `TODO.md` M1's highest-priority open item after the authorization gaps. The fix needs a decision that this document does not make unilaterally: hard delete (removes the row) compared to anonymization (retains a row for referential integrity, for example a forum post's author, with PII scrubbed). Anonymization is usually the right choice for a system with foreign-key references to the user row (forum posts, event registrations, audit logs) that should not disappear when a member leaves.
 
-## PII inventory (current, not exhaustive)
+## PII Inventory (Current, Not Exhaustive)
 
 | Table                   | PII fields                                                     |
 | ----------------------- | -------------------------------------------------------------- |
@@ -60,5 +27,5 @@ that shouldn't disappear when a member leaves.
 | `active_devices`        | IP address, user agent, device name                            |
 | `auth_logs`             | IP address, user agent, location, metadata (may contain email) |
 
-Redaction in logs (not database rows) is covered by
-`docs/observability.md`.
+`docs/observability.md` covers redaction in logs, not database rows.
+</content>

@@ -1,52 +1,27 @@
 # ADR-0007: Single-association deployment with a tenant seam
 
-**Status:** Accepted; `Organization` table implemented, not yet wired to the UI
+**Status:** Accepted. The `Organization` table is implemented. The UI is not wired to it yet.
 
 ## Context
 
-An AMS has to make a tenancy decision — it determines schema shape for
-every domain table, and retrofitting it after data exists is a full
-migration, not a config change. Today there is **no `Organization`/tenant
-concept anywhere in the database**: association name, branding, locale, and
-currency are hardcoded strings, and there is no row to attach
-deployment-specific settings to.
+An AMS must make a tenancy decision early. This decision determines the schema shape for every domain table. Retrofitting the decision after data exists requires a full migration, not a configuration change. Today, the database has **no `Organization` or tenant concept**. Association name, branding, locale, and currency are hardcoded strings. No row exists to hold deployment-specific settings.
 
-Two extremes were considered:
+The team considered two extremes:
 
-- **Full multi-tenant now**: every table gets an `orgId`, enforced by
-  Postgres row-level security and a tenant-scoped query layer. Enables
-  hosted SaaS from day one, but roughly doubles the schema/query work for
-  every future feature and makes cross-tenant data leakage the top security
-  risk from day one, for a benefit (hosted multi-org) nobody has asked for
-  yet.
-- **Strictly single-tenant, no seam**: simplest possible schema, but
-  multi-tenancy later means a rewrite of every table, not an incremental
-  change.
+- **Full multi-tenant now**: Every table gets an `orgId` column. Postgres row-level security and a tenant-scoped query layer enforce it. This approach enables hosted SaaS from day one. However, it roughly doubles the schema and query work for every future feature. It also makes cross-tenant data leakage the top security risk from day one. No one has asked for this benefit (hosted multi-org) yet.
+- **Strictly single-tenant, no seam**: This approach gives the simplest possible schema. A later move to multi-tenancy means a rewrite of every table, not an incremental change.
 
 ## Decision
 
 **Single-association per deployment**, with a tenant seam for later:
 
-- `Organization` (`src/db/schema/organization.ts`) is a **singleton** row
-  (`id = "default"`) holding identity, branding, locale, currency, timezone,
-  and a `settings` JSON column for deployer-configurable options.
-- New domain tables (finance, chapters, committees, etc., as they're built
-  in M3) carry an `orgId` column defaulting to `"default"`, indexed, but
-  **no row-level security and no tenant-scoped query wrapper** — there's
-  only ever one value in that column today.
-- The 33 tables migrated from Prisma do **not** get a retroactive `orgId`
-  added. They predate this decision, there is no multi-tenant use case
-  driving a change to them, and adding it now would be schema churn with no
-  behavioral benefit.
+- `Organization` (`src/db/schema/organization.ts`) is a **singleton** row (`id = "default"`). It holds identity, branding, locale, currency, timezone, and a `settings` JSON column for deployer-configurable options.
+- New domain tables (finance, chapters, committees, and others built in M3) carry an `orgId` column. This column defaults to `"default"` and is indexed. These tables have no row-level security and no tenant-scoped query wrapper. Only one value exists in this column today.
+- The 33 tables migrated from Prisma do **not** get a retroactive `orgId` column. These tables predate this decision. No multi-tenant use case requires a change to them. A retroactive `orgId` column now creates schema churn with no behavioral benefit.
 
 ## Consequences
 
-- Zero RLS/tenant-scoping complexity for the 1.0 timeline.
-- A future move to real multi-tenancy is "populate `orgId` beyond the
-  default, add RLS policies, add a tenant-scoped client wrapper" — not
-  "redesign every table."
-- Every _new_ table added after this ADR is expected to carry the seam. A
-  reviewer (or eventually a CI check) can ask "does this table have
-  `orgId`?" as a mechanical review question.
-- The `Organization` row itself is not yet read by any code path — wiring
-  it into settings pages and email templates is `TODO.md` M3 work.
+- This decision adds zero row-level-security or tenant-scoping complexity to the 1.0 timeline.
+- A future move to real multi-tenancy needs three steps: populate `orgId` beyond the default value, add row-level security policies, and add a tenant-scoped client wrapper. It does not need a redesign of every table.
+- Every _new_ table added after this ADR must carry the seam. A reviewer, or eventually a CI check, can ask "does this table have `orgId`?" as a mechanical review question.
+- No code path reads the `Organization` row yet. `TODO.md` M3 tracks the work to connect the row to settings pages and email templates.

@@ -338,10 +338,25 @@ export async function listCategories(): Promise<CategoryDto[]> {
 }
 
 export async function getCategory(id: string): Promise<CategoryDto> {
-  const categories = await listCategories();
-  const category = categories.find((entry) => entry.id === id);
+  const [category] = await db.select().from(forumCategory).where(eq(forumCategory.id, id)).limit(1);
   if (!category) throw new ForumServiceError(problems.notFound("Category not found"));
-  return category;
+
+  // Same stats as listCategories, but scoped to this category so fetching one
+  // row doesn't aggregate the entire posts table. A flat aggregate (no GROUP
+  // BY) always yields one row — count() = 0 / max() = null when nothing matches.
+  const [stats] = await db
+    .select({
+      postCount: count(),
+      lastPostAt: max(forumPost.createdAt),
+    })
+    .from(forumPost)
+    .where(and(eq(forumPost.categoryId, id), ne(forumPost.status, "DELETED")));
+
+  return {
+    ...category,
+    postCount: stats?.postCount ?? 0,
+    lastPostAt: stats?.lastPostAt ?? null,
+  };
 }
 
 export async function createCategory(
@@ -987,8 +1002,8 @@ export async function moderatePost(
 // Reports
 // ---------------------------------------------------------------------------
 
-export async function listReports(status?: string): Promise<ReportDto[]> {
-  const rows = await db
+const reportWithReporter = () =>
+  db
     .select({
       id: forumReport.id,
       targetType: forumReport.targetType,
@@ -1001,7 +1016,72 @@ export async function listReports(status?: string): Promise<ReportDto[]> {
       reportedByName: user.name,
     })
     .from(forumReport)
-    .innerJoin(user, eq(forumReport.reportedById, user.id))
+    .innerJoin(user, eq(forumReport.reportedById, user.id));
+
+interface ReportJoinRow {
+  id: string;
+  targetType: ForumReport["targetType"];
+  postId: string | null;
+  commentId: string | null;
+  reason: string;
+  status: ForumReport["status"];
+  createdAt: Date;
+  reportedById: string;
+  reportedByName: string;
+}
+
+/** Caps report previews so long post/comment bodies stay bounded. */
+function reportSnippet(content: string): string {
+  return content.length > CONTENT_SNIPPET_LENGTH
+    ? `${content.slice(0, CONTENT_SNIPPET_LENGTH)}…`
+    : content;
+}
+
+function toReportDto(row: ReportJoinRow, targetContent?: ReportDto["targetContent"]): ReportDto {
+  return {
+    id: row.id,
+    targetId: (row.postId ?? row.commentId) as string,
+    targetType: row.targetType,
+    reason: row.reason,
+    status: row.status,
+    reportedBy: { id: row.reportedById, name: row.reportedByName },
+    createdAt: row.createdAt,
+    ...(targetContent ? { targetContent } : {}),
+  };
+}
+
+/**
+ * Loads one report with the same relations listReports inlines, so write
+ * paths can return the row they touched without scanning the whole table.
+ */
+async function getReportDto(id: string): Promise<ReportDto | undefined> {
+  const [row] = await reportWithReporter().where(eq(forumReport.id, id)).limit(1);
+  if (!row) return undefined;
+
+  // Exactly one of postId/commentId is set (createReportSchema enforces it);
+  // targets are fetched without a status filter, as listReports shows them.
+  let targetContent: ReportDto["targetContent"];
+  if (row.postId) {
+    const [post] = await db
+      .select({ title: forumPost.title, content: forumPost.content })
+      .from(forumPost)
+      .where(eq(forumPost.id, row.postId))
+      .limit(1);
+    if (post) targetContent = { title: post.title, content: reportSnippet(post.content) };
+  } else if (row.commentId) {
+    const [comment] = await db
+      .select({ content: forumComment.content })
+      .from(forumComment)
+      .where(eq(forumComment.id, row.commentId))
+      .limit(1);
+    if (comment) targetContent = { content: reportSnippet(comment.content) };
+  }
+
+  return toReportDto(row, targetContent);
+}
+
+export async function listReports(status?: string): Promise<ReportDto[]> {
+  const rows = await reportWithReporter()
     .where(status ? eq(forumReport.status, status as ForumReport["status"]) : undefined)
     .orderBy(desc(forumReport.createdAt));
 
@@ -1033,32 +1113,12 @@ export async function listReports(status?: string): Promise<ReportDto[]> {
     const targetPost = row.postId ? postById.get(row.postId) : undefined;
     const targetComment = row.commentId ? commentById.get(row.commentId) : undefined;
     const targetContent = targetPost
-      ? {
-          title: targetPost.title,
-          content:
-            targetPost.content.length > CONTENT_SNIPPET_LENGTH
-              ? `${targetPost.content.slice(0, CONTENT_SNIPPET_LENGTH)}…`
-              : targetPost.content,
-        }
+      ? { title: targetPost.title, content: reportSnippet(targetPost.content) }
       : targetComment
-        ? {
-            content:
-              targetComment.content.length > CONTENT_SNIPPET_LENGTH
-                ? `${targetComment.content.slice(0, CONTENT_SNIPPET_LENGTH)}…`
-                : targetComment.content,
-          }
+        ? { content: reportSnippet(targetComment.content) }
         : undefined;
 
-    return {
-      id: row.id,
-      targetId: (row.postId ?? row.commentId) as string,
-      targetType: row.targetType,
-      reason: row.reason,
-      status: row.status,
-      reportedBy: { id: row.reportedById, name: row.reportedByName },
-      createdAt: row.createdAt,
-      ...(targetContent ? { targetContent } : {}),
-    };
+    return toReportDto(row, targetContent);
   });
 }
 
@@ -1095,8 +1155,9 @@ export async function createReport(
     })
     .returning({ id: forumReport.id });
 
-  const reports = await listReports();
-  return reports.find((entry) => entry.id === inserted.id) as ReportDto;
+  const created = await getReportDto(inserted.id);
+  if (!created) throw new ForumServiceError(problems.notFound("Report not found"));
+  return created;
 }
 
 export async function resolveReport(
@@ -1133,12 +1194,9 @@ export async function resolveReport(
     })
     .where(eq(forumReport.id, id));
 
-  const [report] = await db
-    .select({ id: forumReport.id })
-    .from(forumReport)
-    .where(eq(forumReport.id, id));
-  const reports = await listReports();
-  return reports.find((entry) => entry.id === report.id) as ReportDto;
+  const resolved = await getReportDto(id);
+  if (!resolved) throw new ForumServiceError(problems.notFound("Report not found"));
+  return resolved;
 }
 
 // Re-export row types for callers/tests that want them.

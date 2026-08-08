@@ -115,6 +115,12 @@ const PAGES = [
     module: "learning",
     auth: true,
   },
+  {
+    slug: "awards-programs",
+    path: "/dashboard/awards/programs",
+    module: "awards",
+    auth: true,
+  },
 ] as const;
 
 const SEVERITIES_FAILING: Record<string, true> = { critical: true, serious: true };

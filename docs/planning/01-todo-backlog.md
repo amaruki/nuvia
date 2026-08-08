@@ -111,6 +111,7 @@ Wave C preamble: finance/dues is the product core for an AMS and the first modul
   - Why: awards is the next module in the post-1.0 promotion order, and it has no schema today, so the item must include schema design.
   - Acceptance: awards clears the same promotion bar as C5 — schema designed and landed + authorized API + UI + tests + docs, with the module flag flipped on.
   - Deps: C5 pattern.
+  - Status: done 2026-08-08. Awards cleared the C5 promotion bar: schema designed and landed (`award_program` + `award_nomination` tables, `AwardProgramStatus`/`AwardCategory`/`AwardNominationStatus` enums, migration 0007), authorized API `/api/v1/awards/**` (programs + nominations) on `awards:*` permissions, programs/nominations pages on `award.service.ts` via `use-awards`, 27 tests in `tests/awards-api.test.ts`, module docs at `docs/modules/awards.md`, and `awards: true` in `config/features.ts` with `/dashboard/awards/programs` added to the axe smoke (17 pages PASS, 0 critical/serious).
 
 - **D5 — Workspaces real (same bar; `mock-workspace-data`).**
   - Why: workspaces is the last module in the post-1.0 promotion order, and its UI currently renders mock data rather than real records.

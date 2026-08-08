@@ -14,8 +14,9 @@ import {
 // The two module sets ADR-0008 / docs/technical-specs/13-module-maturity-gate.md
 // §13.3 fixes: promoted modules ship enabled, Mock-tier modules stay off
 // until they clear the promotion bar. Finance joined the promoted set on
-// 2026-08-08 (backlog C5), chapters (D1), committees (D2) and learning (D3)
-// on the same day; the remaining two stay Mock tier pending their flips.
+// 2026-08-08 (backlog C5), chapters (D1), committees (D2), learning (D3)
+// and awards (D4) on the same day; only workspaces stays Mock tier
+// pending its flip.
 const PROMOTED: readonly ModuleName[] = [
   "members",
   "events",
@@ -23,11 +24,12 @@ const PROMOTED: readonly ModuleName[] = [
   "forums",
   "jobs",
   "finance",
+  "awards",
   "learning",
   "chapters",
   "committees",
 ];
-const MOCK_TIER: readonly ModuleName[] = ["awards", "workspaces"];
+const MOCK_TIER: readonly ModuleName[] = ["workspaces"];
 
 describe("MODULE_FLAGS registry (§13.3 shape)", () => {
   test("covers exactly the eleven known modules, no more and no fewer", () => {
@@ -74,10 +76,10 @@ describe("isModuleEnabled (flag on/off behavior)", () => {
   }
 
   test("a promotion flip turns a module on without touching the registry", () => {
-    const promoted: Record<ModuleName, boolean> = { ...MODULE_FLAGS, awards: true };
-    expect(isModuleEnabled("awards", promoted)).toBe(true);
+    const promoted: Record<ModuleName, boolean> = { ...MODULE_FLAGS, workspaces: true };
+    expect(isModuleEnabled("workspaces", promoted)).toBe(true);
     // The registry itself is untouched.
-    expect(isModuleEnabled("awards")).toBe(false);
+    expect(isModuleEnabled("workspaces")).toBe(false);
   });
 
   test("an all-off override disables every module", () => {
@@ -98,21 +100,10 @@ describe("getEnabledModules / getDisabledModules (enabled set)", () => {
   });
 
   test("the partition follows flag overrides", () => {
-    const promoted: Record<ModuleName, boolean> = { ...MODULE_FLAGS, awards: true };
-    // MODULE_NAMES order: awards sorts before learning/chapters/committees.
-    expect(getEnabledModules(promoted)).toEqual([
-      "members",
-      "events",
-      "content",
-      "forums",
-      "jobs",
-      "finance",
-      "awards",
-      "learning",
-      "chapters",
-      "committees",
-    ]);
-    expect(getDisabledModules(promoted)).toEqual(MOCK_TIER.filter((m) => m !== "awards"));
+    const promoted: Record<ModuleName, boolean> = { ...MODULE_FLAGS, workspaces: true };
+    // Enabling the last Mock-tier module turns the whole registry on.
+    expect(getEnabledModules(promoted)).toEqual([...MODULE_NAMES]);
+    expect(getDisabledModules(promoted)).toEqual([]);
   });
 
   test("an all-on override enables every module", () => {

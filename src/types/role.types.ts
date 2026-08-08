@@ -62,6 +62,10 @@ export const PERMISSION_MODULES = [
   "forum",
   "jobs",
   "learning",
+  "chapters",
+  "committees",
+  "awards",
+  "workspaces",
   "system",
 ] as const;
 
@@ -177,6 +181,34 @@ export const AVAILABLE_PERMISSIONS: Permission[] = [
   "learning:manage",
   "learning:approve",
 
+  // Chapter Management
+  "chapters:create",
+  "chapters:read",
+  "chapters:update",
+  "chapters:delete",
+  "chapters:manage",
+
+  // Committee Management
+  "committees:create",
+  "committees:read",
+  "committees:update",
+  "committees:delete",
+  "committees:manage",
+
+  // Awards Management
+  "awards:create",
+  "awards:read",
+  "awards:update",
+  "awards:delete",
+  "awards:manage",
+
+  // Workspaces Management
+  "workspaces:create",
+  "workspaces:read",
+  "workspaces:update",
+  "workspaces:delete",
+  "workspaces:manage",
+
   // System Administration
   "system:create",
   "system:read",
@@ -258,6 +290,26 @@ export const ROLE_PERMISSIONS: Record<PredefinedRole, Permission[]> = {
     "learning:delete",
     "learning:manage",
     "learning:approve",
+    "chapters:create",
+    "chapters:read",
+    "chapters:update",
+    "chapters:delete",
+    "chapters:manage",
+    "committees:create",
+    "committees:read",
+    "committees:update",
+    "committees:delete",
+    "committees:manage",
+    "awards:create",
+    "awards:read",
+    "awards:update",
+    "awards:delete",
+    "awards:manage",
+    "workspaces:create",
+    "workspaces:read",
+    "workspaces:update",
+    "workspaces:delete",
+    "workspaces:manage",
   ],
 
   staff: [
@@ -290,6 +342,18 @@ export const ROLE_PERMISSIONS: Record<PredefinedRole, Permission[]> = {
     "learning:read",
     "learning:update",
     "learning:manage",
+    "chapters:read",
+    "chapters:update",
+    "chapters:manage",
+    "committees:read",
+    "committees:update",
+    "committees:manage",
+    "awards:read",
+    "awards:update",
+    "awards:manage",
+    "workspaces:read",
+    "workspaces:update",
+    "workspaces:manage",
     "organization:read",
   ],
 
@@ -334,6 +398,9 @@ export const ROLE_PERMISSIONS: Record<PredefinedRole, Permission[]> = {
     "forum:read",
     "forum:manage",
     "forum:moderate",
+    "chapters:read",
+    "chapters:update",
+    "chapters:manage",
     "organization:read",
     "organization:update",
   ],
@@ -351,6 +418,8 @@ export const ROLE_PERMISSIONS: Record<PredefinedRole, Permission[]> = {
     "communications:update",
     "analytics:read",
     "forum:read",
+    "chapters:read",
+    "chapters:update",
     "organization:read",
   ],
 
@@ -371,6 +440,9 @@ export const ROLE_PERMISSIONS: Record<PredefinedRole, Permission[]> = {
     "forum:create",
     "forum:read",
     "forum:manage",
+    "committees:read",
+    "committees:update",
+    "committees:manage",
   ],
 
   organizer: [
@@ -400,6 +472,10 @@ export const ROLE_PERMISSIONS: Record<PredefinedRole, Permission[]> = {
     "forum:read",
     "jobs:read",
     "learning:read",
+    "chapters:read",
+    "committees:read",
+    "awards:read",
+    "workspaces:read",
     "organization:read",
   ],
 
@@ -413,6 +489,10 @@ export const ROLE_PERMISSIONS: Record<PredefinedRole, Permission[]> = {
     "forum:read",
     "jobs:read",
     "learning:read",
+    "chapters:read",
+    "committees:read",
+    "awards:read",
+    "workspaces:read",
   ],
 
   member_student: [
@@ -425,6 +505,10 @@ export const ROLE_PERMISSIONS: Record<PredefinedRole, Permission[]> = {
     "forum:read",
     "jobs:read",
     "learning:read",
+    "chapters:read",
+    "committees:read",
+    "awards:read",
+    "workspaces:read",
   ],
 
   member: [
@@ -547,6 +631,30 @@ export const PERMISSION_CATEGORIES = {
     description: "Manage courses and certifications",
     icon: "book-open",
     color: "rose",
+  },
+  chapters: {
+    name: "Chapters",
+    description: "Manage chapters and regional branches",
+    icon: "map-pin",
+    color: "teal",
+  },
+  committees: {
+    name: "Committees",
+    description: "Manage committees and working groups",
+    icon: "users",
+    color: "violet",
+  },
+  awards: {
+    name: "Awards",
+    description: "Manage award programs and recipients",
+    icon: "award",
+    color: "yellow",
+  },
+  workspaces: {
+    name: "Workspaces",
+    description: "Manage member workspaces and collaboration spaces",
+    icon: "layers",
+    color: "sky",
   },
   system: {
     name: "System Administration",

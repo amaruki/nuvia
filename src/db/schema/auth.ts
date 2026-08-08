@@ -143,7 +143,13 @@ export const authLog = pgTable("auth_logs", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  userId: text("user_id").references(() => user.id),
+  // Cascades with the user row, same as every other per-user table in
+  // this schema. Without it, better-auth's deleteUser hard-delete fails
+  // with a foreign-key violation for any user whose role was ever
+  // changed — a self-service account deletion broken by the audit trail
+  // meant to record it. The trade (audit rows die with their user)
+  // matches the retention stance the rest of this schema already took.
+  userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
   eventType: text("event_type").notNull(),
   severity: text("severity").notNull(),
   message: text("message").notNull(),

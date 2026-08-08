@@ -7,7 +7,7 @@ import { problemResponse, problems, successResponse, validationProblem } from "@
 import { logger } from "@/lib/logger";
 import { db } from "@/db/client";
 import { authLog, user } from "@/db/schema";
-import { ROLE_PERMISSIONS, isPredefinedRole } from "@/types/role.types";
+import { ROLE_PERMISSIONS, isPredefinedRole } from "@/types/role";
 
 /**
  * GET /api/v1/admin/users - Get users with role information

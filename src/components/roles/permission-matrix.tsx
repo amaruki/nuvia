@@ -57,7 +57,7 @@ import {
   ROLE_PERMISSIONS,
   ROLE_DISPLAY_INFO,
   isPredefinedRole,
-} from "@/types/role.types";
+} from "@/types/role";
 
 // Permission item interface
 interface PermissionItem {

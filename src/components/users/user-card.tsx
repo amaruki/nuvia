@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { UserProfile, UserStatus, AuthStatus } from "@/types/user-management.types";
-import { ROLE_DISPLAY_INFO, isPredefinedRole } from "@/types/role.types";
+import { ROLE_DISPLAY_INFO, isPredefinedRole } from "@/types/role";
 import {
   MapPin,
   Mail,

@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { requirePermission } from "@/lib/rbac";
 import { problemResponse, problems, successResponse } from "@/lib/http";
 import { logger } from "@/lib/logger";
-import { AVAILABLE_PERMISSIONS, PERMISSION_CATEGORIES, formatPermission } from "@/types/role.types";
+import { AVAILABLE_PERMISSIONS, PERMISSION_CATEGORIES, formatPermission } from "@/types/role";
 
 /**
  * GET /api/v1/admin/permissions - Get all available permissions

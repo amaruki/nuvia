@@ -1,7 +1,7 @@
 import type { ForumCategory } from "@/db/schema";
 import { problems } from "@/lib/http";
 import { isPredefinedRole } from "@/types/dashboard.types";
-import { getRoleLevel, type Permission, type Role } from "@/types/role.types";
+import { getRoleLevel, type Permission, type Role } from "@/types/role";
 import { ForumServiceError } from "./errors";
 
 // ---------------------------------------------------------------------------

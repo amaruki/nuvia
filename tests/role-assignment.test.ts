@@ -3,7 +3,7 @@ import { eq, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import { authLog, customRole, user } from "@/db/schema";
 import { canAssignRole, canGrantPermissions, changeUserRole, isLastSuperadmin } from "@/lib/rbac";
-import type { Permission } from "@/types/role.types";
+import type { Permission } from "@/types/role";
 
 const createdUserIds: string[] = [];
 const createdRoleNames: string[] = [];

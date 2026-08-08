@@ -47,7 +47,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, MoreHorizontal, User, Shield, Settings, Search, Users } from "lucide-react";
-import { Role, ROLE_DISPLAY_INFO, UserWithRoleInfo } from "@/types/role.types";
+import { Role, ROLE_DISPLAY_INFO, UserWithRoleInfo } from "@/types/role";
 import { logger } from "@/lib/logger";
 
 // Props interface

@@ -38,7 +38,7 @@ import {
 //   Cell,
 //   Legend
 // } from 'recharts';
-import { Role, ROLE_DISPLAY_INFO } from "@/types/role.types";
+import { Role, ROLE_DISPLAY_INFO } from "@/types/role";
 
 // Statistics data interface
 export interface RoleStatisticsData {

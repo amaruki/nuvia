@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if the current user can manage these roles
-    const { canManageRole } = await import("@/types/role.types");
+    const { canManageRole } = await import("@/types/role");
     const cannotManage = users.filter(
       (user) => !canManageRole(currentUser.role, user.role as any) || user.id === currentUser.id,
     );

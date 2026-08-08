@@ -18,7 +18,7 @@ import {
   isPredefinedRole,
   canManageRole,
   getRoleLevel,
-} from "@/types/role.types";
+} from "@/types/role";
 import { problems, type ProblemDetails } from "@/lib/http";
 import { logger } from "@/lib/logger";
 import { invalidateUserSessionCaches } from "@/lib/session-cache";
@@ -594,7 +594,7 @@ export async function getRoleStatistics(): Promise<{
     });
 
     // Get role display info for breakdown
-    const { ROLE_DISPLAY_INFO, PREDEFINED_ROLES } = await import("@/types/role.types");
+    const { ROLE_DISPLAY_INFO, PREDEFINED_ROLES } = await import("@/types/role");
 
     const roleBreakdown = PREDEFINED_ROLES.map((role) => {
       const roleCount = roleDistribution[role] || 0;
@@ -651,7 +651,7 @@ export async function getAllRoles(): Promise<
     });
 
     // Get predefined roles info
-    const { ROLE_DISPLAY_INFO, PREDEFINED_ROLES } = await import("@/types/role.types");
+    const { ROLE_DISPLAY_INFO, PREDEFINED_ROLES } = await import("@/types/role");
 
     const roles = PREDEFINED_ROLES.map((role) => ({
       role,

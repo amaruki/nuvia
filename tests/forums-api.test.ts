@@ -46,7 +46,7 @@ import {
   updateCategory,
   updatePost,
 } from "@/lib/services/forum";
-import { ROLE_PERMISSIONS, isPredefinedRole } from "@/types/role.types";
+import { ROLE_PERMISSIONS, isPredefinedRole } from "@/types/role";
 
 // ---------------------------------------------------------------------------
 // Fixtures

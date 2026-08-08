@@ -7,7 +7,7 @@ import { problem, problemResponse, problems, successResponse, validationProblem 
 import { logger } from "@/lib/logger";
 import { db } from "@/db/client";
 import { authLog, customRole } from "@/db/schema";
-import { AVAILABLE_PERMISSIONS, isPredefinedRole } from "@/types/role.types";
+import { AVAILABLE_PERMISSIONS, isPredefinedRole } from "@/types/role";
 
 /**
  * GET /api/v1/admin/roles - Get all roles with statistics

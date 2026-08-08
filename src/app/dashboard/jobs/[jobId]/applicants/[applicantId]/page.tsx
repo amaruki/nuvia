@@ -2,22 +2,33 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useHeader } from "@/contexts/dashboard-context";
-import { applicants as initialMockApplicants, Applicant } from "../../../_data/mock-applicants";
-import { jobs } from "../../../_data/mock-jobs";
+import {
+  fetchJobApplication,
+  fetchJobPosting,
+  updateApplicationStatus,
+} from "../../../_lib/jobs-api";
+import {
+  APPLICATION_STATUS_LABELS,
+  APPLICATION_STATUS_TRANSITIONS,
+  formatDate,
+  formatSalary,
+  type ApplicationStatus,
+} from "@/types/jobs.types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
   Mail,
-  Phone,
   Calendar,
   FileText,
-  Download,
   ExternalLink,
   CheckCircle,
+  Globe,
+  Clock,
+  DollarSign,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -26,63 +37,79 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+const STATUS_BADGE_STYLES: Record<ApplicationStatus, string> = {
+  PENDING: "bg-blue-100 text-blue-800 hover:bg-blue-100 border-none",
+  REVIEWING: "bg-purple-100 text-purple-800 hover:bg-purple-100 border-none",
+  SHORTLISTED: "bg-indigo-100 text-indigo-800 hover:bg-indigo-100 border-none",
+  INTERVIEWING: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-none",
+  OFFERED: "bg-teal-100 text-teal-800 hover:bg-teal-100 border-none",
+  HIRED: "bg-green-100 text-green-800 hover:bg-green-100 border-none",
+  REJECTED: "bg-red-100 text-red-800 hover:bg-red-100 border-none",
+  WITHDRAWN: "bg-gray-100 text-gray-800 hover:bg-gray-100 border-none",
+};
+
 export default function ApplicantDetailsPage() {
   const params = useParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { setHeader, clearHeader } = useHeader();
   const jobId = params.jobId as string;
-  const applicantId = params.applicantId as string;
+  const applicationId = params.applicantId as string;
 
-  const job = jobs.find((j) => j.id === jobId);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
-  // In a real app, you would fetch this from an API.
-  // Here we find it in the mock data, but we use local state to simulate status changes.
-  const [applicant, setApplicant] = useState<Applicant | undefined>(
-    initialMockApplicants.find((a) => a.id === applicantId && a.jobId === jobId),
-  );
+  const { data: job } = useQuery({
+    queryKey: ["job", jobId],
+    queryFn: () => fetchJobPosting(jobId),
+    enabled: Boolean(jobId),
+  });
+
+  const {
+    data: application,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["job-application", jobId, applicationId],
+    queryFn: () => fetchJobApplication(jobId, applicationId),
+    enabled: Boolean(jobId && applicationId),
+  });
+
+  const statusMutation = useMutation({
+    mutationFn: (status: ApplicationStatus) =>
+      updateApplicationStatus(jobId, applicationId, status),
+    onSuccess: () => {
+      setStatusError(null);
+      queryClient.invalidateQueries({ queryKey: ["job-application", jobId, applicationId] });
+      queryClient.invalidateQueries({ queryKey: ["job-applications", jobId] });
+    },
+    onError: (err) => {
+      setStatusError(err instanceof Error ? err.message : "Failed to update status");
+    },
+  });
 
   useEffect(() => {
-    if (applicant && job) {
+    if (application && job) {
       setHeader({
-        title: `Applicant: ${applicant.name}`,
+        title: `Applicant: ${application.applicantName}`,
         description: `Applied for ${job.title}`,
       });
     }
     return () => clearHeader();
-  }, [setHeader, clearHeader, applicant, job]);
+  }, [setHeader, clearHeader, application, job]);
 
-  if (!job || !applicant) {
-    return <div className="p-8 text-center text-muted-foreground">Applicant not found</div>;
+  if (isLoading) {
+    return <div className="p-8 text-center text-muted-foreground">Loading applicant...</div>;
   }
 
-  const handleStatusChange = (newStatus: Applicant["status"]) => {
-    setApplicant((prev) => (prev ? { ...prev, status: newStatus } : undefined));
-  };
+  if (error || !application) {
+    return (
+      <div className="p-8 text-center text-muted-foreground">
+        {error instanceof Error ? error.message : "Applicant not found"}
+      </div>
+    );
+  }
 
-  const getStatusClass = (status: Applicant["status"]) => {
-    switch (status) {
-      case "New":
-        return "bg-blue-100 text-blue-800 hover:bg-blue-100 border-none";
-      case "Screening":
-        return "bg-purple-100 text-purple-800 hover:bg-purple-100 border-none";
-      case "Interview":
-        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-none";
-      case "Offer":
-        return "bg-green-100 text-green-800 hover:bg-green-100 border-none";
-      case "Rejected":
-        return "bg-red-100 text-red-800 hover:bg-red-100 border-none";
-      default:
-        return "";
-    }
-  };
-
-  const statusOptions: Applicant["status"][] = [
-    "New",
-    "Screening",
-    "Interview",
-    "Offer",
-    "Rejected",
-  ];
+  const allowedTransitions = APPLICATION_STATUS_TRANSITIONS[application.status];
 
   return (
     <div className="space-y-6 animate-fadeInUp h-[calc(100vh-140px)] flex flex-col">
@@ -98,31 +125,35 @@ export default function ApplicantDetailsPage() {
         </Button>
 
         <div className="flex items-center gap-3">
+          {statusError && <span className="text-sm text-destructive">{statusError}</span>}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="gap-2">
                 <span className="text-muted-foreground font-normal">Status:</span>
-                <Badge variant="outline" className={`${getStatusClass(applicant.status)} ml-1`}>
-                  {applicant.status}
+                <Badge
+                  variant="outline"
+                  className={`${STATUS_BADGE_STYLES[application.status]} ml-1`}
+                >
+                  {APPLICATION_STATUS_LABELS[application.status]}
                 </Badge>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {statusOptions.map((status) => (
+              {allowedTransitions.map((status) => (
                 <DropdownMenuItem
                   key={status}
-                  onClick={() => handleStatusChange(status)}
-                  disabled={applicant.status === status}
+                  onClick={() => statusMutation.mutate(status)}
+                  disabled={statusMutation.isPending}
                 >
-                  {status}
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  {APPLICATION_STATUS_LABELS[status]}
                 </DropdownMenuItem>
               ))}
+              {allowedTransitions.length === 0 && (
+                <DropdownMenuItem disabled>Terminal status</DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <Button variant="default">
-            <Mail className="mr-2 h-4 w-4" /> Email Candidate
-          </Button>
         </div>
       </div>
 
@@ -131,7 +162,7 @@ export default function ApplicantDetailsPage() {
         <div className="flex flex-col gap-6 overflow-y-auto pr-2">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Contact Information</CardTitle>
+              <CardTitle className="text-lg">Application Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
@@ -140,16 +171,7 @@ export default function ApplicantDetailsPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Email</p>
-                  <p className="text-sm">{applicant.email}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-background flex items-center justify-center text-foreground">
-                  <Phone className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Phone</p>
-                  <p className="text-sm">{applicant.phone}</p>
+                  <p className="text-sm">{application.applicantEmail}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -158,9 +180,51 @@ export default function ApplicantDetailsPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Applied Date</p>
-                  <p className="text-sm">{applicant.appliedDate}</p>
+                  <p className="text-sm">{formatDate(application.appliedAt)}</p>
                 </div>
               </div>
+              {application.portfolioUrl && (
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-background flex items-center justify-center text-foreground">
+                    <Globe className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Portfolio</p>
+                    <a
+                      href={application.portfolioUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      {application.portfolioUrl}
+                    </a>
+                  </div>
+                </div>
+              )}
+              {application.salaryExpectation !== null && (
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-background flex items-center justify-center text-foreground">
+                    <DollarSign className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Salary Expectation</p>
+                    <p className="text-sm">
+                      {formatSalary(application.salaryExpectation, null, "USD")}
+                    </p>
+                  </div>
+                </div>
+              )}
+              {application.availability && (
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-background flex items-center justify-center text-foreground">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Availability</p>
+                    <p className="text-sm">{application.availability}</p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -170,8 +234,16 @@ export default function ApplicantDetailsPage() {
             </CardHeader>
             <CardContent>
               <div className="bg-muted/30 p-4 rounded-md text-sm leading-relaxed whitespace-pre-wrap font-serif text-foreground">
-                {applicant.coverLetter || "No cover letter provided."}
+                {application.coverLetter || "No cover letter provided."}
               </div>
+              {application.notes && (
+                <div className="mt-4">
+                  <p className="text-sm font-medium mb-1">Internal Notes</p>
+                  <div className="bg-muted/30 p-4 rounded-md text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                    {application.notes}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -183,30 +255,25 @@ export default function ApplicantDetailsPage() {
               <FileText className="h-4 w-4 text-foreground" />
               <span className="font-medium text-sm">Resume Preview</span>
             </div>
-            <div className="flex gap-2">
-              {applicant.resumeUrl && applicant.resumeUrl !== "#" && (
-                <Button variant="ghost" size="sm" asChild>
-                  <a href={applicant.resumeUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 mr-2" /> Open
-                  </a>
-                </Button>
-              )}
-              <Button variant="ghost" size="sm">
-                <Download className="h-4 w-4 mr-2" /> Download
+            {application.resumePath && (
+              <Button variant="ghost" size="sm" asChild>
+                <a href={application.resumePath} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4 mr-2" /> Open
+                </a>
               </Button>
-            </div>
+            )}
           </div>
           <div className="flex-1 bg-card relative">
-            {applicant.resumeUrl && applicant.resumeUrl !== "#" ? (
+            {application.resumePath ? (
               <iframe
-                src={applicant.resumeUrl}
+                src={application.resumePath}
                 className="w-full h-full border-none"
                 title="Resume Viewer"
               />
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-foreground">
                 <FileText className="h-16 w-16 mb-4 opacity-50" />
-                <p>No PDF available to preview</p>
+                <p>No resume uploaded</p>
               </div>
             )}
           </div>

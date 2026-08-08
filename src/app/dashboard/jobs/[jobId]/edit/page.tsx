@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useHeader } from "@/contexts/dashboard-context";
 import { JobForm } from "../../_components/job-form";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-import { jobs } from "../../_data/mock-jobs";
+import { fetchJobBoardMeta, fetchJobPosting } from "../../_lib/jobs-api";
 
 export default function EditJobPage() {
   const { setHeader, clearHeader } = useHeader();
@@ -14,7 +15,24 @@ export default function EditJobPage() {
   const params = useParams();
   const jobId = params.jobId as string;
 
-  const job = jobs.find((j) => j.id === jobId);
+  const {
+    data: job,
+    isLoading: jobLoading,
+    error: jobError,
+  } = useQuery({
+    queryKey: ["job", jobId],
+    queryFn: () => fetchJobPosting(jobId),
+    enabled: Boolean(jobId),
+  });
+
+  const {
+    data: meta,
+    isLoading: metaLoading,
+    error: metaError,
+  } = useQuery({
+    queryKey: ["jobs-meta"],
+    queryFn: fetchJobBoardMeta,
+  });
 
   useEffect(() => {
     if (job) {
@@ -29,8 +47,11 @@ export default function EditJobPage() {
     };
   }, [setHeader, clearHeader, job]);
 
-  if (!job) {
-    return <div>Job not found</div>;
+  const error = jobError ?? metaError;
+  const notFound = !jobLoading && !jobError && jobId && !job;
+
+  if (notFound) {
+    return <div className="p-8 text-center text-muted-foreground">Job not found</div>;
   }
 
   return (
@@ -43,7 +64,14 @@ export default function EditJobPage() {
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Jobs
       </Button>
-      <JobForm mode="edit" initialData={job} />
+
+      {(jobLoading || metaLoading) && <div className="text-muted-foreground">Loading...</div>}
+      {error && (
+        <div className="text-destructive">
+          {error instanceof Error ? error.message : "Failed to load the job posting."}
+        </div>
+      )}
+      {job && meta && <JobForm mode="edit" initialData={job} meta={meta} />}
     </div>
   );
 }

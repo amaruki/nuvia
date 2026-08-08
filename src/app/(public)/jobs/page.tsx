@@ -1,119 +1,103 @@
-"use client";
-
-import React, { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, MapPin, Filter, Briefcase } from "lucide-react";
-import { jobs } from "@/app/dashboard/jobs/_data/mock-jobs";
+import Link from "next/link";
+import { Search } from "lucide-react";
+import { getJobBoardMeta, listPublicJobPostings } from "@/lib/services/job.service";
 import { JobCard } from "@/app/dashboard/jobs/_components/job-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-export default function PublicJobBoardPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState<string | null>(null);
+export default async function PublicJobBoardPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const q = typeof sp.q === "string" ? sp.q : undefined;
+  const type = typeof sp.type === "string" ? sp.type : undefined;
 
-  const uniqueTypes = Array.from(new Set(jobs.map((job) => job.type)));
-
-  const filteredJobs = jobs.filter((job) => {
-    const matchesSearch =
-      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.company.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = selectedType ? job.type === selectedType : true;
-    // Only show active jobs on the front page
-    return matchesSearch && matchesType && job.status === "Active";
-  });
+  const [result, meta] = await Promise.all([
+    listPublicJobPostings({ q, typeName: type, limit: 100 }),
+    getJobBoardMeta(),
+  ]);
+  const jobs = result.items;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <div className="bg-primary/5 border-b py-12 md:py-20">
-        <div className="container mx-auto px-4 max-w-6xl text-center space-y-6">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Find Your Dream Job</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Browse hundreds of job openings from top companies and startups. Your next career move
-            starts here.
+      <div className="max-w-6xl mx-auto p-6">
+        {/* Hero Section */}
+        <div className="text-center py-12">
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Join Our Team
+          </h1>
+          <p className="text-lg text-muted-foreground mb-8">
+            Discover exciting career opportunities with leading companies worldwide
           </p>
 
-          <div className="bg-background border rounded-xl p-2 shadow-lg max-w-3xl mx-auto flex flex-col md:flex-row gap-2 mt-8">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+          {/* Search Form */}
+          <form action="/jobs" method="get" className="max-w-2xl mx-auto flex gap-2 mb-6">
+            <div className="flex-1">
               <Input
-                className="pl-10 h-12 border-0 focus-visible:ring-0 text-base"
-                placeholder="Job title, keywords, or company"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                type="text"
+                name="q"
+                defaultValue={q ?? ""}
+                placeholder="Search job titles, companies..."
+                className="w-full h-12"
               />
             </div>
-            <div className="hidden md:block w-px bg-border my-2"></div>
-            <div className="relative flex-1">
-              <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input
-                className="pl-10 h-12 border-0 focus-visible:ring-0 text-base"
-                placeholder="City, state, or remote"
-              />
-            </div>
-            <Button className="h-12 px-8 text-base">Search Jobs</Button>
+            {type && <input type="hidden" name="type" value={type} />}
+            <Button type="submit" size="lg" className="h-12 px-6">
+              <Search className="h-4 w-4 mr-2" />
+              Search
+            </Button>
+          </form>
+
+          {/* Job Type Filters */}
+          <div className="flex flex-wrap justify-center gap-2">
+            <Badge
+              variant={!type ? "default" : "outline"}
+              className="cursor-pointer text-sm px-4 py-1.5"
+            >
+              <Link href="/jobs">All</Link>
+            </Badge>
+            {meta.types.map((t) => (
+              <Badge
+                key={t.id}
+                variant={type === t.name ? "default" : "outline"}
+                className="cursor-pointer text-sm px-4 py-1.5"
+              >
+                <Link href={`/jobs?type=${encodeURIComponent(t.name)}`}>{t.displayName}</Link>
+              </Badge>
+            ))}
           </div>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 max-w-6xl py-12 space-y-8">
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm font-medium mr-2 flex items-center">
-            <Filter className="h-4 w-4 mr-1" />
-            Filters:
-          </span>
-          <Badge
-            variant={selectedType === null ? "default" : "outline"}
-            className="cursor-pointer hover:opacity-80 px-4 py-1.5 text-sm"
-            onClick={() => setSelectedType(null)}
-          >
-            All Types
-          </Badge>
-          {uniqueTypes.map((type) => (
-            <Badge
-              key={type}
-              variant={selectedType === type ? "default" : "outline"}
-              className="cursor-pointer hover:opacity-80 px-4 py-1.5 text-sm"
-              onClick={() => setSelectedType(type)}
-            >
-              {type}
-            </Badge>
-          ))}
+        {/* Results */}
+        <div className="mb-6 text-muted-foreground">
+          {jobs.length} position{jobs.length === 1 ? "" : "s"} found
         </div>
 
-        {/* Jobs Grid */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold tracking-tight">
-            Latest Opportunities ({filteredJobs.length})
-          </h2>
+        {jobs.length === 0 ? (
+          <div className="text-center py-16 border rounded-lg bg-card">
+            <h3 className="text-lg font-medium mb-2">No jobs match your search</h3>
+            <p className="text-muted-foreground">
+              Try adjusting your search terms or clearing the filters.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {jobs.map((job) => (
+              <JobCard key={job.id} job={job} />
+            ))}
+          </div>
+        )}
 
-          {filteredJobs.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredJobs.map((job) => (
-                <JobCard key={job.id} job={job} />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20 bg-muted/30 rounded-lg border-2 border-dashed">
-              <Briefcase className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium">No jobs found</h3>
-              <p className="text-muted-foreground text-center max-w-sm mt-1">
-                We couldn't find any jobs matching your search criteria.
-              </p>
-              <Button
-                variant="link"
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedType(null);
-                }}
-                className="mt-2"
-              >
-                Clear filters
-              </Button>
-            </div>
-          )}
+        {/* CTA Section */}
+        <div className="text-center mt-16 py-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl">
+          <h2 className="text-2xl font-bold mb-4">Don&apos;t see what you&apos;re looking for?</h2>
+          <p className="text-muted-foreground mb-6">
+            Check back soon — we are always looking for talented people to join our partner
+            companies.
+          </p>
         </div>
       </div>
     </div>

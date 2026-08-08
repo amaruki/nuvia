@@ -532,3 +532,47 @@ html {
     @apply bg-background text-foreground;
   }
 }
+
+/* ============================================================================
+   Landing page motion. CSS-only, transform/opacity only, and fully disabled
+   under prefers-reduced-motion. The stagger comes from animation-delay set
+   inline on each element.
+   ============================================================================ */
+
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-rise {
+  animation: landing-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.landing-hover {
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-rise {
+    animation: none;
+  }
+  .landing-hover,
+  .landing-hover:hover {
+    transition: none;
+    transform: none;
+  }
+}

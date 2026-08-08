@@ -44,6 +44,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "upload.wikimedia.org" },
+      // Placeholder photography for the landing page until real brand
+      // photography exists.
+      { protocol: "https", hostname: "picsum.photos" },
     ],
   },
   async headers() {

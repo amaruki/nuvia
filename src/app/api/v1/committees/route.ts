@@ -14,7 +14,7 @@ import {
   createCommittee,
   createCommitteeSchema,
   listCommittees,
-} from "@/lib/services/committee.service";
+} from "@/lib/services/committee";
 import { handleCommitteeRoute, parseCountParam, parseEnumListParam, parsePagination } from "./_lib";
 
 export async function GET(request: NextRequest) {

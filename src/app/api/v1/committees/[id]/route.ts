@@ -12,7 +12,7 @@ import {
   getCommittee,
   updateCommittee,
   updateCommitteeSchema,
-} from "@/lib/services/committee.service";
+} from "@/lib/services/committee";
 import { handleCommitteeRoute } from "../_lib";
 
 interface RouteContext {

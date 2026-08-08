@@ -46,7 +46,7 @@ Permission holders among predefined roles (`src/types/role.types.ts`): `superadm
 
 ## Services
 
-- `src/lib/services/committee.service.ts` — the whole module's data access: zod create/update schemas, list with filters/pagination, get/create/update/delete, unique-name violation mapping (PG `23505` → `COMMITTEE_NAME_TAKEN`), parent validation (`COMMITTEE_PARENT_NOT_FOUND`, `COMMITTEE_PARENT_SELF`), and the row→DTO mappers that split `committee_members` into leadership vs members and hydrate the jsonb charter/meetings/metrics with safe fallbacks.
+- `src/lib/services/committee/` — the whole module's data access: zod create/update schemas, list with filters/pagination, get/create/update/delete, unique-name violation mapping (PG `23505` → `COMMITTEE_NAME_TAKEN`), parent validation (`COMMITTEE_PARENT_NOT_FOUND`, `COMMITTEE_PARENT_SELF`), and the row→DTO mappers that split `committee_members` into leadership vs members and hydrate the jsonb charter/meetings/metrics with safe fallbacks.
 
 Routes map service errors in `src/app/api/v1/committees/_lib.ts`: `NotFoundError` → 404 problem, `COMMITTEE_NAME_TAKEN`/`COMMITTEE_PARENT_SELF` → 409 conflict, other `BusinessLogicError` → 400 business-logic problem.
 

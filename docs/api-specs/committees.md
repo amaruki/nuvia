@@ -8,7 +8,7 @@ Committee CRUD with charters, contact info, and sub-committee hierarchy
 to 400 `business-logic-error`, and anything else to 500 `internal-error`.
 
 Route files: `src/app/api/v1/committees/**`. Schemas and enum values:
-`src/lib/services/committee.service.ts`; UI shapes:
+`src/lib/services/committee/schemas.ts`; UI shapes:
 `src/types/committee.types.ts`. Permissions: `committees:read`,
 `committees:create`, `committees:update`, `committees:delete`.
 

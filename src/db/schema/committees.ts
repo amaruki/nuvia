@@ -1,6 +1,6 @@
 /**
  * Committees — real tables backing the committees module (backlog D2).
- * Served by src/lib/services/committee.service.ts and the
+ * Served by src/lib/services/committee/ and the
  * /api/v1/committees/** routes.
  *
  * The UI shape in src/types/committee.types.ts stays the API contract:

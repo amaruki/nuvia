@@ -242,7 +242,7 @@ Regional chapters with member rosters.
 Committees with member rosters, same shape as chapters.
 
 - **Entry points:** `src/app/api/v1/committees/**` (5 endpoints),
-  `src/app/api/v1/committees/_lib.ts`, `src/lib/services/committee.service.ts`
+  `src/app/api/v1/committees/_lib.ts`, `src/lib/services/committee/`
   (schemas colocated).
 - **Schema tables:** `committees`, `committee_members` (0006).
 - **Spec:** [`api-specs/committees.md`](api-specs/committees.md).
@@ -254,7 +254,7 @@ Courses and issued certificates.
 
 - **Entry points:** `src/app/api/v1/learning/**` (9 endpoints across
   courses and certificates; certificates carry no DELETE),
-  `src/app/api/v1/learning/_lib.ts`, `src/lib/services/learning.service.ts`
+  `src/app/api/v1/learning/_lib.ts`, `src/lib/services/learning/`
   (schemas colocated).
 - **Schema tables:** `courses`, `certificates` (0009).
 - **Spec:** [`api-specs/learning.md`](api-specs/learning.md).

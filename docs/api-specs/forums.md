@@ -1,7 +1,7 @@
 # API Spec — Forums
 
 Posts, comments, categories, moderation, and reports (backlog B5). Service
-layer: `src/lib/services/forum.service.ts` (schemas and business rules live
+layer: `src/lib/services/forum/` (schemas and business rules live
 there); `forumProblemFromError` maps `ForumServiceError` to its embedded
 problem and anything unexpected to 500 `internal-error`.
 

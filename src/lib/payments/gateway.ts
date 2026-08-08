@@ -155,6 +155,7 @@ export function toAmountString(minorUnits: number): string {
 }
 
 import { ManualGateway } from "./manual";
+import { StripeGateway } from "./stripe";
 
 let resolved: PaymentGateway | null = null;
 
@@ -171,12 +172,8 @@ export function resolvePaymentGateway(): PaymentGateway {
       break;
     }
     case "stripe": {
-      // The env value is declared ahead of the adapter (C3) so deployments can
-      // be configured early; resolving it fails loudly until the adapter lands.
-      throw new GatewayError(
-        "PAYMENT_GATEWAY=stripe is configured but the Stripe adapter is not implemented yet",
-        "PROVIDER_NOT_IMPLEMENTED",
-      );
+      resolved = new StripeGateway();
+      break;
     }
     default: {
       const unhandled: never = env.PAYMENT_GATEWAY;

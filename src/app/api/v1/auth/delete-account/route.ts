@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
+import { isLastSuperadmin } from "@/lib/rbac";
 import { logError } from "@/lib/errors";
 import { problem, problemResponse, problems, successResponse } from "@/lib/http";
 
@@ -12,6 +13,22 @@ export async function DELETE(request: NextRequest) {
 
     if (!session || !session.user) {
       return problemResponse(problems.authenticationRequired());
+    }
+
+    // Lockout guard: the only superadmin deleting their own account would
+    // leave the deployment with no account able to grant the superadmin
+    // role again — a permanent lockout of user management. A second
+    // superadmin must exist first.
+    if (await isLastSuperadmin(session.user.id)) {
+      return problemResponse(
+        problem(
+          "last-superadmin",
+          409,
+          "Cannot delete the last super admin",
+          "Promote another user to super admin before deleting this account, " +
+            "or the system would be locked out of its own user management.",
+        ),
+      );
     }
 
     const body = await request.json().catch(() => ({}));

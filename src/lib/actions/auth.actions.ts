@@ -1,7 +1,7 @@
 "use server";
 
 import { AuthUtils } from "@/lib/auth/utils";
-import { AuthError, AuthErrorType } from "@/lib/auth/common";
+import { clientSafeAuthMessage } from "@/lib/auth/common";
 import { recordLoginAttempt, resolveLoginIdentifier } from "@/lib/auth/login-activity";
 import {
   loginSchema,
@@ -95,7 +95,7 @@ export async function loginAction(formData: FormData): Promise<AuthResponse> {
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Login failed",
+      message: clientSafeAuthMessage(error, "Login failed"),
     };
   }
 }
@@ -149,7 +149,7 @@ export async function signupAction(formData: FormData): Promise<AuthResponse> {
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Signup failed",
+      message: clientSafeAuthMessage(error, "Signup failed"),
     };
   }
 }
@@ -181,7 +181,7 @@ export async function forgotPasswordAction(formData: FormData): Promise<Password
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Password reset failed",
+      message: clientSafeAuthMessage(error, "Password reset failed"),
     };
   }
 }
@@ -218,7 +218,7 @@ export async function resetPasswordAction(formData: FormData): Promise<PasswordR
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Password reset failed",
+      message: clientSafeAuthMessage(error, "Password reset failed"),
     };
   }
 }
@@ -248,7 +248,7 @@ export async function getCurrentUserAction(): Promise<{
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to get current user",
+      error: clientSafeAuthMessage(error, "Failed to get current user"),
     };
   }
 }
@@ -306,7 +306,7 @@ export async function updateProfileAction(formData: FormData): Promise<AuthRespo
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Profile update failed",
+      message: clientSafeAuthMessage(error, "Profile update failed"),
     };
   }
 }
@@ -349,7 +349,7 @@ export async function changePasswordAction(formData: FormData): Promise<Password
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Password change failed",
+      message: clientSafeAuthMessage(error, "Password change failed"),
     };
   }
 }
@@ -374,7 +374,7 @@ export async function getUserSessionsAction(): Promise<any> {
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Failed to get sessions",
+      message: clientSafeAuthMessage(error, "Failed to get sessions"),
     };
   }
 }
@@ -402,7 +402,7 @@ export async function revokeSessionAction(sessionId: string): Promise<PasswordRe
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Failed to revoke session",
+      message: clientSafeAuthMessage(error, "Failed to revoke session"),
     };
   }
 }
@@ -427,7 +427,7 @@ export async function revokeOtherSessionsAction(): Promise<PasswordResetResponse
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Failed to revoke other sessions",
+      message: clientSafeAuthMessage(error, "Failed to revoke other sessions"),
     };
   }
 }
@@ -452,7 +452,7 @@ export async function revokeAllOtherSessionsAction(): Promise<PasswordResetRespo
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Failed to revoke other sessions",
+      message: clientSafeAuthMessage(error, "Failed to revoke other sessions"),
     };
   }
 }
@@ -477,7 +477,7 @@ export async function signOutAction(): Promise<PasswordResetResponse> {
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Sign out failed",
+      message: clientSafeAuthMessage(error, "Sign out failed"),
     };
   }
 }
@@ -496,7 +496,7 @@ export async function deleteAccountAction(): Promise<PasswordResetResponse> {
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Account deletion failed",
+      message: clientSafeAuthMessage(error, "Account deletion failed"),
     };
   }
 }

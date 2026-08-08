@@ -8,7 +8,13 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
-import { AuthError, AuthErrorType, AuthResponseFactory, withAuthErrorHandling } from "./common";
+import {
+  AuthError,
+  AuthErrorType,
+  AuthResponseFactory,
+  clientSafeAuthMessage,
+  withAuthErrorHandling,
+} from "./common";
 import { logger } from "@/lib/logger";
 import { SafeUser, UserSession } from "@/types/auth.types";
 
@@ -192,7 +198,7 @@ export class AuthUtils {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Profile update failed",
+        error: clientSafeAuthMessage(error, "Profile update failed"),
       };
     }
   }
@@ -230,7 +236,7 @@ export class AuthUtils {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Password change failed",
+        error: clientSafeAuthMessage(error, "Password change failed"),
       };
     }
   }
@@ -252,7 +258,7 @@ export class AuthUtils {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Sign out failed",
+        error: clientSafeAuthMessage(error, "Sign out failed"),
       };
     }
   }
@@ -296,7 +302,7 @@ export class AuthUtils {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Account deletion failed",
+        error: clientSafeAuthMessage(error, "Account deletion failed"),
       };
     }
   }
@@ -320,7 +326,7 @@ export class AuthUtils {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to get user",
+        error: clientSafeAuthMessage(error, "Failed to get user"),
       };
     }
   }
@@ -347,7 +353,7 @@ export class AuthUtils {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to list users",
+        error: clientSafeAuthMessage(error, "Failed to list users"),
       };
     }
   }
@@ -375,7 +381,7 @@ export class AuthUtils {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to update user role",
+        error: clientSafeAuthMessage(error, "Failed to update user role"),
       };
     }
   }

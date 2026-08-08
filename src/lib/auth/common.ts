@@ -5,8 +5,17 @@
  * error handling patterns, and response formatting to eliminate code duplication.
  */
 
+import { APIError } from "better-auth/api";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
+
+import {
+  AuthenticationError,
+  AuthorizationError,
+  BusinessLogicError,
+  RateLimitError,
+} from "@/lib/errors";
+import { logger } from "@/lib/logger";
 
 /**
  * Standard API response format for all authentication operations
@@ -215,6 +224,36 @@ export function normalizeAuthError(error: unknown): AuthError {
   }
 
   return new AuthError(AuthErrorType.INTERNAL, "Unknown error occurred");
+}
+
+/**
+ * Reduce an error thrown by the auth stack to a message that is safe to
+ * show in the browser.
+ *
+ * better-auth APIErrors, this module's AuthError, and the app's deliberate
+ * error classes carry user-facing messages by design, and Zod issues are
+ * form feedback. Anything else — database failures, driver errors, SMTP
+ * faults — is only recorded in the server log: returning it verbatim would
+ * leak SQL text, query parameters, and schema details to the client.
+ */
+export function clientSafeAuthMessage(error: unknown, fallback: string): string {
+  if (
+    error instanceof APIError ||
+    error instanceof AuthError ||
+    error instanceof AuthenticationError ||
+    error instanceof AuthorizationError ||
+    error instanceof BusinessLogicError ||
+    error instanceof RateLimitError
+  ) {
+    return error.message;
+  }
+
+  if (error instanceof ZodError) {
+    return error.issues[0]?.message ?? fallback;
+  }
+
+  logger.error("Auth operation failed", error);
+  return fallback;
 }
 
 /**

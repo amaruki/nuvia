@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { AuthResponseFactory } from "@/lib/auth/common";
+import { AuthResponseFactory, clientSafeAuthMessage } from "@/lib/auth/common";
 import { BusinessLogicError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 
@@ -51,12 +51,12 @@ export async function signInWithOAuthAction(provider: string, callbackURL?: stri
 
     throw new BusinessLogicError("No OAuth redirect URL received", "OAUTH_NO_REDIRECT_URL");
   } catch (error) {
-    logger.error("OAuth sign-in error", error instanceof Error ? error.message : String(error));
+    logger.error("OAuth sign-in error", error);
 
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Failed to initiate OAuth sign-in",
-      errors: { server: [error instanceof Error ? error.message : "OAuth sign-in failed"] },
+      message: clientSafeAuthMessage(error, "Failed to initiate OAuth sign-in"),
+      errors: { server: [clientSafeAuthMessage(error, "OAuth sign-in failed")] },
     };
   }
 }
@@ -83,8 +83,7 @@ export async function getOAuthProviderConfigAction(provider: string) {
   } catch (error) {
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to check OAuth provider configuration",
+      message: clientSafeAuthMessage(error, "Failed to check OAuth provider configuration"),
       errors: { server: ["OAUTH_CONFIG_CHECK_FAILED"] },
     };
   }
@@ -110,7 +109,7 @@ export async function getAvailableOAuthProvidersAction() {
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Failed to get available OAuth providers",
+      message: clientSafeAuthMessage(error, "Failed to get available OAuth providers"),
       errors: { server: ["OAUTH_PROVIDERS_RETRIEVAL_FAILED"] },
     };
   }
@@ -139,8 +138,7 @@ export async function getOAuthProviderConfigurationAction(provider: string) {
   } catch (error) {
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to get OAuth provider configuration",
+      message: clientSafeAuthMessage(error, "Failed to get OAuth provider configuration"),
       errors: { server: ["OAUTH_CONFIG_RETRIEVAL_FAILED"] },
     };
   }

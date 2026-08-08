@@ -394,7 +394,6 @@ export function AddAnnouncementForm({
                           mode="single"
                           selected={formValues.expiresAt}
                           onSelect={(date) => form.setValue("expiresAt", date)}
-                          autoFocus
                         />
                       </PopoverContent>
                     </Popover>

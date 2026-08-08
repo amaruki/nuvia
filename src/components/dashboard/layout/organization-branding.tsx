@@ -64,7 +64,7 @@ export function OrganizationCopyright() {
   const name = organization?.name ?? "Nuvia Community Platform";
 
   return (
-    <p className="text-sm text-foreground/50">
+    <p className="text-sm text-foreground/75">
       © {new Date().getFullYear()} {name}. All rights reserved.
     </p>
   );
@@ -79,7 +79,7 @@ export function ContactLink() {
   const href = organization?.supportEmail ? `mailto:${organization.supportEmail}` : "/contact";
 
   return (
-    <a href={href} className="text-sm text-foreground/50 hover:text-foreground/70">
+    <a href={href} className="text-sm text-foreground/75 hover:text-foreground/90">
       Contact Us
     </a>
   );

@@ -272,7 +272,6 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
                     mode="single"
                     selected={dateRange.start}
                     onSelect={(date) => handleDateRangeChange("start", date)}
-                    autoFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -297,7 +296,6 @@ export function ReportsFilters({ filters, onFiltersChange, onClearFilters }: Rep
                     mode="single"
                     selected={dateRange.end}
                     onSelect={(date) => handleDateRangeChange("end", date)}
-                    autoFocus
                   />
                 </PopoverContent>
               </Popover>

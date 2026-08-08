@@ -256,7 +256,6 @@ export function AnnouncementsFilters({
                             start: date,
                           })
                         }
-                        autoFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -282,7 +281,6 @@ export function AnnouncementsFilters({
                             end: date,
                           })
                         }
-                        autoFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -397,7 +395,6 @@ export function AnnouncementsFilters({
                             start: date,
                           })
                         }
-                        autoFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -423,7 +420,6 @@ export function AnnouncementsFilters({
                             end: date,
                           })
                         }
-                        autoFocus
                       />
                     </PopoverContent>
                   </Popover>

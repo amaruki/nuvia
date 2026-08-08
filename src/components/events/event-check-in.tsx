@@ -198,7 +198,16 @@ export function EventCheckIn({
                         ? "border-primary bg-primary/10"
                         : "border-border hover:border-border"
                     }`}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Select registration for ${registration.user?.displayName || registration.user?.username || registration.user?.email || "attendee"}`}
                     onClick={() => handleRegistrationSelect(registration)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleRegistrationSelect(registration);
+                      }
+                    }}
                   >
                     <div className="flex justify-between items-start">
                       <div>

@@ -213,24 +213,28 @@ export function MediaUpload({ onUpload, onClose, className }: MediaUploadProps) 
         <div className="p-6 border-b space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="text-sm font-medium">Visibility</label>
-              <select
-                value={uploadOptions.visibility}
-                onChange={(e) =>
-                  setUploadOptions((prev) => ({ ...prev, visibility: e.target.value as any }))
-                }
-                className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                disabled={isUploading}
-              >
-                <option value="public">Public</option>
-                <option value="private">Private</option>
-                <option value="restricted">Restricted</option>
-                <option value="draft">Draft</option>
-              </select>
+              <label htmlFor="media-upload-visibility" className="block text-sm font-medium mb-2">
+                Visibility
+                <select
+                  value={uploadOptions.visibility}
+                  onChange={(e) =>
+                    setUploadOptions((prev) => ({ ...prev, visibility: e.target.value as any }))
+                  }
+                  id="media-upload-visibility"
+                  className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  disabled={isUploading}
+                >
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
+                  <option value="restricted">Restricted</option>
+                  <option value="draft">Draft</option>
+                </select>
+              </label>
             </div>
 
-            <div>
-              <label className="text-sm font-medium">Options</label>
+            <fieldset>
+              <legend className="text-sm font-medium mb-2">Options</legend>
+
               <div className="mt-2 space-y-2">
                 <label className="flex items-center gap-2 text-sm">
                   <input
@@ -271,7 +275,7 @@ export function MediaUpload({ onUpload, onClose, className }: MediaUploadProps) 
                   <span>Extract metadata</span>
                 </label>
               </div>
-            </div>
+            </fieldset>
           </div>
         </div>
 

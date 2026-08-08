@@ -73,7 +73,7 @@ export function EventDialog({ children, open, onOpenChange, defaultDate }: Event
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
-                  <Calendar mode="single" selected={date} onSelect={setDate} autoFocus />
+                  <Calendar mode="single" selected={date} onSelect={setDate} />
                 </PopoverContent>
               </Popover>
             </div>

@@ -140,7 +140,15 @@ export function QuickNavigationWidget({ onNavigate }: QuickNavigationWidgetProps
                     <div
                       key={item.id}
                       className="p-3 rounded-lg border bg-card border-border hover:bg-background transition-colors cursor-pointer"
+                      role="button"
+                      tabIndex={0}
                       onClick={() => handleNavigate(item.path)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleNavigate(item.path);
+                        }
+                      }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
@@ -178,7 +186,15 @@ export function QuickNavigationWidget({ onNavigate }: QuickNavigationWidgetProps
                   <div
                     key={`all-${item.id}`}
                     className="p-3 rounded-lg border bg-card border-border hover:bg-background transition-colors cursor-pointer"
+                    role="button"
+                    tabIndex={0}
                     onClick={() => handleNavigate(item.path)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleNavigate(item.path);
+                      }
+                    }}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">

@@ -105,6 +105,9 @@ export function SidebarFooterComponent({ className }: SidebarFooterComponentProp
                     "group-data-[collapsible=icon]:hidden",
                   )}
                 />
+                <span className="sr-only">
+                  Open account menu for {user?.displayName || user?.email || "current user"}
+                </span>
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent

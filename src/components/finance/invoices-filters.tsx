@@ -176,12 +176,7 @@ export function InvoicesFilters({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dateRangeStart}
-                  onSelect={setDateRangeStart}
-                  autoFocus
-                />
+                <Calendar mode="single" selected={dateRangeStart} onSelect={setDateRangeStart} />
               </PopoverContent>
             </Popover>
 
@@ -201,12 +196,7 @@ export function InvoicesFilters({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dateRangeEnd}
-                  onSelect={setDateRangeEnd}
-                  autoFocus
-                />
+                <Calendar mode="single" selected={dateRangeEnd} onSelect={setDateRangeEnd} />
               </PopoverContent>
             </Popover>
           </div>

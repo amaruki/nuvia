@@ -256,7 +256,6 @@ export function MediaFilters({
                       };
                       handleFilterChange("dateRange", newRange);
                     }}
-                    autoFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -288,7 +287,6 @@ export function MediaFilters({
                       };
                       handleFilterChange("dateRange", newRange);
                     }}
-                    autoFocus
                   />
                 </PopoverContent>
               </Popover>

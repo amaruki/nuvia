@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useHeader } from "@/contexts/dashboard-context";
 import {
@@ -164,11 +165,9 @@ export default function JobApplicantsPage() {
               filteredApplicants.map((applicant) => (
                 <TableRow key={applicant.id}>
                   <TableCell className="font-medium">
-                    <div
+                    <Link
+                      href={`/dashboard/jobs/${jobId}/applicants/${applicant.id}`}
                       className="flex flex-col cursor-pointer hover:underline"
-                      onClick={() =>
-                        router.push(`/dashboard/jobs/${jobId}/applicants/${applicant.id}`)
-                      }
                     >
                       <span className="text-base font-semibold">{applicant.applicantName}</span>
                       {applicant.coverLetter && (
@@ -179,7 +178,7 @@ export default function JobApplicantsPage() {
                           {applicant.coverLetter}
                         </span>
                       )}
-                    </div>
+                    </Link>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className={STATUS_BADGE_STYLES[applicant.status]}>

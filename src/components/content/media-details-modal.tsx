@@ -470,8 +470,10 @@ export function MediaDetailsModal({
                         }}
                       />
                     ) : media.type === "video" ? (
+                      // oxlint-disable-next-line jsx-a11y/media-has-caption -- uploaded-media preview; caption tracks not supported yet (tracked in docs/accessibility/wcag-2.2-aa-enabled-modules.md)
                       <video src={media.url} controls className="max-w-full max-h-[600px]" />
                     ) : media.type === "audio" ? (
+                      // oxlint-disable-next-line jsx-a11y/media-has-caption -- uploaded-media preview; caption tracks not supported yet (tracked in docs/accessibility/wcag-2.2-aa-enabled-modules.md)
                       <audio src={media.url} controls className="w-full max-w-md" />
                     ) : (
                       <div className="text-center p-8">
@@ -506,15 +508,25 @@ export function MediaDetailsModal({
                       <div
                         key={version.id}
                         className={cn(
-                          "p-4 border rounded-lg cursor-pointer transition-colors",
+                          "p-4 border rounded-lg transition-colors",
                           selectedVersion?.id === version.id
                             ? "border-blue-500 bg-blue-50"
                             : "border-gray-200 hover:border-gray-300",
                         )}
-                        onClick={() => setSelectedVersion(version)}
                       >
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
+                          <div
+                            className="flex items-center gap-3 cursor-pointer"
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => setSelectedVersion(version)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setSelectedVersion(version);
+                              }
+                            }}
+                          >
                             <div className="text-blue-600">
                               <Icon className="h-8 w-8" />
                             </div>

@@ -558,7 +558,16 @@ export default function ContentMedia() {
                   className={`relative group cursor-pointer rounded-lg border overflow-hidden hover:shadow-lg transition-shadow ${
                     selectedMedia.includes(item.id) ? "ring-2 ring-primary" : ""
                   }`}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={selectedMedia.includes(item.id)}
                   onClick={() => toggleMediaSelection(item.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      toggleMediaSelection(item.id);
+                    }
+                  }}
                 >
                   {/* Checkbox */}
                   <div className="absolute top-2 left-2 z-10">
@@ -567,6 +576,8 @@ export default function ContentMedia() {
                       checked={selectedMedia.includes(item.id)}
                       onChange={() => toggleMediaSelection(item.id)}
                       className="h-4 w-4 rounded border-primary"
+                      aria-hidden="true"
+                      tabIndex={-1}
                     />
                   </div>
 
@@ -783,7 +794,15 @@ export default function ContentMedia() {
               <div
                 key={folder.id}
                 className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                role="button"
+                tabIndex={0}
                 onClick={() => setSelectedFolder(folder.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedFolder(folder.id);
+                  }
+                }}
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">

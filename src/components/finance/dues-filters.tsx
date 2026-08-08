@@ -169,12 +169,7 @@ export function DuesFilters({ filters, onFiltersChange, onClearFilters }: DuesFi
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={dateRangeStart}
-                  onSelect={setDateRangeStart}
-                  autoFocus
-                />
+                <Calendar mode="single" selected={dateRangeStart} onSelect={setDateRangeStart} />
               </PopoverContent>
             </Popover>
 
@@ -192,12 +187,7 @@ export function DuesFilters({ filters, onFiltersChange, onClearFilters }: DuesFi
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={dateRangeEnd}
-                  onSelect={setDateRangeEnd}
-                  autoFocus
-                />
+                <Calendar mode="single" selected={dateRangeEnd} onSelect={setDateRangeEnd} />
               </PopoverContent>
             </Popover>
           </div>

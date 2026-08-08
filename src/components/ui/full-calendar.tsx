@@ -212,9 +212,10 @@ const EventGroup = ({ events, hour }: { events: CalendarEvent[]; hour: Date }) =
 
           return (
             <EventDetailsPopover key={event.id} event={event}>
-              <div
+              <button
+                type="button"
                 className={cn(
-                  "absolute cursor-pointer overflow-hidden z-10",
+                  "absolute text-left cursor-pointer overflow-hidden z-10",
                   dayEventVariants({ variant: event.color }),
                 )}
                 style={{
@@ -224,11 +225,11 @@ const EventGroup = ({ events, hour }: { events: CalendarEvent[]; hour: Date }) =
                   right: "4px",
                 }}
               >
-                <div className="font-semibold truncate">{event.title}</div>
-                <div className="text-[10px] opacity-75 mt-0.5">
+                <span className="block font-semibold truncate">{event.title}</span>
+                <span className="block text-[10px] opacity-75 mt-0.5">
                   {format(event.start, "HH:mm")} - {format(event.end, "HH:mm")}
-                </div>
-              </div>
+                </span>
+              </button>
             </EventDetailsPopover>
           );
         })}
@@ -346,13 +347,10 @@ const CalendarMonthView = () => {
   return (
     <div className="h-full flex flex-col">
       <div className="grid grid-cols-7 gap-px sticky top-0 bg-background border-b z-10 shadow-sm">
-        {weekDays.map((day, i) => (
+        {weekDays.map((day) => (
           <div
             key={day}
-            className={cn(
-              "py-3 text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground",
-              [0, 6].includes(i) && "text-muted-foreground/60",
-            )}
+            className="py-3 text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground"
           >
             {day}
           </div>
@@ -366,42 +364,48 @@ const CalendarMonthView = () => {
             <div
               className={cn(
                 "bg-card p-2 text-sm text-muted-foreground overflow-auto transition-all duration-200 hover:shadow-md hover:z-10 hover:scale-[1.02]",
-                !isSameMonth(date, _date) && "text-muted-foreground/40 bg-muted/20",
-                isSameMonth(date, _date) && "cursor-pointer",
+                !isSameMonth(date, _date) && "bg-muted/20",
               )}
               key={_date.toString()}
-              onClick={() => {
-                if (isSameMonth(date, _date)) {
-                  onDateClick?.(_date);
-                }
-              }}
             >
-              <div
-                className={cn(
-                  "size-7 grid place-items-center rounded-full mb-2 sticky top-0 font-semibold transition-all duration-200",
-                  isToday(_date) &&
-                    "bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20",
-                )}
-              >
-                {format(_date, "d")}
-              </div>
+              {isSameMonth(date, _date) ? (
+                <button
+                  type="button"
+                  onClick={() => onDateClick?.(_date)}
+                  aria-label={`Create event on ${format(_date, "EEEE, d MMMM")}`}
+                  className={cn(
+                    "size-7 grid place-items-center rounded-full mb-2 sticky top-0 font-semibold transition-all duration-200 cursor-pointer",
+                    isToday(_date) &&
+                      "bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20",
+                  )}
+                >
+                  {format(_date, "d")}
+                </button>
+              ) : (
+                <div className="size-7 grid place-items-center rounded-full mb-2 sticky top-0 font-semibold transition-all duration-200">
+                  {format(_date, "d")}
+                </div>
+              )}
 
               <div className="space-y-1">
                 {currentEvents.map((event) => {
                   return (
                     <EventDetailsPopover key={event.id} event={event}>
-                      <div className="px-2 py-1 rounded-md text-xs flex items-center gap-2 cursor-pointer transition-all duration-200 hover:shadow-sm group">
-                        <div
+                      <button
+                        type="button"
+                        className="w-full text-left px-2 py-1 rounded-md text-xs flex items-center gap-2 cursor-pointer transition-all duration-200 hover:shadow-sm group"
+                      >
+                        <span
                           className={cn(
-                            "shrink-0 transition-transform duration-200 group-hover:scale-125",
+                            "inline-block shrink-0 transition-transform duration-200 group-hover:scale-125",
                             monthEventVariants({ variant: event.color }),
                           )}
-                        ></div>
+                        ></span>
                         <span className="flex-1 truncate font-medium">{event.title}</span>
-                        <time className="tabular-nums text-muted-foreground/60 text-[10px]">
+                        <time className="tabular-nums text-muted-foreground text-[10px]">
                           {format(event.start, "HH:mm")}
                         </time>
-                      </div>
+                      </button>
                     </EventDetailsPopover>
                   );
                 })}

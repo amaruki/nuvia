@@ -97,10 +97,17 @@ export function DashboardHeader({
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const [mounted, setMounted] = React.useState(false);
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  React.useEffect(() => {
+    if (isSearchOpen) {
+      searchInputRef.current?.focus();
+    }
+  }, [isSearchOpen]);
 
   const getInitials = (name: string): string => {
     return name
@@ -170,7 +177,7 @@ export function DashboardHeader({
                     type="search"
                     placeholder="Search..."
                     className="h-9 w-64 pr-8"
-                    autoFocus
+                    ref={searchInputRef}
                     onBlur={() => setIsSearchOpen(false)}
                   />
                   <Button

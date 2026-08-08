@@ -270,7 +270,6 @@ export function DonationsFilters({
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
-                autoFocus
                 mode="range"
                 defaultMonth={dateRange.start}
                 selected={{

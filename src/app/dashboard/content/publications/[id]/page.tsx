@@ -329,7 +329,7 @@ export default function PublicationDetailsPage() {
               <div key={index} className="relative group">
                 <img
                   src={image}
-                  alt={`Gallery image ${index + 1}`}
+                  alt={`Gallery item ${index + 1}`}
                   className="w-full h-32 object-cover rounded-lg"
                 />
                 <Button

@@ -736,8 +736,14 @@ export async function getCategoryItem(id: string): Promise<CategoryUi> {
   const rows = await db.select().from(contentCategory).where(eq(contentCategory.id, id)).limit(1);
   const row = rows[0];
   if (!row) throw ContentApiError.notFound("Category");
-  const counts = await categoryContentCounts();
-  return categoryRowToUi(row, counts.get(row.id) ?? 0);
+  // A single-category read must not pay for the whole-table GROUP BY that
+  // categoryContentCounts() performs; mirror that aggregation exactly (no
+  // status/deletion filters) so single-item and list views agree.
+  const countRows = await db
+    .select({ value: count() })
+    .from(content)
+    .where(eq(content.categoryId, id));
+  return categoryRowToUi(row, countRows[0]?.value ?? 0);
 }
 
 export async function createCategoryItem(

@@ -173,21 +173,51 @@ export async function invalidateUserSessionCaches(userId: string): Promise<void>
 
   try {
     const pattern = `${CACHE_PREFIX}*`;
-    const keys = await redis.keys(pattern);
 
+    // SCAN walks the keyspace in incremental batches; KEYS would block the
+    // Redis event loop for the entire scan and stall every other client.
+    const keys: string[] = [];
+    let cursor = "0";
+    do {
+      const [nextCursor, batch] = await redis.scan(cursor, "MATCH", pattern, "COUNT", 200);
+      keys.push(...batch);
+      cursor = nextCursor;
+    } while (cursor !== "0");
+
+    if (keys.length === 0) return;
+
+    // One pipeline round-trip reads every candidate key; sequential awaits
+    // used to pay one network round-trip per key.
+    const reads = redis.pipeline();
     for (const key of keys) {
-      const cached = await redis.get(key);
-      if (cached) {
-        try {
-          const sessionData: CachedSession = JSON.parse(cached);
-          if (sessionData.userId === userId) {
-            await redis.del(key);
-          }
-        } catch {
-          // Skip invalid cache entries
-          await redis.del(key);
+      reads.get(key);
+    }
+    const results = await reads.exec();
+    if (!results) return;
+
+    const keysToDelete: string[] = [];
+    for (let i = 0; i < results.length; i++) {
+      const [error, cached] = results[i];
+      if (error || typeof cached !== "string" || cached.length === 0) continue;
+
+      try {
+        const sessionData: CachedSession = JSON.parse(cached);
+        if (sessionData.userId === userId) {
+          keysToDelete.push(keys[i]);
         }
+      } catch {
+        // Unparseable entries can never validate again, so purge them too.
+        keysToDelete.push(keys[i]);
       }
+    }
+
+    if (keysToDelete.length > 0) {
+      // Batched deletes keep the whole invalidation at two round-trips total.
+      const deletes = redis.pipeline();
+      for (const key of keysToDelete) {
+        deletes.del(key);
+      }
+      await deletes.exec();
     }
   } catch (error) {
     logger.warn("Failed to invalidate user session caches", error);

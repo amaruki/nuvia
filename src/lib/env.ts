@@ -94,6 +94,12 @@ const envSchema = z.object({
   LOGGING_REQUESTS: boolFromString(false),
   LOGGING_ERRORS: boolFromString(true),
 
+  // Payments — provider selection for the gateway adapter seam
+  // (docs/adr/0015-payment-gateway-adapter-stripe-first.md). Resolved in one
+  // place by resolvePaymentGateway(); "stripe" is accepted ahead of the
+  // adapter itself, which lands with C3.
+  PAYMENT_GATEWAY: z.enum(["manual", "stripe"]).default("manual"),
+
   // Feature flags
   FEATURE_EMAIL_VERIFICATION: boolFromString(true),
   FEATURE_TWO_FACTOR_AUTH: boolFromString(false),

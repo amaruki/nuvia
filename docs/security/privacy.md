@@ -16,7 +16,7 @@ Not implemented. A member has no self-service way to export their own data today
 
 ## Erasure
 
-**This function is currently broken, not just unimplemented.** `DELETE /api/v1/auth/delete-account` authenticates the caller, does nothing further, and returns `"Account deleted successfully"` (`src/app/api/v1/auth/delete-account/route.ts:29-44`, a self-admitted placeholder). A deployer that relies on this endpoint to honor an erasure request violates that request without knowing it. Fixing this is `TODO.md` M1's highest-priority open item after the authorization gaps. The fix needs a decision that this document does not make unilaterally: hard delete (removes the row) compared to anonymization (retains a row for referential integrity, for example a forum post's author, with PII scrubbed). Anonymization is usually the right choice for a system with foreign-key references to the user row (forum posts, event registrations, audit logs) that should not disappear when a member leaves.
+**Erasure is now implemented.** `DELETE /api/v1/auth/delete-account` authenticates the caller, re-authenticates (a password, or a session fresh enough to pass better-auth's `freshAge` check), refuses to delete the last super admin (lockout guard), and then hard-deletes the user row via better-auth's `deleteUser` (`src/app/api/v1/auth/delete-account/route.ts`). Sessions, accounts, role assignments, login activity, and auth logs cascade with the user; chapter memberships and award nominations are set to null. Covered by `tests/delete-account.test.ts`. The hard-delete-vs-anonymization decision resolved to **hard delete** for the account row and auth-owned data. One residual: rows a user authored (content authorship, forum posts and comments, created events, committee audit fields) reference the author with non-cascading foreign keys, so this endpoint erases the account, not an anonymized trace of their authored content; a deployment that must retain referential integrity for authored content should treat that as a follow-up.
 
 ## PII Inventory (Current, Not Exhaustive)
 
@@ -28,4 +28,3 @@ Not implemented. A member has no self-service way to export their own data today
 | `auth_logs`             | IP address, user agent, location, metadata (may contain email) |
 
 `docs/observability.md` covers redaction in logs, not database rows.
-</content>

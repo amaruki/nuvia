@@ -68,7 +68,7 @@ suite grew from 115 to 147 tests.
 Follow-ups from this pass:
 
 - ☑ **Username uniqueness — corrected; nothing to fix.** The original claim said `users.username` is not unique in the schema, that two accounts can share a username, and that the fix was a schema constraint plus a migration decision about existing duplicates. That wording was stale: the constraint already exists and has always been enforced. `src/db/schema/users.ts:17` declares `username` with `.unique()`, and the database has enforced it since the first Drizzle migration — `drizzle/0000_cute_norman_osborn.sql:76` (`CONSTRAINT "users_username_unique" UNIQUE("username")`) — as the legacy Prisma schema did before it (`username String @unique`). Verified against the live shared test database (PostgreSQL 16): a duplicate insert is rejected with SQLSTATE 23505 on `users_username_unique`, and a scan of the live `users` table finds zero duplicate usernames. Migration decision: constraint-first, no data remediation path required. Every migration that ever created the `users` table carries the constraint, so no migrated database can contain legacy duplicate usernames and no backfill migration is needed.
-- ☐ **Stale comment from the corrected claim above.** `src/lib/auth/login-activity.ts:35` still says "username is not unique in the schema yet (see TODO.md)". The comment is wrong now and should be dropped when that file is next touched; the deterministic oldest-account `orderBy` it explains is harmless — with uniqueness enforced, it can never break a tie.
+- ☑ **Stale comment from the corrected claim above — fixed.** `src/lib/auth/login-activity.ts` no longer claims the username is non-unique; the comment now says the `orderBy` is a defensive tiebreaker only. The deterministic oldest-account `orderBy` itself stays: with uniqueness enforced it can never break a tie, and it is harmless.
 
 ---
 
@@ -133,28 +133,22 @@ This exit criterion is verified end to end. `bun run guard:heavy` exits 0: lint,
 
 ---
 
-## M3 — AMS core is real
+## M3 — AMS core is real — ☑ done
 
 **Exit criterion:** an association can take a member from signup, to paid dues, to event registration, without touching mock data.
 
-- ☐ **The `Organization` singleton lands, and the app actually uses it.** The Drizzle schema already has this table (`src/db/schema/organization.ts`, id `"default"`), but nothing reads or writes it yet. The association name, branding, locale, and currency all still live in hardcoded strings. Wire the singleton into settings pages and email templates first. It is a dependency for the "easy to customize" principle.
-- ☐ **Members and events wired to real data.** Today, 0 of 104 `page.tsx` files import Prisma or Drizzle. Members and Events already have Drizzle tables (`src/db/schema/users.ts`, `events.ts`). The remaining work is API routes, server actions, and replacing the mock-data imports in the UI.
-- ☐ **Dues and finance: the highest product value, currently 100% mock, with zero schema.** No `MembershipTier`, dues, invoice, or gateway model exists in the Drizzle schema at all. The whole `finance` UI, in `src/app/dashboard/finance/` and `src/lib/data/mock-*.ts`, renders from hardcoded arrays.
-  - For an AMS, dues billing is the product. This is the first module to promote out of "flagged off."
-  - No payment SDK is installed. That choice, between Stripe, Midtrans, or another provider, is a separate, deliberate decision. It needs its own ADR before any team builds against it.
-- ☐ **Module promotion gate.** Before any flagged-off module (finance, awards, learning, chapters, committees, workspaces) ships enabled by default, that module must have:
-  - a real Drizzle schema
-  - an authorized API
-  - tests
-  - documentation
+**Status (2026-08-08, backlog scopes A1–C5, F2):** every item below is shipped. The member→dues→event-registration path runs end to end on the database: signup creates a real user row, finance invoices and records payments through a gateway adapter (manual + Stripe), and event registrations live in `event_registrations`. Zero mock data files remain (backlog F2 swept the residue).
 
-  See the module-maturity section of `docs/architecture/overview.md`, and [ADR-0008](docs/adr/0008-module-maturity-gate.md). The promotion order, by value to an association, is: **finance/dues, then chapters, then committees, then learning/CPD, then awards, then workspaces.**
+- ☑ **The `Organization` singleton lands, and the app actually uses it.** Wired in backlog A2: settings pages and email templates read the singleton (`id "default"`), and hardcoded association name/branding strings now come from the row. Commit: `dc534a3`.
+- ☑ **Members and events wired to real data.** Done in backlog B1–B6: members (B1), events read path (B2) and write/registration lifecycle (B3), content (B4), forums (B5), and jobs (B6) all serve from Drizzle tables through authorized `/api/v1` routes.
+- ☑ **Dues and finance: real schema, real lifecycle.** Done in backlog C1–C5. The provider decision landed first as [ADR-0015](docs/adr/0015-payment-gateway-adapter-stripe-first.md) (adapter seam, Stripe first, manual fallback). `membership_tiers`, `subscriptions`, `invoices`, and `payments` tables exist (migrations 0004+); invoice creation, payment recording, and a signature-verified Stripe webhook are tested; the finance dashboard renders from the real services; the module is promoted.
+- ☑ **Module promotion gate — built and applied to all six flagged modules.** Backlog A1 added `config/features.ts` (maturity flags + `MOCK_TIER`) per [ADR-0008](docs/adr/0008-module-maturity-gate.md). Every flagged-off module then cleared the bar — real Drizzle schema, authorized API, tests, documentation, plus WCAG evidence — and was promoted in the value order: finance (C5), chapters (D1), committees (D2), learning/CPD (D3), awards (D4), workspaces (D5). All eleven modules are now Promoted; `MOCK_TIER` is empty. See the module-maturity section of `docs/architecture/overview.md`.
 
-- ☐ **`src/lib/services/media.service.ts`** is 1,184 lines long, but it never writes a file (`storagePath: ''`), and nothing imports it. Either wire it to a real storage backend, a decision among S3, Cloudinary, or local disk with no SDK installed yet, or delete the file. This file is not "50% done." It is unstarted work with extra steps.
+- ☑ **`src/lib/services/media.service.ts`** — wired. Backlog B4 replaced the 1,184-line write-nothing file with a real service that stores uploads on local disk under `storage/uploads/` with a JSON manifest (S3 stays a future adapter, no SDK added).
 
 ---
 
-## M4 — OSS launch
+## M4 — OSS launch — ☑ done
 
 **Exit criterion:**
 
@@ -164,10 +158,10 @@ This exit criterion is verified end to end. `bun run guard:heavy` exits 0: lint,
 
 - ☑ `docs/adr/` holds a decision record for every contested choice. See the index.
 - ☑ **WCAG 2.2 AA.** Done 2026-08-08 (backlog E1): oxlint's `jsx-a11y` rule set enabled at error level (30 rules in `.oxlintrc.json`), an `@axe-core/playwright` smoke gate wired as `bun run test:a11y` (`scripts/a11y-smoke.ts`, fails on critical/serious) covering one authenticated page per enabled module plus the public `/events` and `/jobs` pages, and a manual pass recorded in [`docs/accessibility/wcag-2.2-aa-enabled-modules.md`](docs/accessibility/wcag-2.2-aa-enabled-modules.md). Feature-flagging the rest of the modules shrinks the surface that must conform for version 1.0.
-- ☐ SLSA build provenance, through cosign keyless signing via GitHub Actions OIDC.
-- ☐ An OWASP ASVS and NIST SSDF controls mapping in [`docs/security/controls.md`](docs/security/controls.md).
-- ☐ ISO/IEC 27001 Annex A, **A.8 only**. A.5 through A.7 are organizational controls, such as screening, physical facilities, and policy, that a repository cannot satisfy on its own. Certification also needs an external auditor. State this limit explicitly, instead of overclaiming coverage.
-- ☐ CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, CHANGELOG.md, PR template, CODEOWNERS.
+- ☑ SLSA build provenance, through cosign keyless signing via GitHub Actions OIDC. Backlog E2, commit `69a838c`.
+- ☑ An OWASP ASVS and NIST SSDF controls mapping in [`docs/security/controls.md`](docs/security/controls.md). Backlog E3, commit `c45e5e5`; this reconciliation pass corrected the stale V12 sentence (media now writes files, see B4).
+- ☑ ISO/IEC 27001 Annex A, **A.8 only**. Backlog E4, commit `94f6688`, states the A.5–A.7 limit explicitly instead of overclaiming.
+- ☑ CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, CHANGELOG.md, PR template, CODEOWNERS. All present; PR template and CODEOWNERS landed in backlog E5 (`c7f6946`).
 
 ---
 
@@ -177,21 +171,19 @@ This queue follows the value order established in M3: finance/dues, then chapter
 
 ---
 
-## Cut from the default install (intended, not yet real — owner decision)
+## Module flags — maturity gate built, all modules enabled
 
-Finance, awards, learning, chapters, committees, and workspaces are **intended to be feature-flagged off by default, regardless of role.** A fresh install should expose only the 5 database-backed modules: members, events, content, forums, and jobs. See [ADR-0007](docs/adr/0007-single-association-tenant-seam.md) and [ADR-0008](docs/adr/0008-module-maturity-gate.md). **This feature flag is not built yet.** `config/features.ts` does not exist.
+The feature flag described above as "not built yet" now exists: [`config/features.ts`](config/features.ts) (backlog A1, [ADR-0008](docs/adr/0008-module-maturity-gate.md)). It carries a per-module maturity flag, human-readable labels, and `getEnabledModules`/`getDisabledModules` helpers that the nav, middleware, and docs registry all consume.
 
-To state precisely what that gap does and does not mean: these six modules are still role-gated, the same as every other dashboard section. `src/proxy.ts` calls `dashboard-access.ts`, which checks the per-path `roles` in `navigation-data.ts`. A plain member cannot reach `/dashboard/finance/reports`. What is missing is a maturity flag on top of that role gate. An admin or treasurer who can reach a module today sees a fully mock UI, with zero real schema, and nothing marks the UI as mock.
-
-This gap is the same gap as the unchecked "Module promotion gate" item in M3 above. Closing that gap is what will make this section's heading true. This is not deletion. The UI work is preserved, and each module ships the moment it clears the promotion gate above.
+As of the 2026-08-08 backlog completion, all eleven modules — members, events, content, forums, jobs, finance, awards, learning, chapters, committees, workspaces — are Promoted: real schema, authorized API, tests, documentation, and WCAG evidence each. `MOCK_TIER` is empty and every flag defaults to `true`, so a fresh install exposes the full suite. A deployer who wants a smaller surface switches flags off in `config/features.ts`; the role gate in `src/proxy.ts` → `dashboard-access.ts` still applies on top of the maturity flag, exactly as before.
 
 ---
 
 ## Good first issues
 
 - Remove any dead nav links, or point them at real pages, in `navigation-config.tsx`. Verify the current count first: `tests/nav-links.test.ts` only checks that leaf paths resolve to a real page, so a stale count here could be off if a parent-only nav item is involved.
-- Clean up the role lists in `navigation-data.ts`: most of them omit `superadmin`, which the nav gate and sidebar now special-case anyway. Adding the role back to the lists removes the inconsistency at its source.
+- ~~Clean up the role lists in `navigation-data.ts`: most of them omit `superadmin`…~~ **Done (backlog F3, commit `3998b75`)**: the nav role lists now include superadmin, matching the gate and sidebar special case.
 - Fix the singular-versus-plural mismatch in the Awards nav item.
 - ~~Pick and migrate off one duplicate dependency, once its ADR lands.~~ **Stale as of the M2 "Duplicate dependencies, re-examined" finding above**: all three flagged pairs (toast library, mail transport, animation library) are already resolved, and none needed an ADR. No open duplicate-dependency item remains here.
 - Add the `weeks` react-day-picker `classNames` key to `src/components/ui/calendar.tsx`, for visual parity with version 10's new grid-based rendering. The calendar is functional already. This is a polish pass.
-- Write a Playwright and axe smoke test for one of the 5 enabled modules.
+- ~~Write a Playwright and axe smoke test for one of the 5 enabled modules.~~ **Done (backlog E1, commit `1c8b530`)**: `bun run test:a11y` runs an `@axe-core/playwright` smoke over one authenticated page per enabled module plus the public `/events` and `/jobs` pages.

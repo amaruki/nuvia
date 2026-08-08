@@ -32,8 +32,8 @@ export async function resolveLoginIdentifier(emailOrUsername: string): Promise<s
   const byUsername = await db.query.user.findFirst({
     where: eq(user.username, trimmed.toLowerCase()),
     columns: { email: true },
-    // username is not unique in the schema yet (see TODO.md); pick the
-    // oldest account so resolution is at least deterministic.
+    // username is unique in the schema; the orderBy keeps the lookup
+    // deterministic as a defensive tiebreaker.
     orderBy: [asc(user.createdAt)],
   });
 

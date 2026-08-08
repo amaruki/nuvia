@@ -6,11 +6,10 @@ import { EventLayout } from "@/components/events";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AsyncContent } from "@/components/ui/async-content";
-import { ArrowLeft, Edit, Share2, QrCode } from "lucide-react";
-import { EventRegistration, RegistrationStatus } from "@/types/event.types";
+import { ArrowLeft, Ban, Edit, Share2, QrCode } from "lucide-react";
+import { RegistrationStatus } from "@/types/event.types";
 import { useEvent } from "@/lib/hooks/use-events";
-import { formatDateLong, formatEventTimeRange } from "@/lib/utils/event-utils";
-import { logger } from "@/lib/logger";
+import { cancelEventRegistration } from "@/lib/services/event.service";
 
 export default function EventDetailsPage() {
   const params = useParams();
@@ -24,16 +23,24 @@ export default function EventDetailsPage() {
     router.push(`/events/${eventId}/register`);
   };
 
-  const handleCancelRegistration = (eventId: string) => {
-    // Handle cancellation logic
-    logger.info("Cancel registration for event", eventId);
+  const handleCancelRegistration = async (eventId: string) => {
+    try {
+      const response = await cancelEventRegistration(eventId);
+      if (response.success) {
+        await refetch();
+      } else {
+        alert(response.message || "Failed to cancel registration");
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to cancel registration");
+    }
   };
 
   const handleCheckIn = (eventId: string) => {
     router.push(`/events/${eventId}/check-in`);
   };
 
-  const handleShare = (eventId: string) => {
+  const handleShare = (_eventId: string) => {
     // Handle share logic
     if (navigator.share) {
       navigator.share({
@@ -142,6 +149,19 @@ export default function EventDetailsPage() {
                       Check In
                     </Button>
                   )}
+
+                  {isRegistered &&
+                    registration &&
+                    registration.status !== RegistrationStatus.CANCELLED && (
+                      <Button
+                        variant="outline"
+                        onClick={() => handleCancelRegistration(event.id)}
+                        className="w-full justify-start"
+                      >
+                        <Ban className="h-4 w-4 mr-2" />
+                        Cancel Registration
+                      </Button>
+                    )}
 
                   {event.organizerId === "current-user-id" && ( // This should be replaced with actual user ID
                     <Button

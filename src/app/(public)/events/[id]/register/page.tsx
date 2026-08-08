@@ -5,13 +5,9 @@ import { useParams, useRouter } from "next/navigation";
 import { EventRegistrationForm } from "@/components/events";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { ArrowLeft, CheckCircle, AlertCircle, Clock, Hourglass } from "lucide-react";
 import { Event, EventRegistration } from "@/types/event.types";
-import {
-  getEventById,
-  getUserEventRegistrations,
-  registerForEvent,
-} from "@/lib/services/event.service";
+import { getEventById, registerForEvent } from "@/lib/services/event.service";
 import { EventLayout } from "@/components/events/event-layout";
 
 export default function EventRegistrationPage() {
@@ -118,6 +114,8 @@ export default function EventRegistrationPage() {
                   <CheckCircle className="h-5 w-5 text-success mr-2" />
                 ) : existingRegistration.status === "pending" ? (
                   <Clock className="h-5 w-5 text-warning mr-2" />
+                ) : existingRegistration.status === "waitlisted" ? (
+                  <Hourglass className="h-5 w-5 text-warning mr-2" />
                 ) : (
                   <AlertCircle className="h-5 w-5 text-destructive mr-2" />
                 )}
@@ -148,6 +146,19 @@ export default function EventRegistrationPage() {
                     <p className="text-foreground/60 mb-6">
                       Your registration for {event.title} is being reviewed. You will receive an
                       email once your registration is approved.
+                    </p>
+                  </>
+                )}
+
+                {existingRegistration.status === "waitlisted" && (
+                  <>
+                    <Hourglass className="h-16 w-16 text-warning mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-foreground/90 mb-2">
+                      You're on the Waitlist
+                    </h3>
+                    <p className="text-foreground/60 mb-6">
+                      {event.title} is currently at full capacity. If a confirmed attendee cancels,
+                      your registration will be promoted automatically.
                     </p>
                   </>
                 )}

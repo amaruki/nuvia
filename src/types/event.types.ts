@@ -122,6 +122,7 @@ export interface CreateEventRequest {
   title: string;
   description: string;
   shortDescription?: string;
+  category?: string;
   eventType: EventType;
   startDate: Date;
   endDate: Date;
@@ -140,6 +141,7 @@ export interface UpdateEventRequest {
   title?: string;
   description?: string;
   shortDescription?: string;
+  category?: string;
   eventType?: EventType;
   startDate?: Date;
   endDate?: Date;

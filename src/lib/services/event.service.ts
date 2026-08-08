@@ -25,6 +25,13 @@ import {
   UI_TO_DB_EVENT_TYPE,
   IN_PERSON_EVENT_FORMATS,
   REMOTE_EVENT_FORMATS,
+  DB_TO_UI_EVENT_STATUS,
+  DB_TO_UI_EVENT_TYPE,
+  DB_TO_UI_REGISTRATION_STATUS,
+  type DbEventFormat,
+  type DbEventStatus,
+  type DbEventType,
+  type DbRegistrationStatus,
 } from "@/lib/utils/event-utils";
 import {
   NotFoundError,
@@ -43,29 +50,22 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
 
     try {
       const errorData = await response.json();
-      errorMessage = errorData.message || errorMessage;
+      // RFC 9457 problems carry `detail`; legacy payloads used `message`.
+      errorMessage = errorData.detail || errorData.message || errorMessage;
 
       // Map HTTP status codes to custom error types
       if (response.status === 400) {
-        const errors = errorData.errors || { general: [errorMessage] };
-        const fieldErrors = Object.entries(errors).flatMap(([field, messages]) =>
-          (messages as string[]).map((message) => ({ field, message })),
-        );
-        throw new ValidationError(fieldErrors);
+        throw new ValidationError(normalizeFieldErrors(errorData.errors, errorMessage));
       } else if (response.status === 401) {
         throw new AuthorizationError("Unauthorized access");
       } else if (response.status === 403) {
-        throw new AuthorizationError("Insufficient permissions");
+        throw new AuthorizationError(errorData.detail || "Insufficient permissions");
       } else if (response.status === 404) {
         throw new NotFoundError("Resource", "unknown");
       } else if (response.status === 409) {
         throw new BusinessLogicError(errorMessage, "CONFLICT");
       } else if (response.status === 422) {
-        const errors = errorData.errors || { general: [errorMessage] };
-        const fieldErrors = Object.entries(errors).flatMap(([field, messages]) =>
-          (messages as string[]).map((message) => ({ field, message })),
-        );
-        throw new ValidationError(fieldErrors);
+        throw new ValidationError(normalizeFieldErrors(errorData.errors, errorMessage));
       }
     } catch (error) {
       if (
@@ -84,6 +84,31 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
   }
 
   return response.json();
+}
+
+/**
+ * Accepts both RFC 9457 validation payloads (`errors: [{ field, message }]`)
+ * and the legacy record shape (`errors: { field: [messages] }`) and returns
+ * the flat field-error list the UI error classes consume.
+ */
+function normalizeFieldErrors(
+  rawErrors: unknown,
+  fallbackMessage: string,
+): Array<{ field: string; message: string }> {
+  if (Array.isArray(rawErrors)) {
+    const fields = rawErrors
+      .filter((entry) => entry && typeof entry === "object")
+      .map((entry) => ({
+        field: String((entry as { field?: unknown }).field ?? "general"),
+        message: String((entry as { message?: unknown }).message ?? fallbackMessage),
+      }));
+    if (fields.length > 0) return fields;
+  } else if (rawErrors && typeof rawErrors === "object") {
+    return Object.entries(rawErrors as Record<string, string[]>).flatMap(([field, messages]) =>
+      (messages ?? []).map((message) => ({ field, message: String(message) })),
+    );
+  }
+  return [{ field: "general", message: fallbackMessage }];
 }
 
 // ---------------------------------------------------------------------------
@@ -156,6 +181,106 @@ function hydrateRegistration(payload: ApiEventRegistration): EventRegistration {
     createdAt: new Date(payload.createdAt),
     updatedAt: new Date(payload.updatedAt),
   };
+}
+
+// ---------------------------------------------------------------------------
+// Write-path payload types (backlog B3)
+//
+// The write endpoints (POST/PATCH/DELETE events, registrations) return the
+// storage shape: uppercase DB enums, camelCase storage columns, ISO dates.
+// The hydrate helpers below translate that shape into the UI types.
+// ---------------------------------------------------------------------------
+
+interface ApiEventWriteDto {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  shortDescription: string | null;
+  categoryId: string;
+  type: DbEventType;
+  format: DbEventFormat;
+  status: DbEventStatus;
+  visibility: string;
+  capacity: number | null;
+  registeredCount: number;
+  waitlistCount: number;
+  isVirtual: boolean;
+  isFree: boolean;
+  price: string | null;
+  currency: string;
+  location: string | null;
+  virtualUrl: string | null;
+  timezone: string;
+  startTime: string;
+  endTime: string;
+  registrationStart: string | null;
+  registrationEnd: string | null;
+  allowWaitlist: boolean;
+  requiresApproval: boolean;
+  tags: string[];
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ApiRegistrationWriteDto {
+  id: string;
+  eventId: string;
+  userId: string;
+  status: DbRegistrationStatus;
+  registeredAt: string;
+  checkedInAt: string | null;
+  checkedOutAt: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+function hydrateWriteEvent(payload: ApiEventWriteDto): Event {
+  return {
+    id: payload.id,
+    title: payload.title,
+    description: payload.description ?? "",
+    shortDescription: payload.shortDescription ?? undefined,
+    eventType: DB_TO_UI_EVENT_TYPE[payload.type],
+    status: DB_TO_UI_EVENT_STATUS[payload.status],
+    startDate: new Date(payload.startTime),
+    endDate: new Date(payload.endTime),
+    location: payload.location ?? "",
+    virtualEventUrl: payload.virtualUrl ?? undefined,
+    isVirtual: payload.isVirtual,
+    isInPerson: payload.format === "IN_PERSON" || payload.format === "HYBRID",
+    maxAttendees: payload.capacity ?? undefined,
+    currentAttendees: payload.registeredCount,
+    registrationDeadline: payload.registrationEnd ? new Date(payload.registrationEnd) : undefined,
+    organizerId: payload.createdBy,
+    tags: payload.tags,
+    createdAt: new Date(payload.createdAt),
+    updatedAt: new Date(payload.updatedAt),
+  };
+}
+
+function hydrateWriteRegistration(payload: ApiRegistrationWriteDto): EventRegistration {
+  return {
+    id: payload.id,
+    eventId: payload.eventId,
+    userId: payload.userId,
+    status: DB_TO_UI_REGISTRATION_STATUS[payload.status],
+    registeredAt: new Date(payload.registeredAt),
+    checkedInAt: payload.checkedInAt ? new Date(payload.checkedInAt) : undefined,
+    certificateIssued: false,
+    notes: payload.notes ?? undefined,
+    createdAt: new Date(payload.createdAt),
+    updatedAt: new Date(payload.updatedAt),
+  };
+}
+
+/** Derives the DB format enum from the UI's isVirtual/isInPerson flags. */
+function deriveEventFormat(isVirtual: boolean, isInPerson: boolean): DbEventFormat {
+  if (isVirtual && isInPerson) return "HYBRID";
+  if (isVirtual) return "VIRTUAL";
+  return "IN_PERSON";
 }
 
 /**
@@ -262,7 +387,7 @@ export async function getEventById(id: string): Promise<EventDetailsResponse> {
 }
 
 /**
- * Create a new event
+ * Create a new event (backlog B3 write path)
  */
 export async function createEvent(eventData: CreateEventRequest): Promise<Event> {
   try {
@@ -271,10 +396,29 @@ export async function createEvent(eventData: CreateEventRequest): Promise<Event>
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(eventData),
+      body: JSON.stringify({
+        title: eventData.title,
+        description: eventData.description,
+        shortDescription: eventData.shortDescription,
+        category: eventData.category ?? "general",
+        type: UI_TO_DB_EVENT_TYPE[eventData.eventType][0],
+        format: deriveEventFormat(eventData.isVirtual, eventData.isInPerson),
+        capacity: eventData.maxAttendees,
+        isVirtual: eventData.isVirtual,
+        location: eventData.location,
+        virtualUrl: eventData.virtualEventUrl,
+        startTime: eventData.startDate.toISOString(),
+        endTime: eventData.endDate.toISOString(),
+        registrationEnd: eventData.registrationDeadline?.toISOString(),
+        tags: eventData.tags ?? [],
+      }),
     });
 
-    return await handleApiResponse<Event>(response);
+    const envelope = await handleApiResponse<ApiEnvelope<ApiEventWriteDto>>(response);
+    if (!envelope.data) {
+      throw new Error("Unexpected response shape from create event");
+    }
+    return hydrateWriteEvent(envelope.data);
   } catch (error) {
     logger.error("Error creating event", error);
     throw error;
@@ -282,7 +426,7 @@ export async function createEvent(eventData: CreateEventRequest): Promise<Event>
 }
 
 /**
- * Update an existing event
+ * Update an existing event (backlog B3 write path — PATCH semantics)
  */
 export async function updateEvent(id: string, eventData: UpdateEventRequest): Promise<Event> {
   if (!id) {
@@ -290,15 +434,45 @@ export async function updateEvent(id: string, eventData: UpdateEventRequest): Pr
   }
 
   try {
-    const response = await fetch(`${env.API_PREFIX}/events/${id}`, {
-      method: "PUT",
+    const body: Record<string, unknown> = {};
+    if (eventData.title !== undefined) body.title = eventData.title;
+    if (eventData.description !== undefined) body.description = eventData.description;
+    if (eventData.shortDescription !== undefined)
+      body.shortDescription = eventData.shortDescription;
+    if (eventData.category !== undefined) body.category = eventData.category;
+    if (eventData.eventType !== undefined) {
+      body.type = UI_TO_DB_EVENT_TYPE[eventData.eventType][0];
+    }
+    if (eventData.isVirtual !== undefined && eventData.isInPerson !== undefined) {
+      body.format = deriveEventFormat(eventData.isVirtual, eventData.isInPerson);
+    }
+    if (eventData.isVirtual !== undefined) body.isVirtual = eventData.isVirtual;
+    if (eventData.maxAttendees !== undefined) body.capacity = eventData.maxAttendees;
+    if (eventData.location !== undefined) body.location = eventData.location;
+    if (eventData.virtualEventUrl !== undefined) body.virtualUrl = eventData.virtualEventUrl;
+    if (eventData.startDate !== undefined) body.startTime = eventData.startDate.toISOString();
+    if (eventData.endDate !== undefined) body.endTime = eventData.endDate.toISOString();
+    if (eventData.registrationDeadline !== undefined) {
+      body.registrationEnd = eventData.registrationDeadline.toISOString();
+    }
+    if (eventData.status !== undefined) {
+      body.status = UI_TO_DB_EVENT_STATUS[eventData.status][0];
+    }
+    if (eventData.tags !== undefined) body.tags = eventData.tags;
+
+    const response = await fetch(`${env.API_PREFIX}/events/${encodeURIComponent(id)}`, {
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(eventData),
+      body: JSON.stringify(body),
     });
 
-    return await handleApiResponse<Event>(response);
+    const envelope = await handleApiResponse<ApiEnvelope<ApiEventWriteDto>>(response);
+    if (!envelope.data) {
+      throw new Error("Unexpected response shape from update event");
+    }
+    return hydrateWriteEvent(envelope.data);
   } catch (error) {
     logger.error(`Error updating event with ID ${id}`, error);
     throw error;
@@ -306,7 +480,7 @@ export async function updateEvent(id: string, eventData: UpdateEventRequest): Pr
 }
 
 /**
- * Delete an event
+ * Delete an event (backlog B3 write path)
  */
 export async function deleteEvent(id: string): Promise<void> {
   if (!id) {
@@ -314,14 +488,14 @@ export async function deleteEvent(id: string): Promise<void> {
   }
 
   try {
-    const response = await fetch(`${env.API_PREFIX}/events/${id}`, {
+    const response = await fetch(`${env.API_PREFIX}/events/${encodeURIComponent(id)}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    return await handleApiResponse<void>(response);
+    await handleApiResponse<{ data: { id: string; deleted: boolean } }>(response);
   } catch (error) {
     logger.error(`Error deleting event with ID ${id}`, error);
     throw error;
@@ -329,7 +503,9 @@ export async function deleteEvent(id: string): Promise<void> {
 }
 
 /**
- * Register for an event
+ * Register for an event (backlog B3: POST /events/[id]/registrations).
+ * The user id comes from the session server-side; only notes travel in the
+ * body. Paid events surface a 501 problem until payments land.
  */
 export async function registerForEvent(
   registrationData: RegisterForEventRequest,
@@ -339,15 +515,41 @@ export async function registerForEvent(
   }
 
   try {
-    const response = await fetch(`${env.API_PREFIX}/events/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${env.API_PREFIX}/events/${encodeURIComponent(registrationData.eventId)}/registrations`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ notes: registrationData.notes }),
       },
-      body: JSON.stringify(registrationData),
-    });
+    );
 
-    return await handleApiResponse<EventRegistrationResponse>(response);
+    const envelope = await handleApiResponse<{
+      data: ApiRegistrationWriteDto;
+      meta?: { event?: ApiEventWriteDto };
+    }>(response);
+
+    const registration = hydrateWriteRegistration(envelope.data);
+    const event = envelope.meta?.event
+      ? hydrateWriteEvent(envelope.meta.event)
+      : (await getEventById(registrationData.eventId)).event;
+
+    const statusMessages: Record<DbRegistrationStatus, string> = {
+      CONFIRMED: "Your registration is confirmed",
+      PENDING: "Your registration is pending organizer approval",
+      WAITLISTED: "This event is full — you have been added to the waitlist",
+      CANCELED: "Registration canceled",
+      ATTENDED: "Your registration is confirmed",
+      NO_SHOW: "Your registration is confirmed",
+    };
+
+    return {
+      success: true,
+      message: statusMessages[envelope.data.status],
+      data: { registration, event },
+    };
   } catch (error) {
     logger.error("Error registering for event", error);
     throw error;
@@ -355,7 +557,8 @@ export async function registerForEvent(
 }
 
 /**
- * Cancel event registration
+ * Cancel event registration (backlog B3). Finds the caller's registration
+ * through the event detail endpoint, then POSTs to the cancel route.
  */
 export async function cancelEventRegistration(eventId: string): Promise<EventRegistrationResponse> {
   if (!eventId) {
@@ -363,14 +566,34 @@ export async function cancelEventRegistration(eventId: string): Promise<EventReg
   }
 
   try {
-    const response = await fetch(`${env.API_PREFIX}/events/${eventId}/cancel-registration`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const detail = await getEventById(eventId);
+    const registrationId = detail.registration?.id;
+    if (!registrationId) {
+      throw new BusinessLogicError("You are not registered for this event", "NOT_REGISTERED");
+    }
 
-    return await handleApiResponse<EventRegistrationResponse>(response);
+    const response = await fetch(
+      `${env.API_PREFIX}/events/${encodeURIComponent(eventId)}/registrations/${encodeURIComponent(registrationId)}/cancel`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    const envelope = await handleApiResponse<{
+      data: { registration: ApiRegistrationWriteDto; promoted: ApiRegistrationWriteDto | null };
+    }>(response);
+
+    return {
+      success: true,
+      message: "Your registration has been canceled",
+      data: {
+        registration: hydrateWriteRegistration(envelope.data.registration),
+        event: detail.event,
+      },
+    };
   } catch (error) {
     logger.error(`Error cancelling registration for event ${eventId}`, error);
     throw error;

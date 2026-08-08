@@ -33,6 +33,6 @@ This is the migrated, consolidated technical specification for Nuvia, an open-so
 | [`../PRINCIPLES.md`](../PRINCIPLES.md)                 | The eight project principles and their two documented conflicts |
 | [`../../CODING_STANDARD.md`](../../CODING_STANDARD.md) | Day-to-day coding conventions                                   |
 | [`../../TODO.md`](../../TODO.md)                       | The real roadmap: what works, what is mock, what is planned     |
-| `../../api-specs/`                                     | API endpoint contracts (not yet produced)                       |
-| `../../TASK_BREAKDOWN.md`                              | Sprint-by-sprint task board (not yet produced)                  |
-| `../../DEPLOYMENT_PLAN.md`                             | Deployment runbook (not yet produced)                           |
+| [`../api-specs/`](../api-specs/)                       | API endpoint contracts                                          |
+| [`../TASK_BREAKDOWN.md`](../TASK_BREAKDOWN.md)         | Module-by-module engineering breakdown                          |
+| [`../DEPLOYMENT_PLAN.md`](../DEPLOYMENT_PLAN.md)       | Deployment runbook                                              |

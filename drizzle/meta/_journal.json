@@ -43,6 +43,13 @@
       "when": 1786193584130,
       "tag": "0005_nosy_the_fallen",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786193704505,
+      "tag": "0006_early_thing",
+      "breakpoints": true
     }
   ]
 }

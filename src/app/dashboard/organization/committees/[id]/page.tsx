@@ -29,13 +29,12 @@ import {
   CheckSquare,
   Briefcase,
   ExternalLink,
-  UserPlus,
   Edit,
-  Settings,
   Download,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { mockCommittees } from "@/lib/data/mock-committee-data";
+import { apiFetch } from "@/lib/api-client";
+import { toCommitteeUi, type WireCommittee } from "@/lib/hooks/use-committees";
 
 export default function CommitteeDetailPage() {
   const params = useParams();
@@ -62,17 +61,14 @@ export default function CommitteeDetailPage() {
   }, [committee, setHeader, clearHeader]);
 
   useEffect(() => {
-    // Simulate API call to fetch committee details
     const fetchCommittee = async () => {
       setLoading(true);
       try {
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        const foundCommittee = mockCommittees.find((c) => c.id === committeeId);
-        setCommittee(foundCommittee || null);
+        const { data } = await apiFetch<WireCommittee>(`/api/v1/committees/${committeeId}`);
+        setCommittee(toCommitteeUi(data));
       } catch (error) {
         logger.error("Error fetching committee", error);
+        setCommittee(null);
       } finally {
         setLoading(false);
       }

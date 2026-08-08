@@ -86,6 +86,16 @@ async function main(): Promise<void> {
   try {
     if (managesLocalServices) {
       composeStarted = true;
+      // A previously started project — e.g. a test env kept up for manual
+      // debugging — may still hold a seeded volume. `up` reuses that
+      // container and its data, which breaks tests that assert global
+      // state (superadmin counts, unique emails). Drop it first so every
+      // run starts from the same empty database CI sees.
+      try {
+        await run([...COMPOSE_COMMAND, "down", "--volumes", "--remove-orphans"]);
+      } catch {
+        // Nothing was running; the `up` below is the goal either way.
+      }
       await run([...COMPOSE_COMMAND, "up", "--detach", "--wait"]);
     }
 

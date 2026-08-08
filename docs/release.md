@@ -20,7 +20,36 @@ A migration that combines expand and contract in one step becomes unsafe under a
 
 ## Artifact signing
 
-Nuvia does not implement artifact signing yet. The target is SLSA Build Level 2: a hosted GitHub Actions runner with signed provenance. Nuvia reaches this through `actions/attest-build-provenance` and `cosign` keyless signing (OIDC, with no long-lived signing key to leak). Level 3 (a fully isolated, non-falsifiable build) is a stretch goal, not a requirement for `1.0`.
+Nuvia implements SLSA Build Level 2 at release time. `.github/workflows/release.yml` runs when a GitHub Release is published — the release mechanism this document's Promotion section assumes — and does the following:
+
+- Builds the artifact once, with the same environment as CI's heavy job, and packages it as `nuvia-build-<tag>.tar.gz` (the `.next` build output, `public`, `package.json`, `bun.lock`, and the `drizzle/` migrations — the deployable unit).
+- Generates a signed SLSA build-provenance attestation for the tarball with `actions/attest-build-provenance`, stored in GitHub's attestation store. Nothing is pushed to any registry.
+- Signs the tarball keylessly with `cosign sign-blob` against Sigstore Public Good, using the GitHub Actions OIDC token. No long-lived signing key exists, so there is none to leak.
+- Uploads the tarball, its `sha256` checksum, the cosign bundle (`*.sigstore.json`), and the attestation bundle as workflow-run artifacts.
+
+Level 3 (a fully isolated, non-falsifiable build) remains a stretch goal, not a requirement for `1.0`.
+
+### Verification
+
+Download the release workflow run's artifacts (`gh run download`), then verify both trust chains:
+
+Provenance, via the GitHub attestation CLI:
+
+```sh
+gh attestation verify nuvia-build-<tag>.tar.gz --repo amaruki/nuvia
+```
+
+Keyless signature, via cosign:
+
+```sh
+cosign verify-blob \
+  --bundle nuvia-build-<tag>.tar.gz.sigstore.json \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp '^https://github\.com/amaruki/nuvia/\.github/workflows/release\.yml@refs/tags/.*' \
+  nuvia-build-<tag>.tar.gz
+```
+
+The attestation check proves the bytes were built by this repository's workflow; the cosign check pins the signer to exactly `release.yml` running at a release tag. Verification fails if the tarball differs by one byte from what that run built, or if it was signed by any other workflow, repository, or ref. An artifact that passes both checks is what the Promotion section's rule protects: the signed bytes and the deployed bytes are the same bytes.
 
 ## Promotion
 

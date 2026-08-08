@@ -1,0 +1,134 @@
+# Release — SLSA Build Level 2 provenance + keyless signing
+# (docs/planning/01-todo-backlog.md E2; docs/release.md "Artifact signing").
+#
+# The release mechanism follows docs/release.md: the artifact is built once,
+# on release publish, and promoted unchanged — never rebuilt per environment.
+# What this workflow adds on top of that build:
+#
+#   1. A signed SLSA build-provenance attestation for the build tarball, via
+#      actions/attest-build-provenance, stored in GitHub's attestation store
+#      (push-to-registry stays false: nothing is pushed anywhere).
+#   2. A keyless cosign signature (Sigstore Public Good) over the same
+#      tarball, using the GitHub Actions OIDC token. No long-lived signing
+#      key exists, so there is no key to leak.
+#
+# That combination is SLSA Build Level 2 (hosted build + signed provenance).
+# Level 3 is a stretch goal per docs/release.md, not implemented here.
+#
+# permissions is deliberately minimal: contents stays read-only, so this
+# workflow cannot write release assets or code; the two write scopes exist
+# only for the attestation store and the OIDC token exchange.
+#
+# Third-party actions are pinned to full commit SHAs per docs/supply-chain.md;
+# the tag each SHA resolves to is cited inline. SHAs verified against the
+# upstream repos' tag refs (`git ls-remote --tags ... '<tag>^{}'`) on 2026-08-08.
+
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  # Never cancel a release mid-signature: a partial run leaves an attested
+  # but unsigned artifact. Re-run manually if a run must be discarded.
+  cancel-in-progress: false
+
+jobs:
+  build-attest-sign:
+    name: Build, attest, and sign release artifact
+    runs-on: ubuntu-latest
+    services:
+      # Same services and env as CI's heavy job (.github/workflows/ci.yml):
+      # `next build` forces NODE_ENV=production internally regardless of the
+      # NODE_ENV env var, and src/lib/env.ts refuses to boot in production
+      # without REDIS_URL set (docs/adr/0003-single-rate-limiter.md).
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nuvia
+          POSTGRES_PASSWORD: nuvia
+          POSTGRES_DB: nuvia
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://nuvia:nuvia@localhost:5432/nuvia
+      REDIS_URL: redis://localhost:6379
+      BETTER_AUTH_SECRET: ci-only-secret-not-for-production-use-0000000000
+      APP_URL: http://localhost:3000
+      NODE_ENV: test
+      # github.ref_name is the release tag on `release: published`.
+      ARTIFACT: nuvia-build-${{ github.ref_name }}.tar.gz
+    steps:
+      # actions/checkout v4.4.0 (v4)
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      # oven-sh/setup-bun v2.2.0 (v2)
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version: "1.3.14" # matches package.json's packageManager
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      - name: Package build output
+        run: |
+          mkdir -p dist
+          # The deployable unit per docs/release.md's promote-once model:
+          # build output + runtime assets + lockfile + migrations.
+          tar --create --gzip --file "dist/$ARTIFACT" \
+            .next public package.json bun.lock drizzle
+          (cd dist && sha256sum "$ARTIFACT" > "$ARTIFACT.sha256")
+      # actions/attest-build-provenance v3.2.0 (v3). Attests the tarball's
+      # sha256 digest into a signed SLSA provenance statement and publishes
+      # it to GitHub's attestation store. push-to-registry is explicitly
+      # false: this is a file artifact, nothing is pushed anywhere.
+      - name: Generate SLSA build provenance attestation
+        id: attest
+        uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f
+        with:
+          subject-path: dist/${{ env.ARTIFACT }}
+          push-to-registry: false
+      - name: Collect attestation bundle
+        env:
+          ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: cp "$ATTESTATION_BUNDLE" "dist/$ARTIFACT.attestation.sigstore.json"
+      # sigstore/cosign-installer v3.10.1 (v3); the cosign binary itself is
+      # pinned too — the installer defaults to an older release.
+      - name: Install cosign
+        uses: sigstore/cosign-installer@7e8b541eb2e61bf99390e1afd4be13a184e9ebc5
+        with:
+          cosign-release: v3.1.3
+      # Keyless signing: cosign obtains a short-lived Sigstore certificate
+      # bound to this exact workflow run via the GitHub Actions OIDC token
+      # (id-token: write above). --yes skips interactive confirmation; the
+      # bundle carries the signature + certificate + transparency entry.
+      - name: Keyless-sign the artifact (OIDC, no stored key)
+        run: |
+          cosign sign-blob --yes \
+            --bundle "dist/$ARTIFACT.sigstore.json" \
+            "dist/$ARTIFACT"
+      # actions/upload-artifact v4.6.2 (v4). Uploaded as workflow-run
+      # artifacts, not release assets: that keeps contents at read-only.
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: nuvia-release-${{ github.ref_name }}
+          path: dist/

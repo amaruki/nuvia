@@ -6,10 +6,11 @@
 **Extended:** 2026-08-08 (backlog C5) — the Finance module promotion (`config/features.ts` `finance: true`) adds its six dashboard pages to the conformance scope and to the axe smoke.
 **Extended:** 2026-08-08 (backlog D1) — the Chapters module promotion (`config/features.ts` `chapters: true`) adds its dashboard directory page to the conformance scope and to the axe smoke.
 **Extended:** 2026-08-08 (backlog D2) — the Committees module promotion (`config/features.ts` `committees: true`) adds its dashboard directory page to the conformance scope and to the axe smoke.
+**Extended:** 2026-08-08 (backlog D3) — the Learning module promotion (`config/features.ts` `learning: true`) adds its courses dashboard page to the conformance scope and to the axe smoke.
 
 ## Scope
 
-Per ADR-0008, the WCAG 2.2 AA surface is the **enabled** modules only; flag-off modules are excluded from conformance for 1.0 because feature flags shrink the surface that must conform. Eight modules are enabled as of the D2 committees promotion (2026-08-08).
+Per ADR-0008, the WCAG 2.2 AA surface is the **enabled** modules only; flag-off modules are excluded from conformance for 1.0 because feature flags shrink the surface that must conform. Nine modules are enabled as of the D3 learning promotion (2026-08-08).
 
 | Module     | Flag (config/features.ts) | Representative authenticated page                                                                                                                                                                           |
 | ---------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -21,11 +22,12 @@ Per ADR-0008, the WCAG 2.2 AA surface is the **enabled** modules only; flag-off 
 | finance    | enabled                   | all six dashboard pages: `/dashboard/finance/dues`, `/dashboard/finance/invoices`, `/dashboard/finance/reports`, `/dashboard/finance/budget`, `/dashboard/finance/donations`, `/dashboard/finance/gateways` |
 | chapters   | enabled                   | `/dashboard/organization/chapters`                                                                                                                                                                          |
 | committees | enabled                   | `/dashboard/organization/committees`                                                                                                                                                                        |
+| learning   | enabled                   | `/dashboard/learning/courses`                                                                                                                                                                               |
 | (public)   | —                         | `/events`, `/jobs`                                                                                                                                                                                          |
 
 Page selection: one authenticated page per enabled module, chosen as the page with the densest interaction in that module (tables + filters + dialogs + modals), plus the two public listings that are reachable without authentication. The public pages are in scope because enabled modules include their public surface. Finance is the exception on purpose: at its C5 promotion (2026-08-08) all six of its dashboard pages joined the smoke, so the module is covered page-completely rather than by one representative.
 
-Flag-off modules (`awards`, `learning`, `workspaces`) are **not** axe-audited and are not part of this conformance claim. Finance, chapters and committees were in this list until their C5/D1/D2 promotions moved them into scope.
+Flag-off modules (`awards`, `workspaces`) are **not** axe-audited and are not part of this conformance claim. Finance, chapters, committees and learning were in this list until their C5/D1/D2/D3 promotions moved them into scope.
 
 ## Automated gates
 
@@ -44,7 +46,7 @@ Status at this record: `bunx oxlint` exits 0 (remaining diagnostics are pre-exis
 1. Boots the test Postgres/Redis stack (`compose.test.yml`, project `nuvia-test`) if not already up, pushes the schema (`drizzle-kit push --force`), and seeds the admin accounts with a fresh per-run `SEED_ADMIN_PASSWORD` (never reused, satisfies the password-strength policy).
 2. Spawns `next dev` on a dedicated port (default **3111**, override `A11Y_SMOKE_PORT`) unless something already answers there. A server the script spawned is killed on exit (whole process group); a pre-existing one is left alone. Port 3111 is used because 3100 is occupied by an unrelated local service.
 3. Signs in as the seeded superadmin (`admin@nuvia.com`) via `POST /api/auth/sign-in/email` and installs the session cookie into the Playwright context.
-4. Runs `AxeBuilder` (`@axe-core/playwright`, tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`) against the fifteen pages above.
+4. Runs `AxeBuilder` (`@axe-core/playwright`, tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`) against the sixteen pages above.
 5. **Fails on `critical`/`serious` violations; `moderate`/`minor` are report-only.** Raw axe JSON per page plus a `summary.json` land in a unique `/tmp/nuvia-a11y-smoke-<timestamp>-<pid>/` directory.
 
 Initial run for the E1 record: **all 7 pages PASS — 0 critical/serious, 0 moderate/minor** (raw results: `/tmp/nuvia-a11y-smoke-2026-08-08T11-55-10-375Z-4038955/`).
@@ -54,6 +56,8 @@ Final run for the C5 promotion extension (2026-08-08): **all 13 pages PASS — 0
 Final run for the D1 promotion extension (2026-08-08): **all 14 pages PASS — 0 critical/serious, 0 moderate/minor**, including the new chapters directory page with no axe violations found (raw results: `/tmp/nuvia-a11y-smoke-2026-08-08T13-15-18-337Z-147770/`).
 
 Final run for the D2 promotion extension (2026-08-08): **all 15 pages PASS — 0 critical/serious, 0 moderate/minor**, including the new committees directory page with no axe violations found (raw results: `/tmp/nuvia-a11y-smoke-2026-08-08T13-18-43-973Z-161234/`).
+
+Final run for the D3 promotion extension (2026-08-08): **all 16 pages PASS — 0 critical/serious, 0 moderate/minor**, including the new learning courses page with no axe violations found (raw results: `/tmp/nuvia-a11y-smoke-2026-08-08T14-29-22-147Z-414724/`). The audit surfaced two latent violations that accumulated test data now renders: white on `--destructive` badges at 3.76:1 (finance dues/invoices) and `text-destructive/90` alert text at 4.49:1 (chapters). Both were fixed by darkening `--destructive` to `oklch(0.505 0.213 27.518)` (≥5.6:1 across the destructive combinations). The member directory sort control also intermittently lacked an accessible name (axe `button-name`); it now carries an explicit `aria-label` (`src/components/memberships/membership-list.tsx`). Finally, the smoke harness flushes the test Redis before auditing so stale IP-keyed rate-limit buckets from earlier runs cannot inject 429 error states mid-audit.
 
 Known-benign static finding left in place per the C5 brief: one `jsx-a11y(prefer-tag-over-role)` **warning** at `src/app/dashboard/finance/reports/page.tsx:183` (clickable report rows use `role="button"`). It is warning-level (does not fail the oxlint gate), the rows remain keyboard-operable, and converting them to real `<button>`s is a follow-up rather than a promotion blocker.
 
@@ -116,4 +120,4 @@ The jsx-a11y gate is repo-wide (oxlint has no module awareness), so enabling it 
 - **One page per module (except finance).** The axe smoke audits one representative page per enabled module; finance is covered on all six of its dashboard pages since its C5 promotion. Detail pages (e.g. single article, forum thread, job detail), empty/error states, and rarely-opened dialogs are not covered by the runtime gate; the static oxlint gate covers their code.
 - **Light theme only.** The smoke runs the default (light) theme. Dark-theme contrast is expected to pass for the same reason (both `--primary` values were fixed), but is not yet audited.
 - **`media-has-caption` waiver.** `media-details-modal.tsx` renders uploaded video/audio previews that carry no caption tracks; the two violations carry an inline disable with justification. Supplying real tracks is a content responsibility, and this should be revisited when media gains a caption field.
-- **Contrast of future colors.** The gate catches contrast regressions only on the fifteen audited pages; new components using low-opacity text utilities elsewhere will only be caught if those pages join the audit list.
+- **Contrast of future colors.** The gate catches contrast regressions only on the sixteen audited pages; new components using low-opacity text utilities elsewhere will only be caught if those pages join the audit list.

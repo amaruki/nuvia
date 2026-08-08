@@ -105,6 +105,7 @@ Wave C preamble: finance/dues is the product core for an AMS and the first modul
   - Why: learning/CPD is the next module in the post-1.0 promotion order, and its courses/certifications pages currently render mock data.
   - Acceptance: learning/CPD clears the same promotion bar as C5 — schema + authorized API + courses/certifications pages on real data + tests + docs, with the module flag flipped on.
   - Deps: C5 pattern.
+  - Status: done 2026-08-08. Learning cleared the C5 promotion bar: schema (`course` + `certificate` tables, `course_level`/`certificate_status` enums, migration 0009), authorized API `/api/v1/learning/**` on `learning:*` permissions, courses/certifications/admin pages de-mocked (`courses/_data/mock-data.ts` deleted; hooks and pages on `learning.service.ts` via `use-learning-courses`/`use-learning-certificates`), 27 tests in `tests/learning-api.test.ts`, module docs at `docs/modules/learning.md`, and `learning: true` in `config/features.ts` with `/dashboard/learning/courses` added to the axe smoke (16 pages PASS, 0 critical/serious).
 
 - **D4 — Awards real (same bar; no schema exists yet — item includes schema design).**
   - Why: awards is the next module in the post-1.0 promotion order, and it has no schema today, so the item must include schema design.

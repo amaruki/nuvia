@@ -32,13 +32,15 @@ export const MODULE_NAMES = [
 export type ModuleName = (typeof MODULE_NAMES)[number];
 
 /**
- * §13.3 registry. members/events/content/forums/jobs, finance, chapters and
- * committees are Promoted: backing schema + authorized API + tests + docs
- * (finance promoted 2026-08-08, backlog C5, docs/modules/finance.md;
- * chapters promoted 2026-08-08, backlog D1, docs/modules/chapters.md;
- * committees promoted 2026-08-08, backlog D2, docs/modules/committees.md).
- * The remaining three render from src/lib/data/mock-*.ts and stay off until
- * promoted (§13.4 order: learning, awards, workspaces).
+ * §13.3 registry. members/events/content/forums/jobs, finance, chapters,
+ * committees and learning are Promoted: backing schema + authorized API +
+ * tests + docs (finance promoted 2026-08-08, backlog C5,
+ * docs/modules/finance.md; chapters promoted 2026-08-08, backlog D1,
+ * docs/modules/chapters.md; committees promoted 2026-08-08, backlog D2,
+ * docs/modules/committees.md; learning promoted 2026-08-08, backlog D3,
+ * docs/modules/learning.md). The remaining two (awards, workspaces) cleared
+ * the same bar in D4/D5 on 2026-08-08 and await their flag flips (§13.4
+ * order).
  */
 export const MODULE_FLAGS: Record<ModuleName, boolean> = {
   members: true,
@@ -48,7 +50,7 @@ export const MODULE_FLAGS: Record<ModuleName, boolean> = {
   jobs: true,
   finance: true,
   awards: false,
-  learning: false,
+  learning: true,
   chapters: true,
   committees: true,
   workspaces: false,

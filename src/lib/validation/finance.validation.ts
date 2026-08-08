@@ -1,5 +1,5 @@
 /**
- * Finance request schemas (backlog C2). Zod is the source of truth for
+ * Finance request schemas (backlog C2 + C3). Zod is the source of truth for
  * request shapes (CODING_STANDARD §2.2); the tier/subscription services and
  * the /api/v1/finance routes both parse through these.
  *
@@ -104,3 +104,64 @@ export const cancelSubscriptionSchema = z.object({
 
 /** Input shape callers provide (defaults not yet applied). */
 export type CancelSubscriptionInput = z.input<typeof cancelSubscriptionSchema>;
+
+/** Invoice statuses — mirrors InvoiceStatus in src/db/schema/enums.ts. */
+export const invoiceStatusSchema = z.enum(["ISSUED", "PAID", "VOID"]);
+
+/**
+ * C3: invoice creation. An invoice always bills exactly one subscription
+ * (user + tier are derived from it). Omitted `items` produces a single
+ * default line item from the tier's price (see invoice.service).
+ */
+export const invoiceItemInputSchema = z.object({
+  description: z.string().trim().min(1).max(500),
+  quantity: z.number().int().positive().default(1),
+  unitPrice: moneyString,
+});
+
+export const createInvoiceSchema = z.object({
+  subscriptionId: z.string().min(1),
+  items: z.array(invoiceItemInputSchema).min(1).optional(),
+  notes: z.string().max(2000).optional(),
+  dueDate: z.coerce.date().optional(),
+});
+
+export type CreateInvoiceInput = z.infer<typeof createInvoiceSchema>;
+export type InvoiceItemInput = z.infer<typeof invoiceItemInputSchema>;
+
+/**
+ * C3: manual payment recording. Amounts stay string-mode; the service
+ * rejects overpayment and payments against non-ISSUED invoices.
+ */
+export const recordPaymentSchema = z.object({
+  invoiceId: z.string().min(1),
+  amount: moneyString,
+  paymentMethod: z.string().trim().min(1).max(100).optional(),
+  reason: z.string().max(500).optional(),
+});
+
+export type RecordPaymentInput = z.infer<typeof recordPaymentSchema>;
+
+/** Shared pagination for finance list endpoints (docs/api/conventions.md). */
+export const pageSchema = z.coerce.number().int().min(1).default(1);
+export const limitSchema = z.coerce.number().int().min(1).max(100).default(20);
+
+export const invoiceListQuerySchema = z.object({
+  userId: z.string().min(1).optional(),
+  subscriptionId: z.string().min(1).optional(),
+  status: invoiceStatusSchema.optional(),
+  page: pageSchema,
+  limit: limitSchema,
+});
+
+export type InvoiceListQuery = z.infer<typeof invoiceListQuerySchema>;
+
+export const paymentListQuerySchema = z.object({
+  invoiceId: z.string().min(1).optional(),
+  userId: z.string().min(1).optional(),
+  subscriptionId: z.string().min(1).optional(),
+  page: pageSchema,
+  limit: limitSchema,
+});
+
+export type PaymentListQuery = z.infer<typeof paymentListQuerySchema>;

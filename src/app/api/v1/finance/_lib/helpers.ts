@@ -1,5 +1,5 @@
 /**
- * Shared helpers for the /api/v1/finance routes (backlog C2).
+ * Shared helpers for the /api/v1/finance routes (backlog C2 + C3).
  * - one error→RFC 9457 mapping for the finance services,
  * - one actor builder (audit context from the request),
  * - one tolerant JSON body parser (lifecycle actions accept an empty body).
@@ -12,21 +12,25 @@ import { logger } from "@/lib/logger";
 import type { ActorContext } from "@/lib/services/subscription.service";
 
 /** Business-rule violations that collide with current resource state map to 409. */
-const CONFLICT_CODES = new Set([
-  "INVALID_TRANSITION",
-  "SUBSCRIPTION_ALREADY_ACTIVE",
-  "SUBSCRIPTION_STILL_ENTITLED",
-  "TIER_NAME_TAKEN",
-  "TIER_IN_USE",
-  "TIER_INACTIVE",
-]);
+const CONFLICT_CODES: Record<string, true> = {
+  INVALID_TRANSITION: true,
+  SUBSCRIPTION_ALREADY_ACTIVE: true,
+  SUBSCRIPTION_STILL_ENTITLED: true,
+  TIER_NAME_TAKEN: true,
+  TIER_IN_USE: true,
+  TIER_INACTIVE: true,
+  // C3: invoice/payment state collisions
+  INVOICE_NOT_PAYABLE: true,
+  INVOICE_NOT_VOIDABLE: true,
+  OVERPAYMENT_NOT_ALLOWED: true,
+};
 
 export function problemFromFinanceError(error: unknown, context: string): ProblemDetails {
   if (error instanceof NotFoundError) {
     return problems.notFound(error.message);
   }
   if (error instanceof BusinessLogicError) {
-    return CONFLICT_CODES.has(error.code)
+    return CONFLICT_CODES[error.code] === true
       ? problems.conflict(error.message)
       : problems.businessLogicError(error.message);
   }

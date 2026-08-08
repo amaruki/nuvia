@@ -25,88 +25,115 @@ const boolFromString = (defaultValue: boolean) =>
     .optional()
     .transform((v) => (v === undefined ? defaultValue : v === "true"));
 
-const envSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+const envSchema = z
+  .object({
+    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 
-  // Application
-  APP_URL: z.string().url(),
-  NEXT_PUBLIC_APP_URL: z.string().url().optional(),
+    // Application
+    APP_URL: z.string().url(),
+    NEXT_PUBLIC_APP_URL: z.string().url().optional(),
 
-  // Database — no fallback. An unset DATABASE_URL is a boot failure, not a
-  // silent switch to SQLite.
-  DATABASE_URL: z
-    .string()
-    .url()
-    .refine((url) => url.startsWith("postgresql://") || url.startsWith("postgres://"), {
-      message: "DATABASE_URL must be a postgresql:// connection string",
-    }),
+    // Database — no fallback. An unset DATABASE_URL is a boot failure, not a
+    // silent switch to SQLite.
+    DATABASE_URL: z
+      .string()
+      .url()
+      .refine((url) => url.startsWith("postgresql://") || url.startsWith("postgres://"), {
+        message: "DATABASE_URL must be a postgresql:// connection string",
+      }),
 
-  // Auth
-  BETTER_AUTH_SECRET: z
-    .string()
-    .min(32, "BETTER_AUTH_SECRET must be at least 32 characters")
-    .refine((v) => !isProductionRuntime || v !== "your-secret-key-here", {
-      message: "BETTER_AUTH_SECRET is still set to the placeholder value in production",
-    }),
-  /** @deprecated Unused — better-auth manages sessions itself. Kept optional until removed; see TODO.md. */
-  JWT_SECRET: z.string().optional(),
+    // Auth
+    BETTER_AUTH_SECRET: z
+      .string()
+      .min(32, "BETTER_AUTH_SECRET must be at least 32 characters")
+      .refine((v) => !isProductionRuntime || v !== "your-secret-key-here", {
+        message: "BETTER_AUTH_SECRET is still set to the placeholder value in production",
+      }),
+    /** @deprecated Unused — better-auth manages sessions itself. Kept optional until removed; see TODO.md. */
+    JWT_SECRET: z.string().optional(),
 
-  // OAuth (all optional — providers are enabled only when their pair is present)
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
-  GITHUB_CLIENT_ID: z.string().optional(),
-  GITHUB_CLIENT_SECRET: z.string().optional(),
-  LINKEDIN_CLIENT_ID: z.string().optional(),
-  LINKEDIN_CLIENT_SECRET: z.string().optional(),
+    // OAuth (all optional — providers are enabled only when their pair is present)
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
+    GITHUB_CLIENT_ID: z.string().optional(),
+    GITHUB_CLIENT_SECRET: z.string().optional(),
+    LINKEDIN_CLIENT_ID: z.string().optional(),
+    LINKEDIN_CLIENT_SECRET: z.string().optional(),
 
-  // Email
-  EMAIL_HOST: z.string().optional(),
-  EMAIL_PORT: z.coerce.number().int().positive().default(587),
-  EMAIL_USER: z.string().optional(),
-  EMAIL_PASS: z.string().optional(),
-  EMAIL_FROM: z.string().default("noreply@example.com"),
-  RESEND_API_KEY: z.string().optional(),
+    // Email
+    EMAIL_HOST: z.string().optional(),
+    EMAIL_PORT: z.coerce.number().int().positive().default(587),
+    EMAIL_USER: z.string().optional(),
+    EMAIL_PASS: z.string().optional(),
+    EMAIL_FROM: z.string().default("noreply@example.com"),
+    RESEND_API_KEY: z.string().optional(),
 
-  // Rate limiting / Redis (see docs/adr/0003-single-rate-limiter.md — Redis is
-  // required in production because the in-memory limiter it replaces cannot
-  // survive more than one server process)
-  RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(5),
-  RATE_LIMIT_WINDOW_MINUTES: z.coerce.number().int().positive().default(15),
-  ENABLE_REDIS_CACHE: boolFromString(false),
-  REDIS_URL: z.string().optional(),
+    // Rate limiting / Redis (see docs/adr/0003-single-rate-limiter.md — Redis is
+    // required in production because the in-memory limiter it replaces cannot
+    // survive more than one server process)
+    RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(5),
+    RATE_LIMIT_WINDOW_MINUTES: z.coerce.number().int().positive().default(15),
+    ENABLE_REDIS_CACHE: boolFromString(false),
+    REDIS_URL: z.string().optional(),
 
-  // CORS
-  CORS_ORIGIN: z.string().default("http://localhost:3000"),
-  CORS_CREDENTIALS: boolFromString(false),
+    // CORS
+    CORS_ORIGIN: z.string().default("http://localhost:3000"),
+    CORS_CREDENTIALS: boolFromString(false),
 
-  // API prefix for client-side service fetches (src/lib/services/*)
-  API_PREFIX: z.string().default("/api/v1"),
+    // API prefix for client-side service fetches (src/lib/services/*)
+    API_PREFIX: z.string().default("/api/v1"),
 
-  // Uploads
-  UPLOAD_MAX_SIZE: z.coerce.number().int().positive().default(5_242_880),
-  UPLOAD_ALLOWED_TYPES: z
-    .string()
-    .default("image/jpeg,image/png,image/gif,image/webp")
-    .transform((v) => v.split(",")),
+    // Uploads
+    UPLOAD_MAX_SIZE: z.coerce.number().int().positive().default(5_242_880),
+    UPLOAD_ALLOWED_TYPES: z
+      .string()
+      .default("image/jpeg,image/png,image/gif,image/webp")
+      .transform((v) => v.split(",")),
 
-  // Logging
-  LOGGING_LEVEL: z.enum(["error", "warn", "info", "debug"]).default("info"),
-  LOGGING_REQUESTS: boolFromString(false),
-  LOGGING_ERRORS: boolFromString(true),
+    // Logging
+    LOGGING_LEVEL: z.enum(["error", "warn", "info", "debug"]).default("info"),
+    LOGGING_REQUESTS: boolFromString(false),
+    LOGGING_ERRORS: boolFromString(true),
 
-  // Payments — provider selection for the gateway adapter seam
-  // (docs/adr/0015-payment-gateway-adapter-stripe-first.md). Resolved in one
-  // place by resolvePaymentGateway(); "stripe" is accepted ahead of the
-  // adapter itself, which lands with C3.
-  PAYMENT_GATEWAY: z.enum(["manual", "stripe"]).default("manual"),
+    // Payments — provider selection for the gateway adapter seam
+    // (docs/adr/0015-payment-gateway-adapter-stripe-first.md). Resolved in one
+    // place by resolvePaymentGateway(); "stripe" is accepted ahead of the
+    // adapter itself, which lands with C3.
+    PAYMENT_GATEWAY: z.enum(["manual", "stripe"]).default("manual"),
+    // Stripe adapter credentials (ADR-0015). Optional by design — manual-mode
+    // deployments, builds, and tests never need them. Choosing
+    // PAYMENT_GATEWAY=stripe without them fails at boot via the superRefine
+    // below: fail loudly at boot, not on the first checkout.
+    STRIPE_SECRET_KEY: z.string().optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().optional(),
 
-  // Feature flags
-  FEATURE_EMAIL_VERIFICATION: boolFromString(true),
-  FEATURE_TWO_FACTOR_AUTH: boolFromString(false),
-  FEATURE_SOCIAL_LOGIN: boolFromString(true),
-  FEATURE_ACCOUNT_DELETION: boolFromString(true),
-  FEATURE_PASSWORD_STRENGTH_METER: boolFromString(true),
-});
+    // Feature flags
+    FEATURE_EMAIL_VERIFICATION: boolFromString(true),
+    FEATURE_TWO_FACTOR_AUTH: boolFromString(false),
+    FEATURE_SOCIAL_LOGIN: boolFromString(true),
+    FEATURE_ACCOUNT_DELETION: boolFromString(true),
+    FEATURE_PASSWORD_STRENGTH_METER: boolFromString(true),
+  })
+  .superRefine((data, ctx) => {
+    // PAYMENT_GATEWAY=stripe is unusable without both credentials: the
+    // adapter refuses to construct without the secret key, and webhook
+    // signature verification needs the signing secret.
+    if (data.PAYMENT_GATEWAY !== "stripe") return;
+    if (!data.STRIPE_SECRET_KEY) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["STRIPE_SECRET_KEY"],
+        message: "STRIPE_SECRET_KEY is required when PAYMENT_GATEWAY=stripe",
+      });
+    }
+    if (!data.STRIPE_WEBHOOK_SECRET) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["STRIPE_WEBHOOK_SECRET"],
+        message: "STRIPE_WEBHOOK_SECRET is required when PAYMENT_GATEWAY=stripe",
+      });
+    }
+  });
 
 export type Env = z.infer<typeof envSchema>;
 

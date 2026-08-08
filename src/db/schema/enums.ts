@@ -28,6 +28,11 @@ export const transactionStatusEnum = pgEnum("TransactionStatus", [
   "PARTIALLY_REFUNDED",
 ]);
 
+// Membership invoicing (backlog C3): an invoice is ISSUED until a payment
+// settles it (PAID) or the treasurer voids it (VOID). PAID and VOID are
+// terminal — there is no path back to ISSUED.
+export const invoiceStatusEnum = pgEnum("InvoiceStatus", ["ISSUED", "PAID", "VOID"]);
+
 // Events
 export const eventTypeEnum = pgEnum("EventType", [
   "CONFERENCE",

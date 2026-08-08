@@ -20,9 +20,11 @@ interface WelcomeEmailProps {
 export function WelcomeEmail({ userName, dashboardUrl = "/dashboard" }: WelcomeEmailProps) {
   return (
     <Html>
-      <Head />
       <Preview>Welcome to our platform!</Preview>
       <Tailwind>
+        {/* Head must sit inside Tailwind so media-query/hover classes can
+            be emitted into a <style> tag; outside, rendering throws. */}
+        <Head />
         <Body className="bg-gray-50 font-sans">
           <Container className="max-w-lg mx-auto bg-white rounded-lg shadow-lg">
             {/* Logo/Header */}

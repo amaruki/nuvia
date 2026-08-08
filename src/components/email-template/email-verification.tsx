@@ -19,9 +19,11 @@ interface EmailVerificationProps {
 export function EmailVerificationEmail({ verificationUrl, userName }: EmailVerificationProps) {
   return (
     <Html>
-      <Head />
       <Preview>Verify your email address</Preview>
       <Tailwind>
+        {/* Head must sit inside Tailwind so media-query/hover classes can
+            be emitted into a <style> tag; outside, rendering throws. */}
+        <Head />
         <Body className="bg-gray-50 font-sans">
           <Container className="max-w-lg mx-auto bg-white rounded-lg shadow-lg">
             {/* Logo/Header */}

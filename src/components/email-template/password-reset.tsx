@@ -19,9 +19,11 @@ interface PasswordResetEmailProps {
 export function PasswordResetEmail({ resetUrl, userName }: PasswordResetEmailProps) {
   return (
     <Html>
-      <Head />
       <Preview>Reset your password</Preview>
       <Tailwind>
+        {/* Head must sit inside Tailwind so media-query/hover classes can
+            be emitted into a <style> tag; outside, rendering throws. */}
+        <Head />
         <Body className="bg-gray-50 font-sans">
           <Container className="max-w-lg mx-auto bg-white rounded-lg shadow-lg">
             {/* Logo/Header */}

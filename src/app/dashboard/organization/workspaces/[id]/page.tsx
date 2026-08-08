@@ -8,47 +8,24 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  CommitteeWorkspace,
-  WorkspaceMember,
-  WorkspaceDocument,
-  WorkspaceTask,
-  WorkspaceDiscussion,
-  WorkspaceMeeting,
-  WorkspaceActivity,
-} from "@/types/committee.types";
+import { CommitteeWorkspace } from "@/types/committee.types";
 import {
   ArrowLeft,
-  Mail,
-  Phone,
-  MapPin,
   Calendar,
   Users,
-  Target,
-  Award,
   Clock,
   CheckSquare,
   Briefcase,
-  ExternalLink,
-  UserPlus,
   Edit,
-  Settings,
   Download,
   FileText,
   MessageSquare,
   Activity,
-  Plus,
-  Search,
-  Filter,
-  Eye,
-  MoreHorizontal,
-  TrendingUp,
-  TrendingDown,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { mockWorkspaces } from "@/lib/data/mock-workspace-data";
+import { apiFetch } from "@/lib/api-client";
+import { toWorkspaceUi, type WireWorkspace } from "@/lib/hooks/use-workspaces";
 
 export default function WorkspaceDetailPage() {
   const params = useParams();
@@ -75,17 +52,15 @@ export default function WorkspaceDetailPage() {
   }, [workspace, setHeader, clearHeader]);
 
   useEffect(() => {
-    // Simulate API call to fetch workspace details
+    // Fetch workspace details from the real workspaces API
     const fetchWorkspace = async () => {
       setLoading(true);
       try {
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        const foundWorkspace = mockWorkspaces.find((w) => w.id === workspaceId);
-        setWorkspace(foundWorkspace || null);
+        const { data } = await apiFetch<WireWorkspace>(`/api/v1/workspaces/${workspaceId}`);
+        setWorkspace(toWorkspaceUi(data));
       } catch (error) {
         logger.error("Error fetching workspace", error);
+        setWorkspace(null);
       } finally {
         setLoading(false);
       }
@@ -215,10 +190,6 @@ export default function WorkspaceDetailPage() {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  const formatPercentage = (value: number) => {
-    return `${value.toFixed(1)}%`;
   };
 
   if (loading) {

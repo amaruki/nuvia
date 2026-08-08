@@ -16,5 +16,6 @@ export * from "./content";
 export * from "./jobs";
 export * from "./committees";
 export * from "./chapters";
+export * from "./workspaces";
 export * from "./awards";
 export * from "./relations";

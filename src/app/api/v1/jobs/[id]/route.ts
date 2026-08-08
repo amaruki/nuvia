@@ -8,7 +8,7 @@ import type { NextRequest } from "next/server";
 import { requirePermission } from "@/lib/rbac";
 import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 import { updateJobPostingSchema } from "@/lib/services/job.schemas";
-import { deleteJobPosting, getJobPosting, updateJobPosting } from "@/lib/services/job.service";
+import { deleteJobPosting, getJobPosting, updateJobPosting } from "@/lib/services/job";
 import { handleJobRoute } from "../_lib";
 
 interface RouteContext {

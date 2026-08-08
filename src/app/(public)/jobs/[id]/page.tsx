@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, Clock, DollarSign, MapPin, Briefcase, Calendar } from "lucide-react";
-import { getPublicJobPostingBySlug } from "@/lib/services/job.service";
+import { getPublicJobPostingBySlug } from "@/lib/services/job";
 import { ApplyForm } from "./_components/apply-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

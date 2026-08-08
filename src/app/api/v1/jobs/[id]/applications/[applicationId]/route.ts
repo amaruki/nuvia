@@ -11,7 +11,7 @@ import type { NextRequest } from "next/server";
 import { getCurrentUser, hasAnyPermission, requirePermission } from "@/lib/rbac";
 import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 import { updateApplicationStatusSchema } from "@/lib/services/job.schemas";
-import { getJobApplication, updateApplicationStatus } from "@/lib/services/job.service";
+import { getJobApplication, updateApplicationStatus } from "@/lib/services/job";
 import { handleJobRoute } from "../../../_lib";
 
 interface RouteContext {

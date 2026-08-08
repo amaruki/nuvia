@@ -7,7 +7,7 @@ import type { NextRequest } from "next/server";
 import { requirePermission } from "@/lib/rbac";
 import { problem, problemResponse, successResponse, validationProblem } from "@/lib/http";
 import { createJobPostingSchema } from "@/lib/services/job.schemas";
-import { createJobPosting, listJobPostings } from "@/lib/services/job.service";
+import { createJobPosting, listJobPostings } from "@/lib/services/job";
 import { handleJobRoute, parsePagination } from "./_lib";
 
 export async function GET(request: NextRequest) {

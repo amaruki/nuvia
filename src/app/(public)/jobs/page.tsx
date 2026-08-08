@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
-import { getJobBoardMeta, listPublicJobPostings } from "@/lib/services/job.service";
+import { getJobBoardMeta, listPublicJobPostings } from "@/lib/services/job";
 import { JobCard } from "@/app/dashboard/jobs/_components/job-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

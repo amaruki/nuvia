@@ -1,8 +1,10 @@
 import { NextRequest } from "next/server";
 import { requirePermission } from "@/lib/rbac";
-import { problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
+import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 import { logger } from "@/lib/logger";
 import { listEvents, listEventsQuerySchema } from "@/lib/services/event-read.service";
+import { createEvent, createEventSchema } from "@/lib/services/event-write.service";
+import { handleEventRoute } from "./_lib";
 
 /**
  * Collects a repeatable query parameter, accepting both `?x=a&x=b` and
@@ -73,4 +75,36 @@ export async function GET(request: NextRequest) {
     logger.error("Error listing events", error);
     return problemResponse(problems.internalError("Failed to list events"));
   }
+}
+
+/**
+ * POST /api/v1/events - Create an event
+ * Requires: events:create permission
+ */
+export async function POST(request: NextRequest) {
+  return handleEventRoute(async () => {
+    const auth = await requirePermission("events:create", request.headers);
+    if (!auth.success) {
+      return problemResponse(auth.error!);
+    }
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return problemResponse(
+        problem("validation-error", 422, "Validation failed", "Request body must be valid JSON"),
+      );
+    }
+
+    const parsed = createEventSchema.safeParse(body);
+    if (!parsed.success) {
+      return problemResponse(validationProblem(parsed.error));
+    }
+
+    const dto = await createEvent(parsed.data, auth.user!.id);
+    logger.info("event created", { eventId: dto.id, actor: auth.user!.id });
+
+    return successResponse(dto, undefined, { status: 201 });
+  }, "POST /api/v1/events");
 }

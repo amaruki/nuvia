@@ -3,7 +3,7 @@
  * entitlement ran out to its terminal state (janitor/treasurer action).
  * Requires finance:update. Body: optional `{ "reason": string }`.
  *
- * Semantics (src/lib/services/subscription.service.ts):
+ * Semantics (src/lib/services/subscription/transitions.ts):
  * - stale ACTIVE/TRIALING whose period already ended -> CANCELED,
  * - CANCELED -> grace ends immediately,
  * - PAST_DUE -> UNPAID (retries exhausted; no grace),

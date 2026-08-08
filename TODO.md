@@ -65,9 +65,10 @@ suite grew from 115 to 147 tests.
 - ☑ **Username sign-in works.** The login contract always said "email or username", but the value went to better-auth's email-only `signInEmail`, so username login never worked. Both `loginAction` and the login route now resolve usernames to emails first. Tests in `tests/login-activity.test.ts`.
 - ☑ **Dead code removed.** `src/lib/services/role.service.ts` (a divergent second copy of the role-mutation logic; only one type from it was live) and `src/lib/actions/session-cache.actions.ts` (zero importers, wrong cookie prefix) deleted, per ADR-0001.
 
-Still open from this pass:
+Follow-ups from this pass:
 
-- ☐ **Username uniqueness.** `users.username` is not unique in the schema, so two accounts can share a username. The login resolver picks the oldest account deterministically, but the real fix is a schema constraint plus a migration decision about existing duplicates.
+- ☑ **Username uniqueness — corrected; nothing to fix.** The original claim said `users.username` is not unique in the schema, that two accounts can share a username, and that the fix was a schema constraint plus a migration decision about existing duplicates. That wording was stale: the constraint already exists and has always been enforced. `src/db/schema/users.ts:17` declares `username` with `.unique()`, and the database has enforced it since the first Drizzle migration — `drizzle/0000_cute_norman_osborn.sql:76` (`CONSTRAINT "users_username_unique" UNIQUE("username")`) — as the legacy Prisma schema did before it (`username String @unique`). Verified against the live shared test database (PostgreSQL 16): a duplicate insert is rejected with SQLSTATE 23505 on `users_username_unique`, and a scan of the live `users` table finds zero duplicate usernames. Migration decision: constraint-first, no data remediation path required. Every migration that ever created the `users` table carries the constraint, so no migrated database can contain legacy duplicate usernames and no backfill migration is needed.
+- ☐ **Stale comment from the corrected claim above.** `src/lib/auth/login-activity.ts:35` still says "username is not unique in the schema yet (see TODO.md)". The comment is wrong now and should be dropped when that file is next touched; the deterministic oldest-account `orderBy` it explains is harmless — with uniqueness enforced, it can never break a tie.
 
 ---
 

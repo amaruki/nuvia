@@ -30,8 +30,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const body = await request.json();
 
     const updateRoleSchema = z.object({
-      role: z.string().min(1, "Role is required"),
-      reason: z.string().optional(),
+      role: z.string().min(1, "Role is required").max(100, "Role must be less than 100 characters"),
+      reason: z.string().max(500, "Reason must be less than 500 characters").optional(),
     });
 
     const validationResult = updateRoleSchema.safeParse(body);
@@ -62,6 +62,21 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           message: "You do not have permission to manage this user's role",
         },
         USER_NOT_FOUND: { status: 404, title: "Not found", message: "User not found" },
+        INVALID_ROLE: {
+          status: 422,
+          title: "Invalid role",
+          message: "Role does not exist or is not active",
+        },
+        ROLE_NOT_ASSIGNABLE: {
+          status: 403,
+          title: "Role not assignable",
+          message: "You do not have sufficient privilege to assign this role",
+        },
+        LAST_SUPERADMIN: {
+          status: 409,
+          title: "Last super admin",
+          message: "Cannot change the only super admin's role — the system would be locked out",
+        },
         INTERNAL_ERROR: {
           status: 500,
           title: "Internal server error",

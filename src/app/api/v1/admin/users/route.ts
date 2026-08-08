@@ -2,11 +2,11 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { and, count, desc, asc, eq, ilike, or } from "drizzle-orm";
 import { hashPassword } from "better-auth/crypto";
-import { requirePermission } from "@/lib/rbac";
+import { checkRoleAssignable, requirePermission } from "@/lib/rbac";
 import { problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 import { logger } from "@/lib/logger";
 import { db } from "@/db/client";
-import { user } from "@/db/schema";
+import { authLog, user } from "@/db/schema";
 import { ROLE_PERMISSIONS, isPredefinedRole } from "@/types/role.types";
 
 /**
@@ -22,10 +22,13 @@ export async function GET(request: NextRequest) {
       return problemResponse(auth.error!);
     }
 
-    // Get search parameters
+    // Get search parameters — parseInt("abc") is NaN, which would flow
+    // into limit()/offset() and surface as a 500, so fall back instead.
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 100);
+    const parsedPage = parseInt(searchParams.get("page") || "1", 10);
+    const parsedLimit = parseInt(searchParams.get("limit") || "20", 10);
+    const page = Number.isFinite(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
+    const limit = Number.isFinite(parsedLimit) ? Math.min(Math.max(parsedLimit, 1), 100) : 20;
     const offset = (page - 1) * limit;
     const search = searchParams.get("search") || "";
     const role = searchParams.get("role");
@@ -123,10 +126,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     const createUserSchema = z.object({
-      username: z.string().min(3, "Username must be at least 3 characters"),
-      email: z.string().email("Invalid email address"),
-      name: z.string().min(1, "Name is required"),
-      role: z.string().default("user"),
+      username: z
+        .string()
+        .min(3, "Username must be at least 3 characters")
+        .max(30, "Username must be less than 30 characters")
+        .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores")
+        .transform((val) => val.toLowerCase()),
+      email: z.email("Invalid email address").transform((val) => val.toLowerCase()),
+      name: z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+      role: z.string().max(100, "Role must be less than 100 characters").default("user"),
       password: z.string().min(8, "Password must be at least 8 characters"),
     });
 
@@ -137,6 +145,22 @@ export async function POST(request: NextRequest) {
     }
 
     const { username, email, name, role, password } = validationResult.data;
+
+    // The requested role must exist (predefined or active custom role)
+    // and must not outrank the creator. Before this check existed, any
+    // holder of users:create could create an account directly as
+    // superadmin — or with any arbitrary role string.
+    const assignable = await checkRoleAssignable(auth.user!.id, role);
+
+    if (!assignable.valid) {
+      if (assignable.error === "INVALID_ROLE") {
+        return problemResponse(problems.businessLogicError("Role does not exist or is not active"));
+      }
+
+      return problemResponse(
+        problems.insufficientPermission("You cannot create a user with this role"),
+      );
+    }
 
     // Check if username or email already exists
     const existingUser = await db.query.user.findFirst({
@@ -150,25 +174,53 @@ export async function POST(request: NextRequest) {
     // Create user
     const passwordHash = await hashPassword(password);
 
-    const [newUser] = await db
-      .insert(user)
-      .values({
-        username,
-        email,
-        name,
+    let newUser;
+
+    try {
+      [newUser] = await db
+        .insert(user)
+        .values({
+          username,
+          email,
+          name,
+          role,
+          passwordHash,
+          emailVerified: false,
+        })
+        .returning({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        });
+    } catch (insertError) {
+      // Unique-constraint race between the existence check above and the
+      // insert. Postgres code 23505 = unique_violation.
+      if ((insertError as { code?: string })?.code === "23505") {
+        return problemResponse(problems.conflict("Username or email already exists"));
+      }
+
+      throw insertError;
+    }
+
+    await db.insert(authLog).values({
+      userId: newUser.id,
+      eventType: "USER_CREATED",
+      severity: "INFO",
+      message: `User created with role ${role}`,
+      ipAddress:
+        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        request.headers.get("x-real-ip") ||
+        "unknown",
+      userAgent: request.headers.get("user-agent") || "unknown",
+      metadata: {
+        createdBy: auth.user!.id,
         role,
-        passwordHash,
-        emailVerified: false,
-      })
-      .returning({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      });
+      },
+    });
 
     return successResponse({ user: newUser });
   } catch (error) {

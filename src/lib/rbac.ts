@@ -19,9 +19,9 @@ import {
   canManageRole,
   getRoleLevel,
 } from "@/types/role.types";
-import { AuthError, AuthErrorType } from "./auth/common";
 import { problems, type ProblemDetails } from "@/lib/http";
 import { logger } from "@/lib/logger";
+import { invalidateUserSessionCaches } from "@/lib/session-cache";
 
 // Enhanced user type with role information
 export interface UserWithRole {
@@ -320,6 +320,102 @@ export async function canManageUserRole(managerId: string, targetUserId: string)
 }
 
 /**
+ * Pure role-assignment rule. Answers one question: given the assigner's
+ * role and effective permissions, may they grant `newRole` to someone?
+ *
+ * - Only a superadmin may grant superadmin.
+ * - A superadmin may grant anything else.
+ * - Predefined roles follow ROLE_HIERARCHY: the assigner must strictly
+ *   outrank the granted role (an admin cannot mint another admin).
+ * - Custom roles have no hierarchy position. They are grantable only when
+ *   the assigner personally holds every permission the role carries — a
+ *   role's permissions can never exceed its grantor's.
+ *
+ * Callers must resolve `newRolePermissions` first and reject unknown role
+ * names before reaching this function (see checkRoleAssignable).
+ */
+export function canAssignRole(
+  assignerRole: Role,
+  assignerPermissions: Permission[],
+  newRole: Role,
+  newRolePermissions: Permission[],
+): boolean {
+  if (newRole === "superadmin") {
+    return assignerRole === "superadmin";
+  }
+
+  if (assignerRole === "superadmin") {
+    return true;
+  }
+
+  if (isPredefinedRole(newRole)) {
+    return getRoleLevel(assignerRole) > getRoleLevel(newRole);
+  }
+
+  return newRolePermissions.every((permission) => assignerPermissions.includes(permission));
+}
+
+/**
+ * Pure permission-grant rule for custom-role creation: a role may only be
+ * created carrying permissions its creator already holds. Superadmin is
+ * exempt because it holds every permission by definition.
+ */
+export function canGrantPermissions(
+  creatorRole: Role,
+  creatorPermissions: Permission[],
+  requestedPermissions: Permission[],
+): boolean {
+  if (creatorRole === "superadmin") {
+    return true;
+  }
+
+  return requestedPermissions.every((permission) => creatorPermissions.includes(permission));
+}
+
+export type RoleAssignmentErrorCode = "INVALID_ROLE" | "ROLE_NOT_ASSIGNABLE";
+
+/**
+ * Resolve a role name and check it against the assigner's own role and
+ * permissions. This is the single gate every role grant must pass —
+ * role changes, admin-created users, and bulk updates all route through
+ * changeUserRole, which calls this.
+ *
+ * INVALID_ROLE: the name is neither a predefined role nor an *active*
+ * custom role. Granting a dead name would leave the user with a role
+ * string that resolves to zero permissions — or worse, silently start
+ * granting permissions if a custom role with that name is created later.
+ */
+export async function checkRoleAssignable(
+  assignerId: string,
+  newRole: Role,
+): Promise<{ valid: true } | { valid: false; error: RoleAssignmentErrorCode }> {
+  let newRolePermissions: Permission[];
+
+  if (isPredefinedRole(newRole)) {
+    newRolePermissions = ROLE_PERMISSIONS[newRole as PredefinedRole];
+  } else {
+    const customRoleRecord = await db.query.customRole.findFirst({
+      where: (customRoleTable, { eq: eqOp }) => eqOp(customRoleTable.name, newRole),
+      columns: { permissions: true, isActive: true },
+    });
+
+    if (!customRoleRecord || !customRoleRecord.isActive) {
+      return { valid: false, error: "INVALID_ROLE" };
+    }
+
+    newRolePermissions = customRoleRecord.permissions as Permission[];
+  }
+
+  const assigner = await getUserPermissions(assignerId);
+
+  if (!canAssignRole(assigner.role, assigner.permissions, newRole, newRolePermissions)) {
+    return { valid: false, error: "ROLE_NOT_ASSIGNABLE" };
+  }
+
+  return { valid: true };
+}
+
+/**
  * Change user role with validation and audit logging
  */
 export async function changeUserRole(
@@ -366,6 +462,38 @@ export async function changeUserRole(
       };
     }
 
+    // The assigner must also outrank the *new* role — not just the
+    // target's current one. Before this check existed, an admin could
+    // promote anyone to superadmin: canManageUserRole only compared the
+    // assigner against the target's current role.
+    const assignable = await checkRoleAssignable(changedBy, newRole);
+
+    if (!assignable.valid) {
+      return {
+        success: false,
+        error: assignable.error,
+      };
+    }
+
+    // Lockout guard: never demote the only superadmin. On today's paths
+    // this check cannot fire — only a superadmin can demote a superadmin,
+    // so two exist while the change runs — but changeUserRole is the
+    // single role-mutation gate, and any future caller (self-service
+    // demotion, a system process) gets the protection for free.
+    if (targetUser.role === "superadmin") {
+      const [superadminCount] = await db
+        .select({ value: count() })
+        .from(user)
+        .where(eq(user.role, "superadmin"));
+
+      if (superadminCount.value <= 1) {
+        return {
+          success: false,
+          error: "LAST_SUPERADMIN",
+        };
+      }
+    }
+
     // Update the role and write the audit entry in one transaction — the
     // original Prisma version ran these as two separate, un-transacted
     // statements, so a failure between them could silently drop the audit
@@ -389,6 +517,15 @@ export async function changeUserRole(
       });
     });
 
+    // Drop the target's cached sessions (ENABLE_REDIS_CACHE deployments)
+    // so a demotion takes effect immediately instead of after the 60s
+    // cache TTL. Best effort: cache misses fall through to the database.
+    try {
+      await invalidateUserSessionCaches(targetUserId);
+    } catch (cacheError) {
+      logger.warn("Failed to invalidate session cache after role change", cacheError);
+    }
+
     return {
       success: true,
     };
@@ -399,6 +536,31 @@ export async function changeUserRole(
       error: "INTERNAL_ERROR",
     };
   }
+}
+
+/**
+ * True when the user is a superadmin and the only one left. Used as a
+ * lockout guard before destructive self-service operations (account
+ * deletion): losing the last superadmin locks a deployment out of its
+ * own user management permanently, because only a superadmin can grant
+ * the superadmin role.
+ */
+export async function isLastSuperadmin(userId: string): Promise<boolean> {
+  const targetUser = await db.query.user.findFirst({
+    where: eq(user.id, userId),
+    columns: { role: true },
+  });
+
+  if (targetUser?.role !== "superadmin") {
+    return false;
+  }
+
+  const [superadminCount] = await db
+    .select({ value: count() })
+    .from(user)
+    .where(eq(user.role, "superadmin"));
+
+  return superadminCount.value <= 1;
 }
 
 /**
@@ -516,46 +678,6 @@ export async function getAllRoles(): Promise<
     logger.error("Error getting all roles", error);
     return [];
   }
-}
-
-/**
- * Validate role assignment business rules
- */
-export function validateRoleAssignment(
-  currentRole: Role,
-  newRole: Role,
-  assignerRole: Role,
-): {
-  valid: boolean;
-  reason?: string;
-} {
-  // Cannot assign superadmin role unless you are superadmin
-  if (newRole === "superadmin" && assignerRole !== "superadmin") {
-    return {
-      valid: false,
-      reason: "Only Super Admin can assign Super Admin role",
-    };
-  }
-
-  // Cannot promote someone to same or higher level than yourself
-  if (!canManageRole(assignerRole, newRole)) {
-    return {
-      valid: false,
-      reason: "Cannot assign role higher than or equal to your own",
-    };
-  }
-
-  // Special validation for role changes that would privilege escalation
-  if (getRoleLevel(newRole) > getRoleLevel(assignerRole)) {
-    return {
-      valid: false,
-      reason: "Cannot assign role with higher privilege level than your own",
-    };
-  }
-
-  return {
-    valid: true,
-  };
 }
 
 /**

@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
         .array(z.string())
         .min(1, "At least one user ID is required")
         .max(100, "Cannot update more than 100 users at once"),
-      role: z.string().min(1, "Role is required"),
-      reason: z.string().optional(),
+      role: z.string().min(1, "Role is required").max(100, "Role must be less than 100 characters"),
+      reason: z.string().max(500, "Reason must be less than 500 characters").optional(),
       confirm: z
         .boolean()
         .refine((val) => val === true, "Confirmation is required for bulk operations"),
@@ -41,7 +41,11 @@ export async function POST(request: NextRequest) {
       return problemResponse(validationProblem(validationResult.error));
     }
 
-    const { userIds, role, reason } = validationResult.data;
+    const { role, reason } = validationResult.data;
+
+    // Deduplicate: duplicate IDs would otherwise be double-counted in the
+    // success/failure totals and change the same user twice.
+    const userIds = [...new Set(validationResult.data.userIds)];
 
     // Check if current user ID is in the list (cannot update own role)
     if (userIds.includes(currentUser.id)) {
@@ -56,47 +60,42 @@ export async function POST(request: NextRequest) {
       requestHeaders.get("x-forwarded-for") || requestHeaders.get("x-real-ip") || "unknown";
     const userAgent = requestHeaders.get("user-agent") || "unknown";
 
-    // Process bulk role updates
-    const results = await Promise.allSettled(
-      userIds.map((userId) =>
-        changeUserRole(userId, role, currentUser.id, reason, {
-          ipAddress,
-          userAgent,
-        }),
-      ),
-    );
+    // Process bulk role updates sequentially. Each changeUserRole is its
+    // own database transaction; fanning 100 of them out concurrently
+    // (Promise.allSettled) exhausted the connection pool and turned the
+    // overflow into spurious failures.
+    const failures: Array<{ userId: string; success: false; error: string }> = [];
+    let successfulCount = 0;
 
-    // Count successes and failures
-    const successful = results.filter(
-      (result) => result.status === "fulfilled" && result.value.success,
-    );
-    const failed = results.filter(
-      (result) =>
-        result.status === "rejected" || (result.status === "fulfilled" && !result.value.success),
-    );
+    for (const userId of userIds) {
+      const result = await changeUserRole(userId, role, currentUser.id, reason, {
+        ipAddress,
+        userAgent,
+      });
 
-    // Get detailed error information for failures
-    const failures = results
-      .map((result, index) => ({
-        userId: userIds[index],
-        success: result.status === "fulfilled" && result.value?.success,
-        error:
-          result.status === "rejected" ? "INTERNAL_ERROR" : result.value?.error || "UNKNOWN_ERROR",
-      }))
-      .filter((item) => !item.success);
+      if (result.success) {
+        successfulCount += 1;
+      } else {
+        failures.push({
+          userId,
+          success: false,
+          error: result.error || "UNKNOWN_ERROR",
+        });
+      }
+    }
 
     return successResponse(
       {
         total: userIds.length,
-        successful: successful.length,
-        failed: failed.length,
+        successful: successfulCount,
+        failed: failures.length,
         failures,
         role,
         changedBy: currentUser.id,
         changedAt: new Date(),
       },
       {
-        message: `Bulk role update completed. ${successful.length} successful, ${failed.length} failed.`,
+        message: `Bulk role update completed. ${successfulCount} successful, ${failures.length} failed.`,
       },
     );
   } catch (error) {

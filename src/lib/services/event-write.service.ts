@@ -10,7 +10,7 @@
  * payload; route handlers map it through `problemResponse`.
  */
 
-import { eq, ilike, or } from "drizzle-orm";
+import { eq, ilike, inArray, or } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
 import { event, eventCategory } from "@/db/schema";
@@ -257,14 +257,16 @@ function slugify(title: string): string {
 /** Generates a unique slug from the title, appending -2, -3, … on collision. */
 async function generateUniqueSlug(title: string): Promise<string> {
   const base = slugify(title);
-  const exists = async (slug: string) =>
-    (await db.select({ id: event.id }).from(event).where(eq(event.slug, slug)).limit(1)).length > 0;
-
-  if (!(await exists(base))) return base;
-  for (let attempt = 2; attempt <= 25; attempt += 1) {
-    const candidate = `${base}-${attempt}`;
-    if (!(await exists(candidate))) return candidate;
-  }
+  const candidates = [base, ...Array.from({ length: 24 }, (_, index) => `${base}-${index + 2}`)];
+  // One round-trip for every candidate instead of one query per attempt; the
+  // unique index stays the source of truth for the callers' conflict handling.
+  const rows = await db
+    .select({ slug: event.slug })
+    .from(event)
+    .where(inArray(event.slug, candidates));
+  const taken = new Set(rows.map((row) => row.slug));
+  const available = candidates.find((candidate) => !taken.has(candidate));
+  if (available) return available;
   throw new EventWriteError(
     problem("conflict", 409, "Conflict", `Could not derive a unique slug from "${title}"`),
   );

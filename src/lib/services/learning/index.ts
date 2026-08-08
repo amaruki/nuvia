@@ -2,7 +2,7 @@
  * Learning & Development service — course and certificate CRUD over the
  * real `courses` / `certificates` tables (backlog D3).
  *
- * House error style mirrors chapter.service.ts: a ServiceError carrying an
+ * House error style mirrors chapter/errors.ts: a ServiceError carrying an
  * RFC 9457 ProblemDetails, PG 23505 mapped to a 409 conflict, zod schemas
  * for create/update, and `{ items, page, limit, total, totalPages }` lists.
  *

@@ -6,24 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  RefreshCw,
-  AlertTriangle,
-  Download,
-  Mail,
-  CreditCard,
-  TrendingUp,
-  FileText,
-  DollarSign,
-  Calendar,
-  Plus,
-} from "lucide-react";
+import { RefreshCw, AlertTriangle, Download, TrendingUp, Plus } from "lucide-react";
 
 import { InvoicesOverviewCards } from "@/components/finance/invoices-overview-cards";
 import { InvoicesTable } from "@/components/finance/invoices-table";
 import { InvoicesFilters } from "@/components/finance/invoices-filters";
-import { useInvoices } from "@/lib/hooks/use-invoices";
+import { useFinanceInvoices } from "@/lib/hooks/use-finance-invoices";
 import { useHeader } from "@/contexts/dashboard-context";
+import { toast } from "sonner";
 
 export default function FinanceInvoices() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -40,10 +30,11 @@ export default function FinanceInvoices() {
     updateInvoiceStatus,
     recordPayment,
     sendInvoice,
+    sendReminder,
     refreshData,
     updateFilters,
     clearFilters,
-  } = useInvoices();
+  } = useFinanceInvoices();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -133,7 +124,15 @@ export default function FinanceInvoices() {
             <RefreshCw className="mr-2 h-4 w-4" />
             <span className="hidden sm:inline">Refresh</span>
           </Button>
-          <Button size="sm" className="flex-1 sm:flex-none">
+          <Button
+            size="sm"
+            className="flex-1 sm:flex-none"
+            onClick={() =>
+              toast.info(
+                "Invoice creation bills one subscription — use the invoices API (POST /api/v1/finance/invoices) until the dashboard gains a subscription picker.",
+              )
+            }
+          >
             <Plus className="mr-2 h-4 w-4" />
             <span className="hidden sm:inline">Create Invoice</span>
             <span className="sm:hidden">Create</span>
@@ -285,7 +284,7 @@ export default function FinanceInvoices() {
             invoices={invoices}
             payments={payments}
             onRecordPayment={recordPayment}
-            onSendReminder={() => {}} // TODO: Implement reminder functionality
+            onSendReminder={sendReminder}
             onUpdateStatus={updateInvoiceStatus}
             onSendInvoice={sendInvoice}
           />
@@ -334,7 +333,7 @@ export default function FinanceInvoices() {
                     {statistics.clientBreakdown
                       .sort((a, b) => b.totalAmount - a.totalAmount)
                       .slice(0, 5)
-                      .map((client, index) => (
+                      .map((client) => (
                         <div key={client.clientId} className="flex items-center justify-between">
                           <div className="min-w-0 flex-1 mr-2">
                             <p className="text-sm font-medium truncate">{client.clientName}</p>

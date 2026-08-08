@@ -10,26 +10,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import {
   RefreshCw,
   AlertTriangle,
-  Download,
-  Plus,
   FileText,
   BarChart3,
   PieChart,
   DollarSign,
   TrendingUp,
   Shield,
-  Calendar,
   Filter,
-  Eye,
 } from "lucide-react";
 
 import { ReportsOverviewCards } from "@/components/finance/reports-overview-cards";
 import { ReportsTable } from "@/components/finance/reports-table";
 import { ReportsFilters } from "@/components/finance/reports-filters";
-import { useReports } from "@/lib/hooks/use-reports";
+import { useFinanceReports } from "@/lib/hooks/use-finance-reports";
 import { useHeader } from "@/contexts/dashboard-context";
-import { FinancialReport } from "@/types/finance.types";
-import { logger } from "@/lib/logger";
+import type { FinancialReport } from "@/types/finance.types";
 
 export default function FinanceReports() {
   const router = useRouter();
@@ -39,6 +34,7 @@ export default function FinanceReports() {
 
   const {
     reports,
+    summary,
     statistics,
     loading,
     error,
@@ -48,8 +44,9 @@ export default function FinanceReports() {
     refreshData,
     updateReportStatus,
     downloadReport,
+    editReport,
     deleteReport,
-  } = useReports();
+  } = useFinanceReports();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -63,7 +60,7 @@ export default function FinanceReports() {
   useEffect(() => {
     setHeader({
       title: "Financial Reports",
-      description: "Formal financial reporting and documentation for compliance and analysis",
+      description: "Computed financial reporting from the membership ledger",
     });
 
     return () => {
@@ -73,35 +70,6 @@ export default function FinanceReports() {
 
   const handleViewDetails = (report: FinancialReport) => {
     router.push(`/dashboard/finance/reports/${report.id}`);
-  };
-
-  const handleDownload = (report: FinancialReport) => {
-    downloadReport(report.id);
-  };
-
-  const handleEdit = (report: FinancialReport) => {
-    // TODO: Implement edit functionality
-    logger.info("Edit report", report);
-  };
-
-  const handleShare = (report: FinancialReport) => {
-    // TODO: Implement share functionality
-    logger.info("Share report", report);
-  };
-
-  const handleDelete = (report: FinancialReport) => {
-    if (window.confirm(`Are you sure you want to delete "${report.title}"?`)) {
-      deleteReport(report.id);
-    }
-  };
-
-  const handleUpdateStatus = (report: FinancialReport, status: FinancialReport["status"]) => {
-    updateReportStatus(report.id, status);
-  };
-
-  const handleGenerateReport = () => {
-    // TODO: Implement generate report functionality
-    logger.info("Generate new report");
   };
 
   if (loading) {
@@ -173,15 +141,6 @@ export default function FinanceReports() {
             <RefreshCw className="mr-2 h-4 w-4" />
             <span className="hidden sm:inline">Refresh</span>
           </Button>
-          <Button size="sm" className="flex-1 sm:flex-none" onClick={handleGenerateReport}>
-            <Plus className="mr-2 h-4 w-4" />
-            <span className="hidden sm:inline">Generate Report</span>
-            <span className="sm:hidden">Generate</span>
-          </Button>
-          <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
-            <Download className="mr-2 h-4 w-4" />
-            <span className="hidden sm:inline">Export</span>
-          </Button>
         </div>
       </div>
 
@@ -196,18 +155,12 @@ export default function FinanceReports() {
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+        <TabsList className="grid w-full grid-cols-2 h-auto">
           <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-2">
             Overview
           </TabsTrigger>
           <TabsTrigger value="reports" className="text-xs sm:text-sm py-2 px-2">
             All Reports
-          </TabsTrigger>
-          <TabsTrigger value="templates" className="text-xs sm:text-sm py-2 px-2">
-            Templates
-          </TabsTrigger>
-          <TabsTrigger value="schedule" className="text-xs sm:text-sm py-2 px-2">
-            Schedule
           </TabsTrigger>
         </TabsList>
 
@@ -216,9 +169,9 @@ export default function FinanceReports() {
             {/* Recent Reports */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base sm:text-lg">Recent Reports</CardTitle>
+                <CardTitle className="text-base sm:text-lg">Computed Reports</CardTitle>
                 <CardDescription className="text-sm">
-                  Latest financial reports generated
+                  Live aggregates from the membership ledger
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -227,7 +180,16 @@ export default function FinanceReports() {
                     <div
                       key={report.id}
                       className="flex items-center justify-between cursor-pointer hover:bg-muted/50 p-2 rounded"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`View details for ${report.title}`}
                       onClick={() => handleViewDetails(report)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleViewDetails(report);
+                        }
+                      }}
                     >
                       <div className="min-w-0 flex-1 mr-2">
                         <p className="text-sm font-medium truncate">{report.title}</p>
@@ -275,7 +237,7 @@ export default function FinanceReports() {
                   ].map((item) => (
                     <div
                       key={item.type}
-                      className="flex items-center justify-between p-2 rounded hover:bg-muted/50 cursor-pointer"
+                      className="flex items-center justify-between p-2 rounded hover:bg-muted/50"
                     >
                       <div className="flex items-center gap-2">
                         <item.icon className="h-4 w-4 text-muted-foreground" />
@@ -291,31 +253,44 @@ export default function FinanceReports() {
             </Card>
           </div>
 
-          {/* Upcoming Reports */}
-          {statistics && (
+          {/* Ledger Summary */}
+          {summary && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base sm:text-lg">Monthly Trend</CardTitle>
+                <CardTitle className="text-base sm:text-lg">Ledger Summary</CardTitle>
                 <CardDescription className="text-sm">
-                  Report generation and download trends
+                  Completed transactions over the last {summary.months} months, and receivables
+                  still open on issued invoices
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {statistics.monthlyTrend.map((month, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <span className="text-sm font-medium truncate">{month.month}</span>
-                        <TrendingUp className="h-4 w-4 text-muted-foreground shrink-0" />
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="text-sm font-medium">{month.generated} generated</p>
-                        <p className="text-xs text-muted-foreground">
-                          {month.downloaded} downloads
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Revenue (window)</p>
+                    <p className="text-sm font-medium">
+                      {formatCurrency(Number.parseFloat(summary.totals.revenue))}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Completed transactions</p>
+                    <p className="text-sm font-medium">
+                      {summary.totals.completedTransactionCount}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Outstanding receivables</p>
+                    <p className="text-sm font-medium">
+                      {formatCurrency(Number.parseFloat(summary.outstanding.outstandingAmount))}{" "}
+                      across {summary.outstanding.invoiceCount} invoices
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Overdue</p>
+                    <p className="text-sm font-medium">
+                      {formatCurrency(Number.parseFloat(summary.outstanding.overdueAmount))} across{" "}
+                      {summary.outstanding.overdueCount} invoices
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -326,98 +301,11 @@ export default function FinanceReports() {
           <ReportsTable
             reports={reports}
             onViewDetails={handleViewDetails}
-            onDownload={handleDownload}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onUpdateStatus={handleUpdateStatus}
+            onDownload={downloadReport}
+            onEdit={editReport}
+            onDelete={deleteReport}
+            onUpdateStatus={updateReportStatus}
           />
-        </TabsContent>
-
-        <TabsContent value="templates" className="space-y-6">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                title: "Income Statement Template",
-                description: "Standard income statement format with revenue and expense breakdowns",
-                icon: BarChart3,
-                type: "income_statement",
-              },
-              {
-                title: "Balance Sheet Template",
-                description: "Comprehensive balance sheet with assets, liabilities, and equity",
-                icon: PieChart,
-                type: "balance_sheet",
-              },
-              {
-                title: "Cash Flow Template",
-                description:
-                  "Detailed cash flow statement with operating, investing, and financing activities",
-                icon: DollarSign,
-                type: "cash_flow",
-              },
-              {
-                title: "Budget vs Actual Template",
-                description: "Comparison template for budgeted vs actual performance analysis",
-                icon: TrendingUp,
-                type: "budget_vs_actual",
-              },
-              {
-                title: "Tax Document Template",
-                description: "Tax documentation template for compliance and filing",
-                icon: FileText,
-                type: "tax_document",
-              },
-              {
-                title: "Audit Trail Template",
-                description: "Audit trail template for compliance and internal controls",
-                icon: Shield,
-                type: "audit_trail",
-              },
-            ].map((template, index) => (
-              <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="p-2 rounded-md bg-primary/10">
-                      <template.icon className="h-5 w-5" />
-                    </div>
-                    <Badge variant="outline">Template</Badge>
-                  </div>
-                  <CardTitle className="text-base sm:text-lg">{template.title}</CardTitle>
-                  <CardDescription className="text-sm">{template.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => logger.info("Use template", template.type)}
-                  >
-                    Use Template
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="schedule" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base sm:text-lg">Scheduled Reports</CardTitle>
-              <CardDescription className="text-sm">
-                Automated report generation schedule
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No scheduled reports yet</p>
-                <Button className="mt-4" onClick={() => logger.info("Schedule report")}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Schedule Report
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>

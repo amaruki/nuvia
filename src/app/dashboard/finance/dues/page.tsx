@@ -6,22 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  RefreshCw,
-  AlertTriangle,
-  Download,
-  Mail,
-  CreditCard,
-  TrendingUp,
-  Users,
-  DollarSign,
-  Calendar,
-} from "lucide-react";
+import { RefreshCw, AlertTriangle, Download, TrendingUp } from "lucide-react";
 
 import { DuesOverviewCards } from "@/components/finance/dues-overview-cards";
 import { DuesTable } from "@/components/finance/dues-table";
 import { DuesFilters } from "@/components/finance/dues-filters";
-import { useDues } from "@/lib/hooks/use-dues";
+import { useFinanceDues } from "@/lib/hooks/use-finance-dues";
 import { useHeader } from "@/contexts/dashboard-context";
 
 export default function FinanceDues() {
@@ -32,7 +22,6 @@ export default function FinanceDues() {
   const {
     dues,
     payments,
-    reminders,
     statistics,
     loading,
     error,
@@ -43,7 +32,7 @@ export default function FinanceDues() {
     refreshData,
     updateFilters,
     clearFilters,
-  } = useDues();
+  } = useFinanceDues();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -299,36 +288,12 @@ export default function FinanceDues() {
               <CardDescription>Sent and scheduled reminders</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {reminders.map((reminder) => (
-                  <div key={reminder.id} className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">{reminder.recipient}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {reminder.reminderType} • {reminder.template}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <Badge
-                        variant={
-                          reminder.status === "sent"
-                            ? "default"
-                            : reminder.status === "failed"
-                              ? "destructive"
-                              : "secondary"
-                        }
-                        className="text-xs"
-                      >
-                        {reminder.status}
-                      </Badge>
-                      <p className="text-xs text-muted-foreground">
-                        {reminder.sentDate
-                          ? new Date(reminder.sentDate).toLocaleDateString()
-                          : new Date(reminder.scheduledDate).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+              <div className="rounded-md border border-dashed p-6 text-center">
+                <p className="text-sm font-medium">No reminders are tracked yet</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  The membership schema has no reminders store. Sending a reminder from the dues
+                  table reports this honestly instead of recording anything.
+                </p>
               </div>
             </CardContent>
           </Card>

@@ -122,7 +122,7 @@ export default function Home() {
             <Button variant="ghost" asChild className="hidden sm:inline-flex">
               <Link href="/auth/login">Sign in</Link>
             </Button>
-            <Button size="sm" asChild className="active:translate-y-px">
+            <Button size="sm" asChild>
               <Link href="/auth/signup">Get started</Link>
             </Button>
           </div>
@@ -155,10 +155,10 @@ export default function Home() {
                 the rest of the roadmap visible instead of pretending mock screens are finished.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Button size="lg" asChild className="active:translate-y-px">
+                <Button size="lg" asChild>
                   <Link href="/auth/signup">Get started</Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild className="active:translate-y-px">
+                <Button size="lg" variant="outline" asChild>
                   <Link href={GITHUB_URL} target="_blank" rel="noreferrer">
                     <GitFork />
                     View source
@@ -609,7 +609,7 @@ export default function Home() {
                   </div>
                 </li>
               </ul>
-              <Button size="lg" variant="outline" asChild className="mt-8 active:translate-y-px">
+              <Button size="lg" variant="outline" asChild className="mt-8">
                 <Link href={GITHUB_URL} target="_blank" rel="noreferrer">
                   <GitFork />
                   View repository
@@ -635,7 +635,7 @@ export default function Home() {
                 Bun, Docker, PostgreSQL, and Redis are the local prerequisites. Git hooks, oxlint,
                 oxfmt, and the isolated integration-test services come with the repository.
               </p>
-              <Button size="lg" variant="outline" asChild className="mt-8 active:translate-y-px">
+              <Button size="lg" variant="outline" asChild className="mt-8">
                 <Link href={GITHUB_URL} target="_blank" rel="noreferrer">
                   <GitFork />
                   View source
@@ -690,12 +690,7 @@ export default function Home() {
                     own.
                   </p>
                 </div>
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  asChild
-                  className="shrink-0 active:translate-y-px"
-                >
+                <Button size="lg" variant="secondary" asChild className="shrink-0">
                   <Link href="/auth/signup">
                     Get started
                     <ArrowRight data-icon="inline-end" />

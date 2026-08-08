@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, isNotNull, lte, lt } from "drizzle-orm";
+import { and, count, desc, eq, gte, isNotNull, lte, lt, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { authLog } from "@/db/schema";
 import { env } from "@/lib/env";
@@ -215,60 +215,65 @@ export class LoggingService {
     try {
       const inRange = and(gte(authLog.timestamp, startDate), lte(authLog.timestamp, endDate));
 
-      // Get total events count
-      const [{ value: totalEvents }] = await db
-        .select({ value: count() })
-        .from(authLog)
-        .where(inRange);
-
-      // Get events by type
-      const eventsByTypeRaw = await db
-        .select({ eventType: authLog.eventType, value: count() })
-        .from(authLog)
-        .where(inRange)
-        .groupBy(authLog.eventType);
+      // All seven aggregates are read-only and depend only on the pre-built
+      // `inRange` predicate, never on each other's results, so run them
+      // concurrently instead of paying seven sequential round-trips.
+      const [
+        [{ value: totalEvents }],
+        eventsByTypeRaw,
+        eventsBySeverityRaw,
+        [{ value: uniqueUsers }],
+        [{ value: failedLogins }],
+        [{ value: successfulLogins }],
+        [{ value: suspiciousActivities }],
+      ] = await Promise.all([
+        // Get total events count
+        db.select({ value: count() }).from(authLog).where(inRange),
+        // Get events by type
+        db
+          .select({ eventType: authLog.eventType, value: count() })
+          .from(authLog)
+          .where(inRange)
+          .groupBy(authLog.eventType),
+        // Get events by severity
+        db
+          .select({ severity: authLog.severity, value: count() })
+          .from(authLog)
+          .where(inRange)
+          .groupBy(authLog.severity),
+        // COUNT(DISTINCT userId) reduces to a scalar in the database instead
+        // of transferring every distinct userId row to JS just to take
+        // .length (O(rows) network/memory before, O(1) after).
+        db
+          .select({ value: sql<number>`count(distinct ${authLog.userId})` })
+          .from(authLog)
+          .where(and(inRange, isNotNull(authLog.userId))),
+        // Get failed logins count
+        db
+          .select({ value: count() })
+          .from(authLog)
+          .where(and(inRange, eq(authLog.eventType, AuthEventType.LOGIN_FAILURE))),
+        // Get successful logins count
+        db
+          .select({ value: count() })
+          .from(authLog)
+          .where(and(inRange, eq(authLog.eventType, AuthEventType.LOGIN_SUCCESS))),
+        // Get suspicious activities count
+        db
+          .select({ value: count() })
+          .from(authLog)
+          .where(and(inRange, eq(authLog.eventType, AuthEventType.SUSPICIOUS_ACTIVITY))),
+      ]);
 
       const eventsByType: Record<string, number> = {};
       eventsByTypeRaw.forEach((item) => {
         eventsByType[item.eventType] = item.value;
       });
 
-      // Get events by severity
-      const eventsBySeverityRaw = await db
-        .select({ severity: authLog.severity, value: count() })
-        .from(authLog)
-        .where(inRange)
-        .groupBy(authLog.severity);
-
       const eventsBySeverity: Record<string, number> = {};
       eventsBySeverityRaw.forEach((item) => {
         eventsBySeverity[item.severity] = item.value;
       });
-
-      // Get unique users count
-      const uniqueUsersRows = await db
-        .selectDistinct({ userId: authLog.userId })
-        .from(authLog)
-        .where(and(inRange, isNotNull(authLog.userId)));
-      const uniqueUsers = uniqueUsersRows.length;
-
-      // Get failed logins count
-      const [{ value: failedLogins }] = await db
-        .select({ value: count() })
-        .from(authLog)
-        .where(and(inRange, eq(authLog.eventType, AuthEventType.LOGIN_FAILURE)));
-
-      // Get successful logins count
-      const [{ value: successfulLogins }] = await db
-        .select({ value: count() })
-        .from(authLog)
-        .where(and(inRange, eq(authLog.eventType, AuthEventType.LOGIN_SUCCESS)));
-
-      // Get suspicious activities count
-      const [{ value: suspiciousActivities }] = await db
-        .select({ value: count() })
-        .from(authLog)
-        .where(and(inRange, eq(authLog.eventType, AuthEventType.SUSPICIOUS_ACTIVITY)));
 
       return {
         totalEvents,

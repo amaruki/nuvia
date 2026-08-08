@@ -81,32 +81,29 @@ async function waitForDependencies(): Promise<void> {
 
 async function main(): Promise<void> {
   const managesLocalServices = process.env.CI !== "true";
-  let composeStarted = false;
 
-  try {
-    if (managesLocalServices) {
-      composeStarted = true;
-      // A previously started project — e.g. a test env kept up for manual
-      // debugging — may still hold a seeded volume. `up` reuses that
-      // container and its data, which breaks tests that assert global
-      // state (superadmin counts, unique emails). Drop it first so every
-      // run starts from the same empty database CI sees.
-      try {
-        await run([...COMPOSE_COMMAND, "down", "--volumes", "--remove-orphans"]);
-      } catch {
-        // Nothing was running; the `up` below is the goal either way.
-      }
-      await run([...COMPOSE_COMMAND, "up", "--detach", "--wait"]);
-    }
-
-    await waitForDependencies();
-    await run(["bunx", "drizzle-kit", "push", "--force"]);
-    await run(["bun", "test"]);
-  } finally {
-    if (composeStarted) {
+  if (managesLocalServices) {
+    // A previously started project — e.g. a test env kept up for manual
+    // debugging — may still hold a seeded volume. `up` reuses that
+    // container and its data, which breaks tests that assert global
+    // state (superadmin counts, unique emails). Drop it first so every
+    // run starts from the same empty database CI sees.
+    try {
       await run([...COMPOSE_COMMAND, "down", "--volumes", "--remove-orphans"]);
+    } catch {
+      // Nothing was running; the `up` below is the goal either way.
     }
+    await run([...COMPOSE_COMMAND, "up", "--detach", "--wait"]);
   }
+
+  await waitForDependencies();
+  await run(["bunx", "drizzle-kit", "push", "--force"]);
+  await run(["bun", "test"]);
+
+  // Deliberately leave the local project running: the dev server's .env
+  // points at the same database (15433), and tearing it down here kills
+  // every in-flight `next dev` session. The next run's `down` above
+  // resets the volume again, and CI never manages local services.
 }
 
 await main();

@@ -17,7 +17,7 @@ bun install   # also installs git hooks — see below
 cp .env.example .env.local
 # fill in DATABASE_URL, BETTER_AUTH_SECRET at minimum
 bun run db:generate && bun run db:push
-SEED_ADMIN_PASSWORD='your-strong-password' bun run db:seed   # remember it — you sign in with it
+SEED_ADMIN_PASSWORD='Your-Strong-Passw0rd' bun run db:seed   # remember it — you sign in with it
 bun run dev
 ```
 

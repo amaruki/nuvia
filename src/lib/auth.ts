@@ -233,28 +233,32 @@ export const emailTemplates = {
  * Username generator for OAuth users
  */
 async function generateUniqueUsername(baseUsername: string): Promise<string> {
-  let username = baseUsername.toLowerCase().replace(/[^a-z0-9_]/g, "");
-  let counter = 1;
-  let uniqueUsername = username;
+  const username = baseUsername.toLowerCase().replace(/[^a-z0-9_]/g, "");
 
-  // Check if username exists and generate unique one if needed
-  while (
-    await db.query.user.findFirst({
-      where: (user, { eq }) => eq(user.username, uniqueUsername),
-      columns: { id: true },
-    })
-  ) {
-    uniqueUsername = `${username}${counter}`;
-    counter++;
+  // One prefix query replaces one DB round trip per collision. LIKE is
+  // case-sensitive, matching the old eq() probes and the app's lowercase
+  // username storage; a literal `_` in the base only widens the fetch, and
+  // Set membership below is exact-string, so no candidate is misjudged.
+  const existing = await db.query.user.findMany({
+    where: (user, { like }) => like(user.username, `${username}%`),
+    columns: { username: true },
+  });
+  const taken = new Set(existing.map((row) => row.username));
 
-    // Prevent infinite loop
-    if (counter > 9999) {
-      uniqueUsername = `${username}_${Date.now()}`;
-      break;
+  if (!taken.has(username)) {
+    return username;
+  }
+
+  // Mirrors the old loop's cap: it probed base1..base9998 and, once all were
+  // taken, returned a timestamped suffix without a final uniqueness check.
+  for (let counter = 1; counter <= 9998; counter++) {
+    const candidate = `${username}${counter}`;
+    if (!taken.has(candidate)) {
+      return candidate;
     }
   }
 
-  return uniqueUsername;
+  return `${username}_${Date.now()}`;
 }
 
 /**

@@ -535,8 +535,19 @@ html {
   }
 }
 
+/* Scroll-triggered reveals. Progressive enhancement: browsers without
+   scroll-driven animations render the sections statically, always visible. */
+@supports (animation-timeline: view()) {
+  .landing-reveal {
+    animation: landing-rise 0.7s var(--ease-out) both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 35%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .landing-rise {
+  .landing-rise,
+  .landing-reveal {
     animation: none;
   }
   .landing-hover,

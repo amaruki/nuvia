@@ -282,7 +282,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="mt-12 grid gap-4 md:grid-cols-6">
+            <div className="landing-reveal mt-12 grid gap-4 md:grid-cols-6">
               <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-accent/40 md:col-span-4">
                 <div
                   aria-hidden="true"
@@ -453,7 +453,7 @@ export default function Home() {
               </p>
             </div>
 
-            <Card className="mt-12 gap-0 overflow-hidden py-0 shadow-none">
+            <Card className="landing-reveal mt-12 gap-0 overflow-hidden py-0 shadow-none">
               <CardContent className="grid px-0 md:grid-cols-[0.9fr_1.1fr]">
                 <div className="bg-card p-6 md:p-8">
                   <div className="flex items-center gap-3">
@@ -513,7 +513,7 @@ export default function Home() {
             aria-hidden="true"
             className="absolute inset-y-0 left-0 -z-10 w-1/2 bg-gradient-to-r from-accent/40 to-transparent"
           />
-          <div className="container mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="landing-reveal container mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="relative">
               <div
                 aria-hidden="true"
@@ -640,7 +640,7 @@ export default function Home() {
           id="contribute"
           className="scroll-mt-20 bg-muted/40 px-4 pb-28 pt-24 sm:px-6 lg:px-8"
         >
-          <div className="container mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+          <div className="landing-reveal container mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
               <p className="font-mono text-xs font-medium uppercase tracking-widest text-primary">
                 Contributor path
@@ -685,7 +685,7 @@ export default function Home() {
 
         <section className="px-4 py-24 sm:px-6 lg:px-8">
           <div className="container mx-auto max-w-6xl">
-            <div className="relative overflow-hidden rounded-xl bg-primary p-8 text-primary-foreground shadow-xl shadow-primary/20 md:p-12">
+            <div className="landing-reveal relative overflow-hidden rounded-xl bg-primary p-8 text-primary-foreground shadow-xl shadow-primary/20 md:p-12">
               <div
                 aria-hidden="true"
                 className="absolute -right-12 -top-12 size-48 rounded-full border border-primary-foreground/15"

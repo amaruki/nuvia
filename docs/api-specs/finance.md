@@ -4,8 +4,10 @@ Membership tiers, subscriptions, invoices, recorded payments, reports, and
 the configured payment gateway (backlog C1–C5, ADR-0014/ADR-0015). Routes:
 `src/app/api/v1/finance/**`; shared helpers in
 `src/app/api/v1/finance/_lib/helpers.ts`; schemas in
-`src/lib/validation/finance.validation.ts`; service-layer state machines in
-`src/lib/services/{membership-tier,subscription,invoice,payment,finance-report}.service.ts`.
+`src/lib/validation/finance.validation.ts`; the subscription state machine in
+`src/lib/services/subscription/`; other service layers in
+`src/lib/services/{membership-tier,invoice,finance-report}.service.ts` and
+`src/lib/services/payment/`.
 
 ## Cross-cutting conventions
 

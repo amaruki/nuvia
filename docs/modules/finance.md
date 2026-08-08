@@ -70,9 +70,9 @@ Permission holders among predefined roles (`src/types/role.types.ts`): `superadm
 ## Services and the gateway seam
 
 - `src/lib/services/membership-tier.service.ts` — tier CRUD.
-- `src/lib/services/subscription.service.ts` — lifecycle engine: create → trialing → active → past_due → renew/pause/resume/cancel → expire, with grace handling and the UNPAID path.
+- `src/lib/services/subscription/` — lifecycle engine: create → trialing → active → past_due → renew/pause/resume/cancel → expire, with grace handling and the UNPAID path.
 - `src/lib/services/invoice.service.ts` — invoice issuance from subscription events; void.
-- `src/lib/services/payment.service.ts` — manual and webhook-verified payment recording into `membership_payments` + `membership_transactions`.
+- `src/lib/services/payment/` — manual and webhook-verified payment recording into `membership_payments` + `membership_transactions`.
 - `src/lib/services/finance-report.service.ts` — revenue by period/tier, outstanding summary, dues ledger, report summary (computed from transactions).
 - `src/lib/services/membership-status.service.ts` — member status/role derived from subscription transitions ([ADR-0014](../adr/0014-member-status-from-subscription.md), backlog A3, commit cd534a3).
 - `src/lib/payments/gateway.ts` + `manual.ts` + `stripe.ts` — the payment-gateway adapter seam ([ADR-0015](../adr/0015-payment-gateway-adapter-stripe-first.md)): manual provider built in (commit a43568b), Stripe adapter with signature-verified webhooks (commit e672c11, SDK pinned in commit 60d42d2).
@@ -96,15 +96,15 @@ Six pages under `src/app/dashboard/finance/`, wired to the services above throug
 
 ## Tests
 
-79 tests across three files, run against the shared test database (real tables, real enums):
+79 tests across three suites, run against the shared test database (real tables, real enums):
 
-| File                                  | Tests | Covers                                                                                                                                                      |
-| ------------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/subscription-lifecycle/`       | 26    | gateway seam math, tier CRUD, full lifecycle machine, illegal transitions, A3 role derivation, same-transaction audit trail                                 |
-| `tests/invoice-payment.test.ts`       | 39    | invoice issuance, manual payment recording, RFC 9457 error mapping, Stripe adapter (mocked SDK), verified-webhook processing end to end, validation schemas |
-| `tests/finance-dashboard-api.test.ts` | 14    | report queries, dues ledger, invoice listing, gateway description, ledger consistency after void                                                            |
+| File                            | Tests | Covers                                                                                                                                                      |
+| ------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/subscription-lifecycle/` | 26    | gateway seam math, tier CRUD, full lifecycle machine, illegal transitions, A3 role derivation, same-transaction audit trail                                 |
+| `tests/invoice-payment/`        | 39    | invoice issuance, manual payment recording, RFC 9457 error mapping, Stripe adapter (mocked SDK), verified-webhook processing end to end, validation schemas |
+| `tests/finance-dashboard-api/`  | 14    | report queries, dues ledger, invoice listing, gateway description, ledger consistency after void                                                            |
 
-Run: `bun test tests/subscription-lifecycle/ tests/invoice-payment.test.ts tests/finance-dashboard-api.test.ts` (needs the test Postgres/Redis stack, `compose.test.yml`).
+Run: `bun test tests/subscription-lifecycle/ tests/invoice-payment/ tests/finance-dashboard-api/` (needs the test Postgres/Redis stack, `compose.test.yml`).
 
 ## Accessibility
 
@@ -112,14 +112,14 @@ WCAG 2.2 AA is part of the promotion bar for an enabled module. All six finance 
 
 ## Promotion bar evidence
 
-| Criterion (ADR-0008 tier 4)            | Evidence                                                                                                                                                        |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Real Drizzle schema                    | `src/db/schema/membership.ts` + `enums.ts`; migrations `drizzle/0000_cute_norman_osborn.sql`, `drizzle/0004_plain_ultimo.sql` (commits c688925, 9a53fbe)        |
-| Authorized API                         | 25 handlers under `src/app/api/v1/finance/**`, each calling `requirePermission("finance:*")` (commits d8e4251, df6de14, e672c11, a17439c)                       |
-| Tests                                  | `tests/subscription-lifecycle/`, `tests/invoice-payment.test.ts`, `tests/finance-dashboard-api.test.ts` — 79 tests (commits d8e4251, df6de14, e672c11, a17439c) |
-| Documentation                          | This document                                                                                                                                                   |
-| WCAG 2.2 AA pass (enabled-module gate) | `bun run test:a11y` over all six finance pages, 0 critical/serious (2026-08-08); see the accessibility record above                                             |
-| Flag on                                | `config/features.ts` `MODULE_FLAGS.finance = true` (this promotion)                                                                                             |
+| Criterion (ADR-0008 tier 4)            | Evidence                                                                                                                                                 |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Real Drizzle schema                    | `src/db/schema/membership.ts` + `enums.ts`; migrations `drizzle/0000_cute_norman_osborn.sql`, `drizzle/0004_plain_ultimo.sql` (commits c688925, 9a53fbe) |
+| Authorized API                         | 25 handlers under `src/app/api/v1/finance/**`, each calling `requirePermission("finance:*")` (commits d8e4251, df6de14, e672c11, a17439c)                |
+| Tests                                  | `tests/subscription-lifecycle/`, `tests/invoice-payment/`, `tests/finance-dashboard-api/` — 79 tests (commits d8e4251, df6de14, e672c11, a17439c)        |
+| Documentation                          | This document                                                                                                                                            |
+| WCAG 2.2 AA pass (enabled-module gate) | `bun run test:a11y` over all six finance pages, 0 critical/serious (2026-08-08); see the accessibility record above                                      |
+| Flag on                                | `config/features.ts` `MODULE_FLAGS.finance = true` (this promotion)                                                                                      |
 
 ## Related decisions
 

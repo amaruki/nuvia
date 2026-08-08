@@ -87,7 +87,7 @@ stored; it is computed from subscription rows).
 - **Validation:** `listQuerySchema` in `member.service.ts` (page/limit/
   search/role[]/memberStatus[]/sort).
 - **Spec:** [`api-specs/members.md`](api-specs/members.md).
-- **Tests:** `tests/members-api.test.ts`,
+- **Tests:** `tests/members-api/`,
   `tests/member-status-derivation.test.ts`.
 
 ## 5. Events (backlog B2/B3)
@@ -96,8 +96,8 @@ Event CRUD plus registration, waitlist, check-in, and cancel.
 
 - **Entry points:** `src/app/api/v1/events/**` (9 routes),
   `src/lib/services/event-read.service.ts` (list/get with filters),
-  `src/lib/services/event-write.service.ts` (create/update/delete +
-  `eventFields` zod), `src/lib/services/registration.service.ts`
+  `src/lib/services/event-write/` (create/update/delete + `eventFields`
+  zod), `src/lib/services/registration.service.ts`
   (status derivation: PENDING paid / CONFIRMED capacity / WAITLISTED full,
   capacity + waitlist promotion in one transaction),
   `src/lib/validation/event.validation.ts` (UI/server-action schemas —
@@ -166,7 +166,9 @@ manual payments, reports, gateway abstraction, and webhook intake.
   subscriptions + 6 lifecycle actions, invoices + void, payments, reports,
   gateway), `src/app/api/v1/finance/_lib/helpers.ts`
   (`actorFromRequest`, `problemFromFinanceError`, conflict-code set),
-  `src/lib/services/{membership-tier,subscription,invoice,payment,finance-report}.service.ts`,
+  `src/lib/services/subscription/` (lifecycle engine),
+  `src/lib/services/{membership-tier,invoice,finance-report}.service.ts`,
+  `src/lib/services/payment/`,
   `src/lib/payments/{gateway,stripe}.ts` (provider seam),
   `src/lib/validation/finance.validation.ts` (string-mode money schemas).
 - **Schema tables:** `membership_tiers`, `membership_subscriptions`,
@@ -178,9 +180,9 @@ manual payments, reports, gateway abstraction, and webhook intake.
   roll back on failure so provider retries succeed.
 - **Spec:** [`api-specs/finance.md`](api-specs/finance.md),
   [`api-specs/webhooks.md`](api-specs/webhooks.md).
-- **Tests:** `tests/invoice-payment.test.ts`,
+- **Tests:** `tests/invoice-payment/`,
   `tests/subscription-lifecycle/`,
-  `tests/finance-dashboard-api.test.ts`.
+  `tests/finance-dashboard-api/`.
 
 ## 10. Organization (ADR-0007)
 

@@ -6,7 +6,7 @@ in `handleEventRoute()` (`src/app/api/v1/events/_lib.ts`), which maps
 `problemDetails` and everything else to 500 `internal-error`.
 
 Route files: `src/app/api/v1/events/**`. Schemas: `eventFields` in
-`src/lib/services/event-write.service.ts`, `listEventsQuerySchema` in
+`src/lib/services/event-write/schemas.ts`, `listEventsQuerySchema` in
 `src/lib/services/event-read.service.ts`, registration schemas in
 `src/lib/services/registration.service.ts`. Enums from
 `src/db/schema/enums.ts`.

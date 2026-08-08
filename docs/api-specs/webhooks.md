@@ -34,5 +34,5 @@ mapped by `stripeEventMeta`.
 
 Errors are still RFC 9457 problem documents. Duplicate deliveries are
 absorbed by the idempotency claim inside `processGatewayWebhook`
-(`src/lib/services/payment.service.ts`) and answered 200 with
+(`src/lib/services/payment/webhook.ts`) and answered 200 with
 `duplicate: true` — that is why the contract never answers 409 here.

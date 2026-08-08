@@ -3,7 +3,7 @@
  *
  * Scope decision ("single billing service — your call"): invoicing is split
  * into TWO services by aggregate. This file owns the invoice aggregate
- * (header + line items + void lifecycle); payment.service.ts owns payment
+ * (header + line items + void lifecycle); the payment/ folder owns payment
  * recording and provider-webhook processing. Both are thin, audited, and
  * route-free, mirroring how membership-tier.service.ts and
  * subscription.service.ts split the C2 domain.

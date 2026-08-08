@@ -50,6 +50,13 @@
       "when": 1786193704505,
       "tag": "0006_early_thing",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1786195936667,
+      "tag": "0007_awards",
+      "breakpoints": true
     }
   ]
 }

@@ -528,9 +528,11 @@ html {
     border-color 0.3s var(--ease-out);
 }
 
-.landing-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+@media (hover: hover) and (pointer: fine) {
+  .landing-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -17,6 +17,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronRight } from "lucide-react";
 import { NavigationItem } from "./navigation-config";
+import { isModuleEnabled } from "../../../../config/features";
 
 interface NavigationItemComponentProps {
   item: NavigationItem;
@@ -24,6 +25,14 @@ interface NavigationItemComponentProps {
 }
 
 export function NavigationItemComponent({ item, isActive }: NavigationItemComponentProps) {
+  // Module maturity gate (ADR-0008): a section whose module flag is off is
+  // not silently clickable — it renders disabled and visibly marked. The
+  // mock pages themselves stay reachable by URL, where ModulePreviewBanner
+  // marks them.
+  if (item.module && !isModuleEnabled(item.module)) {
+    return <PreviewNavigationItem item={item} />;
+  }
+
   const isItemActive = isActive(item.path);
   const hasSubItems = item.subItems && item.subItems.length > 0;
 
@@ -83,27 +92,41 @@ function CollapsibleSubItemsPopover({
           <div className="px-2 py-1.5 text-sm font-medium text-foreground border-b">
             {item.title}
           </div>
-          {item.subItems!.map((subItem) => (
-            <Link
-              key={subItem.id}
-              href={subItem.path}
-              className={cn(
-                "flex items-center justify-between gap-2 p-2 text-sm rounded-md",
-                "hover:bg-accent transition-colors",
-                isActive(subItem.path) && "bg-accent text-accent-foreground",
-              )}
-            >
-              <span className="flex items-center gap-2">
-                {subItem.icon}
-                {subItem.title}
-              </span>
-              {subItem.badge && (
-                <Badge variant="secondary" className="h-4 min-w-4 p-1 text-xs shrink-0">
-                  {subItem.badge}
-                </Badge>
-              )}
-            </Link>
-          ))}
+          {item.subItems!.map((subItem) =>
+            subItem.module && !isModuleEnabled(subItem.module) ? (
+              <div
+                key={subItem.id}
+                aria-disabled="true"
+                className="flex items-center justify-between gap-2 p-2 text-sm rounded-md opacity-50 cursor-not-allowed"
+              >
+                <span className="flex items-center gap-2">
+                  {subItem.icon}
+                  {subItem.title}
+                </span>
+                <PreviewBadge className="h-4 px-1 text-xs" />
+              </div>
+            ) : (
+              <Link
+                key={subItem.id}
+                href={subItem.path}
+                className={cn(
+                  "flex items-center justify-between gap-2 p-2 text-sm rounded-md",
+                  "hover:bg-accent transition-colors",
+                  isActive(subItem.path) && "bg-accent text-accent-foreground",
+                )}
+              >
+                <span className="flex items-center gap-2">
+                  {subItem.icon}
+                  {subItem.title}
+                </span>
+                {subItem.badge && (
+                  <Badge variant="secondary" className="h-4 min-w-4 p-1 text-xs shrink-0">
+                    {subItem.badge}
+                  </Badge>
+                )}
+              </Link>
+            ),
+          )}
         </div>
       </PopoverContent>
     </Popover>
@@ -183,12 +206,56 @@ function RegularNavigationItem({ item, isItemActive }: RegularNavigationItemProp
   );
 }
 
+/**
+ * Nav row for a section whose module flag is off (ADR-0008). aria-disabled
+ * activates the sidebar primitives' pointer-events-none + opacity treatment,
+ * so the row is visibly present but not clickable; the "Preview" badge marks
+ * it as mock-tier.
+ */
+function PreviewNavigationItem({ item }: { item: NavigationItem }) {
+  return (
+    <SidebarMenuItem key={item.id}>
+      <SidebarMenuButton aria-disabled="true" className="cursor-not-allowed">
+        {item.icon}
+        <span>{item.title}</span>
+        <PreviewBadge className="ml-auto h-5 px-1.5 text-xs" />
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+}
+
+/** The one shared "Preview" mark for mock-tier nav rows (ADR-0008). */
+function PreviewBadge({ className }: { className?: string }) {
+  return (
+    <Badge variant="outline" className={cn("shrink-0 text-muted-foreground", className)}>
+      Preview
+    </Badge>
+  );
+}
+
 interface SubNavigationItemProps {
   subItem: NavigationItem;
   isActive: (path: string) => boolean;
 }
 
 function SubNavigationItem({ subItem, isActive }: SubNavigationItemProps) {
+  // Gated sub-entries (e.g. the organization section's chapters/committees/
+  // workspaces/committee-budgets rows) render disabled + marked, same as
+  // whole gated sections.
+  if (subItem.module && !isModuleEnabled(subItem.module)) {
+    return (
+      <SidebarMenuSubItem key={subItem.id}>
+        <SidebarMenuSubButton
+          aria-disabled="true"
+          className="cursor-not-allowed justify-between gap-2"
+        >
+          <span>{subItem.title}</span>
+          <PreviewBadge className="h-4 px-1 text-[10px]" />
+        </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
+    );
+  }
+
   const isSubActive = isActive(subItem.path);
 
   return (

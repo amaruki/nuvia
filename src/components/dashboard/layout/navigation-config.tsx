@@ -48,9 +48,12 @@ import {
   Palette,
 } from "lucide-react";
 import { navigationData, navigationCategories, type NavItemData } from "@/lib/navigation-data";
+import { getModuleForPath, type ModuleName } from "../../../../config/features";
 
 export interface NavigationItem extends NavItemData {
   readonly icon: React.ReactNode;
+  /** Module maturity gate attribution (config/features.ts); undefined for non-module sections. */
+  readonly module?: ModuleName;
   readonly subItems?: readonly NavigationItem[];
 }
 
@@ -137,6 +140,7 @@ function withIcons(items: readonly NavItemData[]): readonly NavigationItem[] {
   return items.map((item) => ({
     ...item,
     icon: icons[item.id] ?? <FileText className="h-4 w-4" />,
+    module: getModuleForPath(item.path) ?? undefined,
     subItems: item.subItems ? withIcons(item.subItems) : undefined,
   }));
 }

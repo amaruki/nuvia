@@ -586,3 +586,21 @@ export const formatPermission = (permission: Permission): string => {
   const category = PERMISSION_CATEGORIES[module as PermissionModule];
   return `${category?.name || module} - ${action.charAt(0).toUpperCase() + action.slice(1)}`;
 };
+
+/**
+ * User row shaped for role-management UIs (the admin users API plus the
+ * resolved permissions of the user's role). Moved here verbatim when
+ * src/lib/services/role.service.ts was deleted — the type was the only
+ * thing its importers still used.
+ */
+export interface UserWithRoleInfo {
+  id: string;
+  username: string;
+  email: string;
+  name?: string;
+  displayName?: string | null;
+  role: Role;
+  permissions: Permission[];
+  createdAt: Date;
+  updatedAt: Date;
+}

@@ -30,8 +30,7 @@ import { PermissionMatrix } from "@/components/roles/permission-matrix";
 import { RoleStatistics, RoleStatisticsData } from "@/components/roles/role-statistics";
 
 // Import types and services
-import { Role, Permission } from "@/types/role.types";
-import { UserWithRoleInfo } from "@/lib/services/role.service";
+import { Role, Permission, UserWithRoleInfo } from "@/types/role.types";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 

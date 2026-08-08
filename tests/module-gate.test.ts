@@ -12,11 +12,18 @@ import {
 } from "../config/features";
 
 // The two module sets ADR-0008 / docs/technical-specs/13-module-maturity-gate.md
-// §13.3 fix: five promoted modules ship enabled, six Mock-tier modules stay
-// off until they clear the promotion bar.
-const PROMOTED: readonly ModuleName[] = ["members", "events", "content", "forums", "jobs"];
-const MOCK_TIER: readonly ModuleName[] = [
+// §13.3 fixes: promoted modules ship enabled, Mock-tier modules stay off
+// until they clear the promotion bar. Finance joined the promoted set on
+// 2026-08-08 (backlog C5); the remaining five stay Mock tier.
+const PROMOTED: readonly ModuleName[] = [
+  "members",
+  "events",
+  "content",
+  "forums",
+  "jobs",
   "finance",
+];
+const MOCK_TIER: readonly ModuleName[] = [
   "awards",
   "learning",
   "chapters",
@@ -69,10 +76,10 @@ describe("isModuleEnabled (flag on/off behavior)", () => {
   }
 
   test("a promotion flip turns a module on without touching the registry", () => {
-    const promoted: Record<ModuleName, boolean> = { ...MODULE_FLAGS, finance: true };
-    expect(isModuleEnabled("finance", promoted)).toBe(true);
+    const promoted: Record<ModuleName, boolean> = { ...MODULE_FLAGS, awards: true };
+    expect(isModuleEnabled("awards", promoted)).toBe(true);
     // The registry itself is untouched.
-    expect(isModuleEnabled("finance")).toBe(false);
+    expect(isModuleEnabled("awards")).toBe(false);
   });
 
   test("an all-off override disables every module", () => {
@@ -93,9 +100,9 @@ describe("getEnabledModules / getDisabledModules (enabled set)", () => {
   });
 
   test("the partition follows flag overrides", () => {
-    const promoted: Record<ModuleName, boolean> = { ...MODULE_FLAGS, finance: true };
-    expect(getEnabledModules(promoted)).toEqual([...PROMOTED, "finance"]);
-    expect(getDisabledModules(promoted)).toEqual(MOCK_TIER.filter((m) => m !== "finance"));
+    const promoted: Record<ModuleName, boolean> = { ...MODULE_FLAGS, awards: true };
+    expect(getEnabledModules(promoted)).toEqual([...PROMOTED, "awards"]);
+    expect(getDisabledModules(promoted)).toEqual(MOCK_TIER.filter((m) => m !== "awards"));
   });
 
   test("an all-on override enables every module", () => {
@@ -122,14 +129,15 @@ describe("isMockMarked (mock-marking predicate)", () => {
   }
 
   test("promotion clears the mock mark", () => {
-    const promoted: Record<ModuleName, boolean> = { ...MODULE_FLAGS, finance: true };
-    expect(isMockMarked("finance", promoted)).toBe(false);
+    const promoted: Record<ModuleName, boolean> = { ...MODULE_FLAGS, awards: true };
+    expect(isMockMarked("awards", promoted)).toBe(false);
   });
 
   test("today flag-off and mock-marked coincide for every module", () => {
-    // Holds while nothing has reached the Backed tier; when a module does,
-    // this equivalence is the tripwire that says isMockMarked needs a tier
-    // lookup of its own.
+    // Holds while every flag-off module is still Mock tier (finance reached
+    // Promoted in backlog C5, so it is flag-on and unmarked); when a flag-off
+    // module reaches Backed, this equivalence is the tripwire that says
+    // isMockMarked needs a tier lookup of its own.
     for (const name of MODULE_NAMES) {
       expect(isMockMarked(name)).toBe(!isModuleEnabled(name));
     }

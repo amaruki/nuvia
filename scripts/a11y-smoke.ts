@@ -14,7 +14,9 @@
  *   3. Signs in as the seeded superadmin via the better-auth email endpoint
  *      (session cookie lands in the Playwright context automatically).
  *   4. Runs @axe-core/playwright against ONE representative authenticated
- *      page per enabled module plus the public /events and /jobs pages.
+ *      page per enabled module (finance — promoted in backlog C5 — is
+ *      covered on all six of its dashboard pages) plus the public /events
+ *      and /jobs pages.
  *      critical/serious violations fail the run; moderate/minor are
  *      report-only. Raw axe results are written to a unique /tmp directory.
  *
@@ -67,7 +69,8 @@ const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 /**
  * One representative page per enabled module (config/features.ts module
- * flags) plus the two public listings. See
+ * flags) plus the two public listings. Finance — promoted in backlog C5 —
+ * is audited on all six of its dashboard pages. See
  * docs/accessibility/wcag-2.2-aa-enabled-modules.md for the selection.
  */
 const PAGES = [
@@ -83,6 +86,17 @@ const PAGES = [
   { slug: "content-media", path: "/dashboard/content/media", module: "content", auth: true },
   { slug: "forums-categories", path: "/dashboard/forums/categories", module: "forums", auth: true },
   { slug: "jobs-board", path: "/dashboard/jobs", module: "jobs", auth: true },
+  { slug: "finance-dues", path: "/dashboard/finance/dues", module: "finance", auth: true },
+  { slug: "finance-invoices", path: "/dashboard/finance/invoices", module: "finance", auth: true },
+  { slug: "finance-reports", path: "/dashboard/finance/reports", module: "finance", auth: true },
+  { slug: "finance-budget", path: "/dashboard/finance/budget", module: "finance", auth: true },
+  {
+    slug: "finance-donations",
+    path: "/dashboard/finance/donations",
+    module: "finance",
+    auth: true,
+  },
+  { slug: "finance-gateways", path: "/dashboard/finance/gateways", module: "finance", auth: true },
 ] as const;
 
 const SEVERITIES_FAILING: Record<string, true> = { critical: true, serious: true };
@@ -185,8 +199,13 @@ async function ensureDevServer(): Promise<{
   const deadline = Date.now() + 240_000; // first compile can be slow
   while (Date.now() < deadline) {
     if (server.exitCode !== null) {
-      const lockHeld = await findLockHoldingServer(logPath);
-      if (lockHeld) return { server: null, logFd, baseUrl: lockHeld };
+      // The child may exit before its lock message is flushed to the log;
+      // give the file a few seconds to settle before declaring failure.
+      for (let attempt = 0; attempt < 10; attempt += 1) {
+        const lockHeld = await findLockHoldingServer(logPath);
+        if (lockHeld) return { server: null, logFd, baseUrl: lockHeld };
+        await Bun.sleep(500);
+      }
       throw new Error(`next dev exited early (code ${server.exitCode}); see ${logPath}`);
     }
     if (await isServing(BASE_URL)) {

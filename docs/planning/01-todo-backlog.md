@@ -85,6 +85,7 @@ Wave C preamble: finance/dues is the product core for an AMS and the first modul
   - Why: finance leads the promotion order, and promotion is what switches a module on by default.
   - Acceptance: per the wave goal — finance clears the promotion bar (schema + authorized API + tests + docs) with the flag on and a WCAG pass on finance pages.
   - Deps: A1, C4.
+  - Status: done 2026-08-08. `finance: true` in `config/features.ts`; module docs landed at `docs/modules/finance.md` evidencing the promotion bar — schema (`src/db/schema/membership.ts`, migrations `drizzle/0000_cute_norman_osborn.sql` + `drizzle/0004_plain_ultimo.sql`), authorized API (`/api/v1/finance/**`, every handler on a `finance:*` permission; commits d8e4251, df6de14, e672c11, a17439c), tests (79 across `tests/subscription-lifecycle.test.ts`, `tests/invoice-payment.test.ts`, `tests/finance-dashboard-api.test.ts`) — and the WCAG gate: all six finance pages added to the axe smoke (`scripts/a11y-smoke.ts`), 0 critical/serious on all 13 audited pages (`docs/accessibility/wcag-2.2-aa-enabled-modules.md`).
 
 ## Wave D — Post-1.0 promotion queue (one item per module; same promotion bar as C5)
 

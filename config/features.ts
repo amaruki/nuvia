@@ -32,10 +32,12 @@ export const MODULE_NAMES = [
 export type ModuleName = (typeof MODULE_NAMES)[number];
 
 /**
- * §13.3 registry. members/events/content/forums/jobs are the five modules
- * with a backing schema + real API today; the other six render from
- * src/lib/data/mock-*.ts and stay off until promoted (§13.4 order:
- * finance, chapters, committees, learning, awards, workspaces).
+ * §13.3 registry. members/events/content/forums/jobs plus finance are
+ * Promoted: backing schema + authorized API + tests + docs (finance
+ * promoted 2026-08-08, backlog C5, docs/modules/finance.md). The
+ * remaining five render from src/lib/data/mock-*.ts and stay off until
+ * promoted (§13.4 order: chapters, committees, learning, awards,
+ * workspaces).
  */
 export const MODULE_FLAGS: Record<ModuleName, boolean> = {
   members: true,
@@ -43,7 +45,7 @@ export const MODULE_FLAGS: Record<ModuleName, boolean> = {
   content: true,
   forums: true,
   jobs: true,
-  finance: false,
+  finance: true,
   awards: false,
   learning: false,
   chapters: false,
@@ -93,10 +95,11 @@ export function getDisabledModules(
 /**
  * Mock-marking predicate: whether a module's UI must carry a visible
  * "Preview — mock data" mark wherever it still renders (nav badge, page
- * banner). Today every flag-off module is Mock tier — nothing has reached
- * Backed yet — so flag-off and mock-marked coincide. When a module first
- * reaches Backed, this predicate gains a tier lookup of its own; it is
- * kept separate from isModuleEnabled so that moment doesn't ripple.
+ * banner). Today every flag-off module is Mock tier — finance, the only
+ * module past Mock, is Promoted and flag-on (backlog C5) — so flag-off
+ * and mock-marked still coincide. When a flag-off module first reaches
+ * Backed, this predicate gains a tier lookup of its own; it is kept
+ * separate from isModuleEnabled so that moment doesn't ripple.
  */
 export function isMockMarked(
   name: ModuleName,

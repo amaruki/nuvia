@@ -8,15 +8,9 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
-import {
-  AuthError,
-  AuthErrorType,
-  AuthResponseFactory,
-  clientSafeAuthMessage,
-  withAuthErrorHandling,
-} from "./common";
+import { AuthError, AuthErrorType, clientSafeAuthMessage } from "./common";
 import { logger } from "@/lib/logger";
-import { SafeUser, UserSession } from "@/types/auth.types";
+import { SafeUser } from "@/types/auth.types";
 
 // Better Auth Session type - matches the actual response from auth.api.getSession()
 interface Session {

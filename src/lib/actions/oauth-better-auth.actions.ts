@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { AuthResponseFactory, clientSafeAuthMessage } from "@/lib/auth/common";
+import { clientSafeAuthMessage } from "@/lib/auth/common";
 import { BusinessLogicError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 

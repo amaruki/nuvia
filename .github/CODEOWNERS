@@ -1,0 +1,24 @@
+# CODEOWNERS — who must review changes.
+#
+# Ownership derivation (backlog item E5): the maintainer handle is @amaruki,
+# verified from `git remote -v` (git@github.com:amaruki/nuvia.git) and
+# corroborated by the clone URLs in CONTRIBUTING.md and README.md and the
+# private-advisory URL in SECURITY.md. There is no GitHub org and no second
+# reviewer yet, so every path below routes to the same handle. When a
+# maintainer team forms, split the security-sensitive paths below to that
+# team first — that is the honest reading of this file today.
+
+# Default: everything routes to the maintainer.
+* @amaruki
+
+# Security-sensitive paths — changes here need the closest review this
+# project can currently give:
+#   /src/lib/rbac.ts      the single authorization helper (ADR-0001)
+#   /src/proxy.ts         the auth-gating proxy (renamed middleware.ts)
+#   /.github/workflows/   CI — the catch-all for anything that bypasses the
+#                         local lefthook hooks (ADR-0010)
+#   /docs/adr/            the decision records themselves
+/src/lib/rbac.ts @amaruki
+/src/proxy.ts @amaruki
+/.github/workflows/ @amaruki
+/docs/adr/ @amaruki

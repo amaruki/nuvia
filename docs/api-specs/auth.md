@@ -115,7 +115,7 @@ check. Guards:
 
 - 409 `last-superadmin` — the last super admin cannot delete their own
   account (permanent user-management lockout; `isLastSuperadmin` in
-  `src/lib/rbac.ts`).
+  `src/lib/rbac/role-assignment.ts`).
 
 Success 200 with message "Account deleted successfully". The user row is
 hard-deleted with cascades to sessions, accounts, devices, login activity,

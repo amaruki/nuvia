@@ -44,7 +44,7 @@ Restated from [`docs/api/conventions.md`](../api/conventions.md); read that
 document for the full rules.
 
 1. **Authorize before parsing.** Every route handler calls
-   `requirePermission()` or `requireRole()` (`src/lib/rbac.ts`) before
+   `requirePermission()` or `requireRole()` (`src/lib/rbac/`) before
    reading the body. The single documented exception is
    [`webhooks.md`](webhooks.md), where the caller is authenticated by Stripe
    signature verification instead of a session (ADR-0015 §4).

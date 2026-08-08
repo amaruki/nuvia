@@ -22,7 +22,7 @@ graph TB
         Dashboard["dashboard/ (role-gated via proxy.ts)"]
         API["api/v1/** routes"]
         Services["service functions (src/lib/services)"]
-        RBAC["src/lib/rbac.ts (requirePermission / requireRole)"]
+        RBAC["src/lib/rbac (requirePermission / requireRole)"]
         Logger["src/lib/logger.ts"]
         RateLimit["src/lib/rate-limit.ts"]
     end
@@ -63,7 +63,7 @@ sequenceDiagram
     participant U as User
     participant P as proxy.ts
     participant R as route.ts
-    participant RBAC as rbac.ts
+    participant RBAC as rbac
     participant S as service function
     participant D as Drizzle / Postgres
 

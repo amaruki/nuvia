@@ -12,11 +12,11 @@ Supersedes `docs/security/controls.md` and `docs/security/threat-model.md`'s con
 
 ## 7.2 Authorization
 
-| Concern         | Implementation                                                                                                                               |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| API routes      | `requirePermission` / `requireRole` (`src/lib/rbac.ts`), the sole authorization helper ([ADR-0001](../adr/0001-one-authorization-helper.md)) |
-| Dashboard pages | `src/proxy.ts` calls `isRoleAllowedForPath` against `src/lib/navigation-data.ts`'s per-path role list (Section 2.4)                          |
-| Custom roles    | Resolved via database lookup when `role` is not one of the 14 predefined values; see Section 12                                              |
+| Concern         | Implementation                                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| API routes      | `requirePermission` / `requireRole` (`src/lib/rbac/`), the sole authorization helper ([ADR-0001](../adr/0001-one-authorization-helper.md)) |
+| Dashboard pages | `src/proxy.ts` calls `isRoleAllowedForPath` against `src/lib/navigation-data.ts`'s per-path role list (Section 2.4)                        |
+| Custom roles    | Resolved via database lookup when `role` is not one of the 14 predefined values; see Section 12                                            |
 
 ## 7.3 Rate limiting
 

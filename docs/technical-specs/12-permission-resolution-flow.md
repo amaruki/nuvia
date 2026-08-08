@@ -20,7 +20,7 @@ Every authorization check in Nuvia (`requirePermission`, `requireRole`, and the 
 ## 12.3 Interface / request shape
 
 ```ts
-// src/lib/rbac.ts
+// src/lib/rbac/index.ts
 async function getCurrentUser(): Promise<UserWithRole | null>;
 // UserWithRole.permissions: Permission[] — the fully resolved set, per 12.4
 
@@ -47,7 +47,7 @@ resolve(user.role):
 
 ## 12.5 Performance targets
 
-No specific latency budget is set for this resolution path today. The predefined-role branch is O(1) (a plain object lookup); the custom-role branch costs one indexed database read (`custom_roles.name` is unique). Source: `src/lib/rbac.ts` code inspection, not a measured benchmark (see Section 8).
+No specific latency budget is set for this resolution path today. The predefined-role branch is O(1) (a plain object lookup); the custom-role branch costs one indexed database read (`custom_roles.name` is unique). Source: `src/lib/rbac/` code inspection, not a measured benchmark (see Section 8).
 
 ## 12.6 What this does NOT do
 

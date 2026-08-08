@@ -13,12 +13,12 @@
 
 # Security-sensitive paths — changes here need the closest review this
 # project can currently give:
-#   /src/lib/rbac.ts      the single authorization helper (ADR-0001)
+#   /src/lib/rbac/        the single authorization helper (ADR-0001)
 #   /src/proxy.ts         the auth-gating proxy (renamed middleware.ts)
 #   /.github/workflows/   CI — the catch-all for anything that bypasses the
 #                         local lefthook hooks (ADR-0010)
 #   /docs/adr/            the decision records themselves
-/src/lib/rbac.ts @amaruki
+/src/lib/rbac/ @amaruki
 /src/proxy.ts @amaruki
 /.github/workflows/ @amaruki
 /docs/adr/ @amaruki

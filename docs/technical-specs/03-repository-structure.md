@@ -14,7 +14,7 @@ src/
 │   ├── services/             # Business logic (route.ts -> service -> Drizzle)
 │   ├── validation/            # Zod schemas, one file per domain
 │   ├── auth/                  # better-auth config, session/middleware helpers
-│   ├── rbac.ts                 # requirePermission / requireRole (ADR-0001)
+│   ├── rbac/                   # requirePermission / requireRole (ADR-0001)
 │   ├── http.ts                  # RFC 9457 problemResponse / successResponse (ADR-0002)
 │   ├── rate-limit.ts             # Redis-backed rate limiter (ADR-0003)
 │   ├── logger.ts                  # Structured logger (ADR-0004)

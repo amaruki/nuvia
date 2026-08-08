@@ -6,7 +6,7 @@ Each module below states its responsibility, its public surface, the entities it
 
 **Responsibility**: user identity, role assignment, custom-role definitions. This module is deep: a caller asking "can this user do X" never touches `ROLE_PERMISSIONS`, `custom_roles`, or the predefined/custom branching logic directly — it calls `requirePermission(user, permission)` and gets a boolean-or-throw. See Section 12 for the full resolution algorithm this hides.
 
-**Public surface**: `requirePermission(user, permission): void | throws`, `requireRole(user, role): void | throws` (`src/lib/rbac.ts`), `getCurrentUser(): UserWithRole | null`. Invariants: a `Permission` is always a `module:action` string from the fixed `PERMISSION_MODULES` x `PERMISSION_ACTIONS` product; a predefined `Role` always resolves through `ROLE_PERMISSIONS`; an unrecognized role string is treated as a `CustomRole` name and resolved via a database lookup, defaulting to zero permissions if inactive or absent.
+**Public surface**: `requirePermission(user, permission): void | throws`, `requireRole(user, role): void | throws` (`src/lib/rbac/`), `getCurrentUser(): UserWithRole | null`. Invariants: a `Permission` is always a `module:action` string from the fixed `PERMISSION_MODULES` x `PERMISSION_ACTIONS` product; a predefined `Role` always resolves through `ROLE_PERMISSIONS`; an unrecognized role string is treated as a `CustomRole` name and resolved via a database lookup, defaulting to zero permissions if inactive or absent.
 
 **Entities owned**: `User`, `CustomRole`, `Role` (as data, via `user_role_assignments` and `role_change_history`).
 

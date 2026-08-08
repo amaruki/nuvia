@@ -12,17 +12,17 @@ Every choice below was already made and recorded in an ADR before this document 
 
 ## 4.2 Backend
 
-| Component      | Technology                                              | Justification                                                                      |
-| -------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Framework      | Next.js 16 (App Router)                                 | Server Components by default ([ADR-0006](../adr/0006-server-first-components.md))  |
-| API style      | REST, versioned under `/api/v1/**`                      | Matches the route.ts -> service -> Drizzle layering                                |
-| Validation     | Zod                                                     | Request/response schema validation, one file per domain in `src/lib/validation/`   |
-| ORM            | Drizzle ORM                                             | [ADR-0011](../adr/0011-prisma-to-drizzle.md), replacing Prisma                     |
-| Error contract | RFC 9457 Problem Details (`src/lib/http.ts`)            | [ADR-0002](../adr/0002-rfc9457-error-contract.md)                                  |
-| Authorization  | `requirePermission` / `requireRole` (`src/lib/rbac.ts`) | [ADR-0001](../adr/0001-one-authorization-helper.md), the sole authorization helper |
-| Rate limiting  | Redis-backed (`src/lib/rate-limit.ts`)                  | [ADR-0003](../adr/0003-single-rate-limiter.md)                                     |
-| Logging        | One structured logger (`src/lib/logger.ts`)             | [ADR-0004](../adr/0004-one-structured-logger.md)                                   |
-| Authentication | better-auth                                             | Session cookies, `httpOnly`, `SameSite=Lax`                                        |
+| Component      | Technology                                            | Justification                                                                      |
+| -------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Framework      | Next.js 16 (App Router)                               | Server Components by default ([ADR-0006](../adr/0006-server-first-components.md))  |
+| API style      | REST, versioned under `/api/v1/**`                    | Matches the route.ts -> service -> Drizzle layering                                |
+| Validation     | Zod                                                   | Request/response schema validation, one file per domain in `src/lib/validation/`   |
+| ORM            | Drizzle ORM                                           | [ADR-0011](../adr/0011-prisma-to-drizzle.md), replacing Prisma                     |
+| Error contract | RFC 9457 Problem Details (`src/lib/http.ts`)          | [ADR-0002](../adr/0002-rfc9457-error-contract.md)                                  |
+| Authorization  | `requirePermission` / `requireRole` (`src/lib/rbac/`) | [ADR-0001](../adr/0001-one-authorization-helper.md), the sole authorization helper |
+| Rate limiting  | Redis-backed (`src/lib/rate-limit.ts`)                | [ADR-0003](../adr/0003-single-rate-limiter.md)                                     |
+| Logging        | One structured logger (`src/lib/logger.ts`)           | [ADR-0004](../adr/0004-one-structured-logger.md)                                   |
+| Authentication | better-auth                                           | Session cookies, `httpOnly`, `SameSite=Lax`                                        |
 
 ## 4.3 Frontend
 

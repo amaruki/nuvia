@@ -32,15 +32,15 @@ export const MODULE_NAMES = [
 export type ModuleName = (typeof MODULE_NAMES)[number];
 
 /**
- * §13.3 registry. members/events/content/forums/jobs, finance, chapters,
- * committees, learning and awards are Promoted: backing schema + authorized
+ * §13.3 registry. Every module is Promoted: backing schema + authorized
  * API + tests + docs (finance promoted 2026-08-08, backlog C5,
  * docs/modules/finance.md; chapters promoted 2026-08-08, backlog D1,
  * docs/modules/chapters.md; committees promoted 2026-08-08, backlog D2,
  * docs/modules/committees.md; learning promoted 2026-08-08, backlog D3,
  * docs/modules/learning.md; awards promoted 2026-08-08, backlog D4,
- * docs/modules/awards.md). The remaining one (workspaces) cleared the same
- * bar in D5 on 2026-08-08 and awaits its flag flip (§13.4 order).
+ * docs/modules/awards.md; workspaces promoted 2026-08-08, backlog D5,
+ * docs/modules/workspaces.md). No module remains Mock tier: the promotion
+ * queue from ADR-0008 / §13.4 is fully drained.
  */
 export const MODULE_FLAGS: Record<ModuleName, boolean> = {
   members: true,
@@ -53,7 +53,7 @@ export const MODULE_FLAGS: Record<ModuleName, boolean> = {
   learning: true,
   chapters: true,
   committees: true,
-  workspaces: false,
+  workspaces: true,
 };
 
 /** Human-readable titles for UI surfaces (badge tooltips, banners). */
@@ -98,11 +98,12 @@ export function getDisabledModules(
 /**
  * Mock-marking predicate: whether a module's UI must carry a visible
  * "Preview — mock data" mark wherever it still renders (nav badge, page
- * banner). Today every flag-off module is Mock tier — finance, the only
- * module past Mock, is Promoted and flag-on (backlog C5) — so flag-off
- * and mock-marked still coincide. When a flag-off module first reaches
- * Backed, this predicate gains a tier lookup of its own; it is kept
- * separate from isModuleEnabled so that moment doesn't ripple.
+ * banner). Every module has now cleared the promotion bar (finance in C5,
+ * chapters/committees/learning/awards/workspaces in D1–D5), so no module
+ * is flag-off and none is mock-marked. The predicate still equates
+ * mock-marked with flag-off; if a module is ever flagged off again while
+ * past Mock tier, it gains a tier lookup of its own. It is kept separate
+ * from isModuleEnabled so that moment doesn't ripple.
  */
 export function isMockMarked(
   name: ModuleName,

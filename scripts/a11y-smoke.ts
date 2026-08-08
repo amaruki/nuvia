@@ -121,6 +121,12 @@ const PAGES = [
     module: "awards",
     auth: true,
   },
+  {
+    slug: "workspaces-directory",
+    path: "/dashboard/organization/workspaces",
+    module: "workspaces",
+    auth: true,
+  },
 ] as const;
 
 const SEVERITIES_FAILING: Record<string, true> = { critical: true, serious: true };

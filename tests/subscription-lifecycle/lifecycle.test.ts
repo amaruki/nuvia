@@ -1,14 +1,9 @@
 /**
- * Backlog C2 — tier CRUD + subscription lifecycle engine, exercised against
- * the shared test database (real tables, real enum columns).
- *
- * Coverage:
- * - the ADR-0015 gateway seam: manual adapter behavior + minor-unit math,
- * - tier CRUD round-trip with string-mode numeric(10,2) amounts,
- * - the full lifecycle machine create→trialing→active→past_due→renew→
- *   pause→resume→cancel→expire, including grace and the UNPAID path,
- * - illegal from-states rejected, the A3 role derivation firing on every
- *   transition, and the same-transaction auth_logs audit trail.
+ * Backlog C2 split — the subscription lifecycle engine against the real
+ * membership_subscriptions table: the full machine create→trialing→active→
+ * past_due→renew→pause→resume→cancel→expire including grace and the UNPAID
+ * path, illegal from-states rejected, the A3 role derivation firing on every
+ * transition, and the same-transaction auth_logs audit trail.
  *
  * Every row this file creates is removed in afterAll; names carry a unique
  * suffix so runs never collide.
@@ -17,21 +12,9 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import { authLog, membershipTier, user } from "@/db/schema";
-import { BusinessLogicError, NotFoundError } from "@/lib/errors";
-import {
-  GatewayError,
-  resolvePaymentGateway,
-  toAmountString,
-  toMinorUnits,
-} from "@/lib/payments/gateway";
-import {
-  createTier,
-  deleteTier,
-  getTier,
-  listTiers,
-  updateTier,
-} from "@/lib/services/membership-tier.service";
+import { authLog } from "@/db/schema";
+import { NotFoundError } from "@/lib/errors";
+import { createTier, deleteTier } from "@/lib/services/membership-tier.service";
 import {
   cancelSubscription,
   createSubscription,
@@ -44,247 +27,12 @@ import {
   resumeSubscription,
   type ActorContext,
 } from "@/lib/services/subscription.service";
-import { createTierSchema, updateTierSchema } from "@/lib/validation/finance.validation";
+import { actor, createFixture, DAY, expectRejects, readRole, suffix } from "./helpers";
 
-const DAY = 86_400_000;
-const suffix = (): string => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-const actor: ActorContext = { actorId: "system:c2-lifecycle-test" };
-
-const createdUserIds: string[] = [];
-const createdTierIds: string[] = [];
-
-async function createTestUser(role = "user"): Promise<string> {
-  const stamp = suffix();
-  const [row] = await db
-    .insert(user)
-    .values({
-      username: `c2-${stamp}`,
-      email: `c2-${stamp}@example.test`,
-      name: "C2 Lifecycle Test",
-      role,
-      emailVerified: false,
-    })
-    .returning({ id: user.id });
-
-  createdUserIds.push(row.id);
-  return row.id;
-}
-
-async function readRole(userId: string): Promise<string | undefined> {
-  const row = await db.query.user.findFirst({
-    where: eq(user.id, userId),
-    columns: { role: true },
-  });
-  return row?.role;
-}
-async function expectRejects(
-  fn: () => Promise<unknown>,
-  code?: string,
-  errorClass:
-    | typeof BusinessLogicError
-    | typeof NotFoundError
-    | typeof GatewayError = BusinessLogicError,
-): Promise<void> {
-  const err: unknown = await fn().catch((e: unknown) => e);
-  expect(err).toBeInstanceOf(errorClass);
-  if (code !== undefined && err instanceof BusinessLogicError) {
-    expect(err.code).toBe(code);
-  }
-}
+const fixture = createFixture();
 
 afterAll(async () => {
-  // Subscriptions and auth logs cascade off the user rows; tiers are removed
-  // last, once nothing references them anymore.
-  for (const id of createdUserIds) {
-    await db.delete(user).where(eq(user.id, id));
-  }
-  for (const id of createdTierIds) {
-    await db.delete(membershipTier).where(eq(membershipTier.id, id));
-  }
-});
-
-describe("payment gateway seam — manual adapter (ADR-0015)", () => {
-  const gateway = resolvePaymentGateway();
-
-  test("PAYMENT_GATEWAY defaults to the manual provider", () => {
-    expect(gateway.provider).toBe("manual");
-  });
-
-  test("createCheckout settles immediately with no hosted step", async () => {
-    const result = await gateway.createCheckout({
-      userId: "user-x",
-      subscriptionId: "sub-x",
-      tierId: "tier-x",
-      tierName: "Test Tier",
-      amountMinor: toMinorUnits("10.00"),
-      currency: "USD",
-    });
-
-    expect(result.checkoutUrl).toBeNull();
-    expect(result.providerState).toBe("completed");
-    expect(result.providerTxId?.startsWith("manual_")).toBe(true);
-  });
-
-  test("createCheckout rejects non-positive amounts", async () => {
-    await expectRejects(
-      () =>
-        gateway.createCheckout({
-          userId: "user-x",
-          subscriptionId: "sub-x",
-          tierId: "tier-x",
-          tierName: "Test Tier",
-          amountMinor: 0,
-          currency: "USD",
-        }),
-      "INVALID_AMOUNT",
-      GatewayError,
-    );
-  });
-
-  test("verifyWebhook rejects every callback — nothing external to trust", async () => {
-    await expectRejects(
-      () => gateway.verifyWebhook({ headers: new Headers(), body: "{}" }),
-      "WEBHOOKS_NOT_SUPPORTED",
-      GatewayError,
-    );
-  });
-
-  test("getChargeStatus is unsupported — manual state lives on membership_transactions", async () => {
-    await expectRejects(
-      () => gateway.getChargeStatus("manual_anything"),
-      "QUERY_NOT_SUPPORTED",
-      GatewayError,
-    );
-  });
-
-  test("maps manual states onto internal transaction and subscription statuses", () => {
-    expect(gateway.toTransactionStatus("pending")).toBe("PENDING");
-    expect(gateway.toTransactionStatus("completed")).toBe("COMPLETED");
-    expect(gateway.toTransactionStatus("failed")).toBe("FAILED");
-    expect(gateway.toTransactionStatus("canceled")).toBe("CANCELED");
-    expect(gateway.toTransactionStatus("refunded")).toBe("REFUNDED");
-
-    expect(gateway.toSubscriptionStatus("completed")).toBe("ACTIVE");
-    expect(gateway.toSubscriptionStatus("failed")).toBe("PAST_DUE");
-    expect(gateway.toSubscriptionStatus("canceled")).toBe("CANCELED");
-    // A refund alone does not cancel — the lifecycle decides that.
-    expect(gateway.toSubscriptionStatus("refunded")).toBeNull();
-    expect(gateway.toSubscriptionStatus("pending")).toBeNull();
-  });
-
-  test("rejects unknown provider states", () => {
-    expect(() => gateway.toTransactionStatus("nope")).toThrow(GatewayError);
-    expect(() => gateway.toSubscriptionStatus("nope")).toThrow(GatewayError);
-  });
-
-  test("converts amounts across the minor-unit boundary exactly", () => {
-    expect(toMinorUnits("100.00")).toBe(10000);
-    expect(toMinorUnits("0.05")).toBe(5);
-    expect(toMinorUnits("7")).toBe(700);
-    expect(toMinorUnits("99999999.99")).toBe(9999999999);
-
-    expect(toAmountString(10000)).toBe("100.00");
-    expect(toAmountString(5)).toBe("0.05");
-    expect(toAmountString(toMinorUnits("99999999.99"))).toBe("99999999.99");
-
-    expect(() => toMinorUnits("10.999")).toThrow(GatewayError);
-    expect(() => toMinorUnits("-1.00")).toThrow(GatewayError);
-    expect(() => toAmountString(-5)).toThrow(GatewayError);
-  });
-});
-
-describe("membership tier CRUD — real membership_tiers table", () => {
-  let crudTierId: string;
-  const crudTierName = `c2-crud-${suffix()}`;
-
-  test("create stores the string-mode price and returns the full row", async () => {
-    const tier = await createTier({
-      name: crudTierName,
-      displayName: "C2 CRUD Tier",
-      description: "lifecycle test tier",
-      price: "49.99",
-      billingCycle: "monthly",
-      features: ["voting"],
-      trialDays: 14,
-      sortOrder: 5,
-    });
-
-    createdTierIds.push(tier.id);
-    crudTierId = tier.id;
-
-    expect(tier.price).toBe("49.99");
-    expect(tier.billingCycle).toBe("monthly");
-    expect(tier.trialDays).toBe(14);
-    expect(tier.features).toEqual(["voting"]);
-    expect(tier.benefits).toEqual([]);
-    expect(tier.isActive).toBe(true);
-  });
-
-  test("read and list return the created tier", async () => {
-    const fetched = await getTier(crudTierId);
-    expect(fetched.name).toBe(crudTierName);
-
-    const listed = await listTiers();
-    expect(listed.some((tier) => tier.id === crudTierId)).toBe(true);
-  });
-
-  test("update changes only the provided fields", async () => {
-    const updated = await updateTier(crudTierId, { price: "59.50" });
-    expect(updated.price).toBe("59.50");
-    expect(updated.displayName).toBe("C2 CRUD Tier");
-
-    const refetched = await getTier(crudTierId);
-    expect(refetched.price).toBe("59.50");
-  });
-
-  test("duplicate tier names are rejected", async () => {
-    await expectRejects(
-      () =>
-        createTier({
-          name: crudTierName,
-          displayName: "Dup",
-          price: "1.00",
-          billingCycle: "monthly",
-        }),
-      "TIER_NAME_TAKEN",
-    );
-  });
-
-  test("zod accepts string decimals only — numeric(10,2) string mode", () => {
-    const base = {
-      name: `zod-${suffix()}`,
-      displayName: "Zod Tier",
-      billingCycle: "monthly" as const,
-    };
-
-    expect(createTierSchema.safeParse({ ...base, price: 49.99 }).success).toBe(false);
-    expect(createTierSchema.safeParse({ ...base, price: "49.999" }).success).toBe(false);
-    expect(createTierSchema.safeParse({ ...base, price: "-5.00" }).success).toBe(false);
-    expect(createTierSchema.safeParse({ ...base, price: "123456789.00" }).success).toBe(false);
-    expect(createTierSchema.safeParse({ ...base, price: "99999999.99" }).success).toBe(true);
-    expect(createTierSchema.safeParse({ ...base, price: "0" }).success).toBe(true);
-  });
-
-  test("update schema rejects an empty body", () => {
-    expect(updateTierSchema.safeParse({}).success).toBe(false);
-    expect(updateTierSchema.safeParse({ price: "1.00" }).success).toBe(true);
-  });
-
-  test("delete removes an unused tier", async () => {
-    const throwaway = await createTier({
-      name: `c2-throwaway-${suffix()}`,
-      displayName: "Throwaway",
-      price: "1.00",
-      billingCycle: "monthly",
-    });
-
-    await deleteTier(throwaway.id);
-    await expectRejects(() => getTier(throwaway.id), undefined, NotFoundError);
-  });
-
-  test("unknown tier ids are NotFound", async () => {
-    await expectRejects(() => getTier(crypto.randomUUID()), undefined, NotFoundError);
-  });
+  await fixture.cleanup();
 });
 
 describe("subscription lifecycle engine — real membership_subscriptions table", () => {
@@ -298,12 +46,12 @@ describe("subscription lifecycle engine — real membership_subscriptions table"
       billingCycle: "monthly",
       trialDays: 14,
     });
-    createdTierIds.push(tier.id);
+    fixture.trackTier(tier.id);
     lifecycleTierId = tier.id;
   });
 
   test("full lifecycle: trialing→active→past_due→renew→pause→resume→cancel→expire", async () => {
-    const userId = await createTestUser();
+    const userId = await fixture.createTestUser();
     const start = new Date(Date.now() - 13 * DAY); // one day of trial left
 
     // create → TRIALING, and the A3 sync promotes the role in the same call
@@ -385,7 +133,7 @@ describe("subscription lifecycle engine — real membership_subscriptions table"
   });
 
   test("trial override: trialDays 0 skips the tier trial; cancel→grace→expire", async () => {
-    const userId = await createTestUser();
+    const userId = await fixture.createTestUser();
     const start = new Date(Date.now() - 5 * DAY);
 
     const created = await createSubscription(
@@ -407,7 +155,7 @@ describe("subscription lifecycle engine — real membership_subscriptions table"
   });
 
   test("expire gives up on past-due retries: PAST_DUE → UNPAID, no grace", async () => {
-    const userId = await createTestUser();
+    const userId = await fixture.createTestUser();
 
     const created = await createSubscription(
       { userId, tierId: lifecycleTierId, trialDays: 0 },
@@ -426,7 +174,7 @@ describe("subscription lifecycle engine — real membership_subscriptions table"
   });
 
   test("expire normalizes a stale ACTIVE row whose period already ran out", async () => {
-    const userId = await createTestUser();
+    const userId = await fixture.createTestUser();
 
     // 40 days ago, monthly billing: the row says ACTIVE but the clock says expired.
     const created = await createSubscription(
@@ -443,7 +191,7 @@ describe("subscription lifecycle engine — real membership_subscriptions table"
   });
 
   test("expire refuses a subscription still inside its paid period", async () => {
-    const userId = await createTestUser();
+    const userId = await fixture.createTestUser();
     const created = await createSubscription(
       { userId, tierId: lifecycleTierId, trialDays: 0 },
       actor,
@@ -456,7 +204,7 @@ describe("subscription lifecycle engine — real membership_subscriptions table"
   });
 
   test("cancel-at-period-end keeps the subscription running until the period ends", async () => {
-    const userId = await createTestUser();
+    const userId = await fixture.createTestUser();
     const created = await createSubscription(
       { userId, tierId: lifecycleTierId, trialDays: 0 },
       actor,
@@ -476,7 +224,7 @@ describe("subscription lifecycle engine — real membership_subscriptions table"
   });
 
   test("one live subscription per user; re-subscribing works after terminal states", async () => {
-    const userId = await createTestUser();
+    const userId = await fixture.createTestUser();
 
     const first = await createSubscription(
       { userId, tierId: lifecycleTierId, trialDays: 0 },
@@ -499,7 +247,7 @@ describe("subscription lifecycle engine — real membership_subscriptions table"
   });
 
   test("delete refuses a tier that still has subscriptions, then allows it", async () => {
-    const userId = await createTestUser();
+    const userId = await fixture.createTestUser();
     await createSubscription({ userId, tierId: lifecycleTierId, trialDays: 0 }, actor);
 
     await expectRejects(() => deleteTier(lifecycleTierId), "TIER_IN_USE");
@@ -509,7 +257,7 @@ describe("subscription lifecycle engine — real membership_subscriptions table"
   });
 
   test("every privileged transition wrote an auth_logs audit entry, same transaction", async () => {
-    const userId = await createTestUser();
+    const userId = await fixture.createTestUser();
     const noted: ActorContext = { actorId: "system:c2-lifecycle-test", reason: "audit check" };
 
     const created = await createSubscription(

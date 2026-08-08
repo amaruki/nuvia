@@ -1,0 +1,29 @@
+import { type Locale, addDays, format, startOfMonth, startOfWeek } from "date-fns";
+
+const getDaysInMonth = (date: Date) => {
+  const startOfMonthDate = startOfMonth(date);
+  const startOfWeekForMonth = startOfWeek(startOfMonthDate, {
+    weekStartsOn: 0,
+  });
+
+  let currentDate = startOfWeekForMonth;
+  const calendar = [];
+
+  while (calendar.length < 42) {
+    calendar.push(new Date(currentDate));
+    currentDate = addDays(currentDate, 1);
+  }
+
+  return calendar;
+};
+
+const generateWeekdays = (locale: Locale) => {
+  const daysOfWeek = [];
+  for (let i = 0; i < 7; i++) {
+    const date = addDays(startOfWeek(new Date(), { weekStartsOn: 0 }), i);
+    daysOfWeek.push(format(date, "EEEE", { locale }));
+  }
+  return daysOfWeek;
+};
+
+export { getDaysInMonth, generateWeekdays };

@@ -99,7 +99,7 @@ Wave C preamble: finance/dues is the product core for an AMS and the first modul
   - Why: committees is the next module in the post-1.0 promotion order, and its UI currently renders mock data rather than real records.
   - Acceptance: committees clears the same promotion bar as C5 — schema + authorized API + UI de-mock of `mock-committee-data` + tests + docs, with the module flag flipped on.
   - Deps: C5 pattern.
-  - Status: done 2026-08-08. Committees cleared the C5 promotion bar: schema (`committees` + `committee_members` tables, migration 0006), authorized API `/api/v1/committees/**` on `committees:*` permissions, UI de-mocked (`mock-committee-data.ts` deleted; hooks and pages on `apiFetch`/react-query), 14 tests in `tests/committees-api.test.ts`, module docs at `docs/modules/committees.md`, and `committees: true` in `config/features.ts` with `/dashboard/organization/committees` added to the axe smoke (15 pages PASS, 0 critical/serious).
+  - Status: done 2026-08-08. Committees cleared the C5 promotion bar: schema (`committees` + `committee_members` tables, migration 0006), authorized API `/api/v1/committees/**` on `committees:*` permissions, UI de-mocked (`mock-committee-data.ts` deleted; hooks and pages on `apiFetch`/react-query), 14 tests in `tests/committees-api/`, module docs at `docs/modules/committees.md`, and `committees: true` in `config/features.ts` with `/dashboard/organization/committees` added to the axe smoke (15 pages PASS, 0 critical/serious).
 
 - **D3 — Learning/CPD real (same bar; courses/certifications pages).**
   - Why: learning/CPD is the next module in the post-1.0 promotion order, and its courses/certifications pages currently render mock data.

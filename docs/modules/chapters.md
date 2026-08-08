@@ -43,7 +43,7 @@ Role coverage: admin holds all `chapters:*`; staff and chapter officers hold rea
 
 ## Service layer
 
-`src/lib/services/chapter.service.ts` — server-only, drizzle, RFC 9457:
+`src/lib/services/chapter/` — server-only, drizzle, RFC 9457:
 
 - `listChapters({status?, region?, country?, search?, page?, limit?})` — server-side filters + pagination; members for listed chapters are fetched in one batched query so the hook's client-side leadership-role filter works without N+1.
 - `getChapter(id)` — populates `leadership` and `subChapterIds`; null when missing.
@@ -56,7 +56,7 @@ Pages under `src/app/dashboard/chapters/` (list, add, `[id]` detail), wired thro
 
 ## Tests
 
-22 tests in `tests/chapters-api.test.ts`, run against the shared test database (`tests/helpers.ts`, real tables):
+22 tests in `tests/chapters-api/` (7 focused files plus shared fixtures), run against the shared test database (`tests/helpers.ts`, real tables):
 
 - Auth + per-action RBAC (admin/staff/member; staff lacks create/delete, member lacks all).
 - Validation (422), duplicate-name conflict (409), unknown-parent (422).
@@ -65,7 +65,7 @@ Pages under `src/app/dashboard/chapters/` (list, add, `[id]` detail), wired thro
 - Delete semantics: member-row cascade, child set-null, double-delete 404.
 - Service-layer round trip (including `establishedDate`/`memberCount` and `system:` actor email).
 
-Run: `bun test tests/chapters-api.test.ts` (uses `DATABASE_URL` from `.env`).
+Run: `bun test tests/chapters-api/` (uses `DATABASE_URL` from `.env`).
 
 ## Known limitations
 

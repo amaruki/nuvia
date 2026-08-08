@@ -106,7 +106,7 @@ Event CRUD plus registration, waitlist, check-in, and cancel.
   `event_sessions`, `event_speakers`, `event_sponsors` (all migration 0000).
 - **Spec:** [`api-specs/events.md`](api-specs/events.md).
 - **Tests:** `tests/events-read-api.test.ts`,
-  `tests/events-write-api.test.ts`.
+  `tests/events-write-api/`.
 
 ## 6. Content & media (backlog B4)
 
@@ -155,7 +155,7 @@ Job postings and applications with reference data for form dropdowns.
 - **Schema tables:** `job_categories`, `job_types`, `locations`,
   `companies`, `job_postings`, `job_applications` (all 0000).
 - **Spec:** [`api-specs/jobs.md`](api-specs/jobs.md).
-- **Tests:** `tests/jobs-api.test.ts`.
+- **Tests:** `tests/jobs-api/`.
 
 ## 9. Finance (backlog C1–C5, ADR-0014/0015)
 
@@ -179,7 +179,7 @@ manual payments, reports, gateway abstraction, and webhook intake.
 - **Spec:** [`api-specs/finance.md`](api-specs/finance.md),
   [`api-specs/webhooks.md`](api-specs/webhooks.md).
 - **Tests:** `tests/invoice-payment.test.ts`,
-  `tests/subscription-lifecycle.test.ts`,
+  `tests/subscription-lifecycle/`,
   `tests/finance-dashboard-api.test.ts`.
 
 ## 10. Organization (ADR-0007)
@@ -231,11 +231,10 @@ Regional chapters with member rosters.
 
 - **Entry points:** `src/app/api/v1/chapters/**` (5 endpoints),
   `src/app/api/v1/chapters/_lib.ts` (`handleChapterRoute`,
-  `parsePagination`), `src/lib/services/chapter.service.ts` (schemas
-  colocated).
+  `parsePagination`), `src/lib/services/chapter/` (schemas colocated).
 - **Schema tables:** `chapters`, `chapter_members` (0005).
 - **Spec:** [`api-specs/chapters.md`](api-specs/chapters.md).
-- **Tests:** `tests/chapters-api.test.ts`.
+- **Tests:** `tests/chapters-api/`.
 
 ## 14. Committees (backlog D2)
 
@@ -246,7 +245,7 @@ Committees with member rosters, same shape as chapters.
   (schemas colocated).
 - **Schema tables:** `committees`, `committee_members` (0006).
 - **Spec:** [`api-specs/committees.md`](api-specs/committees.md).
-- **Tests:** `tests/committees-api.test.ts`.
+- **Tests:** `tests/committees-api/` (focused suite folder).
 
 ## 15. Learning / CPD (backlog D3)
 
@@ -258,7 +257,7 @@ Courses and issued certificates.
   (schemas colocated).
 - **Schema tables:** `courses`, `certificates` (0009).
 - **Spec:** [`api-specs/learning.md`](api-specs/learning.md).
-- **Tests:** `tests/learning-api.test.ts`.
+- **Tests:** `tests/learning-api/`.
 
 ## 16. Awards (backlog D4)
 
@@ -269,7 +268,7 @@ Award programs and nominations.
   `src/lib/services/award.service.ts` (schemas colocated).
 - **Schema tables:** `award_programs`, `award_nominations` (0007).
 - **Spec:** [`api-specs/awards.md`](api-specs/awards.md).
-- **Tests:** `tests/awards-api.test.ts`.
+- **Tests:** `tests/awards-api/`.
 
 ## 17. Workspaces (backlog D5)
 
@@ -280,4 +279,4 @@ Member workspaces.
   (schemas colocated).
 - **Schema tables:** `workspaces` (0008).
 - **Spec:** [`api-specs/workspaces.md`](api-specs/workspaces.md).
-- **Tests:** `tests/workspaces-api.test.ts`.
+- **Tests:** `tests/workspaces-api/`.

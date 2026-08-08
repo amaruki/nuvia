@@ -73,13 +73,20 @@ The list hooks fetch pages (`limit=100`) and expose plain async mutations (`crea
 
 ## Tests
 
-27 tests in one file, run against the shared test database (real tables, real constraints):
+27 tests in `tests/learning-api/` — one self-contained file per area, shared fixtures in `helpers.ts` — run against the shared test database (real tables, real constraints):
 
-| File                         | Tests | Covers                                                                                                                                                                                                                                                                                                                                                  |
-| ---------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/learning-api.test.ts` | 27    | RBAC matrix (admin/staff/member: member holds no `learning:*`, staff no create/delete), create/issue validation (422), unknown-course issuance (400), verification-code shape, denormalized course data, list filters with pagination meta, revoke/restore, course delete set-nulling `certificate.course_id`, service round-trip and `computeDuration` |
+| File                            | Tests | Covers                                                                                                                                   |
+| ------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `rbac.test.ts`                  | 3     | Auth + RBAC matrix: anonymous/member blocked from course and certificate list/create/issue, item reads require `learning:read`           |
+| `course-write.test.ts`          | 2     | Create validation (422), admin create with the full UI envelope shape and derived duration                                               |
+| `course-list.test.ts`           | 4     | `{data, meta}` envelope over the `RUN_ID` delta, level + category filters, pagination                                                    |
+| `course-read-update.test.ts`    | 4     | Fetch by id, unknown-id 404, update permission/validation gates, partial-update reflection                                               |
+| `certificate-issue.test.ts`     | 3     | Issue validation (422), unknown-course issuance (400), denormalized course data + verification-code shape                                |
+| `certificate-lifecycle.test.ts` | 6     | List delta/meta, status + course filters, pagination, fetch + 404, revoke/restore permission/validation/effect                           |
+| `course-delete.test.ts`         | 2     | `learning:delete` gate (staff lacks it), delete set-nulls `certificate.course_id` while the denormalized record survives, idempotent 404 |
+| `service.test.ts`               | 3     | Service round-trip, `computeDuration`, unknown ids surface as null                                                                       |
 
-Run: `bun test tests/learning-api.test.ts` (needs the test Postgres/Redis stack, `compose.test.yml`). The suite is baseline-delta and self-cleaning: every row is `RUN_ID`-isolated and removed in `afterAll`.
+Run: `bun test tests/learning-api/` (needs the test Postgres/Redis stack, `compose.yml`). The suite is baseline-delta and self-cleaning: every row is `RUN_ID`-isolated and removed in `afterAll`.
 
 ## Accessibility
 
@@ -91,7 +98,7 @@ WCAG 2.2 AA is part of the promotion bar for an enabled module. The learning pag
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | Real Drizzle schema                    | `src/db/schema/learning.ts`; migration `drizzle/0009_slimy_mole_man.sql` (backlog D3)                             |
 | Authorized API                         | 9 handlers under `src/app/api/v1/learning/**`, each calling `requirePermission("learning:*")` before body parsing |
-| Tests                                  | `tests/learning-api.test.ts` — 27 tests against the real tables                                                   |
+| Tests                                  | `tests/learning-api/` — 27 tests against the real tables                                                          |
 | Documentation                          | This document                                                                                                     |
 | WCAG 2.2 AA pass (enabled-module gate) | Static `jsx-a11y` gate passes; axe smoke run recorded by the E1 enablement pass (see Accessibility)               |
 | Flag on                                | `config/features.ts` `MODULE_FLAGS.learning = true` — pending, flipped by the orchestrator post-commit            |

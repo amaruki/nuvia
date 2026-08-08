@@ -6,7 +6,7 @@ Regional chapter CRUD (backlog D1). All handlers wrap service work in
 `internal-error`.
 
 Route files: `src/app/api/v1/chapters/**`. Schemas:
-`src/lib/services/chapter.service.ts`; UI shapes: `src/types/chapter.types.ts`.
+`src/lib/services/chapter/schemas.ts`; UI shapes: `src/types/chapter.types.ts`.
 Permissions: `chapters:read`, `chapters:create`, `chapters:update`,
 `chapters:delete`.
 

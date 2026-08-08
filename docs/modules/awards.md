@@ -51,7 +51,7 @@ Role coverage: admin holds all `awards:*`; staff holds read/update/manage; corpo
 - `listAwardPrograms({status?, category?, search?, page?, limit?})` / `listAwardNominations({status?, programId?, search?, page?, limit?})` — server-side filters + pagination; nomination counts for listed programs are fetched in one batched query (no N+1).
 - `getAwardProgram(id)` / `getAwardNomination(id)` — null when missing.
 - `createAwardProgram` / `updateAwardProgram` / `deleteAwardProgram` / `createAwardNomination` / `updateAwardNomination` / `deleteAwardNomination` — actor recorded via `createdBy`/`updatedBy` user FKs; unique-name violations map to 409, unknown program/user and bad date ranges to 422.
-- `AwardServiceError` carries a `ProblemDetails` payload; route handlers translate it (mirrors `chapter.service.ts`). Exported zod schemas: `createAwardProgramSchema`, `updateAwardProgramSchema`, `createAwardNominationSchema`, `updateAwardNominationSchema` (date unions are `z.union([z.null(), z.coerce.date()])` — null branch first so `null` clears dates instead of coercing to the epoch).
+- `AwardServiceError` carries a `ProblemDetails` payload; route handlers translate it (mirrors `chapter/errors.ts`). Exported zod schemas: `createAwardProgramSchema`, `updateAwardProgramSchema`, `createAwardNominationSchema`, `updateAwardNominationSchema` (date unions are `z.union([z.null(), z.coerce.date()])` — null branch first so `null` clears dates instead of coercing to the epoch).
 
 ## Dashboard UI
 
@@ -59,7 +59,7 @@ Role coverage: admin holds all `awards:*`; staff holds read/update/manage; corpo
 
 ## Tests
 
-27 tests in `tests/awards-api.test.ts`, run against the shared test database (`tests/helpers.ts`, real tables):
+27 tests in `tests/awards-api/` (6 focused files plus shared fixtures), run against the shared test database (`tests/helpers.ts`, real tables):
 
 - Auth + per-action RBAC (admin/staff/member; staff lacks create/delete, member lacks all).
 - Validation (422), duplicate-program-name conflict (409), unknown-program nomination (422).
@@ -68,7 +68,7 @@ Role coverage: admin holds all `awards:*`; staff holds read/update/manage; corpo
 - Program lifecycle: date clearing via `PATCH … null`, unique-name 409 on update, cascade delete of nominations.
 - Service-layer round trip (actor FKs, batched counts).
 
-Run: `bun test tests/awards-api.test.ts` (uses `DATABASE_URL` from `.env`).
+Run: `bun test tests/awards-api/` (uses `DATABASE_URL` from `.env`).
 
 ## Known limitations
 

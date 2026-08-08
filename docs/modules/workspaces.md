@@ -54,7 +54,7 @@ Permission holders among predefined roles (`src/types/role.types.ts`): `superadm
 
 ## Dashboard UI
 
-Two pages under `src/app/dashboard/organization/workspaces/`, wired to the API through `src/lib/hooks/use-workspaces.ts` (react-query over `apiFetch`, backlog D5 — the `mock-workspace-data.ts` file was deleted once its last importer moved):
+Two pages under `src/app/dashboard/organization/workspaces/`, wired to the API through `src/lib/hooks/use-workspaces/` (react-query over `apiFetch`, backlog D5 — the `mock-workspace-data.ts` file was deleted once its last importer moved):
 
 | Page             | Path                                      |
 | ---------------- | ----------------------------------------- |
@@ -65,13 +65,20 @@ The hook fetches the list (filters → query params), hydrates wire dates per co
 
 ## Tests
 
-24 tests in one file, run against the shared test database (real tables, real constraints):
+24 tests in six focused files plus a shared fixtures module
+(`tests/workspaces-api/fixtures.ts`), run against the shared test database
+(real tables, real constraints):
 
-| File                           | Tests | Covers                                                                                                                                                                                                                                                                                                                                                                                           |
-| ------------------------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `tests/workspaces-api.test.ts` | 24    | Auth + RBAC matrix (admin/staff/member tiers; staff lacks create/delete; plain member lacks even read), create validation (422), unique-name conflict (409), committee linking incl. unknown-committee 422 and null-clears-link, list filters (status/type/memberRole/date range/search) with pagination meta, PATCH semantics, delete permissions and idempotent 404s, service-layer round trip |
+| File                                       | Tests | Covers                                                                                                     |
+| ------------------------------------------ | ----- | ---------------------------------------------------------------------------------------------------------- |
+| `tests/workspaces-api/auth-rbac.test.ts`   | 3     | Auth + RBAC matrix (admin/staff/member tiers; staff lacks create/delete; plain member lacks even read)     |
+| `tests/workspaces-api/create.test.ts`      | 4     | Create validation (422), unique-name conflict (409), committee linking incl. unknown-committee 422         |
+| `tests/workspaces-api/list.test.ts`        | 7     | List filters (status/type/memberRole/date range/search) with pagination meta, jsonb roster filter          |
+| `tests/workspaces-api/read-update.test.ts` | 6     | Fetch/404, PATCH permission + validation, field updates, rename conflict (409), null-clears-committee-link |
+| `tests/workspaces-api/delete.test.ts`      | 2     | Delete permissions and idempotent 404s                                                                     |
+| `tests/workspaces-api/service.test.ts`     | 2     | Service-layer round trip and unknown-id semantics                                                          |
 
-Run: `bun test tests/workspaces-api.test.ts` (needs the test Postgres/Redis stack, `compose.test.yml`). The suite is baseline-delta and self-cleaning: every row is `RUN_ID`-isolated and removed in `afterAll`.
+Run: `bun test tests/workspaces-api/` (needs the test Postgres/Redis stack, `compose.test.yml`). Each file is baseline-delta and self-cleaning: every row is `RUN_ID`-isolated and removed in `afterAll`.
 
 ## Accessibility
 
@@ -83,7 +90,7 @@ WCAG 2.2 AA is part of the promotion bar for an enabled module. The workspaces p
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Real Drizzle schema                    | `src/db/schema/workspaces.ts`; migration `drizzle/0008_wonderful_sage.sql` (backlog D5)                               |
 | Authorized API                         | 5 handlers under `src/app/api/v1/workspaces/**`, each calling `requirePermission("workspaces:*")` before body parsing |
-| Tests                                  | `tests/workspaces-api.test.ts` — 24 tests against the real tables                                                     |
+| Tests                                  | `tests/workspaces-api/` — 24 tests against the real tables                                                            |
 | Documentation                          | This document                                                                                                         |
 | WCAG 2.2 AA pass (enabled-module gate) | Static `jsx-a11y` gate passes; axe smoke run recorded by the E1 enablement pass (see Accessibility)                   |
 | Flag on                                | `config/features.ts` `MODULE_FLAGS.workspaces = true` (this promotion)                                                |

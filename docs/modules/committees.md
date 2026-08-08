@@ -63,13 +63,16 @@ The hook fetches the list (filters → query params), computes statistics and th
 
 ## Tests
 
-14 tests in one file, run against the shared test database (real tables, real constraints):
+14 tests in a focused folder, run against the shared test database (real tables, real constraints):
 
-| File                           | Tests | Covers                                                                                                                                                                                                                                                                                                                          |
-| ------------------------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/committees-api.test.ts` | 14    | RBAC matrix (admin/staff/member), create validation (422), unique-name conflict (409), charter date stamping/preservation, leadership vs member split from `committee_members`, parent/child hierarchy incl. self-parent 409 and dangling parent 400, list filters with pagination meta, delete permissions and idempotent 404s |
+| File                                     | Tests | Covers                                                                                                                                                                                         |
+| ---------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/committees-api/crud.test.ts`      | 9     | RBAC matrix (admin/staff/member), create validation (422), unique-name conflict (409), charter date stamping/preservation, leadership vs member split from `committee_members`, PATCH behavior |
+| `tests/committees-api/hierarchy.test.ts` | 2     | Parent/child hierarchy incl. self-parent 409 and dangling parent 400                                                                                                                           |
+| `tests/committees-api/listing.test.ts`   | 2     | List filters with pagination meta                                                                                                                                                              |
+| `tests/committees-api/delete.test.ts`    | 1     | Delete permissions and idempotent 404s                                                                                                                                                         |
 
-Run: `bun test tests/committees-api.test.ts` (needs the test Postgres/Redis stack, `compose.test.yml`). The suite is baseline-delta and self-cleaning: every row is `RUN_ID`-isolated and removed in `afterAll`.
+Shared setup (actors, payloads, cleanup) lives in `tests/committees-api/fixtures.ts`. Run: `bun test tests/committees-api/` (needs the test Postgres/Redis stack, `compose.yml`). Each file is baseline-delta and self-cleaning: every row is `RUN_ID`-isolated and removed in `afterAll`.
 
 ## Accessibility
 
@@ -81,7 +84,7 @@ WCAG 2.2 AA is part of the promotion bar for an enabled module. The committees p
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Real Drizzle schema                    | `src/db/schema/committees.ts`; migration `drizzle/0006_early_thing.sql` (backlog D2)                                  |
 | Authorized API                         | 5 handlers under `src/app/api/v1/committees/**`, each calling `requirePermission("committees:*")` before body parsing |
-| Tests                                  | `tests/committees-api.test.ts` — 14 tests against the real tables                                                     |
+| Tests                                  | `tests/committees-api/` — 14 tests against the real tables                                                            |
 | Documentation                          | This document                                                                                                         |
 | WCAG 2.2 AA pass (enabled-module gate) | Static `jsx-a11y` gate passes; axe smoke run recorded by the E1 enablement pass (see Accessibility)                   |
 | Flag on                                | `config/features.ts` `MODULE_FLAGS.committees = true` (this promotion)                                                |

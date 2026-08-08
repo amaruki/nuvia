@@ -1,7 +1,7 @@
 import { and, count, desc, eq, gte, isNotNull, lte, lt } from "drizzle-orm";
 import { db } from "@/db/client";
 import { authLog } from "@/db/schema";
-import { LOGGING } from "@/lib/config";
+import { env } from "@/lib/env";
 import { logError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 
@@ -70,7 +70,7 @@ export class LoggingService {
    */
   async logAuthEvent(entry: Omit<AuthLogEntry, "id" | "timestamp">): Promise<void> {
     try {
-      if (!LOGGING.ERRORS) {
+      if (!env.LOGGING_ERRORS) {
         return;
       }
 
@@ -81,7 +81,7 @@ export class LoggingService {
       };
 
       // Log to console for development/debugging
-      if (LOGGING.REQUESTS || LOGGING.ERRORS) {
+      if (env.LOGGING_REQUESTS || env.LOGGING_ERRORS) {
         logger.info(`[AuthEvent] ${logEntry.eventType}: ${logEntry.message}`, {
           userId: logEntry.userId,
           severity: logEntry.severity,

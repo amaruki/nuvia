@@ -19,7 +19,7 @@ import {
   EventStatistics,
   EventDashboardData,
 } from "@/types/event.types";
-import { API } from "@/lib/config";
+import { env } from "@/lib/env";
 import {
   getMockEvents,
   getMockEventById,
@@ -125,7 +125,7 @@ export async function getEventById(id: string): Promise<EventDetailsResponse> {
  */
 export async function createEvent(eventData: CreateEventRequest): Promise<Event> {
   try {
-    const response = await fetch(`${API.PREFIX}/events`, {
+    const response = await fetch(`${env.API_PREFIX}/events`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -149,7 +149,7 @@ export async function updateEvent(id: string, eventData: UpdateEventRequest): Pr
   }
 
   try {
-    const response = await fetch(`${API.PREFIX}/events/${id}`, {
+    const response = await fetch(`${env.API_PREFIX}/events/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -173,7 +173,7 @@ export async function deleteEvent(id: string): Promise<void> {
   }
 
   try {
-    const response = await fetch(`${API.PREFIX}/events/${id}`, {
+    const response = await fetch(`${env.API_PREFIX}/events/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -198,7 +198,7 @@ export async function registerForEvent(
   }
 
   try {
-    const response = await fetch(`${API.PREFIX}/events/register`, {
+    const response = await fetch(`${env.API_PREFIX}/events/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -222,7 +222,7 @@ export async function cancelEventRegistration(eventId: string): Promise<EventReg
   }
 
   try {
-    const response = await fetch(`${API.PREFIX}/events/${eventId}/cancel-registration`, {
+    const response = await fetch(`${env.API_PREFIX}/events/${eventId}/cancel-registration`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -247,7 +247,7 @@ export async function checkInToEvent(
   }
 
   try {
-    const response = await fetch(`${API.PREFIX}/events/check-in`, {
+    const response = await fetch(`${env.API_PREFIX}/events/check-in`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -267,7 +267,7 @@ export async function checkInToEvent(
  */
 export async function getEventStatistics(): Promise<EventStatistics> {
   try {
-    const response = await fetch(`${API.PREFIX}/events/statistics`, {
+    const response = await fetch(`${env.API_PREFIX}/events/statistics`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -324,7 +324,7 @@ export async function getUserOrganizedEvents(userId: string): Promise<Event[]> {
   }
 
   try {
-    const response = await fetch(`${API.PREFIX}/users/${userId}/organized-events`, {
+    const response = await fetch(`${env.API_PREFIX}/users/${userId}/organized-events`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -354,7 +354,7 @@ export async function getEventCertificate(
   }
 
   try {
-    const response = await fetch(`${API.PREFIX}/events/${eventId}/certificate/${userId}`, {
+    const response = await fetch(`${env.API_PREFIX}/events/${eventId}/certificate/${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -380,7 +380,7 @@ export async function verifyEventCertificate(verificationCode: string): Promise<
   }
 
   try {
-    const response = await fetch(`${API.PREFIX}/certificates/verify/${verificationCode}`, {
+    const response = await fetch(`${env.API_PREFIX}/certificates/verify/${verificationCode}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -79,6 +79,9 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
   CORS_CREDENTIALS: boolFromString(false),
 
+  // API prefix for client-side service fetches (src/lib/services/*)
+  API_PREFIX: z.string().default("/api/v1"),
+
   // Uploads
   UPLOAD_MAX_SIZE: z.coerce.number().int().positive().default(5_242_880),
   UPLOAD_ALLOWED_TYPES: z

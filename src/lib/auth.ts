@@ -11,7 +11,7 @@ import { nextCookies } from "better-auth/next-js";
 import { db } from "@/db/client";
 import * as schema from "@/db/schema";
 import { validatePasswordStrength } from "./utils/password";
-import { SOCIAL_PROVIDERS, FEATURES, APP_URL, EMAIL_CONFIG } from "./config";
+import { env } from "@/lib/env";
 import { renderEmailTemplate } from "./email-utils";
 import { invalidateUserSessionCaches } from "./session-cache";
 import { logger } from "./logger";
@@ -43,7 +43,7 @@ const validateEnvironment = () => {
     logger.warn(`WARNING: ${message}`);
   }
 
-  if (!APP_URL) {
+  if (!env.APP_URL) {
     throw new AuthError(AuthErrorType.INTERNAL, "APP_URL environment variable is required");
   }
 };
@@ -81,17 +81,17 @@ class EmailService {
       }
     }
     // Initialize Nodemailer if available
-    else if (EMAIL_CONFIG.HOST && EMAIL_CONFIG.USER && EMAIL_CONFIG.PASS) {
+    else if (env.EMAIL_HOST && env.EMAIL_USER && env.EMAIL_PASS) {
       this.service = "nodemailer";
       try {
         const { createTransport } = await import("nodemailer");
         this.nodemailerTransporter = createTransport({
-          host: EMAIL_CONFIG.HOST,
-          port: EMAIL_CONFIG.PORT,
-          secure: EMAIL_CONFIG.PORT === 465,
+          host: env.EMAIL_HOST,
+          port: env.EMAIL_PORT,
+          secure: env.EMAIL_PORT === 465,
           auth: {
-            user: EMAIL_CONFIG.USER,
-            pass: EMAIL_CONFIG.PASS,
+            user: env.EMAIL_USER,
+            pass: env.EMAIL_PASS,
           },
         });
         logger.info("✅ Nodemailer email service initialized");
@@ -128,7 +128,7 @@ class EmailService {
         return { success: true };
       }
 
-      const from = options.from || EMAIL_CONFIG.FROM;
+      const from = options.from || env.EMAIL_FROM;
 
       if (this.service === "resend" && this.resendClient) {
         const { data, error } = await this.resendClient.emails.send({
@@ -202,7 +202,7 @@ export const emailTemplates = {
   welcome: async (userName?: string) => {
     const component = React.createElement(WelcomeEmail, {
       userName,
-      dashboardUrl: `${APP_URL}/dashboard`,
+      dashboardUrl: `${env.APP_URL}/dashboard`,
     });
     const { html, text } = await renderEmailTemplate(component);
     return {
@@ -261,7 +261,7 @@ function mapOAuthProfileToUser(profile: any) {
  */
 export const auth = betterAuth({
   // Core configuration
-  baseURL: APP_URL,
+  baseURL: env.APP_URL,
   basePath: "/api/auth",
   secret: process.env.BETTER_AUTH_SECRET || "fallback-secret-for-development",
 
@@ -346,7 +346,7 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       enabled: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-      redirectUri: `${APP_URL}/api/auth/callback/google`,
+      redirectUri: `${env.APP_URL}/api/auth/callback/google`,
       accessType: "offline",
       prompt: "consent",
       scopes: ["openid", "profile", "email"],
@@ -475,8 +475,8 @@ export const auth = betterAuth({
     },
     cookiePrefix: "nuvia-auth",
     trustedOrigins: isProduction
-      ? [APP_URL]
-      : [APP_URL, "http://localhost:3000", "http://localhost:3001"],
+      ? [env.APP_URL]
+      : [env.APP_URL, "http://localhost:3000", "http://localhost:3001"],
     generateState: true,
     stateOptions: {
       maxAge: 600, // 10 minutes

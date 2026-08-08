@@ -117,7 +117,7 @@ export default function Home() {
       {/* Hero: value proposition on the left, a live component preview on
           the right. The preview uses the same Card, Table, Avatar, and
           Badge components the dashboard renders with. */}
-      <section className="overflow-hidden px-6 pb-24 pt-16 md:pt-20">
+      <section className="overflow-hidden px-6 pb-16 pt-16 md:pb-20 md:pt-20">
         <div className="container mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-2">
           <div>
             <h1 className="landing-rise text-4xl font-bold tracking-tighter md:text-5xl lg:text-6xl">
@@ -147,12 +147,12 @@ export default function Home() {
           </div>
 
           <div className="landing-rise relative pb-10" style={{ animationDelay: "220ms" }}>
-            <Card className="relative z-10 shadow-lg">
+            <Card className="relative z-10 gap-4 py-5 shadow-lg">
               <CardHeader>
                 <CardTitle>Members</CardTitle>
                 <CardDescription>Roll, roles, and renewals</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-0">
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent">
@@ -185,8 +185,8 @@ export default function Home() {
 
             {/* Overlapping event card for depth. Hidden on small screens
                 where the columns stack. */}
-            <Card className="absolute -bottom-2 -left-6 z-20 hidden w-56 -rotate-1 shadow-xl md:block">
-              <CardContent className="flex items-center gap-3">
+            <Card className="absolute -bottom-2 -left-6 z-20 hidden w-56 -rotate-1 p-4 shadow-xl md:block">
+              <CardContent className="flex items-center gap-3 px-0">
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
                   <CalendarDays className="size-5" />
                 </span>
@@ -202,7 +202,7 @@ export default function Home() {
 
       {/* Features: bento grid. Cell sizes vary so the section has rhythm
           instead of six identical tiles. */}
-      <section id="features" className="border-t border-border/60 px-6 py-24">
+      <section id="features" className="border-t border-border/60 px-6 py-16 md:py-20">
         <div className="container mx-auto max-w-6xl">
           <h2 className="max-w-[24ch] text-3xl font-bold tracking-tight md:text-4xl">
             Everything an association runs on
@@ -212,9 +212,9 @@ export default function Home() {
             member roll to the job board.
           </p>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-6">
-            <Card className="landing-hover md:col-span-2 lg:col-span-4">
-              <CardHeader>
+          <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-6">
+            <Card className="landing-hover gap-4 p-5 md:col-span-2 lg:col-span-4">
+              <CardHeader className="px-0">
                 <CardTitle>Roles that map to your organization</CardTitle>
                 <CardDescription>
                   Predefined roles plus custom ones, each with its own permission set. Assign them
@@ -230,8 +230,8 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="landing-hover bg-accent/40 lg:col-span-2">
-              <CardHeader>
+            <Card className="landing-hover gap-4 bg-accent/40 p-5 lg:col-span-2">
+              <CardHeader className="px-0">
                 <span className="flex size-10 items-center justify-center rounded-md bg-background text-accent-foreground shadow-xs">
                   <Layers className="size-5" />
                 </span>
@@ -242,8 +242,8 @@ export default function Home() {
               </CardHeader>
             </Card>
 
-            <Card className="landing-hover lg:col-span-2">
-              <CardHeader>
+            <Card className="landing-hover gap-4 p-5 lg:col-span-2">
+              <CardHeader className="px-0">
                 <span className="flex size-10 items-center justify-center rounded-md bg-accent text-accent-foreground">
                   <CalendarDays className="size-5" />
                 </span>
@@ -254,8 +254,8 @@ export default function Home() {
               </CardHeader>
             </Card>
 
-            <Card className="landing-hover lg:col-span-2">
-              <CardHeader>
+            <Card className="landing-hover gap-4 p-5 lg:col-span-2">
+              <CardHeader className="px-0">
                 <span className="flex size-10 items-center justify-center rounded-md bg-accent text-accent-foreground">
                   <MessagesSquare className="size-5" />
                 </span>
@@ -266,8 +266,8 @@ export default function Home() {
               </CardHeader>
             </Card>
 
-            <Card className="landing-hover lg:col-span-2">
-              <CardHeader>
+            <Card className="landing-hover gap-4 p-5 lg:col-span-2">
+              <CardHeader className="px-0">
                 <span className="flex size-10 items-center justify-center rounded-md bg-accent text-accent-foreground">
                   <HandCoins className="size-5" />
                 </span>
@@ -278,8 +278,8 @@ export default function Home() {
               </CardHeader>
             </Card>
 
-            <Card className="landing-hover bg-muted/60 md:col-span-2 lg:col-span-6">
-              <CardContent className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+            <Card className="landing-hover gap-4 bg-muted/60 p-5 md:col-span-2 lg:col-span-6">
+              <CardContent className="flex flex-col justify-between gap-6 px-0 md:flex-row md:items-center">
                 <div className="max-w-xl">
                   <CardTitle className="flex items-center gap-2">
                     <Newspaper className="size-5" />
@@ -306,8 +306,8 @@ export default function Home() {
 
       {/* Modules: what is backed by a real database today, and what ships
           later. Mirrors the honest status in README and TODO.md. */}
-      <section id="modules" className="border-t border-border/60 bg-muted/30 px-6 py-24">
-        <div className="container mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1fr_1.2fr] lg:items-start">
+      <section id="modules" className="border-t border-border/60 bg-muted/30 px-6 py-16 md:py-20">
+        <div className="container mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-start">
           <div>
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Real where it counts</h2>
             <p className="mt-4 max-w-[52ch] text-muted-foreground">
@@ -317,13 +317,13 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Card>
-              <CardHeader>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Card className="gap-4 p-5">
+              <CardHeader className="px-0">
                 <CardTitle className="text-base">Live on PostgreSQL</CardTitle>
                 <CardDescription>Connected through Drizzle, gated by auth.</CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-wrap gap-2">
+              <CardContent className="flex flex-wrap gap-2 px-0">
                 {LIVE_MODULES.map((module) => (
                   <Badge key={module} variant="secondary">
                     {module}
@@ -331,14 +331,14 @@ export default function Home() {
                 ))}
               </CardContent>
             </Card>
-            <Card>
-              <CardHeader>
+            <Card className="gap-4 p-5">
+              <CardHeader className="px-0">
                 <CardTitle className="text-base">On the roadmap</CardTitle>
                 <CardDescription>
                   Promoted in this order, by value to an association.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-wrap gap-2">
+              <CardContent className="flex flex-wrap gap-2 px-0">
                 {ROADMAP_MODULES.map((module) => (
                   <Badge key={module} variant="outline">
                     {module}
@@ -351,8 +351,8 @@ export default function Home() {
       </section>
 
       {/* Community */}
-      <section id="community" className="border-t border-border/60 px-6 py-24">
-        <div className="container mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
+      <section id="community" className="border-t border-border/60 px-6 py-16 md:py-20">
+        <div className="container mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
           <Image
             src="https://picsum.photos/seed/nuvia-association-meeting/1200/900"
             alt="Attendees talking at an association meeting"
@@ -407,8 +407,11 @@ export default function Home() {
       </section>
 
       {/* Contribute */}
-      <section id="contribute" className="border-t border-border/60 bg-muted/30 px-6 py-24">
-        <div className="container mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
+      <section
+        id="contribute"
+        className="border-t border-border/60 bg-muted/30 px-6 py-16 md:py-20"
+      >
+        <div className="container mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
           <div>
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
               Your first contribution is one clone away
@@ -438,8 +441,8 @@ export default function Home() {
       </section>
 
       {/* Final call to action */}
-      <section className="px-6 py-24">
-        <div className="container mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 rounded-xl border border-border/60 bg-card p-10 shadow-sm md:flex-row md:items-center">
+      <section className="px-6 py-16 md:py-20">
+        <div className="container mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 rounded-xl border border-border/60 bg-card p-8 shadow-sm md:flex-row md:items-center md:p-10">
           <div>
             <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
               Run your association on Nuvia

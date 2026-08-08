@@ -13,6 +13,7 @@ import * as schema from "@/db/schema";
 import { validatePasswordStrength } from "./utils/password";
 import { SOCIAL_PROVIDERS, FEATURES, APP_URL, EMAIL_CONFIG } from "./config";
 import { renderEmailTemplate } from "./email-utils";
+import { invalidateUserSessionCaches } from "./session-cache";
 import { logger } from "./logger";
 import PasswordResetEmail from "@/components/email-template/password-reset";
 import EmailVerificationEmail from "@/components/email-template/email-verification";
@@ -287,6 +288,22 @@ export const auth = betterAuth({
           }
 
           return { data: user };
+        },
+      },
+    },
+    session: {
+      delete: {
+        // When a session is revoked (sign-out, revokeSession, password
+        // change with revokeOtherSessions), drop its owner's entries from
+        // the optional Redis session cache too. Otherwise a revoked
+        // session's cached identity stays servable by
+        // validateSessionWithCache until the 60s TTL lapses.
+        after: async (session) => {
+          try {
+            await invalidateUserSessionCaches(session.userId);
+          } catch (error) {
+            logger.warn("Failed to invalidate session cache on session delete", error);
+          }
         },
       },
     },

@@ -1,32 +1,35 @@
-import { NextRequest, NextResponse } from "next/server";
-import { invalidateSessionCache } from "@/lib/session-cache";
+import { NextRequest } from "next/server";
+import { invalidateUserSessionCaches } from "@/lib/session-cache";
 import { auth } from "@/lib/auth";
+import { problemResponse, problems, successResponse } from "@/lib/http";
 import { logger } from "@/lib/logger";
 
+/**
+ * POST /api/auth/invalidate-session-cache — drop the caller's own cached
+ * sessions.
+ *
+ * Hardened from the original version, which accepted a client-supplied
+ * token and invalidated that exact key: any authenticated user could
+ * evict any other user's cached session (a denial of the cache for
+ * whoever they targeted). The body is now ignored and the server
+ * invalidates by the caller's verified user id instead, so a user can
+ * only ever clear their own entries.
+ */
 export async function POST(request: NextRequest) {
   try {
-    // Verify the user is authenticated before invalidating cache
     const session = await auth.api.getSession({
       headers: request.headers,
     });
 
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user) {
+      return problemResponse(problems.authenticationRequired());
     }
 
-    const body = await request.json();
-    const { token } = body;
+    await invalidateUserSessionCaches(session.user.id);
 
-    if (!token) {
-      return NextResponse.json({ error: "Missing token" }, { status: 400 });
-    }
-
-    // Invalidate the session cache in Redis
-    await invalidateSessionCache(token);
-
-    return NextResponse.json({ success: true });
+    return successResponse(null, { message: "Session cache invalidated" });
   } catch (error) {
     logger.error("Error invalidating session cache", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return problemResponse(problems.internalError());
   }
 }

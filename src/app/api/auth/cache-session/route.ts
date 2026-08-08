@@ -1,32 +1,46 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { cacheSession } from "@/lib/session-cache";
 import { auth } from "@/lib/auth";
+import { problemResponse, problems, successResponse } from "@/lib/http";
 import { logger } from "@/lib/logger";
 
+/**
+ * POST /api/auth/cache-session — warm the Redis session cache for the
+ * caller's own session.
+ *
+ * Hardened from the original version, which accepted a client-supplied
+ * token and sessionData body: any authenticated user could plant a
+ * forged identity under any session token, and validateSessionWithCache
+ * trusts whatever it finds there. The body is now ignored entirely — the
+ * server derives both the token and the cached payload from the caller's
+ * verified session, so a user can only ever cache themselves.
+ */
 export async function POST(request: NextRequest) {
   try {
-    // Verify the user is authenticated before caching session
     const session = await auth.api.getSession({
       headers: request.headers,
     });
 
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user) {
+      return problemResponse(problems.authenticationRequired());
     }
 
-    const body = await request.json();
-    const { token, sessionData } = body;
+    await cacheSession(session.session.token, {
+      id: session.session.id,
+      userId: session.user.id,
+      expiresAt: session.session.expiresAt,
+      user: {
+        id: session.user.id,
+        email: session.user.email,
+        username: (session.user as { username?: string }).username ?? session.user.name,
+        name: session.user.name,
+        image: session.user.image,
+      },
+    });
 
-    if (!token || !sessionData) {
-      return NextResponse.json({ error: "Missing token or sessionData" }, { status: 400 });
-    }
-
-    // Cache the session in Redis
-    await cacheSession(token, sessionData);
-
-    return NextResponse.json({ success: true });
+    return successResponse(null, { message: "Session cached" });
   } catch (error) {
     logger.error("Error caching session", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return problemResponse(problems.internalError());
   }
 }

@@ -6,7 +6,6 @@ import {
   Event,
   EventRegistration,
   EventCertificate,
-  EventCheckIn,
   EventFilter,
   CreateEventRequest,
   UpdateEventRequest,
@@ -20,12 +19,13 @@ import {
   EventDashboardData,
 } from "@/types/event.types";
 import { env } from "@/lib/env";
+import { getMockUserEventRegistrations, getMockEventDashboardData } from "@/lib/mock/eventMockData";
 import {
-  getMockEvents,
-  getMockEventById,
-  getMockUserEventRegistrations,
-  getMockEventDashboardData,
-} from "@/lib/mock/eventMockData";
+  UI_TO_DB_EVENT_STATUS,
+  UI_TO_DB_EVENT_TYPE,
+  IN_PERSON_EVENT_FORMATS,
+  REMOTE_EVENT_FORMATS,
+} from "@/lib/utils/event-utils";
 import {
   NotFoundError,
   ValidationError,
@@ -86,6 +86,114 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
   return response.json();
 }
 
+// ---------------------------------------------------------------------------
+// Read-path payload types (backlog B2)
+//
+// The API serializes Dates as ISO strings; the UI Event/EventRegistration
+// types use Date objects. The Api* types describe the wire shape and the
+// hydrate helpers convert it into the UI shape.
+// ---------------------------------------------------------------------------
+
+type ApiEvent = Omit<
+  Event,
+  "startDate" | "endDate" | "createdAt" | "updatedAt" | "registrationDeadline" | "organizer"
+> & {
+  startDate: string;
+  endDate: string;
+  createdAt: string;
+  updatedAt: string;
+  registrationDeadline?: string;
+};
+
+type ApiEventRegistration = Omit<
+  EventRegistration,
+  "registeredAt" | "checkedInAt" | "createdAt" | "updatedAt" | "user"
+> & {
+  registeredAt: string;
+  checkedInAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+interface ApiEventDetail {
+  event: ApiEvent;
+  isRegistered: boolean;
+  registration?: ApiEventRegistration;
+  organizerEvents: ApiEvent[];
+  similarEvents: ApiEvent[];
+}
+
+interface ApiPaginationMeta {
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+}
+
+interface ApiEnvelope<T> {
+  data?: T;
+  meta?: ApiPaginationMeta;
+}
+
+function hydrateEvent(payload: ApiEvent): Event {
+  return {
+    ...payload,
+    startDate: new Date(payload.startDate),
+    endDate: new Date(payload.endDate),
+    createdAt: new Date(payload.createdAt),
+    updatedAt: new Date(payload.updatedAt),
+    registrationDeadline: payload.registrationDeadline
+      ? new Date(payload.registrationDeadline)
+      : undefined,
+  };
+}
+
+function hydrateRegistration(payload: ApiEventRegistration): EventRegistration {
+  return {
+    ...payload,
+    registeredAt: new Date(payload.registeredAt),
+    checkedInAt: payload.checkedInAt ? new Date(payload.checkedInAt) : undefined,
+    createdAt: new Date(payload.createdAt),
+    updatedAt: new Date(payload.updatedAt),
+  };
+}
+
+/**
+ * Translates the UI EventFilter into GET /api/v1/events query parameters.
+ * The API speaks the schema vocabulary (uppercase DB enums, `format` instead
+ * of `isInPerson`), so UI values are expanded through the mapping tables in
+ * event-utils.
+ */
+function buildEventsQuery(filter: EventFilter | undefined, page: number, pageSize: number): string {
+  const params = new URLSearchParams();
+  params.set("page", String(page));
+  params.set("limit", String(pageSize));
+
+  if (filter) {
+    if (filter.searchQuery) params.set("search", filter.searchQuery);
+    for (const status of filter.status ?? []) {
+      for (const dbStatus of UI_TO_DB_EVENT_STATUS[status]) params.append("status", dbStatus);
+    }
+    for (const eventType of filter.eventType ?? []) {
+      for (const dbType of UI_TO_DB_EVENT_TYPE[eventType]) params.append("type", dbType);
+    }
+    if (filter.startDate) params.set("startDate", filter.startDate.toISOString());
+    if (filter.endDate) params.set("endDate", filter.endDate.toISOString());
+    if (filter.organizerId) params.set("createdBy", filter.organizerId);
+    if (filter.isVirtual !== undefined) params.set("isVirtual", String(filter.isVirtual));
+    const formats =
+      filter.isInPerson === true
+        ? IN_PERSON_EVENT_FORMATS
+        : filter.isInPerson === false
+          ? REMOTE_EVENT_FORMATS
+          : [];
+    for (const format of formats) params.append("format", format);
+    for (const tag of filter.tags ?? []) params.append("tags", tag);
+  }
+
+  return params.toString();
+}
+
 /**
  * Get all events with optional filtering and pagination
  */
@@ -95,8 +203,23 @@ export async function getEvents(
   pageSize = 10,
 ): Promise<EventListResponse> {
   try {
-    // Using mock data for demonstration
-    return getMockEvents(filter, page, pageSize);
+    const query = buildEventsQuery(filter, page, pageSize);
+    const response = await fetch(`${env.API_PREFIX}/events?${query}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+
+    const envelope = await handleApiResponse<ApiEnvelope<{ events: ApiEvent[] }>>(response);
+    const meta = envelope.meta ?? {};
+
+    return {
+      events: (envelope.data?.events ?? []).map(hydrateEvent),
+      totalCount: meta.total ?? 0,
+      page: meta.page ?? page,
+      pageSize: meta.limit ?? pageSize,
+      totalPages: meta.totalPages ?? 0,
+    };
   } catch (error) {
     logger.error("Error fetching events", error);
     throw error;
@@ -112,8 +235,26 @@ export async function getEventById(id: string): Promise<EventDetailsResponse> {
   }
 
   try {
-    // Using mock data for demonstration
-    return getMockEventById(id);
+    const response = await fetch(`${env.API_PREFIX}/events/${encodeURIComponent(id)}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+
+    const envelope = await handleApiResponse<ApiEnvelope<ApiEventDetail>>(response);
+    const detail = envelope.data;
+
+    if (!detail?.event) {
+      throw new NotFoundError("Event", id);
+    }
+
+    return {
+      event: hydrateEvent(detail.event),
+      isRegistered: detail.isRegistered ?? false,
+      registration: detail.registration ? hydrateRegistration(detail.registration) : undefined,
+      organizerEvents: (detail.organizerEvents ?? []).map(hydrateEvent),
+      similarEvents: (detail.similarEvents ?? []).map(hydrateEvent),
+    };
   } catch (error) {
     logger.error(`Error fetching event with ID ${id}`, error);
     throw error;

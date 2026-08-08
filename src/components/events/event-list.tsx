@@ -13,7 +13,12 @@ import { useEventFilters, useEvents } from "@/lib/hooks/use-events";
 import { EventFilter } from "@/components/events/event-filter";
 
 interface EventListProps {
-  events: Event[];
+  /**
+   * Vestigial: EventList fetches its own rows via useEvents() and ignores
+   * this prop. Kept optional for backwards compatibility with older
+   * server-side callers; do not rely on it.
+   */
+  events?: Event[];
   isLoading?: boolean;
   error?: string;
   filter?: EventFilterType;

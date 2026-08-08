@@ -54,3 +54,7 @@ next-env.d.ts
 
 # drizzle
 /drizzle/meta/*.json.bak
+
+# agent planning artifacts — not part of the product
+/plans/
+/.omo/

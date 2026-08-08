@@ -54,7 +54,7 @@ import {
   ARTICLE_DIFFICULTIES,
   ARTICLE_FORMATS,
 } from "@/types/article.types";
-import { mockArticles } from "@/lib/data/mock-article-data";
+import { useArticles } from "@/lib/hooks/use-articles";
 import { cn } from "@/lib/utils";
 
 // Form schema for articles
@@ -114,9 +114,13 @@ export default function ArticlePageForm({
   const [gallery, setGallery] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<File[]>([]);
 
-  // Extract unique authors from mock data
-  const mockAuthors = Array.from(new Set(mockArticles.map((a) => a.author.id))).map(
-    (id) => mockArticles.find((a) => a.author.id === id)!.author,
+  // Author choices come from the real articles (backlog F2): the content
+  // API stores authors on each item, so existing authors are the honest
+  // source. This hook instance shares the content query cache with the
+  // page's own useArticles call.
+  const { filteredArticles } = useArticles();
+  const authors = Array.from(
+    new Map(filteredArticles.map((article) => [article.author.id, article.author])).values(),
   );
 
   const form = useForm<z.input<typeof formSchema>, any, ArticleFormData>({
@@ -390,7 +394,7 @@ export default function ArticlePageForm({
                       <SelectValue placeholder="Select author" />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockAuthors.map((author) => (
+                      {authors.map((author) => (
                         <SelectItem key={author.id} value={author.id}>
                           {author.name}
                         </SelectItem>

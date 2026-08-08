@@ -46,7 +46,7 @@ import {
   PUBLICATION_CATEGORIES,
   PUBLICATION_STATUSES,
 } from "@/types/publication.types";
-import { mockAuthors } from "@/lib/data/mock-publication-data";
+import { usePublications } from "@/lib/hooks/use-publications";
 import { cn } from "@/lib/utils";
 
 // Schema remains the same
@@ -102,6 +102,16 @@ export default function PublicationPageForm({
   const [featuredImage, setFeaturedImage] = useState<string>("");
   const [gallery, setGallery] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<File[]>([]);
+  // Author choices come from the real publications (backlog F2): the
+  // content API stores authors on each item, so existing authors are the
+  // honest source. This hook instance shares the content query cache with
+  // the page's own usePublications call.
+  const { filteredPublications } = usePublications();
+  const authors = Array.from(
+    new Map(
+      filteredPublications.map((publication) => [publication.author.id, publication.author]),
+    ).values(),
+  );
 
   const form = useForm<z.input<typeof formSchema>, any, PublicationFormData>({
     resolver: zodResolver(formSchema),
@@ -342,7 +352,7 @@ export default function PublicationPageForm({
                       <SelectValue placeholder="Select author" />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockAuthors.map((author) => (
+                      {authors.map((author) => (
                         <SelectItem key={author.id} value={author.id}>
                           {author.name}
                         </SelectItem>

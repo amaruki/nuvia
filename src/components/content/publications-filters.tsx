@@ -38,7 +38,7 @@ import {
   PUBLICATION_STATUSES,
 } from "@/types/publication.types";
 import { cn } from "@/lib/utils";
-import { mockAuthors, mockTags } from "@/lib/data/mock-publication-data";
+import { usePublications } from "@/lib/hooks/use-publications";
 
 interface PublicationsFiltersProps {
   filters: PublicationFilters;
@@ -52,6 +52,20 @@ export function PublicationsFilters({
   onClearFilters,
 }: PublicationsFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  // Author and tag facets are derived from the real publications the API
+  // returns (backlog F2): there is no stored facet list, so facets are
+  // empty until publications exist. This hook instance shares the content
+  // query cache with the page's own usePublications call.
+  const { filteredPublications } = usePublications();
+  const authors = Array.from(
+    new Map(
+      filteredPublications.map((publication) => [publication.author.id, publication.author]),
+    ).values(),
+  );
+  const tagFacets = filteredPublications
+    .flatMap((publication) => publication.tags)
+    .map((tag, index) => ({ ...tag, id: tag.id || `tag_${index}` }));
+  const tags = Array.from(new Map(tagFacets.map((tag) => [tag.id, tag])).values());
 
   const hasActiveFilters = !!(
     filters.search ||
@@ -368,7 +382,7 @@ export function PublicationsFilters({
             <div className="space-y-3">
               <Label className="text-sm font-medium">Authors</Label>
               <div className="space-y-2 max-h-32 overflow-y-auto">
-                {mockAuthors.map((author) => (
+                {authors.map((author) => (
                   <div key={author.id} className="flex items-center space-x-2">
                     <Checkbox
                       id={`author-${author.id}`}
@@ -390,7 +404,7 @@ export function PublicationsFilters({
             <div className="space-y-3">
               <Label className="text-sm font-medium">Tags</Label>
               <div className="space-y-2 max-h-32 overflow-y-auto">
-                {mockTags.map((tag) => (
+                {tags.map((tag) => (
                   <div key={tag.id} className="flex items-center space-x-2">
                     <Checkbox
                       id={`tag-${tag.id}`}

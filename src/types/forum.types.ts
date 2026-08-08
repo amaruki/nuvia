@@ -2,8 +2,7 @@ import type { UserRole } from "./dashboard.types";
 
 /**
  * Forum UI types — same shapes the mock data used, now sourced from the
- * /api/v1/forums endpoints. Components import these instead of
- * `src/lib/data/mock-forums.ts`.
+ * /api/v1/forums endpoints (backlog B5; mock file removed in F2).
  */
 
 export type ForumCategory = {

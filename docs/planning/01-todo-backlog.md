@@ -157,6 +157,7 @@ Wave C preamble: finance/dues is the product core for an AMS and the first modul
   - Why: after the B/C waves land, mock files for wired modules are residue, while mock UI stays only for unpromoted modules (ADR-0008).
   - Acceptance: `src/lib/mock/` and only the `src/lib/data/mock-*.ts` whose module is now wired are deleted; unpromoted modules keep mock UI.
   - Deps: B1–B6, C4.
+  - Status: done. Deleted `src/lib/mock/` (`eventMockData.ts`), the wired-module mocks under `src/lib/data/` (`mock-article-data.ts`, `mock-publication-data.ts`, `mock-media-data.ts`, `mock-forums.ts`), the orphaned jobs `_data` mocks, and the mock-backed `media.service.ts`. Rewired `event.service.ts` (dashboard/registration reads: real upcoming events, honest empty stats/registrations), `use-media` (real upload-manifest API for list/upload/delete/export, honest errors/empties for features with no backing store), and the article/publication filter & form author/tag facets (derived from the real content collections). Unpromoted modules (chapters, committees, workspaces, learning/CPD) keep their mocks per ADR-0008. Finance mocks were already removed by C4.
 
 - **F3 — navigation-data.ts role-list cleanup (`superadmin` added consistently).**
   - Why: the audit surfaced role lists omitting `superadmin`, which `dashboard-access.ts` special-cases around; it is tagged good-first-issue.

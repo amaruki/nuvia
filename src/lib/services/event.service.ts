@@ -17,9 +17,9 @@ import {
   EventCheckInResponse,
   EventStatistics,
   EventDashboardData,
+  EventStatus,
 } from "@/types/event.types";
 import { API_PREFIX } from "@/lib/api-prefix";
-import { getMockUserEventRegistrations, getMockEventDashboardData } from "@/lib/mock/eventMockData";
 import {
   UI_TO_DB_EVENT_STATUS,
   UI_TO_DB_EVENT_TYPE,
@@ -647,12 +647,38 @@ export async function getEventStatistics(): Promise<EventStatistics> {
 }
 
 /**
- * Get event dashboard data
+ * Get event dashboard data (backlog F2 mock-residue sweep).
+ *
+ * Upcoming events come from the real B2 read API. Statistics, organized
+ * events and registrations are honest empty states: there is no
+ * `/api/v1/events/statistics` route (B2/B3 landed per-event reads and
+ * admin-only registration listings only) and no API that lists the calling
+ * user's registrations across events, so those widgets show zeros/empties
+ * instead of invented numbers.
  */
 export async function getEventDashboardData(): Promise<EventDashboardData> {
   try {
-    // Using mock data for demonstration
-    return getMockEventDashboardData();
+    const upcoming = await getEvents(
+      { status: [EventStatus.PUBLISHED], startDate: new Date() },
+      1,
+      6,
+    );
+
+    return {
+      upcomingEvents: upcoming.events,
+      myEvents: [],
+      myRegistrations: [],
+      eventStatistics: {
+        totalEvents: 0,
+        upcomingEvents: 0,
+        completedEvents: 0,
+        cancelledEvents: 0,
+        totalRegistrations: 0,
+        averageAttendanceRate: 0,
+        popularEventTypes: [],
+        monthlyStats: [],
+      },
+    };
   } catch (error) {
     logger.error("Error fetching event dashboard data", error);
     throw error;
@@ -660,23 +686,22 @@ export async function getEventDashboardData(): Promise<EventDashboardData> {
 }
 
 /**
- * Get user's event registrations
+ * Get user's event registrations.
+ *
+ * Honest empty state (backlog F2): B3 landed the per-event registration
+ * lifecycle, but there is no API that lists a user's registrations across
+ * events (`GET /events/[id]/registrations` is admin-only, `events:manage`)
+ * and certificates are not modeled yet. Callers render their empty states
+ * until such an endpoint exists.
  */
 export async function getUserEventRegistrations(
   userId: string,
-  status?: string[],
+  _status?: string[],
 ): Promise<EventRegistration[]> {
   if (!userId) {
     throw new ValidationError([{ field: "userId", message: "User ID is required" }]);
   }
-
-  try {
-    // Using mock data for demonstration
-    return getMockUserEventRegistrations(userId, status as any);
-  } catch (error) {
-    logger.error(`Error fetching event registrations for user ${userId}`, error);
-    throw error;
-  }
+  return [];
 }
 
 /**

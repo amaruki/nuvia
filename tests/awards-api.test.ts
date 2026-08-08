@@ -40,7 +40,7 @@ import {
   deleteAwardProgram as deleteAwardProgramDirect,
   getAwardNomination as getAwardNominationDirect,
   getAwardProgram as getAwardProgramDirect,
-} from "@/lib/services/award.service";
+} from "@/lib/services/award";
 
 // ---------------------------------------------------------------------------
 // Fixtures

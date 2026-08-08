@@ -46,7 +46,7 @@ Role coverage: admin holds all `awards:*`; staff holds read/update/manage; corpo
 
 ## Service layer
 
-`src/lib/services/award.service.ts` — server-only, drizzle, RFC 9457:
+`src/lib/services/award/` (barrel `index.ts`; schemas in `schemas.ts`) — server-only, drizzle, RFC 9457:
 
 - `listAwardPrograms({status?, category?, search?, page?, limit?})` / `listAwardNominations({status?, programId?, search?, page?, limit?})` — server-side filters + pagination; nomination counts for listed programs are fetched in one batched query (no N+1).
 - `getAwardProgram(id)` / `getAwardNomination(id)` — null when missing.

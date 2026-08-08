@@ -10,7 +10,7 @@ import {
   createAwardNomination,
   createAwardNominationSchema,
   listAwardNominations,
-} from "@/lib/services/award.service";
+} from "@/lib/services/award";
 import { handleAwardRoute, parsePagination } from "../_lib";
 
 export async function GET(request: NextRequest) {

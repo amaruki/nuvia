@@ -5,7 +5,7 @@
 import type { NextResponse } from "next/server";
 import { problemResponse, problems } from "@/lib/http";
 import { logger } from "@/lib/logger";
-import { AwardServiceError } from "@/lib/services/award.service";
+import { AwardServiceError } from "@/lib/services/award";
 
 /** Maps AwardServiceError to its RFC 9457 response; anything else is a 500. */
 export async function handleAwardRoute(

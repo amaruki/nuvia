@@ -12,7 +12,7 @@ import {
   getAwardNomination,
   updateAwardNomination,
   updateAwardNominationSchema,
-} from "@/lib/services/award.service";
+} from "@/lib/services/award";
 import { handleAwardRoute } from "../../_lib";
 
 interface RouteContext {

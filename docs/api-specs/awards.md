@@ -6,7 +6,7 @@ in `handleAwardRoute()` (`src/app/api/v1/awards/_lib.ts`), which maps
 `internal-error`.
 
 Route files: `src/app/api/v1/awards/**`. Schemas:
-`src/lib/services/award.service.ts`; UI shapes: `src/types/award.types.ts`.
+`src/lib/services/award/schemas.ts`; UI shapes: `src/types/award.types.ts`.
 Permissions: `awards:read`, `awards:create`, `awards:update`,
 `awards:delete`.
 

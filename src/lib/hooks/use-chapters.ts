@@ -209,36 +209,35 @@ export function useChapters() {
   }, [refreshData]);
 
   // Client-side filtering (the API accepts the same filters server-side).
-  const filteredChapters = useMemo(
-    () =>
-      chapters.filter((chapter) => {
-        if (filters.status && !filters.status.includes(chapter.status)) return false;
-        if (filters.region && !filters.region.includes(chapter.location.region)) return false;
-        if (filters.country && !filters.country.includes(chapter.location.country)) return false;
-        if (filters.memberCountRange) {
-          const { min, max } = filters.memberCountRange;
-          if (chapter.memberCount < min || chapter.memberCount > max) return false;
-        }
-        if (filters.leadershipRole && filters.leadershipRole.length > 0) {
-          const hasRole = chapter.leadership.some((leader) =>
-            filters.leadershipRole!.includes(leader.role),
-          );
-          if (!hasRole) return false;
-        }
-        if (filters.search) {
-          const searchLower = filters.search.toLowerCase();
-          return (
-            chapter.displayName.toLowerCase().includes(searchLower) ||
-            chapter.name.toLowerCase().includes(searchLower) ||
-            chapter.location.city.toLowerCase().includes(searchLower) ||
-            chapter.location.state.toLowerCase().includes(searchLower) ||
-            (chapter.description && chapter.description.toLowerCase().includes(searchLower))
-          );
-        }
-        return true;
-      }),
-    [chapters, filters],
-  );
+  const filteredChapters = useMemo(() => {
+    // Loop-invariant: the lowercased query depends on filters, not on the chapter.
+    const searchLower = filters.search?.toLowerCase();
+    return chapters.filter((chapter) => {
+      if (filters.status && !filters.status.includes(chapter.status)) return false;
+      if (filters.region && !filters.region.includes(chapter.location.region)) return false;
+      if (filters.country && !filters.country.includes(chapter.location.country)) return false;
+      if (filters.memberCountRange) {
+        const { min, max } = filters.memberCountRange;
+        if (chapter.memberCount < min || chapter.memberCount > max) return false;
+      }
+      if (filters.leadershipRole && filters.leadershipRole.length > 0) {
+        const hasRole = chapter.leadership.some((leader) =>
+          filters.leadershipRole!.includes(leader.role),
+        );
+        if (!hasRole) return false;
+      }
+      if (searchLower) {
+        return (
+          chapter.displayName.toLowerCase().includes(searchLower) ||
+          chapter.name.toLowerCase().includes(searchLower) ||
+          chapter.location.city.toLowerCase().includes(searchLower) ||
+          chapter.location.state.toLowerCase().includes(searchLower) ||
+          (chapter.description && chapter.description.toLowerCase().includes(searchLower))
+        );
+      }
+      return true;
+    });
+  }, [chapters, filters]);
 
   const updateFilters = useCallback((newFilters: Partial<ChapterFilterOptions>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));

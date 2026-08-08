@@ -252,34 +252,32 @@ export function useMemberships({
   );
 
   // Client-side filters for criteria the members API does not support yet.
-  const members = useMemo(
-    () =>
-      fetchedMembers.filter((member) => {
-        if (filters.tiers?.length && !filters.tiers.includes(member.membershipTier)) return false;
-        if (
-          filters.locations?.length &&
-          !filters.locations.some((location) =>
-            member.location.toLowerCase().includes(location.toLowerCase()),
-          )
-        ) {
-          return false;
-        }
-        if (
-          filters.committees?.length &&
-          !filters.committees.some((committee) => (member.committees ?? []).includes(committee))
-        ) {
-          return false;
-        }
-        if (
-          filters.skills?.length &&
-          !filters.skills.some((skill) => (member.skills ?? []).includes(skill))
-        ) {
-          return false;
-        }
-        return true;
-      }),
-    [fetchedMembers, filters],
-  );
+  const members = useMemo(() => {
+    // Loop-invariant: lowercased location filters change with `filters`, not per member.
+    const locationsLower = filters.locations?.map((location) => location.toLowerCase());
+    return fetchedMembers.filter((member) => {
+      if (filters.tiers?.length && !filters.tiers.includes(member.membershipTier)) return false;
+      if (
+        locationsLower?.length &&
+        !locationsLower.some((location) => member.location.toLowerCase().includes(location))
+      ) {
+        return false;
+      }
+      if (
+        filters.committees?.length &&
+        !filters.committees.some((committee) => (member.committees ?? []).includes(committee))
+      ) {
+        return false;
+      }
+      if (
+        filters.skills?.length &&
+        !filters.skills.some((skill) => (member.skills ?? []).includes(skill))
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }, [fetchedMembers, filters]);
 
   const updateFilters = useCallback((newFilters: MembershipFilter) => {
     setFilters(newFilters);

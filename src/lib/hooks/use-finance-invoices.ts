@@ -171,6 +171,8 @@ function computeStatistics(invoices: Invoice[]): InvoiceStatistics {
 }
 
 function applyFilters(invoices: Invoice[], filters: InvoiceFilterOptions): Invoice[] {
+  // Loop-invariant: lowercase the search needle once per pass, not per row.
+  const needle = filters.search?.toLowerCase();
   return invoices.filter((invoice) => {
     if (filters.status?.length && !filters.status.includes(invoice.status)) return false;
     if (filters.client?.length && !filters.client.includes(invoice.clientName)) return false;
@@ -187,8 +189,7 @@ function applyFilters(invoices: Invoice[], filters: InvoiceFilterOptions): Invoi
       if (filters.amountRange.max > 0 && invoice.totalAmount > filters.amountRange.max)
         return false;
     }
-    if (filters.search) {
-      const needle = filters.search.toLowerCase();
+    if (needle) {
       const haystack =
         `${invoice.invoiceNumber} ${invoice.clientName} ${invoice.clientEmail}`.toLowerCase();
       if (!haystack.includes(needle)) return false;

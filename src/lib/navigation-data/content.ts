@@ -1,0 +1,44 @@
+import type { NavItemData } from "./types";
+
+export const contentSection: readonly NavItemData[] = [
+  // Content Management Section
+  {
+    id: "content",
+    title: "Content Management",
+    path: "/dashboard/content",
+    category: "main",
+    roles: ["admin", "superadmin", "staff", "moderator"],
+    subItems: [
+      {
+        id: "publications",
+        title: "Publications",
+        path: "/dashboard/content/publications",
+        roles: ["admin", "superadmin", "staff"],
+      },
+      {
+        id: "articles-news",
+        title: "Articles & News",
+        path: "/dashboard/content/articles",
+        roles: ["admin", "superadmin", "staff", "moderator"],
+      },
+      {
+        id: "announcements",
+        title: "Announcements",
+        path: "/dashboard/content/announcements",
+        roles: ["admin", "superadmin", "staff", "chapter_admin", "committee_chair"],
+      },
+      {
+        id: "categories-tags",
+        title: "Categories & Tags",
+        path: "/dashboard/content/categories",
+        roles: ["admin", "superadmin", "staff"],
+      },
+      {
+        id: "media-library",
+        title: "Media Library",
+        path: "/dashboard/content/media",
+        roles: ["admin", "superadmin", "staff"],
+      },
+    ] as const,
+  },
+] as const;

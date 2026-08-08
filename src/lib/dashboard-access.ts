@@ -46,6 +46,17 @@ export function getRequiredRolesForPath(pathname: string): readonly UserRole[] |
 }
 
 export function isRoleAllowedForPath(pathname: string, role: string | null | undefined): boolean {
+  // superadmin holds every permission elsewhere in the system (rbac.ts's
+  // hasPermission/hasRole both special-case it), so the path gate must not
+  // lock it out just because a nav entry's role list forgot to name it.
+  // Without this, every navigation-data.ts entry that omits "superadmin"
+  // — the majority of sections and sub-items at the time of writing,
+  // including the whole finance section — silently redirected the one
+  // role that must be able to reach everything.
+  if (role === "superadmin") {
+    return true;
+  }
+
   const requiredRoles = getRequiredRolesForPath(pathname);
   if (!requiredRoles) return true;
   return !!role && requiredRoles.includes(role as UserRole);

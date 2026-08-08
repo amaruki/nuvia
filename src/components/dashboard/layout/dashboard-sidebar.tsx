@@ -55,9 +55,15 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     return false;
   };
 
-  // Filter navigation items based on user role
+  // Filter navigation items based on user role. superadmin sees every
+  // section: navigation-data.ts's per-item role lists omit it almost
+  // everywhere, and the server-side gate (src/lib/dashboard-access.ts)
+  // already lets superadmin through for the same reason — the sidebar
+  // must not hide what the gate permits.
   const filteredNavigationItems = navigationConfig.filter((item) => {
-    return !item.roles || item.roles.includes(user?.role as UserRole);
+    return (
+      user?.role === "superadmin" || !item.roles || item.roles.includes(user?.role as UserRole)
+    );
   });
 
   // Group items by category

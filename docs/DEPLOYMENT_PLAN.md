@@ -68,7 +68,7 @@ not in the env schema). They are accepted and ignored; do not rely on them.
 
 ## Database
 
-39 tables, created by migrations `drizzle/0000`–`0004` (ledger in
+48 tables, created by migrations `drizzle/0000`–`0009` (ledger in
 [`TASK_BREAKDOWN.md`](TASK_BREAKDOWN.md#12-ops--tooling)). Schema source:
 `src/db/schema/index.ts`; casing `snake_case`; `strict: true`.
 
@@ -87,9 +87,10 @@ transactionally. If `db:migrate` fails at 0003 with "cannot run inside a
 transaction block", apply the statement manually with `psql` on the target
 database and re-run `db:migrate` (the journal treats an already-applied
 statement's file as pending until recorded). Migration 0004 (invoices,
-payments, webhook events) is plain DDL and applies normally. On an existing
-database that already has the value, 0003's statement errors as "already
-exists" — same fallback.
+payments, webhook events) and migrations 0005–0009 (chapters, committees,
+awards, workspaces, learning) are plain DDL and apply normally. On an
+existing database that already has the value, 0003's statement errors as
+"already exists" — same fallback.
 
 Fresh-install order: start Postgres → `bun run db:migrate` →
 `bun run db:seed` → boot the app.

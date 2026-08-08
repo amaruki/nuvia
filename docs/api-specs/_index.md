@@ -5,10 +5,13 @@ specs are descriptive: [`docs/api/conventions.md`](../api/conventions.md)
 remains the normative contract, and the route files themselves are the source
 of truth this document set was generated from.
 
-- Provenance: produced for backlog item F4 by a full scan of the 78
-  `route.ts` files under `src/app/api/` on 2026-08-08. Every method,
-  permission, schema, and status code below was read out of the route file (or
-  the service/schema module it imports) cited in each table row.
+- Provenance: produced for backlog item F4 by a full scan of the
+  `route.ts` files under `src/app/api/` on 2026-08-08 — first the 78 routes
+  of the B/C waves, then extended in the finalization pass to all 92 routes
+  once the D-wave modules (chapters, committees, learning, awards,
+  workspaces) landed. Every method, permission, schema, and status code
+  below was read out of the route file (or the service/schema module it
+  imports) cited in each table row.
 - When code and spec disagree, the code wins; update the spec.
 - To regenerate the inventory: walk `src/app/api/**/route.ts`, record each
   exported HTTP verb, its `requirePermission(...)` / `requireRole(...)` call,
@@ -26,6 +29,11 @@ of truth this document set was generated from.
 | [`forums.md`](forums.md)             | Posts, comments, categories, moderation, reports (B5)     | `/api/v1/forums`                                   | 18        |
 | [`jobs.md`](jobs.md)                 | Postings + applications (B6)                              | `/api/v1/jobs`                                     | 12        |
 | [`finance.md`](finance.md)           | Tiers, subscriptions, invoices, payments, reports (C2/C3) | `/api/v1/finance`                                  | 25        |
+| [`awards.md`](awards.md)             | Award programs + nominations (D4)                         | `/api/v1/awards`                                   | 10        |
+| [`learning.md`](learning.md)         | Courses + certificates (D3)                               | `/api/v1/learning`                                 | 9         |
+| [`chapters.md`](chapters.md)         | Regional chapters + member rosters (D1)                   | `/api/v1/chapters`                                 | 5         |
+| [`committees.md`](committees.md)     | Committees + member rosters (D2)                          | `/api/v1/committees`                               | 5         |
+| [`workspaces.md`](workspaces.md)     | Member workspaces (D5)                                    | `/api/v1/workspaces`                               | 5         |
 | [`admin.md`](admin.md)               | Roles, permissions, user management                       | `/api/v1/admin`                                    | 9         |
 | [`organization.md`](organization.md) | Organization profile                                      | `/api/v1/organization`                             | 2         |
 | [`webhooks.md`](webhooks.md)         | Stripe webhook receiver (C3)                              | `/api/v1/webhooks`                                 | 1         |

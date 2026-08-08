@@ -14,7 +14,7 @@ Conventions used below:
   `src/types/role.types.ts` and are enforced through `requirePermission` /
   `requireRole` (`src/lib/rbac.ts`).
 - **Errors** are RFC 9457 problems built only through `src/lib/http.ts`.
-- All 39 tables were created by migrations `drizzle/0000`–`0004`.
+- All 48 tables were created by migrations `drizzle/0000`–`0009`.
 
 ## 1. Core platform
 
@@ -220,4 +220,64 @@ Pages and components consuming the API above.
   `.github/workflows/` (`ci.yml`, `release.yml` — SLSA provenance build).
 - **Migration ledger:** `drizzle/0000` (34 tables), `0001` (auth_logs FK
   cascade), `0002` (forum_reports), `0003` (ContentType + PUBLICATION),
-  `0004` (invoice/payment/webhook tables).
+  `0004` (invoice/payment/webhook tables), `0005` (chapters +
+  chapter_members), `0006` (committees + committee_members), `0007`
+  (award_programs + award_nominations), `0008` (workspaces), `0009`
+  (courses + certificates).
+
+## 13. Chapters (backlog D1)
+
+Regional chapters with member rosters.
+
+- **Entry points:** `src/app/api/v1/chapters/**` (5 endpoints),
+  `src/app/api/v1/chapters/_lib.ts` (`handleChapterRoute`,
+  `parsePagination`), `src/lib/services/chapter.service.ts` (schemas
+  colocated).
+- **Schema tables:** `chapters`, `chapter_members` (0005).
+- **Spec:** [`api-specs/chapters.md`](api-specs/chapters.md).
+- **Tests:** `tests/chapters-api.test.ts`.
+
+## 14. Committees (backlog D2)
+
+Committees with member rosters, same shape as chapters.
+
+- **Entry points:** `src/app/api/v1/committees/**` (5 endpoints),
+  `src/app/api/v1/committees/_lib.ts`, `src/lib/services/committee.service.ts`
+  (schemas colocated).
+- **Schema tables:** `committees`, `committee_members` (0006).
+- **Spec:** [`api-specs/committees.md`](api-specs/committees.md).
+- **Tests:** `tests/committees-api.test.ts`.
+
+## 15. Learning / CPD (backlog D3)
+
+Courses and issued certificates.
+
+- **Entry points:** `src/app/api/v1/learning/**` (9 endpoints across
+  courses and certificates; certificates carry no DELETE),
+  `src/app/api/v1/learning/_lib.ts`, `src/lib/services/learning.service.ts`
+  (schemas colocated).
+- **Schema tables:** `courses`, `certificates` (0009).
+- **Spec:** [`api-specs/learning.md`](api-specs/learning.md).
+- **Tests:** `tests/learning-api.test.ts`.
+
+## 16. Awards (backlog D4)
+
+Award programs and nominations.
+
+- **Entry points:** `src/app/api/v1/awards/**` (10 endpoints across
+  `programs` and `nominations`), `src/app/api/v1/awards/_lib.ts`,
+  `src/lib/services/award.service.ts` (schemas colocated).
+- **Schema tables:** `award_programs`, `award_nominations` (0007).
+- **Spec:** [`api-specs/awards.md`](api-specs/awards.md).
+- **Tests:** `tests/awards-api.test.ts`.
+
+## 17. Workspaces (backlog D5)
+
+Member workspaces.
+
+- **Entry points:** `src/app/api/v1/workspaces/**` (5 endpoints),
+  `src/app/api/v1/workspaces/_lib.ts`, `src/lib/services/workspace.service.ts`
+  (schemas colocated).
+- **Schema tables:** `workspaces` (0008).
+- **Spec:** [`api-specs/workspaces.md`](api-specs/workspaces.md).
+- **Tests:** `tests/workspaces-api.test.ts`.

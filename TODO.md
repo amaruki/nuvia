@@ -163,7 +163,7 @@ This exit criterion is verified end to end. `bun run guard:heavy` exits 0: lint,
 - The controls mapping in `docs/security/controls.md` states honestly what is CI-verified and what is process-only.
 
 - ☑ `docs/adr/` holds a decision record for every contested choice. See the index.
-- ☐ **WCAG 2.2 AA.** This item needs the `eslint-plugin-jsx-a11y` equivalent, through oxlint's `jsx-a11y` rule set, `@axe-core/playwright` in the end-to-end tests, and a manual pass on the 5 enabled modules. Feature-flagging the rest of the modules shrinks the surface that must conform for version 1.0.
+- ☑ **WCAG 2.2 AA.** Done 2026-08-08 (backlog E1): oxlint's `jsx-a11y` rule set enabled at error level (30 rules in `.oxlintrc.json`), an `@axe-core/playwright` smoke gate wired as `bun run test:a11y` (`scripts/a11y-smoke.ts`, fails on critical/serious) covering one authenticated page per enabled module plus the public `/events` and `/jobs` pages, and a manual pass recorded in [`docs/accessibility/wcag-2.2-aa-enabled-modules.md`](docs/accessibility/wcag-2.2-aa-enabled-modules.md). Feature-flagging the rest of the modules shrinks the surface that must conform for version 1.0.
 - ☐ SLSA build provenance, through cosign keyless signing via GitHub Actions OIDC.
 - ☐ An OWASP ASVS and NIST SSDF controls mapping in [`docs/security/controls.md`](docs/security/controls.md).
 - ☐ ISO/IEC 27001 Annex A, **A.8 only**. A.5 through A.7 are organizational controls, such as screening, physical facilities, and policy, that a repository cannot satisfy on its own. Certification also needs an external auditor. State this limit explicitly, instead of overclaiming coverage.

@@ -119,6 +119,7 @@ Wave C preamble: finance/dues is the product core for an AMS and the first modul
   - Why: M4's exit criteria require WCAG 2.2 AA on all enabled modules, and none currently has an automated accessibility gate.
   - Acceptance: the `jsx-a11y` rule set is enabled, the `@axe-core/playwright` smoke passes on the five enabled modules, and a manual pass is recorded.
   - Deps: each module at Backed+.
+  - Status: done 2026-08-08. `jsx-a11y` enabled at error level (30 rules); 39 static violations fixed across 18 files; `bun run test:a11y` smoke (Playwright + `@axe-core/playwright`, WCAG 2.2 AA tags) audits one authenticated page per enabled module plus public `/events` and `/jobs` and passes with 0 critical/serious after fixing 12 axe findings (contrast tokens, unnamed sidebar trigger, calendar chip semantics); manual pass recorded in `docs/accessibility/wcag-2.2-aa-enabled-modules.md`.
 
 - **E2 — SLSA Build Level 2 provenance (`actions/attest-build-provenance` + cosign keyless signing via GitHub Actions OIDC).**
   - Why: M4's exit criteria require supply-chain provenance, which this item builds into the release pipeline per `docs/release.md`.

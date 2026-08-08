@@ -110,7 +110,7 @@ export const chapterRelations = relations(chapter, ({ one, many }) => ({
     references: [chapter.id],
     relationName: "chapterHierarchy",
   }),
-  subChapters: many(chapter, "chapterHierarchy"),
+  subChapters: many(chapter, { relationName: "chapterHierarchy" }),
 }));
 
 export const chapterMemberRelations = relations(chapterMember, ({ one }) => ({

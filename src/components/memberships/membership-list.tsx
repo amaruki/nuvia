@@ -164,7 +164,7 @@ export function MembershipList({
         <div className="flex items-center gap-3 flex-wrap">
           {/* Sort Dropdown */}
           <Select value={getSortValue()} onValueChange={handleSortChange}>
-            <SelectTrigger className="w-[200px] h-10 font-medium">
+            <SelectTrigger aria-label="Sort members" className="w-[200px] h-10 font-medium">
               <ArrowUpDown className="size-4 mr-2 text-muted-foreground" />
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>

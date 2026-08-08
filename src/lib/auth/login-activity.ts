@@ -9,7 +9,7 @@
  * worked.
  */
 
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { user, userLoginActivity } from "@/db/schema";
 import { logger } from "@/lib/logger";
@@ -32,6 +32,9 @@ export async function resolveLoginIdentifier(emailOrUsername: string): Promise<s
   const byUsername = await db.query.user.findFirst({
     where: eq(user.username, trimmed.toLowerCase()),
     columns: { email: true },
+    // username is not unique in the schema yet (see TODO.md); pick the
+    // oldest account so resolution is at least deterministic.
+    orderBy: [asc(user.createdAt)],
   });
 
   return byUsername?.email ?? trimmed;

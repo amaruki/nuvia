@@ -10,13 +10,21 @@ import {
   Text,
 } from "@react-email/components";
 import { Tailwind } from "@react-email/tailwind";
+import { EmailFooter } from "./shared-footer";
 
 interface EmailVerificationProps {
   verificationUrl: string;
   userName?: string;
+  organizationName?: string;
+  supportEmail?: string;
 }
 
-export function EmailVerificationEmail({ verificationUrl, userName }: EmailVerificationProps) {
+export function EmailVerificationEmail({
+  verificationUrl,
+  userName,
+  organizationName = "Nuvia",
+  supportEmail,
+}: EmailVerificationProps) {
   return (
     <Html>
       <Preview>Verify your email address</Preview>
@@ -77,11 +85,7 @@ export function EmailVerificationEmail({ verificationUrl, userName }: EmailVerif
             </Section>
 
             {/* Footer */}
-            <Section className="bg-gray-50 p-6 rounded-b-lg border-t">
-              <Text className="text-xs text-gray-500 text-center">
-                This is an automated message. Please do not reply to this email.
-              </Text>
-            </Section>
+            <EmailFooter organizationName={organizationName} supportEmail={supportEmail} />
           </Container>
         </Body>
       </Tailwind>

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { ContactLink, OrganizationCopyright } from "./organization-branding";
 
 interface DashboardFooterProps {
   className?: string;
@@ -12,9 +13,7 @@ export function DashboardFooter({ className }: DashboardFooterProps) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
-            <p className="text-sm text-foreground/50">
-              © {new Date().getFullYear()} Nuvia Community Platform. All rights reserved.
-            </p>
+            <OrganizationCopyright />
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">
@@ -27,9 +26,7 @@ export function DashboardFooter({ className }: DashboardFooterProps) {
             <Link href="/terms" className="text-sm text-foreground/50 hover:text-foreground/70">
               Terms of Service
             </Link>
-            <Link href="/contact" className="text-sm text-foreground/50 hover:text-foreground/70">
-              Contact Us
-            </Link>
+            <ContactLink />
           </div>
         </div>
 

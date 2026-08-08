@@ -10,13 +10,21 @@ import {
   Text,
 } from "@react-email/components";
 import { Tailwind } from "@react-email/tailwind";
+import { EmailFooter } from "./shared-footer";
 
 interface PasswordResetEmailProps {
   resetUrl: string;
   userName?: string;
+  organizationName?: string;
+  supportEmail?: string;
 }
 
-export function PasswordResetEmail({ resetUrl, userName }: PasswordResetEmailProps) {
+export function PasswordResetEmail({
+  resetUrl,
+  userName,
+  organizationName = "Nuvia",
+  supportEmail,
+}: PasswordResetEmailProps) {
   return (
     <Html>
       <Preview>Reset your password</Preview>
@@ -76,11 +84,7 @@ export function PasswordResetEmail({ resetUrl, userName }: PasswordResetEmailPro
             </Section>
 
             {/* Footer */}
-            <Section className="bg-gray-50 p-6 rounded-b-lg border-t">
-              <Text className="text-xs text-gray-500 text-center">
-                This is an automated message. Please do not reply to this email.
-              </Text>
-            </Section>
+            <EmailFooter organizationName={organizationName} supportEmail={supportEmail} />
           </Container>
         </Body>
       </Tailwind>

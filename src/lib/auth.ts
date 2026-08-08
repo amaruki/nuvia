@@ -19,6 +19,7 @@ import PasswordResetEmail from "@/components/email-template/password-reset";
 import EmailVerificationEmail from "@/components/email-template/email-verification";
 import WelcomeEmail from "@/components/email-template/welcome";
 import React from "react";
+import { getOrganization } from "./services/organization.service";
 import { AuthError, AuthErrorType } from "./auth/common";
 
 // TODO: Move email service logic to a separate module
@@ -180,33 +181,48 @@ const emailService = new EmailService();
  */
 export const emailTemplates = {
   passwordReset: async (resetUrl: string, userName?: string) => {
-    const component = React.createElement(PasswordResetEmail, { resetUrl, userName });
+    const organization = await getOrganization();
+    const component = React.createElement(PasswordResetEmail, {
+      resetUrl,
+      userName,
+      organizationName: organization.name,
+      supportEmail: organization.supportEmail ?? undefined,
+    });
     const { html, text } = await renderEmailTemplate(component);
     return {
-      subject: "Reset your password",
+      subject: `Reset your ${organization.name} password`,
       html,
       text,
     };
   },
 
   emailVerification: async (verificationUrl: string, userName?: string) => {
-    const component = React.createElement(EmailVerificationEmail, { verificationUrl, userName });
+    const organization = await getOrganization();
+    const component = React.createElement(EmailVerificationEmail, {
+      verificationUrl,
+      userName,
+      organizationName: organization.name,
+      supportEmail: organization.supportEmail ?? undefined,
+    });
     const { html, text } = await renderEmailTemplate(component);
     return {
-      subject: "Verify your email address",
+      subject: `Verify your ${organization.name} email address`,
       html,
       text,
     };
   },
 
   welcome: async (userName?: string) => {
+    const organization = await getOrganization();
     const component = React.createElement(WelcomeEmail, {
       userName,
       dashboardUrl: `${env.APP_URL}/dashboard`,
+      organizationName: organization.name,
+      supportEmail: organization.supportEmail ?? undefined,
     });
     const { html, text } = await renderEmailTemplate(component);
     return {
-      subject: "Welcome to our platform!",
+      subject: `Welcome to ${organization.name}!`,
       html,
       text,
     };

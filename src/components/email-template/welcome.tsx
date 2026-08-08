@@ -11,16 +11,24 @@ import {
   Text,
 } from "@react-email/components";
 import { Tailwind } from "@react-email/tailwind";
+import { EmailFooter } from "./shared-footer";
 
 interface WelcomeEmailProps {
   userName?: string;
   dashboardUrl?: string;
+  organizationName?: string;
+  supportEmail?: string;
 }
 
-export function WelcomeEmail({ userName, dashboardUrl = "/dashboard" }: WelcomeEmailProps) {
+export function WelcomeEmail({
+  userName,
+  dashboardUrl = "/dashboard",
+  organizationName = "Nuvia",
+  supportEmail,
+}: WelcomeEmailProps) {
   return (
     <Html>
-      <Preview>Welcome to our platform!</Preview>
+      <Preview>Welcome to {organizationName}!</Preview>
       <Tailwind>
         {/* Head must sit inside Tailwind so media-query/hover classes can
             be emitted into a <style> tag; outside, rendering throws. */}
@@ -53,8 +61,8 @@ export function WelcomeEmail({ userName, dashboardUrl = "/dashboard" }: WelcomeE
             {/* Main Content */}
             <Section className="p-8">
               <Text className="text-gray-700 leading-6 mb-6">
-                Thank you for joining our platform! Your account has been successfully created and
-                we're excited to have you with us.
+                Thank you for joining {organizationName}! Your account has been successfully created
+                and we're excited to have you with us.
               </Text>
 
               <div className="text-center my-6">
@@ -131,7 +139,10 @@ export function WelcomeEmail({ userName, dashboardUrl = "/dashboard" }: WelcomeE
               <div className="text-center mt-6">
                 <Text className="text-sm text-gray-600">
                   Need help?{" "}
-                  <Link href="/support" className="text-purple-600 font-medium">
+                  <Link
+                    href={supportEmail ? `mailto:${supportEmail}` : "/support"}
+                    className="text-purple-600 font-medium"
+                  >
                     Contact our support team
                   </Link>
                 </Text>
@@ -139,11 +150,7 @@ export function WelcomeEmail({ userName, dashboardUrl = "/dashboard" }: WelcomeE
             </Section>
 
             {/* Footer */}
-            <Section className="bg-gray-50 p-6 rounded-b-lg border-t">
-              <Text className="text-xs text-gray-500 text-center">
-                This is an automated message. Please do not reply to this email.
-              </Text>
-            </Section>
+            <EmailFooter organizationName={organizationName} supportEmail={supportEmail} />
           </Container>
         </Body>
       </Tailwind>

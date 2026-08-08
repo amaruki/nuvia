@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file gives guidance to AI coding agents that work in this repository. It states the canonical choice for every contested decision and links to the ADR that explains the reason. This file does not repeat that reasoning, so it stays short enough for readers to actually use it. If you are an agent and this file conflicts with something you inferred from the surrounding code, this file wins. The surrounding code may predate the decision.
+This file gives guidance to AI coding agents that work in this repository. It states the canonical choice for every contested decision and links to the ADR that explains the reason. This file does not repeat that reasoning, so it stays short enough for readers to actually use it. If you are an agent and this file conflicts with something you inferred from the surrounding code, this file wins. The surrounding code may predate the decision. Do not overcommenting in codebase, Clean code comments should explain why the code exists or why a non-obvious decision was made, not restate what the code already clearly shows.
 
 ## Why this file exists
 

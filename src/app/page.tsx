@@ -415,16 +415,16 @@ export default function Home() {
                     </CardDescription>
                   </div>
                   <div className="flex shrink-0 flex-wrap gap-3">
-                    <Button variant="secondary" asChild>
+                    <Button variant="secondary" asChild className="group">
                       <Link href="/events">
                         Browse events
-                        <ArrowUpRight />
+                        <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none motion-reduce:transition-none" />
                       </Link>
                     </Button>
-                    <Button variant="secondary" asChild>
+                    <Button variant="secondary" asChild className="group">
                       <Link href="/jobs">
                         Job board
-                        <ArrowUpRight />
+                        <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none motion-reduce:transition-none" />
                       </Link>
                     </Button>
                   </div>
@@ -707,10 +707,10 @@ export default function Home() {
                     own.
                   </p>
                 </div>
-                <Button size="lg" variant="secondary" asChild className="shrink-0">
+                <Button size="lg" variant="secondary" asChild className="group shrink-0">
                   <Link href="/auth/signup">
                     Get started
-                    <ArrowRight data-icon="inline-end" />
+                    <ArrowRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none motion-reduce:transition-none" />
                   </Link>
                 </Button>
               </div>

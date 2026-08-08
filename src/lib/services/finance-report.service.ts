@@ -16,7 +16,7 @@
  * otherwise (those pages render honest empty states instead).
  */
 
-import { asc, desc, eq } from "drizzle-orm";
+import { asc, desc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   membershipInvoice,
@@ -215,6 +215,7 @@ async function fetchItemsForInvoices(invoiceIds: string[]) {
       unitPrice: membershipInvoiceItem.unitPrice,
     })
     .from(membershipInvoiceItem)
+    .where(inArray(membershipInvoiceItem.invoiceId, invoiceIds))
     .orderBy(asc(membershipInvoiceItem.createdAt), asc(membershipInvoiceItem.id));
 
   const wanted = new Set(invoiceIds);

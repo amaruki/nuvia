@@ -29,7 +29,7 @@ import {
   updateCategoryItem,
   updateContentItem,
   type ContentCollection,
-} from "@/lib/services/content.service";
+} from "@/lib/services/content";
 
 // ---------------------------------------------------------------------------
 // Fixtures

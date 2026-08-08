@@ -82,6 +82,6 @@ PATCH accepts the partial of the collection's create schema.
 ## Errors
 
 401/403 auth; 404 `not-found` for unknown ids; 409 `conflict` for slug
-collisions (`ContentApiError.conflict` in `src/lib/services/content.service.ts`);
+collisions (`ContentApiError.conflict` in `src/lib/services/content/errors.ts`);
 400 `invalid-request-format` for non-JSON bodies; 422 `validation-error` with
 `errors[]` on schema rejection; 500 `internal-error`.

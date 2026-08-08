@@ -114,7 +114,7 @@ Four collections on one table, plus disk-backed uploads.
 
 - **Entry points:** `src/app/api/v1/content/{articles,publications,announcements,categories}/**`
   (20 routes, all delegating to `src/app/api/v1/content/shared.ts`),
-  `src/lib/services/content.service.ts` (content + category CRUD, slug
+  `src/lib/services/content/` (content + category CRUD, slug
   uniqueness, `metadata.ui` round-trip),
   `src/lib/services/media-upload.service.ts` (uploads on local disk +
   JSON manifest — no media table, migrations were frozen; swap-in point for

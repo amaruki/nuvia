@@ -28,7 +28,7 @@ import {
   listContent,
   updateCategoryItem,
   updateContentItem,
-} from "@/lib/services/content.service";
+} from "@/lib/services/content";
 
 const CREATE_SCHEMAS = {
   articles: createArticleSchema,

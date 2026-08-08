@@ -4,7 +4,9 @@
  * Serves the member directory API (`/api/v1/members`) from the database:
  * users joined with their newest `membership_subscription`, with the member
  * status derived through the A3 derivation (ADR-0014). This service IMPORTS
- * `deriveMemberStatus` and never re-derives status ad hoc.
+ * `deriveMemberStatus` and never re-derives status ad hoc; the single SQL
+ * expression of the rule is `derivedMemberStatusSql`, the mirror that lets
+ * the listing's status filter run in the database.
  *
  * Permission mapping (authoritative note lives on the routes):
  * - list   -> `memberships:read` (membership-flavored directory listing)
@@ -12,7 +14,8 @@
  *   subscription history)
  */
 
-import { and, asc, count, desc, eq, ilike, inArray, isNull, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, isNull, or, sql, type SQL } from "drizzle-orm";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import { db } from "@/db/client";
 import {
   membershipSubscription,
@@ -22,7 +25,11 @@ import {
   type User,
 } from "@/db/schema";
 import { NotFoundError } from "@/lib/errors";
-import { deriveMemberStatus, type MemberStatus } from "./membership-status.service";
+import {
+  PAST_DUE_GRACE_DAYS,
+  deriveMemberStatus,
+  type MemberStatus,
+} from "./membership-status.service";
 
 /** Columns this service reads from the users table. */
 const userColumns = {
@@ -179,6 +186,65 @@ function baseWhere(search?: string, roles?: string[]) {
 }
 
 /**
+ * The newest subscription per user as an SQL subquery — the same "newest row
+ * governs" selection ADR-0014 and `latestSubscriptionsByUser` use (createdAt
+ * desc, id tiebreak), carrying only the columns the derivation reads.
+ */
+function latestSubscriptionPerUser() {
+  return db
+    .selectDistinctOn([membershipSubscription.userId], {
+      userId: membershipSubscription.userId,
+      status: membershipSubscription.status,
+      currentPeriodEnd: membershipSubscription.currentPeriodEnd,
+      trialEnd: membershipSubscription.trialEnd,
+    })
+    .from(membershipSubscription)
+    .orderBy(
+      asc(membershipSubscription.userId),
+      desc(membershipSubscription.createdAt),
+      desc(membershipSubscription.id),
+    )
+    .as("latest_subscription");
+}
+
+/** The `latestSubscriptionPerUser` fields the status derivation reads. */
+interface LatestSubscriptionColumns {
+  userId: AnyPgColumn;
+  status: AnyPgColumn;
+  currentPeriodEnd: AnyPgColumn;
+  trialEnd: AnyPgColumn;
+}
+
+/**
+ * SQL mirror of `deriveMemberStatus` (ADR-0014): member status is derived,
+ * never stored, so a status filter must re-express the derivation to run in
+ * the database. Must stay in lockstep with the pure function — same snapshot
+ * columns, same comparisons, same `PAST_DUE_GRACE_DAYS` window. `now` is
+ * bound as a parameter so the SQL filter and the JS derivation on the
+ * returned page evaluate the same instant. The status column is the closed
+ * `MembershipStatus` enum, so the trailing `else` only collects the expired
+ * outcomes.
+ */
+function derivedMemberStatusSql(latest: LatestSubscriptionColumns, now: Date): SQL<MemberStatus> {
+  const trialAnchor = sql`coalesce(${latest.trialEnd}, ${latest.currentPeriodEnd})`;
+  const graceEnd = sql`${latest.currentPeriodEnd} + ${PAST_DUE_GRACE_DAYS} * interval '1 day'`;
+  // postgres.js rejects a raw Date parameter here, so bind the same instant
+  // as ISO text; the untyped parameter resolves against the timestamptz side.
+  const nowIso = now.toISOString();
+  return sql<MemberStatus>`
+    case
+      when ${latest.userId} is null then 'none'
+      when ${latest.status} = 'ACTIVE' and (${latest.currentPeriodEnd} is null or ${nowIso} <= ${latest.currentPeriodEnd}) then 'active'
+      when ${latest.status} = 'TRIALING' and (${trialAnchor} is null or ${nowIso} <= ${trialAnchor}) then 'trialing'
+      when ${latest.status} = 'CANCELED' and ${latest.currentPeriodEnd} is not null and ${nowIso} <= ${latest.currentPeriodEnd} then 'in_grace'
+      when ${latest.status} = 'PAST_DUE' and (${latest.currentPeriodEnd} is null or ${nowIso} <= ${graceEnd}) then 'in_grace'
+      when ${latest.status} = 'PAUSED' then 'paused'
+      else 'expired'
+    end
+  `;
+}
+
+/**
  * The newest subscription per user (ordered by createdAt, id as tiebreak),
  * keyed by userId — one query per page of users.
  */
@@ -276,36 +342,14 @@ function toListItem(
   };
 }
 
-function compareMembers(a: MemberListItem, b: MemberListItem, sortBy: MemberSortField): number {
-  const value = (item: MemberListItem): string | number => {
-    switch (sortBy) {
-      case "name":
-        return item.name;
-      case "username":
-        return item.username;
-      case "email":
-        return item.email;
-      case "role":
-        return item.role;
-      case "createdAt":
-        return item.createdAt.getTime();
-    }
-  };
-  const av = value(a);
-  const bv = value(b);
-  if (av < bv) return -1;
-  if (av > bv) return 1;
-  return 0;
-}
-
 /**
  * Paginated member directory listing.
  *
- * Member status is a derived value (ADR-0014), so a status filter cannot be
- * pushed into SQL: the filtered path loads the candidate users plus their
- * newest subscriptions, derives the status with `deriveMemberStatus`, filters
- * and pages in memory. Without a status filter we page in SQL and derive only
- * for the page.
+ * Member status is derived, never stored (ADR-0014), but the derivation is a
+ * pure function of the newest subscription row and `now`, so the status
+ * filter is re-expressed in SQL (`derivedMemberStatusSql`): both paths push
+ * filtering, sorting and paging into the database and derive status in JS
+ * only for the returned page.
  */
 export async function listMembers(params: MemberListParams): Promise<MemberListResult> {
   const page = Number.isFinite(params.page) ? Math.max(1, Math.floor(params.page)) : 1;
@@ -318,22 +362,37 @@ export async function listMembers(params: MemberListParams): Promise<MemberListR
   const now = new Date();
 
   if (params.memberStatuses && params.memberStatuses.length > 0) {
-    const rows = await db.select(userColumns).from(user).where(where);
-    const latest = await latestSubscriptionsByUser(rows.map((row) => row.id));
-    const tierNames = await tierNamesByIds([...latest.values()].map((sub) => sub.tierId));
-    const wanted = new Set<MemberStatus>(params.memberStatuses);
-    const matched = rows
-      .map((row) => toListItem(row, latest.get(row.id) ?? null, tierNames, now))
-      .filter((item) => wanted.has(item.memberStatus));
-    matched.sort((a, b) => (sortOrder === "asc" ? 1 : -1) * compareMembers(a, b, sortBy));
-    const total = matched.length;
-    const totalPages = Math.ceil(total / limit);
+    // Filtering, sorting and paging all run in SQL here: the status
+    // predicate is the derivation mirrored (derivedMemberStatusSql), so no
+    // candidate rows beyond the page are shipped to the app.
+    const latest = latestSubscriptionPerUser();
+    const statusFilter = and(
+      where,
+      inArray(derivedMemberStatusSql(latest, now), params.memberStatuses),
+    )!;
+    const joinOn = eq(latest.userId, user.id);
+    const direction = sortOrder === "asc" ? asc : desc;
+    const [{ value: total }] = await db
+      .select({ value: count() })
+      .from(user)
+      .leftJoin(latest, joinOn)
+      .where(statusFilter);
+    const rows = await db
+      .select(userColumns)
+      .from(user)
+      .leftJoin(latest, joinOn)
+      .where(statusFilter)
+      .orderBy(direction(SORT_COLUMNS[sortBy]))
+      .limit(limit)
+      .offset((page - 1) * limit);
+    const latestSubs = await latestSubscriptionsByUser(rows.map((row) => row.id));
+    const tierNames = await tierNamesByIds([...latestSubs.values()].map((sub) => sub.tierId));
     return {
-      members: matched.slice((page - 1) * limit, page * limit),
+      members: rows.map((row) => toListItem(row, latestSubs.get(row.id) ?? null, tierNames, now)),
       total,
       page,
       limit,
-      totalPages,
+      totalPages: Math.ceil(total / limit),
     };
   }
 

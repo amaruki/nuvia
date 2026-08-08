@@ -18,11 +18,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { MembershipStatus, MembershipTier } from "@/types/membership.types";
-import type {
-  MembershipFilter,
-  MembershipProfile,
-  MembershipSort,
-} from "@/types/membership.types";
+import type { MembershipFilter, MembershipProfile, MembershipSort } from "@/types/membership.types";
 
 interface UseMembershipsOptions {
   initialFilters?: MembershipFilter;
@@ -61,14 +57,7 @@ const memberApiItemSchema = z.object({
   emailVerified: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  memberStatus: z.enum([
-    "active",
-    "trialing",
-    "in_grace",
-    "paused",
-    "expired",
-    "none",
-  ]),
+  memberStatus: z.enum(["active", "trialing", "in_grace", "paused", "expired", "none"]),
   subscription: z
     .object({
       id: z.string(),
@@ -103,16 +92,13 @@ const problemSchema = z.object({
 });
 
 /** Fetch and validate one page of the member directory. */
-export async function fetchMembersPage(
-  query: URLSearchParams,
-): Promise<MembersPage> {
+export async function fetchMembersPage(query: URLSearchParams): Promise<MembersPage> {
   const response = await fetch(`/api/v1/members?${query.toString()}`);
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const parsedProblem = problemSchema.safeParse(body);
     const message =
-      (parsedProblem.success &&
-        (parsedProblem.data.detail ?? parsedProblem.data.title)) ||
+      (parsedProblem.success && (parsedProblem.data.detail ?? parsedProblem.data.title)) ||
       "Failed to load members";
     throw new Error(message);
   }
@@ -135,10 +121,7 @@ const UI_STATUS_TO_MEMBER_STATUSES: Record<
   [MembershipStatus.CANCELLED]: ["in_grace", "expired"],
 };
 
-const MEMBER_STATUS_TO_UI_STATUS: Record<
-  MemberApiItem["memberStatus"],
-  MembershipStatus
-> = {
+const MEMBER_STATUS_TO_UI_STATUS: Record<MemberApiItem["memberStatus"], MembershipStatus> = {
   active: MembershipStatus.ACTIVE,
   trialing: MembershipStatus.ACTIVE,
   in_grace: MembershipStatus.ACTIVE,
@@ -206,12 +189,8 @@ function toMembershipProfile(member: MemberApiItem): MembershipProfile {
     location: "", // no location column in the users schema yet
     membershipTier: tierForMember(member),
     membershipStatus: MEMBER_STATUS_TO_UI_STATUS[member.memberStatus],
-    membershipStartDate: sub
-      ? new Date(sub.currentPeriodStart)
-      : new Date(member.createdAt),
-    membershipEndDate: sub?.currentPeriodEnd
-      ? new Date(sub.currentPeriodEnd)
-      : null,
+    membershipStartDate: sub ? new Date(sub.currentPeriodStart) : new Date(member.createdAt),
+    membershipEndDate: sub?.currentPeriodEnd ? new Date(sub.currentPeriodEnd) : null,
     applicationDate: new Date(member.createdAt),
     lastRenewalDate: sub ? new Date(sub.createdAt) : undefined,
     memberId: `M-${member.id.replace(/-/g, "").slice(0, 6).toUpperCase()}`,
@@ -230,19 +209,14 @@ export function useMemberships({
   // Debounce the search box so typing does not fire a request per keystroke.
   const [debouncedSearch, setDebouncedSearch] = useState(filters.search ?? "");
   useEffect(() => {
-    const timer = setTimeout(
-      () => setDebouncedSearch(filters.search ?? ""),
-      300,
-    );
+    const timer = setTimeout(() => setDebouncedSearch(filters.search ?? ""), 300);
     return () => clearTimeout(timer);
   }, [filters.search]);
 
   const memberStatusParams = useMemo(
     () => [
       ...new Set(
-        (filters.statuses ?? []).flatMap(
-          (status) => UI_STATUS_TO_MEMBER_STATUSES[status],
-        ),
+        (filters.statuses ?? []).flatMap((status) => UI_STATUS_TO_MEMBER_STATUSES[status]),
       ),
     ],
     [filters.statuses],
@@ -262,24 +236,18 @@ export function useMemberships({
       params.set("page", String(pageParam));
       params.set("limit", String(pageSize));
       if (debouncedSearch) params.set("search", debouncedSearch);
-      for (const status of memberStatusParams)
-        params.append("memberStatus", status);
+      for (const status of memberStatusParams) params.append("memberStatus", status);
       params.set("sortBy", API_SORT_BY_FIELD[sort.field]);
       params.set("sortOrder", sort.direction);
       return fetchMembersPage(params);
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
-      lastPage.meta.page < lastPage.meta.totalPages
-        ? lastPage.meta.page + 1
-        : undefined,
+      lastPage.meta.page < lastPage.meta.totalPages ? lastPage.meta.page + 1 : undefined,
   });
 
   const fetchedMembers = useMemo(
-    () =>
-      (query.data?.pages ?? [])
-        .flatMap((page) => page.data.members)
-        .map(toMembershipProfile),
+    () => (query.data?.pages ?? []).flatMap((page) => page.data.members).map(toMembershipProfile),
     [query.data],
   );
 
@@ -287,11 +255,7 @@ export function useMemberships({
   const members = useMemo(
     () =>
       fetchedMembers.filter((member) => {
-        if (
-          filters.tiers?.length &&
-          !filters.tiers.includes(member.membershipTier)
-        )
-          return false;
+        if (filters.tiers?.length && !filters.tiers.includes(member.membershipTier)) return false;
         if (
           filters.locations?.length &&
           !filters.locations.some((location) =>
@@ -302,9 +266,7 @@ export function useMemberships({
         }
         if (
           filters.committees?.length &&
-          !filters.committees.some((committee) =>
-            (member.committees ?? []).includes(committee),
-          )
+          !filters.committees.some((committee) => (member.committees ?? []).includes(committee))
         ) {
           return false;
         }
@@ -375,9 +337,7 @@ export function useMembershipFilters(initialFilters: MembershipFilter = {}) {
     return Object.keys(filters).some((key) => {
       const value = filters[key as keyof MembershipFilter];
       return (
-        value !== undefined &&
-        value !== null &&
-        (Array.isArray(value) ? value.length > 0 : true)
+        value !== undefined && value !== null && (Array.isArray(value) ? value.length > 0 : true)
       );
     });
   }, [filters]);

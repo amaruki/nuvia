@@ -12,17 +12,7 @@
  *   subscription history)
  */
 
-import {
-  and,
-  asc,
-  count,
-  desc,
-  eq,
-  ilike,
-  inArray,
-  isNull,
-  or,
-} from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, isNull, or } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   membershipSubscription,
@@ -32,10 +22,7 @@ import {
   type User,
 } from "@/db/schema";
 import { NotFoundError } from "@/lib/errors";
-import {
-  deriveMemberStatus,
-  type MemberStatus,
-} from "./membership-status.service";
+import { deriveMemberStatus, type MemberStatus } from "./membership-status.service";
 
 /** Columns this service reads from the users table. */
 const userColumns = {
@@ -202,10 +189,7 @@ async function latestSubscriptionsByUser(userIds: string[]) {
     .select()
     .from(membershipSubscription)
     .where(inArray(membershipSubscription.userId, userIds))
-    .orderBy(
-      desc(membershipSubscription.createdAt),
-      desc(membershipSubscription.id),
-    );
+    .orderBy(desc(membershipSubscription.createdAt), desc(membershipSubscription.id));
   for (const row of rows) {
     if (!map.has(row.userId)) map.set(row.userId, row);
   }
@@ -292,11 +276,7 @@ function toListItem(
   };
 }
 
-function compareMembers(
-  a: MemberListItem,
-  b: MemberListItem,
-  sortBy: MemberSortField,
-): number {
+function compareMembers(a: MemberListItem, b: MemberListItem, sortBy: MemberSortField): number {
   const value = (item: MemberListItem): string | number => {
     switch (sortBy) {
       case "name":
@@ -327,12 +307,8 @@ function compareMembers(
  * and pages in memory. Without a status filter we page in SQL and derive only
  * for the page.
  */
-export async function listMembers(
-  params: MemberListParams,
-): Promise<MemberListResult> {
-  const page = Number.isFinite(params.page)
-    ? Math.max(1, Math.floor(params.page))
-    : 1;
+export async function listMembers(params: MemberListParams): Promise<MemberListResult> {
+  const page = Number.isFinite(params.page) ? Math.max(1, Math.floor(params.page)) : 1;
   const limit = Number.isFinite(params.limit)
     ? Math.min(100, Math.max(1, Math.floor(params.limit)))
     : 20;
@@ -344,16 +320,12 @@ export async function listMembers(
   if (params.memberStatuses && params.memberStatuses.length > 0) {
     const rows = await db.select(userColumns).from(user).where(where);
     const latest = await latestSubscriptionsByUser(rows.map((row) => row.id));
-    const tierNames = await tierNamesByIds(
-      [...latest.values()].map((sub) => sub.tierId),
-    );
+    const tierNames = await tierNamesByIds([...latest.values()].map((sub) => sub.tierId));
     const wanted = new Set<MemberStatus>(params.memberStatuses);
     const matched = rows
       .map((row) => toListItem(row, latest.get(row.id) ?? null, tierNames, now))
       .filter((item) => wanted.has(item.memberStatus));
-    matched.sort(
-      (a, b) => (sortOrder === "asc" ? 1 : -1) * compareMembers(a, b, sortBy),
-    );
+    matched.sort((a, b) => (sortOrder === "asc" ? 1 : -1) * compareMembers(a, b, sortBy));
     const total = matched.length;
     const totalPages = Math.ceil(total / limit);
     return {
@@ -365,10 +337,7 @@ export async function listMembers(
     };
   }
 
-  const [{ value: total }] = await db
-    .select({ value: count() })
-    .from(user)
-    .where(where);
+  const [{ value: total }] = await db.select({ value: count() }).from(user).where(where);
   const direction = sortOrder === "asc" ? asc : desc;
   const rows = await db
     .select(userColumns)
@@ -378,13 +347,9 @@ export async function listMembers(
     .limit(limit)
     .offset((page - 1) * limit);
   const latest = await latestSubscriptionsByUser(rows.map((row) => row.id));
-  const tierNames = await tierNamesByIds(
-    [...latest.values()].map((sub) => sub.tierId),
-  );
+  const tierNames = await tierNamesByIds([...latest.values()].map((sub) => sub.tierId));
   return {
-    members: rows.map((row) =>
-      toListItem(row, latest.get(row.id) ?? null, tierNames, now),
-    ),
+    members: rows.map((row) => toListItem(row, latest.get(row.id) ?? null, tierNames, now)),
     total,
     page,
     limit,
@@ -409,10 +374,7 @@ export async function getMemberDetail(userId: string): Promise<MemberDetail> {
     .select()
     .from(membershipSubscription)
     .where(eq(membershipSubscription.userId, userId))
-    .orderBy(
-      desc(membershipSubscription.createdAt),
-      desc(membershipSubscription.id),
-    );
+    .orderBy(desc(membershipSubscription.createdAt), desc(membershipSubscription.id));
   const tierNames = await tierNamesByIds(subs.map((sub) => sub.tierId));
   const subscriptionHistory = subs.map((sub) => toHistoryEntry(sub, tierNames));
   const newest = subs[0] ?? null;

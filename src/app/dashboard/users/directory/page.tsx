@@ -4,12 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { UserDirectory } from "@/components/users/user-directory";
 import { AuthStatus, UserStatus } from "@/types/user-management.types";
-import type {
-  UserFilter,
-  UserProfile,
-  UserSort,
-  UserStats,
-} from "@/types/user-management.types";
+import type { UserFilter, UserProfile, UserSort, UserStats } from "@/types/user-management.types";
 import { USER_ROLES } from "@/types/dashboard.types";
 import type { UserRole } from "@/types/dashboard.types";
 import { useHeader } from "@/contexts/dashboard-context";
@@ -44,12 +39,8 @@ function toUserProfile(member: MemberApiItem): UserProfile {
     avatar: member.image ?? undefined,
     bio: member.bio ?? undefined,
     userRole,
-    status: member.emailVerified
-      ? UserStatus.ACTIVE
-      : UserStatus.PENDING_VERIFICATION,
-    authStatus: member.emailVerified
-      ? AuthStatus.VERIFIED
-      : AuthStatus.UNVERIFIED,
+    status: member.emailVerified ? UserStatus.ACTIVE : UserStatus.PENDING_VERIFICATION,
+    authStatus: member.emailVerified ? AuthStatus.VERIFIED : AuthStatus.UNVERIFIED,
     emailVerified: member.emailVerified,
     phoneVerified: false, // no phone column in the users schema yet
     createdAt: new Date(member.createdAt),
@@ -81,10 +72,7 @@ export default function UserDirectoryPage() {
   // Debounce the search box so typing does not fire a request per keystroke.
   const [debouncedSearch, setDebouncedSearch] = useState("");
   useEffect(() => {
-    const timer = setTimeout(
-      () => setDebouncedSearch(filters.search ?? ""),
-      300,
-    );
+    const timer = setTimeout(() => setDebouncedSearch(filters.search ?? ""), 300);
     return () => clearTimeout(timer);
   }, [filters.search]);
 
@@ -100,18 +88,16 @@ export default function UserDirectoryPage() {
     },
   });
 
-  const apiUsers = useMemo(
-    () => (data?.data.members ?? []).map(toUserProfile),
-    [data],
-  );
+  const apiUsers = useMemo(() => (data?.data.members ?? []).map(toUserProfile), [data]);
   const total = data?.meta.total ?? 0;
 
   // Stats are computed from real loaded rows. Fields without a data source
   // in the users schema (2FA, last login, suspended state) report zero.
   const stats: UserStats = useMemo(() => {
-    const roleDistribution = Object.fromEntries(
-      USER_ROLES.map((role) => [role, 0]),
-    ) as Record<UserRole, number>;
+    const roleDistribution = Object.fromEntries(USER_ROLES.map((role) => [role, 0])) as Record<
+      UserRole,
+      number
+    >;
     let activeUsers = 0;
     let verifiedUsers = 0;
     let newUsersThisMonth = 0;
@@ -159,37 +145,27 @@ export default function UserDirectoryPage() {
 
     // Apply role filter
     if (filters.roles?.length) {
-      filtered = filtered.filter((user) =>
-        filters.roles!.includes(user.userRole),
-      );
+      filtered = filtered.filter((user) => filters.roles!.includes(user.userRole));
     }
 
     // Apply status filter
     if (filters.statuses?.length) {
-      filtered = filtered.filter((user) =>
-        filters.statuses!.includes(user.status),
-      );
+      filtered = filtered.filter((user) => filters.statuses!.includes(user.status));
     }
 
     // Apply auth status filter
     if (filters.authStatuses?.length) {
-      filtered = filtered.filter((user) =>
-        filters.authStatuses!.includes(user.authStatus),
-      );
+      filtered = filtered.filter((user) => filters.authStatuses!.includes(user.authStatus));
     }
 
     // Apply email verification filter
     if (filters.emailVerified !== undefined) {
-      filtered = filtered.filter(
-        (user) => user.emailVerified === filters.emailVerified,
-      );
+      filtered = filtered.filter((user) => user.emailVerified === filters.emailVerified);
     }
 
     // Apply phone verification filter
     if (filters.phoneVerified !== undefined) {
-      filtered = filtered.filter(
-        (user) => user.phoneVerified === filters.phoneVerified,
-      );
+      filtered = filtered.filter((user) => user.phoneVerified === filters.phoneVerified);
     }
 
     // Apply location filter
@@ -207,13 +183,9 @@ export default function UserDirectoryPage() {
     filtered.sort((a, b) => {
       const { field, direction } = sort;
       const rawA =
-        field === "name"
-          ? `${a.firstName} ${a.lastName}`
-          : a[field as keyof UserProfile];
+        field === "name" ? `${a.firstName} ${a.lastName}` : a[field as keyof UserProfile];
       const rawB =
-        field === "name"
-          ? `${b.firstName} ${b.lastName}`
-          : b[field as keyof UserProfile];
+        field === "name" ? `${b.firstName} ${b.lastName}` : b[field as keyof UserProfile];
       const aValue = toComparable(rawA);
       const bValue = toComparable(rawB);
 
@@ -241,10 +213,7 @@ export default function UserDirectoryPage() {
   };
 
   if (isError) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Failed to load the user directory";
+    const message = error instanceof Error ? error.message : "Failed to load the user directory";
     return (
       <div className="container mx-auto px-4 py-6">
         <Card>

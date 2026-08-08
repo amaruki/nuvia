@@ -20,10 +20,7 @@ import { getMemberDetail } from "@/lib/services/member.service";
  * Member status is never stored — it is derived per ADR-0014 by the member
  * service through `deriveMemberStatus`.
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
     const auth = await requirePermission("users:read");

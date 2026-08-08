@@ -1,12 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { requirePermission } from "@/lib/rbac";
-import {
-  problemResponse,
-  problems,
-  successResponse,
-  validationProblem,
-} from "@/lib/http";
+import { problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 import { logger } from "@/lib/logger";
 import { listMembers } from "@/lib/services/member.service";
 
@@ -25,14 +20,7 @@ import { listMembers } from "@/lib/services/member.service";
  * service through `deriveMemberStatus`.
  */
 
-const MEMBER_STATUSES = [
-  "active",
-  "trialing",
-  "in_grace",
-  "paused",
-  "expired",
-  "none",
-] as const;
+const MEMBER_STATUSES = ["active", "trialing", "in_grace", "paused", "expired", "none"] as const;
 
 const listQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -40,9 +28,7 @@ const listQuerySchema = z.object({
   search: z.string().trim().min(1).optional(),
   role: z.array(z.string().min(1)),
   memberStatus: z.array(z.enum(MEMBER_STATUSES)),
-  sortBy: z
-    .enum(["name", "username", "email", "role", "createdAt"])
-    .default("createdAt"),
+  sortBy: z.enum(["name", "username", "email", "role", "createdAt"]).default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
 

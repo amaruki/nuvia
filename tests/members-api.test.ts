@@ -210,9 +210,7 @@ describe("listMembers — derived status matches the A3 derivation", () => {
       expect(expectedStatus[slug]).toBeDefined();
       expect(member.memberStatus).toBe(expectedStatus[slug]);
     }
-    expect(
-      result.members.some((member) => member.username.endsWith("-deleted")),
-    ).toBe(false);
+    expect(result.members.some((member) => member.username.endsWith("-deleted"))).toBe(false);
   });
 
   test("list items expose the newest subscription with its tier name", async () => {
@@ -322,9 +320,7 @@ describe("listMembers — search, role and status filters", () => {
         memberStatuses: statuses,
       });
       expect(result.total).toBe(slugs.length);
-      const got = result.members
-        .map((member) => member.username.replace(`${COHORT}-`, ""))
-        .sort();
+      const got = result.members.map((member) => member.username.replace(`${COHORT}-`, "")).sort();
       expect(got).toEqual([...slugs].sort());
     }
   });
@@ -385,11 +381,9 @@ describe("listMembers — pagination", () => {
     expect(pageTwo.members).toHaveLength(4);
     expect(pageThree.members).toHaveLength(1);
 
-    const idsAcrossPages = [
-      ...pageOne.members,
-      ...pageTwo.members,
-      ...pageThree.members,
-    ].map((member) => member.id);
+    const idsAcrossPages = [...pageOne.members, ...pageTwo.members, ...pageThree.members].map(
+      (member) => member.id,
+    );
     expect(new Set(idsAcrossPages).size).toBe(9);
   });
 
@@ -437,9 +431,7 @@ describe("getMemberDetail — user block, derived status, subscription history",
     expect(detail.subscriptionHistory).toHaveLength(2);
     expect(detail.subscriptionHistory[0].status).toBe("ACTIVE");
     expect(detail.subscriptionHistory[1].status).toBe("CANCELED");
-    expect(detail.currentSubscription?.id).toBe(
-      detail.subscriptionHistory[0].id,
-    );
+    expect(detail.currentSubscription?.id).toBe(detail.subscriptionHistory[0].id);
     expect(detail.subscriptionHistory[0].tierName).toBe(TIER_NAME);
   });
 
@@ -457,15 +449,11 @@ describe("getMemberDetail — user block, derived status, subscription history",
   });
 
   test("unknown user id throws NotFoundError", async () => {
-    await expect(getMemberDetail(crypto.randomUUID())).rejects.toBeInstanceOf(
-      NotFoundError,
-    );
+    await expect(getMemberDetail(crypto.randomUUID())).rejects.toBeInstanceOf(NotFoundError);
   });
 
   test("soft-deleted user throws NotFoundError", async () => {
-    await expect(getMemberDetail(ids.deleted)).rejects.toBeInstanceOf(
-      NotFoundError,
-    );
+    await expect(getMemberDetail(ids.deleted)).rejects.toBeInstanceOf(NotFoundError);
   });
 });
 
@@ -476,9 +464,7 @@ describe("members routes — authorization gate (RFC 9457)", () => {
     );
 
     expect(response.status).toBe(401);
-    expect(response.headers.get("content-type")).toContain(
-      "application/problem+json",
-    );
+    expect(response.headers.get("content-type")).toContain("application/problem+json");
     const body = await response.json();
     expect(body.status).toBe(401);
     expect(body.type).toContain("/problems/authentication-required");
@@ -493,9 +479,7 @@ describe("members routes — authorization gate (RFC 9457)", () => {
     );
 
     expect(response.status).toBe(401);
-    expect(response.headers.get("content-type")).toContain(
-      "application/problem+json",
-    );
+    expect(response.headers.get("content-type")).toContain("application/problem+json");
     const body = await response.json();
     expect(body.status).toBe(401);
   });

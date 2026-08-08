@@ -80,7 +80,8 @@ const envSchema = z
     CORS_ORIGIN: z.string().default("http://localhost:3000"),
     CORS_CREDENTIALS: boolFromString(false),
 
-    // API prefix for client-side service fetches (src/lib/services/*)
+    // API prefix for server-side route code. Client modules must use
+    // src/lib/api-prefix.ts instead — they cannot import this file.
     API_PREFIX: z.string().default("/api/v1"),
 
     // Uploads

@@ -45,7 +45,7 @@ import {
   resolveReport,
   updateCategory,
   updatePost,
-} from "@/lib/services/forum.service";
+} from "@/lib/services/forum";
 import { ROLE_PERMISSIONS, isPredefinedRole } from "@/types/role.types";
 
 // ---------------------------------------------------------------------------

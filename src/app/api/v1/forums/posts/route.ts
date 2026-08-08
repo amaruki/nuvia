@@ -7,7 +7,7 @@ import {
   forumProblemFromError,
   listPosts,
   listPostsQuerySchema,
-} from "@/lib/services/forum.service";
+} from "@/lib/services/forum";
 
 /**
  * GET /api/v1/forums/posts - List posts (filters: categoryId, status, authorId, page, limit)

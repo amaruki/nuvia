@@ -6,7 +6,7 @@ import {
   createCommentSchema,
   forumProblemFromError,
   listComments,
-} from "@/lib/services/forum.service";
+} from "@/lib/services/forum";
 
 type RouteContext = { params: Promise<{ id: string }> };
 

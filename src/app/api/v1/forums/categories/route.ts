@@ -6,7 +6,7 @@ import {
   createCategorySchema,
   forumProblemFromError,
   listCategories,
-} from "@/lib/services/forum.service";
+} from "@/lib/services/forum";
 
 /**
  * GET /api/v1/forums/categories - List forum categories with post stats

@@ -1,6 +1,6 @@
 /**
  * Forum — translated from prisma/schema.prisma's "CONTENT MANAGEMENT
- * MODELS" section (forum half). Served by src/lib/services/forum.service.ts
+ * MODELS" section (forum half). Served by src/lib/services/forum/
  * and the /api/v1/forums/** routes.
  */
 

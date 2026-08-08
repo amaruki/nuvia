@@ -6,7 +6,7 @@ import {
   createReportSchema,
   forumProblemFromError,
   listReports,
-} from "@/lib/services/forum.service";
+} from "@/lib/services/forum";
 
 /**
  * GET /api/v1/forums/reports - List content reports (filter: status)

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requirePermission } from "@/lib/rbac";
 import { problemResponse, successResponse } from "@/lib/http";
-import { deleteComment, forumProblemFromError, getComment } from "@/lib/services/forum.service";
+import { deleteComment, forumProblemFromError, getComment } from "@/lib/services/forum";
 
 type RouteContext = { params: Promise<{ id: string }> };
 

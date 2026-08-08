@@ -7,7 +7,7 @@ import {
   getPost,
   updatePost,
   updatePostSchema,
-} from "@/lib/services/forum.service";
+} from "@/lib/services/forum";
 
 type RouteContext = { params: Promise<{ id: string }> };
 

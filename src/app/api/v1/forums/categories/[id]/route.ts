@@ -7,7 +7,7 @@ import {
   getCategory,
   updateCategory,
   updateCategorySchema,
-} from "@/lib/services/forum.service";
+} from "@/lib/services/forum";
 
 type RouteContext = { params: Promise<{ id: string }> };
 

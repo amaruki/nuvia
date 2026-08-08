@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requirePermission } from "@/lib/rbac";
 import { problemResponse, successResponse } from "@/lib/http";
-import { forumProblemFromError, getModerationQueue } from "@/lib/services/forum.service";
+import { forumProblemFromError, getModerationQueue } from "@/lib/services/forum";
 
 /**
  * GET /api/v1/forums/moderation/queue - Posts awaiting review, with pending report counts

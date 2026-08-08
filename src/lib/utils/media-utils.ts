@@ -1,4 +1,4 @@
-import { MediaType, MediaStatus, MediaVisibility } from "@/types/media.types";
+import { MediaType, MediaStatus, MediaVisibility } from "@/types/media";
 import { logger } from "@/lib/logger";
 
 // File size formatting

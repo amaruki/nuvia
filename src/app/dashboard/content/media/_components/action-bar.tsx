@@ -4,7 +4,7 @@ import { Download, Filter, Plus, RefreshCw } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { MediaFolder } from "@/types/media.types";
+import type { MediaFolder } from "@/types/media";
 
 interface ActionBarProps {
   totalItems: number;

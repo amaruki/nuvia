@@ -1,6 +1,6 @@
 import { Download, Eye, HardDrive } from "lucide-react";
 
-import type { MediaStatistics } from "@/types/media.types";
+import type { MediaStatistics } from "@/types/media";
 import { formatNumber } from "./media-helpers";
 
 interface StatsOverviewProps {

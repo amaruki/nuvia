@@ -1,7 +1,7 @@
 "use client";
 
 import { MediaDetailsModal } from "@/components/content/media-details-modal";
-import type { Media } from "@/types/media.types";
+import type { Media } from "@/types/media";
 
 interface MediaDetailsSectionProps {
   viewingMedia: Media;

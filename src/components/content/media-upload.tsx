@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
-import { MediaUploadOptions, MediaType } from "@/types/media.types";
+import { MediaUploadOptions, MediaType } from "@/types/media";
 
 interface MediaUploadProps {
   onUpload: (files: File[], options: MediaUploadOptions) => Promise<void>;

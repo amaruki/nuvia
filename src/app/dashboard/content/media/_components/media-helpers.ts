@@ -10,7 +10,7 @@ import {
   Video,
 } from "lucide-react";
 
-import type { MediaStatus, MediaType, MediaVisibility } from "@/types/media.types";
+import type { MediaStatus, MediaType, MediaVisibility } from "@/types/media";
 
 export const formatNumber = (num: number) => {
   return new Intl.NumberFormat("en-US").format(num);

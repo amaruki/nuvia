@@ -45,7 +45,7 @@ import {
   Users2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Media, MediaPermission } from "@/types/media.types";
+import { Media, MediaPermission } from "@/types/media";
 
 interface MediaPermissionsManagerProps {
   media: Media | null;

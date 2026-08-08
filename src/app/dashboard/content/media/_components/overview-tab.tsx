@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { MediaStatistics } from "@/types/media.types";
+import type { MediaStatistics } from "@/types/media";
 import { formatNumber, getMediaIcon } from "./media-helpers";
 
 interface OverviewTabProps {

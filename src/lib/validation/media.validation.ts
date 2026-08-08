@@ -5,7 +5,7 @@ import {
   MediaVisibility,
   MediaStorageType,
   MediaCompressionLevel,
-} from "@/types/media.types";
+} from "@/types/media";
 
 // Base validation schemas
 const uuidSchema = z.string().uuid("Invalid ID format");

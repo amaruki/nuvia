@@ -3,7 +3,7 @@
 import { Grid3X3, List, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { Media, MediaFilters } from "@/types/media.types";
+import type { Media, MediaFilters } from "@/types/media";
 import { MediaGrid } from "./media-grid";
 import { MediaTable } from "./media-table";
 

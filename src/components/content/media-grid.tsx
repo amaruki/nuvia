@@ -23,7 +23,7 @@ import {
   Grid3X3,
   List,
 } from "lucide-react";
-import { Media, MediaType, MediaStatus, MediaVisibility } from "@/types/media.types";
+import { Media, MediaType, MediaStatus, MediaVisibility } from "@/types/media";
 import { cn } from "@/lib/utils";
 
 interface MediaGridProps {

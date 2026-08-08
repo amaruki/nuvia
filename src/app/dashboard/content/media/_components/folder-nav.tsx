@@ -3,7 +3,7 @@
 import { Folder } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { MediaFolder } from "@/types/media.types";
+import type { MediaFolder } from "@/types/media";
 
 interface FolderNavProps {
   folders: MediaFolder[];

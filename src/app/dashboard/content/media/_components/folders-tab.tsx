@@ -3,7 +3,7 @@
 import React from "react";
 import { Folder } from "lucide-react";
 
-import type { MediaFolder } from "@/types/media.types";
+import type { MediaFolder } from "@/types/media";
 import { getVisibilityIcon } from "./media-helpers";
 
 interface FoldersTabProps {

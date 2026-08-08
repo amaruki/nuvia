@@ -5,7 +5,7 @@ import { Copy, Edit, Eye, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Media } from "@/types/media.types";
+import type { Media } from "@/types/media";
 import { getMediaIcon, getStatusColor, getVisibilityIcon } from "./media-helpers";
 
 interface MediaGridProps {

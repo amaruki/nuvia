@@ -17,7 +17,7 @@ import {
   Clock,
   BarChart3,
 } from "lucide-react";
-import { MediaStatistics } from "@/types/media.types";
+import { MediaStatistics } from "@/types/media";
 
 interface MediaOverviewCardsProps {
   statistics: MediaStatistics | null;

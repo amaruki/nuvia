@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 
 import { useMedia } from "@/lib/hooks/use-media";
-import { Media, MediaType, MediaVisibility, MediaTag } from "@/types/media.types";
+import { Media, MediaType, MediaVisibility, MediaTag } from "@/types/media";
 
 export default function EditMediaPage() {
   const params = useParams();

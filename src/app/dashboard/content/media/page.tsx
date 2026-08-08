@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMedia } from "@/lib/hooks/use-media";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
-import { Media } from "@/types/media.types";
+import { Media } from "@/types/media";
 import { MediaUpload } from "@/components/content/media-upload";
 import { MediaFilters } from "@/components/content/media-filters";
 import { ActionBar } from "./_components/action-bar";

@@ -13,7 +13,7 @@ import {
   MediaType,
   MediaStatus,
   MediaVisibility,
-} from "@/types/media.types";
+} from "@/types/media";
 
 import { apiFetch } from "@/lib/api-client";
 

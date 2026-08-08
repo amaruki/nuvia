@@ -143,10 +143,31 @@ async function seedAdmin(password: string): Promise<void> {
 // Dev server lifecycle
 // ---------------------------------------------------------------------------
 
-async function ensureDevServer(): Promise<{ server: ChildProcess | null; logFd: number | null }> {
+/**
+ * Next 16 allows only one `next dev` per project directory. If another dev
+ * server already holds that lock, a fresh spawn exits immediately; parse the
+ * lock holder's port out of the log and reuse it instead of killing someone
+ * else's process.
+ */
+async function findLockHoldingServer(logPath: string): Promise<string | null> {
+  const logText = await Bun.file(logPath).text();
+  if (!logText.includes("Another next dev server is already running")) return null;
+  const match = logText.match(/Another next dev server[\s\S]*?Local:\s+http:\/\/[^/\s:]+:(\d+)/);
+  if (!match) return null;
+  const baseUrl = `http://127.0.0.1:${match[1]}`;
+  if (!(await isServing(baseUrl))) return null;
+  log(`Another next dev holds the project lock; reusing it at ${baseUrl} (left running on exit).`);
+  return baseUrl;
+}
+
+async function ensureDevServer(): Promise<{
+  server: ChildProcess | null;
+  logFd: number | null;
+  baseUrl: string;
+}> {
   if (await isServing(BASE_URL)) {
     log(`Reusing server already listening on ${BASE_URL}.`);
-    return { server: null, logFd: null };
+    return { server: null, logFd: null, baseUrl: BASE_URL };
   }
 
   log(`Spawning next dev on ${BASE_URL}…`);
@@ -164,11 +185,13 @@ async function ensureDevServer(): Promise<{ server: ChildProcess | null; logFd: 
   const deadline = Date.now() + 240_000; // first compile can be slow
   while (Date.now() < deadline) {
     if (server.exitCode !== null) {
+      const lockHeld = await findLockHoldingServer(logPath);
+      if (lockHeld) return { server: null, logFd, baseUrl: lockHeld };
       throw new Error(`next dev exited early (code ${server.exitCode}); see ${logPath}`);
     }
     if (await isServing(BASE_URL)) {
       log("Dev server is answering.");
-      return { server, logFd };
+      return { server, logFd, baseUrl: BASE_URL };
     }
     await Bun.sleep(1_000);
   }
@@ -209,9 +232,9 @@ type PlaywrightCookie = Parameters<BrowserContext["addCookies"]>[0][number];
  * context trips parsing the relative response URL under Bun when storing
  * cookies, so we stay out of its HTTP stack.)
  */
-async function signIn(context: BrowserContext, password: string): Promise<void> {
+async function signIn(context: BrowserContext, password: string, baseUrl: string): Promise<void> {
   log(`Signing in as ${ADMIN_EMAIL} via /api/auth/sign-in/email…`);
-  const response = await fetch(`${BASE_URL}/api/auth/sign-in/email`, {
+  const response = await fetch(`${baseUrl}/api/auth/sign-in/email`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ email: ADMIN_EMAIL, password }),
@@ -284,8 +307,9 @@ interface PageReport {
 async function auditPage(
   context: BrowserContext,
   target: (typeof PAGES)[number],
+  baseUrl: string,
 ): Promise<PageReport> {
-  const url = `${BASE_URL}${target.path}`;
+  const url = `${baseUrl}${target.path}`;
   const page = await context.newPage();
   try {
     await page.goto(url, { waitUntil: "load", timeout: 180_000 });
@@ -334,18 +358,18 @@ async function main(): Promise<void> {
   await ensureTestStack();
   await seedAdmin(password);
 
-  const { server, logFd } = await ensureDevServer();
+  const { server, logFd, baseUrl } = await ensureDevServer();
   let browser: Browser | null = null;
 
   try {
     browser = await chromium.launch();
-    const context = await browser.newContext({ baseURL: BASE_URL });
-    await signIn(context, password);
+    const context = await browser.newContext({ baseURL: baseUrl });
+    await signIn(context, password, baseUrl);
 
     const reports: PageReport[] = [];
     for (const target of PAGES) {
       log(`Auditing ${target.path} …`);
-      const report = await auditPage(context, target);
+      const report = await auditPage(context, target, baseUrl);
       reports.push(report);
       await Bun.write(
         `${OUTPUT_DIR}/axe-${target.slug}.json`,
@@ -376,7 +400,7 @@ async function main(): Promise<void> {
       JSON.stringify(
         {
           generatedAt: new Date().toISOString(),
-          baseUrl: BASE_URL,
+          baseUrl,
           pages: reports.map((report) => ({
             slug: report.slug,
             module: report.module,

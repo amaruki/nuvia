@@ -3,6 +3,7 @@
   "plugins": ["jsx-a11y"],
   "rules": {
     "no-console": "error",
+    "max-lines": ["warn", { "max": 300, "skipBlankLines": true, "skipComments": true }],
     "jsx-a11y/alt-text": "error",
     "jsx-a11y/anchor-has-content": "error",
     "jsx-a11y/anchor-is-valid": "error",

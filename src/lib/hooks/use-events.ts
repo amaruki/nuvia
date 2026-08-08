@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Event, EventFilter, EventListResponse, EventDetailsResponse } from "@/types/event.types";
-import { getEvents, getEventById } from "@/lib/services/event.service";
+import { getEvents, getEventById } from "@/lib/services/event";
 import { logger } from "@/lib/logger";
 
 /**

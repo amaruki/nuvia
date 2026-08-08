@@ -16,7 +16,7 @@ import {
   Award,
 } from "lucide-react";
 import { Event, EventRegistration, EventStatistics } from "@/types/event.types";
-import { getEventDashboardData, getEventStatistics } from "@/lib/services/event.service";
+import { getEventDashboardData, getEventStatistics } from "@/lib/services/event";
 import { EventListLayout } from "@/components/events/event-list-layout";
 
 export default function EventDashboardPage() {

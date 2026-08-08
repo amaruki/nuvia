@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, CheckCircle, AlertCircle, Clock, Hourglass } from "lucide-react";
 import { Event, EventRegistration } from "@/types/event.types";
-import { getEventById, registerForEvent } from "@/lib/services/event.service";
+import { getEventById, registerForEvent } from "@/lib/services/event";
 import { EventLayout } from "@/components/events/event-layout";
 
 export default function EventRegistrationPage() {

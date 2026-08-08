@@ -6,7 +6,7 @@ import { EventCard } from "@/components/events";
 import { Button } from "@/components/ui/button";
 import { Calendar, ArrowRight } from "lucide-react";
 import { Event, EventStatus } from "@/types/event.types";
-import { getEvents } from "@/lib/services/event.service";
+import { getEvents } from "@/lib/services/event";
 
 interface EnhancedUpcomingEventsWidgetProps {
   limit?: number;

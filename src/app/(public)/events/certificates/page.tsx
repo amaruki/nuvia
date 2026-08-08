@@ -5,7 +5,7 @@ import { EventCertificateList } from "@/components/events";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Award, Download, ExternalLink } from "lucide-react";
 import { EventCertificate, Event } from "@/types/event.types";
-import { getUserEventRegistrations, getEventCertificate } from "@/lib/services/event.service";
+import { getUserEventRegistrations, getEventCertificate } from "@/lib/services/event";
 import { EventListLayout } from "@/components/events/event-list-layout";
 
 export default function EventCertificatesPage() {

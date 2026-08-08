@@ -18,7 +18,7 @@ import {
 import { ArrowLeft, Save, X, Plus } from "lucide-react";
 import { EventType, EventStatus, Event } from "@/types/event.types";
 import { EventLayout } from "@/components/events/event-layout";
-import { getEventById } from "@/lib/services/event.service";
+import { getEventById } from "@/lib/services/event";
 import { logger } from "@/lib/logger";
 
 const eventTypeOptions = [

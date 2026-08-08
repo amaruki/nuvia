@@ -6,7 +6,7 @@
  * component cannot hold an authenticated client session.
  *
  * This module imports the database client, so it must never be imported from
- * client components. The client-side counterpart (src/lib/services/event.service.ts)
+ * client components. The client-side counterpart (src/lib/services/event/)
  * reaches the same data over the API via fetch.
  */
 

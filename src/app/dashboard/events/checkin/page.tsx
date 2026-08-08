@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ScanLine, Users } from "lucide-react";
 import { useHeader } from "@/contexts/dashboard-context";
-import { getEvents } from "@/lib/services/event.service";
+import { getEvents } from "@/lib/services/event";
 import { formatDate, formatTime } from "@/lib/utils/event-utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

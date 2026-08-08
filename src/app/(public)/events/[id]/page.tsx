@@ -9,7 +9,7 @@ import { AsyncContent } from "@/components/ui/async-content";
 import { ArrowLeft, Ban, Edit, Share2, QrCode } from "lucide-react";
 import { RegistrationStatus } from "@/types/event.types";
 import { useEvent } from "@/lib/hooks/use-events";
-import { cancelEventRegistration } from "@/lib/services/event.service";
+import { cancelEventRegistration } from "@/lib/services/event";
 
 export default function EventDetailsPage() {
   const params = useParams();

@@ -6,7 +6,7 @@ import { EventCertificateList } from "@/components/events";
 import { Button } from "@/components/ui/button";
 import { Award, ArrowRight } from "lucide-react";
 import { EventCertificate, Event } from "@/types/event.types";
-import { getUserEventRegistrations } from "@/lib/services/event.service";
+import { getUserEventRegistrations } from "@/lib/services/event";
 
 interface EnhancedCertificatesWidgetProps {
   limit?: number;

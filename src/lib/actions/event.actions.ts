@@ -23,7 +23,7 @@ import {
   registerForEvent,
   cancelEventRegistration,
   checkInToEvent,
-} from "@/lib/services/event.service";
+} from "@/lib/services/event";
 import { createSuccessResponse, createErrorResponse, ValidationError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 import {

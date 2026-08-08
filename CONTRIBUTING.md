@@ -33,6 +33,8 @@ Install Docker with Docker Compose before you run the integration tests.
 
 Run `bun run guard:heavy` locally before you open a PR. The integration test command starts an isolated PostgreSQL and Redis stack.
 
+The formatting standard is pinned in `.oxfmtrc.json`, so `oxfmt` formats identically on every machine and every oxfmt version. Do not run `oxfmt --init` or change the pinned options casually; the pre-commit gate enforces exactly this configuration.
+
 ## Commit messages
 
 Use the format `<type>(<scope>): <subject>`, in the imperative mood, under 80 characters. Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `perf`, `ci`, `build`, `revert`. Keep one logical concern in each commit. See the Drizzle migration's commit history for the pattern. It landed the ORM migration, the dependency-bump fallout, and a formatting pass as three separate commits, not one.

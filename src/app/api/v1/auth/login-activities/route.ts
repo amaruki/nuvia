@@ -1,11 +1,21 @@
 import { NextRequest } from "next/server";
+import { count, desc, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
-import { logError } from "@/lib/errors";
+import { db } from "@/db/client";
+import { userLoginActivity } from "@/db/schema";
 import { problemResponse, problems, successResponse } from "@/lib/http";
+import { logger } from "@/lib/logger";
 
+/**
+ * GET /api/v1/auth/login-activities — the caller's own login history.
+ *
+ * Replaced the placeholder that always returned an empty list. Queries
+ * the userLoginActivity table the schema always had, scoped strictly to
+ * the caller's user id (there is no way to ask for someone else's),
+ * newest first.
+ */
 export async function GET(request: NextRequest) {
   try {
-    // Get authenticated user using better-auth
     const session = await auth.api.getSession({
       headers: request.headers,
     });
@@ -14,16 +24,35 @@ export async function GET(request: NextRequest) {
       return problemResponse(problems.authenticationRequired());
     }
 
-    // Get query parameters for pagination
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const parsedPage = parseInt(searchParams.get("page") || "1", 10);
+    const parsedLimit = parseInt(searchParams.get("limit") || "10", 10);
+    const page = Number.isFinite(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
+    const limit = Number.isFinite(parsedLimit) ? Math.min(Math.max(parsedLimit, 1), 50) : 10;
+    const offset = (page - 1) * limit;
 
-    // TODO: this is a placeholder — src/db/schema/users.ts's
-    // userLoginActivity table already exists for exactly this, this route
-    // just never queries it. See TODO.md.
-    const activities: any[] = [];
-    const total = 0;
+    const whereClause = eq(userLoginActivity.userId, session.user.id);
+
+    const [{ value: total }] = await db
+      .select({ value: count() })
+      .from(userLoginActivity)
+      .where(whereClause);
+
+    const activities = await db
+      .select({
+        id: userLoginActivity.id,
+        ipAddress: userLoginActivity.ipAddress,
+        userAgent: userLoginActivity.userAgent,
+        deviceType: userLoginActivity.deviceType,
+        location: userLoginActivity.location,
+        loginAt: userLoginActivity.loginAt,
+        successful: userLoginActivity.successful,
+      })
+      .from(userLoginActivity)
+      .where(whereClause)
+      .orderBy(desc(userLoginActivity.loginAt))
+      .limit(limit)
+      .offset(offset);
 
     return successResponse({
       activities,
@@ -35,14 +64,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    // Log the error for debugging
-    logError(error as Error, {
-      endpoint: "/api/v1/auth/login-activities",
-      method: "GET",
-      ip: request.headers.get("x-forwarded-for") || "unknown",
-      userAgent: request.headers.get("user-agent") || "unknown",
-    });
-
+    logger.error("Error retrieving login activities", error);
     return problemResponse(
       problems.internalError("An unexpected error occurred while retrieving login activities"),
     );

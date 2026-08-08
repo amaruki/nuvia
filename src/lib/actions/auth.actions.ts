@@ -2,6 +2,7 @@
 
 import { AuthUtils } from "@/lib/auth/utils";
 import { AuthError, AuthErrorType } from "@/lib/auth/common";
+import { recordLoginAttempt, resolveLoginIdentifier } from "@/lib/auth/login-activity";
 import {
   loginSchema,
   signupSchema,
@@ -48,27 +49,49 @@ export async function loginAction(formData: FormData): Promise<AuthResponse> {
     // Validate input
     const validatedData = loginSchema.parse({ emailOrUsername, password });
 
-    // Use Better Auth API for sign in
-    const result = await auth.api.signInEmail({
-      body: {
-        email: validatedData.emailOrUsername,
-        password: validatedData.password,
-      },
-    });
+    // The field accepts a username too, but signInEmail only understands
+    // emails — resolve it first. Without this, username sign-in silently
+    // failed for every user.
+    const email = await resolveLoginIdentifier(validatedData.emailOrUsername);
+    const requestHeaders = await headers();
 
-    // Better Auth returns session/user object or throws errors
-    return {
-      success: true,
-      message: "Login successful",
-      data: {
-        user: transformUserToSafeUser(result.user),
-        session: {
-          accessToken: result.token,
-          refreshToken: result.token, // Better Auth might use the same token
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+    try {
+      // Use Better Auth API for sign in
+      const result = await auth.api.signInEmail({
+        body: {
+          email: email,
+          password: validatedData.password,
         },
-      },
-    };
+      });
+
+      await recordLoginAttempt({
+        emailOrUsername: email,
+        successful: true,
+        headers: requestHeaders,
+      });
+
+      // Better Auth returns session/user object or throws errors
+      return {
+        success: true,
+        message: "Login successful",
+        data: {
+          user: transformUserToSafeUser(result.user),
+          session: {
+            accessToken: result.token,
+            refreshToken: result.token, // Better Auth might use the same token
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+          },
+        },
+      };
+    } catch (signInError) {
+      await recordLoginAttempt({
+        emailOrUsername: email,
+        successful: false,
+        headers: requestHeaders,
+      });
+
+      throw signInError;
+    }
   } catch (error) {
     return {
       success: false,

@@ -1,0 +1,70 @@
+/**
+ * Shared helpers for the /api/v1/finance routes (backlog C2).
+ * - one error→RFC 9457 mapping for the finance services,
+ * - one actor builder (audit context from the request),
+ * - one tolerant JSON body parser (lifecycle actions accept an empty body).
+ */
+
+import type { NextRequest, NextResponse } from "next/server";
+import { BusinessLogicError, NotFoundError } from "@/lib/errors";
+import { problem, problems, problemResponse, type ProblemDetails } from "@/lib/http";
+import { logger } from "@/lib/logger";
+import type { ActorContext } from "@/lib/services/subscription.service";
+
+/** Business-rule violations that collide with current resource state map to 409. */
+const CONFLICT_CODES = new Set([
+  "INVALID_TRANSITION",
+  "SUBSCRIPTION_ALREADY_ACTIVE",
+  "SUBSCRIPTION_STILL_ENTITLED",
+  "TIER_NAME_TAKEN",
+  "TIER_IN_USE",
+  "TIER_INACTIVE",
+]);
+
+export function problemFromFinanceError(error: unknown, context: string): ProblemDetails {
+  if (error instanceof NotFoundError) {
+    return problems.notFound(error.message);
+  }
+  if (error instanceof BusinessLogicError) {
+    return CONFLICT_CODES.has(error.code)
+      ? problems.conflict(error.message)
+      : problems.businessLogicError(error.message);
+  }
+  logger.error(context, error);
+  return problems.internalError("An unexpected error occurred");
+}
+
+/** Audit context for the subscription engine: acting user + request origin. */
+export function actorFromRequest(
+  userId: string,
+  request: NextRequest,
+  reason?: string,
+): ActorContext {
+  return {
+    actorId: userId,
+    reason,
+    ipAddress:
+      request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? undefined,
+    userAgent: request.headers.get("user-agent") ?? undefined,
+  };
+}
+
+/**
+ * Lifecycle actions are POSTs that may carry no body at all — treat an empty
+ * body as `{}` instead of failing JSON parsing.
+ */
+export async function parseOptionalJsonBody(
+  request: NextRequest,
+): Promise<{ ok: true; body: unknown } | { ok: false; response: NextResponse }> {
+  const text = await request.text();
+  if (text.length === 0) return { ok: true, body: {} };
+
+  try {
+    return { ok: true, body: JSON.parse(text) };
+  } catch {
+    return {
+      ok: false,
+      response: problemResponse(problem("invalid-json", 400, "Invalid JSON body")),
+    };
+  }
+}

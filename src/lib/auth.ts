@@ -430,10 +430,35 @@ export const auth = betterAuth({
     max: 100, // 100 requests per minute
   },
 
-  // Email verification configuration
+  // Email verification configuration. Key name matters: better-auth reads
+  // sendVerificationEmail/expiresIn from `emailVerification`, not from the
+  // `verification` block below (that one only configures the verification
+  // table's storage). The previous config put expiresIn under
+  // `verification`, where it was ignored, and never configured a sender —
+  // so no verification email was ever sent and the verify-email route had
+  // nothing to verify.
+  emailVerification: {
+    sendOnSignUp: true,
+    expiresIn: 300, // 5 minutes
+    sendVerificationEmail: async ({ user, url }) => {
+      const template = await emailTemplates.emailVerification(url, user.name || user.email);
+      const result = await emailService.sendEmail({
+        to: user.email,
+        subject: template.subject,
+        text: template.text,
+        html: template.html,
+      });
+
+      if (!result.success) {
+        logger.error("Failed to send email verification email", result.error);
+        throw new Error("Failed to send email verification email");
+      }
+    },
+  },
+
+  // Verification-table storage behavior (cleanup of expired rows stays on).
   verification: {
     disableCleanup: false,
-    expiresIn: 300, // 5 minutes
   },
 
   // Next.js cookies plugin

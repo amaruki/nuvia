@@ -18,16 +18,14 @@ function findRouteFiles(dir: string, acc: string[] = []): string[] {
 }
 
 const AUTH_CALL_PATTERN =
-  /requirePermission|requireRole|auth\.api\.(getSession|signInEmail|signUpEmail|requestPasswordReset|resetPassword|changePassword|deleteUser|updateUser|listSessions|revokeSession|revokeOtherSessions)/;
+  /requirePermission|requireRole|auth\.api\.(getSession|signInEmail|signUpEmail|requestPasswordReset|resetPassword|changePassword|deleteUser|updateUser|listSessions|revokeSession|revokeOtherSessions|verifyEmail)/;
 
-// verify-email is a known, tracked exception (TODO.md: "found along the
-// way, not yet fixed") — it's a placeholder that doesn't call
-// better-auth's real verifyEmail endpoint, and fixing it properly also
-// needs emailVerification.sendVerificationEmail configured in auth.ts
-// (unconfigured today, so no verification token is ever actually issued
-// end-to-end) — a bigger change than this test's scope. Listed explicitly
-// so this stays a deliberate, visible exception rather than a silent gap.
-const KNOWN_EXCEPTIONS = new Set(["auth/verify-email/route.ts"]);
+// verify-email used to be the one named exception here: a placeholder that
+// never called better-auth's verifyEmail endpoint. That is fixed — the
+// route now delegates to auth.api.verifyEmail — so the exception list is
+// empty. A future placeholder route should not be added to it lightly;
+// this list exists to make gaps deliberate and visible, not to hide them.
+const KNOWN_EXCEPTIONS = new Set<string>();
 
 describe("every /api/v1/** route calls an authorization/session-check helper", () => {
   const routeFiles = findRouteFiles(API_V1_DIR);

@@ -37,6 +37,11 @@ export const RATE_LIMITS = {
   resetPassword: { windowSeconds: 60 * 60, max: 3 },
   // 5 / hour — matches the pre-migration REGISTRATION config.
   signup: { windowSeconds: 60 * 60, max: 5 },
+  // 10 / 15 minutes — token verification. Tokens are signed JWTs and not
+  // brute-forceable, but this endpoint is public and server-side auth.api
+  // calls bypass better-auth's own HTTP-layer limiter (ADR-0003's reason
+  // for this file existing), so it gets its own bucket like the rest.
+  verifyEmail: { windowSeconds: 15 * 60, max: 10 },
   // 100 / 15 minutes — the generic /api/** backstop proxy.ts applies to
   // everything else (matches the pre-migration API config).
   api: { windowSeconds: 15 * 60, max: 100 },

@@ -25,8 +25,9 @@ const seedPassword = process.env.SEED_ADMIN_PASSWORD;
 if (!seedPassword) {
   console.error(
     "SEED_ADMIN_PASSWORD is not set. Refusing to seed admin accounts with a " +
-      "guessable or shared password. Set it to a strong password before running " +
-      "`bun run db:seed`, e.g.:\n\n  SEED_ADMIN_PASSWORD=$(openssl rand -base64 24) bun run db:seed\n",
+      "guessable or shared password. Set it to a strong password you will " +
+      "remember — you will sign in with it — before running `bun run db:seed`, e.g.:\n\n" +
+      "  SEED_ADMIN_PASSWORD='your-strong-password' bun run db:seed\n",
   );
   process.exit(1);
 }
@@ -186,6 +187,14 @@ async function main() {
   created.forEach((admin, index) => {
     console.log(`${index + 1}. ${admin.email} (${admin.role})`);
   });
+
+  console.log("\nHOW TO SIGN IN:");
+  console.log("  - Open /auth/login in your browser.");
+  console.log("  - Use any email or username above with the password you passed as");
+  console.log("    SEED_ADMIN_PASSWORD when you ran this script.");
+  console.log("  - The password is not printed here for security. If you did not");
+  console.log("    note it, re-run the seed with a password you will remember:");
+  console.log("      SEED_ADMIN_PASSWORD='your-password' bun run db:seed");
 
   console.log("\nSECURITY WARNING:");
   console.log("  - Rotate these passwords after first login.");

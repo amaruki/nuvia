@@ -68,7 +68,7 @@ export default function OAuthCallbackPage() {
 
           // Redirect to dashboard after a short delay
           setTimeout(() => {
-            router.push("/dashboard");
+            window.location.assign("/dashboard");
           }, 2000);
         } else {
           // If no session, check if we have OAuth callback parameters
@@ -117,7 +117,7 @@ export default function OAuthCallbackPage() {
 
                 // Redirect to dashboard after a short delay
                 setTimeout(() => {
-                  router.push("/dashboard");
+                  window.location.assign("/dashboard");
                 }, 2000);
               }
             } catch (oauthError) {

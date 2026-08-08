@@ -17,9 +17,12 @@ bun install   # also installs git hooks — see below
 cp .env.example .env.local
 # fill in DATABASE_URL, BETTER_AUTH_SECRET at minimum
 bun run db:generate && bun run db:push
-SEED_ADMIN_PASSWORD=$(openssl rand -base64 24) bun run db:seed
+SEED_ADMIN_PASSWORD='your-strong-password' bun run db:seed   # remember it — you sign in with it
 bun run dev
 ```
+
+Sign in at `/auth/login` with any seeded account (for example `admin@nuvia.com`)
+and the password you passed as `SEED_ADMIN_PASSWORD`.
 
 ## The enforcement you will actually hit
 

@@ -53,12 +53,12 @@ export function useSession(): SessionData {
   const transformUserData = useCallback((authUser: any): User => {
     return {
       id: authUser.user.id,
-      username: (authUser.user as any).username || authUser.user.name || "",
+      username: authUser.user.username || authUser.user.name || "",
       email: authUser.user.email,
-      displayName: authUser.user.name || (authUser.user as any).displayName || undefined,
+      displayName: authUser.user.name || authUser.user.displayName || undefined,
       image: authUser.user.image || undefined,
-      bio: (authUser.user as any).bio || undefined,
-      role: (authUser.user as any).role || "admin",
+      bio: authUser.user.bio || undefined,
+      role: authUser.user.role || "user",
       createdAt: new Date(authUser.user.createdAt),
       updatedAt: new Date(authUser.user.updatedAt),
     };

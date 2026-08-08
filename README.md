@@ -71,11 +71,14 @@ The integration test command starts isolated PostgreSQL and Redis containers. It
    bun run db:push       # apply it (dev) — or db:migrate for a tracked migration
    ```
 
-5. Seed an admin account. This step **requires an explicit password**, on purpose. An earlier seed script hardcoded one shared password across five privileged accounts (see [ADR-0009](docs/adr/0009-security-hardening-p0.md)):
+5. Seed an admin account. This step **requires an explicit password**, on purpose. An earlier seed script hardcoded one shared password across five privileged accounts (see [ADR-0009](docs/adr/0009-security-hardening-p0.md)). Pick a strong password you will remember — you will use it to sign in as every seeded account:
 
    ```bash
-   SEED_ADMIN_PASSWORD=$(openssl rand -base64 24) bun run db:seed
+   SEED_ADMIN_PASSWORD='your-strong-password' bun run db:seed
    ```
+
+   Then sign in at [/auth/login](http://localhost:3000/auth/login) using any seeded
+   account (for example `admin@nuvia.com`) and the password you just set.
 
 6. Start the development server:
 

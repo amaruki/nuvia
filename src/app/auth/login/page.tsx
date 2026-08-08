@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,13 +9,12 @@ import { animate } from "animejs";
 import { useSession } from "@/hooks/use-session";
 import { useOAuthLogin } from "@/hooks/use-oauth-login";
 import { extractOAuthError, cleanOAuthUrlParams } from "@/lib/utils/oauth-utils";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { AuthLayoutWrapper } from "@/components/auth/auth-layout";
 import { OAuthButton } from "@/components/auth/oauth-button";
-import { FormMessage } from "@/components/auth/form-message";
 import { FormDivider } from "@/components/auth/form-divider";
 import { loginAction } from "@/lib/actions/auth.actions";
 import { logger } from "@/lib/logger";
@@ -30,11 +29,11 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isPending } = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
+  const redirectedRef = useRef(false);
 
   const {
     register,
@@ -53,16 +52,30 @@ function LoginForm() {
     },
   });
 
-  // Redirect authenticated users to dashboard or requested page
+  // Redirect authenticated users to dashboard or requested page.
+  //
+  // Hard-navigate so the session is re-validated by a full page load. A soft
+  // router.push keeps better-auth's in-memory session store alive; if that
+  // store is stale (session revoked server-side), the middleware bounces
+  // /dashboard back here and the stale store pushes straight back again — an
+  // infinite login/dashboard redirect loop.
+  //
+  // Two loop hazards this effect must avoid:
+  //  1. No cleanOAuthUrlParams() here — its history.replaceState makes Next.js
+  //     refresh useSearchParams(), which re-runs this effect, and every re-run
+  //     aborts the in-flight /dashboard navigation before it can commit.
+  //  2. redirectedRef guards against re-runs issuing repeated assigns.
   useEffect(() => {
-    if (!isPending && user) {
-      const redirectTo = searchParams.get("redirectTo") || "/dashboard";
-      // Clear any OAuth errors before redirecting
-      cleanOAuthUrlParams();
-      router.push(redirectTo);
-      return; // Prevent any further rendering
+    if (!isPending && user && !redirectedRef.current) {
+      redirectedRef.current = true;
+      const redirectTo = searchParams.get("redirectTo");
+      const target =
+        redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+          ? redirectTo
+          : "/dashboard";
+      window.location.assign(target);
     }
-  }, [user, isPending, router, searchParams]);
+  }, [user, isPending, searchParams]);
 
   // Handle OAuth callback errors and animations
   useEffect(() => {
@@ -102,6 +115,7 @@ function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
+    let navigating = false;
 
     try {
       const formData = new FormData();
@@ -111,19 +125,29 @@ function LoginForm() {
       const result = await loginAction(formData);
 
       if (result.success) {
-        toast.success("Login successful! Redirecting...");
-        setTimeout(() => {
-          const redirectTo = searchParams.get("redirectTo") || "/dashboard";
-          router.push(redirectTo);
-        }, 1500);
-      } else {
-        toast.error(result.message || "Login failed");
+        const redirectTo = searchParams.get("redirectTo");
+        const target =
+          redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+            ? redirectTo
+            : "/dashboard";
+        // Hard-navigate rather than router.push: the session cookie has just
+        // landed, but better-auth's client session store still holds the
+        // pre-login "no session" result. A full page load re-fetches the
+        // session with the cookie, so protected pages render for the signed-in
+        // user instead of flashing "you must be logged in".
+        navigating = true;
+        window.location.assign(target);
+        return;
       }
+
+      toast.error(result.message || "Login failed");
     } catch (err) {
       toast.error("An unexpected error occurred. Please try again.");
       logger.error("An unexpected error occurred. Please try again.", err);
     } finally {
-      setIsLoading(false);
+      if (!navigating) {
+        setIsLoading(false);
+      }
     }
   };
 

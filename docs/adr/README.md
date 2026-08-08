@@ -17,3 +17,4 @@ This directory contains one ADR file for each decision. Each of these decisions 
 | [0011](0011-prisma-to-drizzle.md)               | Prisma → Drizzle ORM migration                         | Implemented                                |
 | [0012](0012-bun-package-manager-and-runtime.md) | Bun is the canonical package manager and runtime       | Accepted, implemented                      |
 | [0013](0013-oxlint-oxfmt-toolchain.md)          | oxlint + oxfmt replace ESLint + Prettier               | Accepted, implemented                      |
+| [0014](0014-member-status-from-subscription.md) | Member status derives from the subscription lifecycle  | Accepted, implemented                      |

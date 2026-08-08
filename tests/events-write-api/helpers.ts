@@ -15,7 +15,7 @@ import {
   EventWriteError,
   type CreateEventInput,
   type EventDto,
-} from "@/lib/services/event-write.service";
+} from "@/lib/services/event-write";
 import {
   RegistrationServiceError,
   type DbRegistrationStatus,

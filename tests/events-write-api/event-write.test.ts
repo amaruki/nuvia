@@ -1,6 +1,6 @@
 /**
  * Integration tests for the event write service core (backlog B3):
- * event-write.service.ts → POST/PATCH/DELETE /api/v1/events[...]
+ * src/lib/services/event-write/ → POST/PATCH/DELETE /api/v1/events[...]
  *
  * Part of the tests/events-write-api/ split of the former
  * tests/events-write-api.test.ts. Fixtures and FK-order teardown live in
@@ -17,7 +17,7 @@ import {
   deleteEvent,
   updateEvent,
   EventWriteError,
-} from "@/lib/services/event-write.service";
+} from "@/lib/services/event-write";
 import { createRegistration } from "@/lib/services/registration.service";
 import {
   baseEventInput,

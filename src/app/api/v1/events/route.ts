@@ -3,7 +3,7 @@ import { requirePermission } from "@/lib/rbac";
 import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 import { logger } from "@/lib/logger";
 import { listEvents, listEventsQuerySchema } from "@/lib/services/event-read.service";
-import { createEvent, createEventSchema } from "@/lib/services/event-write.service";
+import { createEvent, createEventSchema } from "@/lib/services/event-write";
 import { handleEventRoute } from "./_lib";
 
 /**

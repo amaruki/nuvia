@@ -5,7 +5,7 @@
 import type { NextResponse } from "next/server";
 import { problemResponse, problems } from "@/lib/http";
 import { logger } from "@/lib/logger";
-import { EventWriteError } from "@/lib/services/event-write.service";
+import { EventWriteError } from "@/lib/services/event-write";
 import { RegistrationServiceError } from "@/lib/services/registration.service";
 
 /** Maps service errors to RFC 9457 responses; anything else is a 500. */

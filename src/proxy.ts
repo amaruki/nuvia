@@ -99,12 +99,18 @@ async function authenticate(request: NextRequest): Promise<{ success: boolean; u
  */
 function isPublicEndpoint(pathname: string): boolean {
   const publicEndpoints = [
-    "/api/auth/callback", // OAuth callbacks
-    "/api/v1/auth/login", // Login endpoints
-    "/api/v1/auth/register", // Registration endpoints
-    "/api/v1/auth/reset-password", // Password reset
-    "/api/v1/auth/verify-email", // Email verification
-    // TODO: Add other public endpoints as needed
+    // better-auth's own base path handles its own authentication per
+    // endpoint (sign-in, sign-up, session, OAuth). Gating it behind the
+    // proxy's session check blocked anonymous flows — sign-in, sign-up,
+    // OAuth — for any client calling the HTTP API directly. The custom
+    // cache-* routes under this prefix do their own session checks.
+    "/api/auth/",
+    // Anonymous-by-design v1 auth endpoints.
+    "/api/v1/auth/login",
+    "/api/v1/auth/signup",
+    "/api/v1/auth/forgot-password",
+    "/api/v1/auth/reset-password",
+    "/api/v1/auth/verify-email",
   ];
 
   return publicEndpoints.some((endpoint) => pathname.startsWith(endpoint));

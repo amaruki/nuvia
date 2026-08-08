@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ForumLayout } from "./forum-layout";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Check, X, AlertTriangle, User, Shield, RefreshCw, Filter } from "lucide-react";
+import { Check, X, User, Shield, RefreshCw, Filter } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,11 +14,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { getMockModerationQueue, ForumPost } from "@/lib/data/mock-forums";
+import { useModeratePost, useModerationQueue } from "@/lib/hooks/use-forums";
 import { formatDistanceToNow } from "date-fns";
 import {
   Select,
@@ -27,12 +26,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 
 export function ModerationQueue() {
-  const [posts, setPosts] = useState<ForumPost[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: queue = [], isLoading, refetch } = useModerationQueue();
+  const moderatePost = useModeratePost();
   const [rejectDialog, setRejectDialog] = useState<{ open: boolean; postId: string | null }>({
     open: false,
     postId: null,
@@ -40,25 +38,19 @@ export function ModerationQueue() {
   const [rejectReason, setRejectReason] = useState("Violation of community guidelines");
   const [filter, setFilter] = useState("all");
 
-  useEffect(() => {
-    loadQueue();
-  }, []);
-
-  const loadQueue = async () => {
-    setIsLoading(true);
-    try {
-      const data = await getMockModerationQueue();
-      setPosts(data);
-    } catch (error) {
-      logger.error("Failed to load moderation queue", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const posts = queue.filter((post) => {
+    if (filter === "reported") return post.reportCount > 0;
+    if (filter === "high_risk") return post.reportCount >= 2;
+    return true;
+  });
 
   const handleApprove = (id: string) => {
-    setPosts((prev) => prev.filter((p) => p.id !== id));
-    // In real app, call approve API
+    moderatePost.mutate(
+      { postId: id, action: "approve" },
+      {
+        onError: (error) => logger.error("Failed to approve post", error),
+      },
+    );
   };
 
   const openRejectDialog = (id: string) => {
@@ -67,8 +59,12 @@ export function ModerationQueue() {
 
   const handleReject = () => {
     if (rejectDialog.postId) {
-      setPosts((prev) => prev.filter((p) => p.id !== rejectDialog.postId));
-      // In real app, call reject API with reason
+      moderatePost.mutate(
+        { postId: rejectDialog.postId, action: "reject", reason: rejectReason },
+        {
+          onError: (error) => logger.error("Failed to reject post", error),
+        },
+      );
     }
     setRejectDialog({ open: false, postId: null });
     setRejectReason("Violation of community guidelines");
@@ -92,7 +88,7 @@ export function ModerationQueue() {
               <SelectItem value="high_risk">High Risk</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={loadQueue} className="gap-2">
+          <Button variant="outline" onClick={() => void refetch()} className="gap-2">
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>

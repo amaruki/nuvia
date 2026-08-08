@@ -1,15 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ForumLayout } from "./forum-layout";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +23,6 @@ import {
   ClipboardList,
   Trash2,
   Edit,
-  GripVertical,
   Layers,
 } from "lucide-react";
 import {
@@ -42,10 +34,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { getMockCategories, ForumCategory } from "@/lib/data/mock-forums";
+import type { ForumCategory } from "@/types/forum.types";
+import {
+  useCreateForumCategory,
+  useDeleteForumCategory,
+  useForumCategories,
+  useUpdateForumCategory,
+} from "@/lib/hooks/use-forums";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -56,34 +52,23 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export function CategoryManager() {
-  const [categories, setCategories] = useState<ForumCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: categories = [], isLoading } = useForumCategories();
+  const createCategory = useCreateForumCategory();
+  const updateCategory = useUpdateForumCategory();
+  const deleteCategory = useDeleteForumCategory();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [currentCategory, setCurrentCategory] = useState<ForumCategory | null>(null);
 
-  // Form states - simplified for mock
+  // Form states — "name" maps to the category's display name; the API
+  // derives the unique slug from it.
   const [formData, setFormData] = useState({ name: "", description: "" });
-
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  const loadCategories = async () => {
-    setIsLoading(true);
-    try {
-      const data = await getMockCategories();
-      setCategories(data);
-    } catch (error) {
-      logger.error("Failed to load categories", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this category?")) {
-      setCategories((prev) => prev.filter((c) => c.id !== id));
+      deleteCategory.mutate(id, {
+        onError: (error) => logger.error("Failed to delete category", error),
+      });
     }
   };
 
@@ -94,28 +79,33 @@ export function CategoryManager() {
   };
 
   const handleUpdate = () => {
-    if (currentCategory) {
-      setCategories((prev) =>
-        prev.map((c) => (c.id === currentCategory.id ? { ...c, ...formData } : c)),
-      );
-      setIsEditOpen(false);
-      setCurrentCategory(null);
-    }
+    if (!currentCategory) return;
+    updateCategory.mutate(
+      {
+        id: currentCategory.id,
+        input: { name: formData.name, description: formData.description },
+      },
+      {
+        onSuccess: () => {
+          setIsEditOpen(false);
+          setCurrentCategory(null);
+        },
+        onError: (error) => logger.error("Failed to update category", error),
+      },
+    );
   };
 
   const handleCreate = () => {
-    const newCat: ForumCategory = {
-      id: `new-${Date.now()}`,
-      name: formData.name,
-      description: formData.description,
-      icon: "MessageSquare",
-      color: "#6b7280",
-      postCount: 0,
-      createdAt: new Date().toISOString(),
-    };
-    setCategories([...categories, newCat]);
-    setIsCreateOpen(false);
-    setFormData({ name: "", description: "" });
+    createCategory.mutate(
+      { name: formData.name, description: formData.description },
+      {
+        onSuccess: () => {
+          setIsCreateOpen(false);
+          setFormData({ name: "", description: "" });
+        },
+        onError: (error) => logger.error("Failed to create category", error),
+      },
+    );
   };
 
   return (
@@ -289,7 +279,12 @@ export function CategoryManager() {
                       <Input
                         id="desc"
                         value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            description: e.target.value,
+                          })
+                        }
                         placeholder="What is this category for?"
                       />
                     </div>

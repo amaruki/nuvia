@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ForumLayout } from "./forum-layout";
 import {
   Table,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Eye, ShieldAlert, CheckCircle, MoreHorizontal, Flag, RefreshCw } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,7 +30,8 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
-import { getMockReports, Report } from "@/lib/data/mock-forums";
+import type { Report } from "@/types/forum.types";
+import { useForumReports, useResolveReport } from "@/lib/hooks/use-forums";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -38,33 +39,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { logger } from "@/lib/logger";
 
 export function ReportList() {
-  const [reports, setReports] = useState<Report[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: reports = [], isLoading, refetch } = useForumReports();
+  const resolveReport = useResolveReport();
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  useEffect(() => {
-    loadReports();
-  }, []);
-
-  const loadReports = async () => {
-    setIsLoading(true);
-    try {
-      const data = await getMockReports();
-      setReports(data);
-    } catch (error) {
-      logger.error("Failed to load reports", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleResolve = (id: string) => {
-    setReports((prev) => prev.map((r) => (r.id === id ? { ...r, status: "RESOLVED" } : r)));
-    if (selectedReport?.id === id) {
-      setSelectedReport((prev) => (prev ? { ...prev, status: "RESOLVED" } : null));
-    }
-    // In real app, call resolve API
+  const handleResolve = (id: string, deleteContent = false) => {
+    resolveReport.mutate(
+      { id, action: "RESOLVED", deleteContent },
+      {
+        onError: (error) => logger.error("Failed to resolve report", error),
+      },
+    );
   };
 
   const viewDetails = (report: Report) => {
@@ -78,7 +64,7 @@ export function ReportList() {
       description="Investigate and resolve reports from the community."
       total={reports.length}
       actions={
-        <Button variant="outline" onClick={loadReports} className="gap-2">
+        <Button variant="outline" onClick={() => void refetch()} className="gap-2">
           <RefreshCw className="h-4 w-4" />
           Refresh
         </Button>
@@ -274,7 +260,14 @@ export function ReportList() {
                       <CheckCircle className="h-4 w-4" />
                       Resolve Report (Ignore)
                     </Button>
-                    <Button variant="destructive" className="w-full">
+                    <Button
+                      variant="destructive"
+                      className="w-full"
+                      onClick={() => {
+                        handleResolve(selectedReport.id, true);
+                        setIsDetailsOpen(false);
+                      }}
+                    >
                       Delete Content & Resolve
                     </Button>
                   </>

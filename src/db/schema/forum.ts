@@ -1,6 +1,7 @@
 /**
  * Forum — translated from prisma/schema.prisma's "CONTENT MANAGEMENT
- * MODELS" section (forum half). Not wired to any route/service yet.
+ * MODELS" section (forum half). Served by src/lib/services/forum.service.ts
+ * and the /api/v1/forums/** routes.
  */
 
 import { relations } from "drizzle-orm";
@@ -14,7 +15,13 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { commentStatusEnum, postStatusEnum, postTypeEnum } from "./enums";
+import {
+  commentStatusEnum,
+  postStatusEnum,
+  postTypeEnum,
+  reportStatusEnum,
+  reportTargetTypeEnum,
+} from "./enums";
 import { user } from "./users";
 
 export const forumCategory = pgTable("forum_categories", {
@@ -127,6 +134,41 @@ export const forumAttachment = pgTable("forum_attachments", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/**
+ * User-submitted reports against a post or comment. Exactly one of
+ * postId/commentId is set (enforced by the service's zod schemas);
+ * targetType says which.
+ */
+export const forumReport = pgTable(
+  "forum_reports",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    targetType: reportTargetTypeEnum("target_type").notNull(),
+    postId: text("post_id").references(() => forumPost.id, { onDelete: "cascade" }),
+    commentId: text("comment_id").references(() => forumComment.id, { onDelete: "cascade" }),
+    reason: text("reason").notNull(),
+    status: reportStatusEnum("status").notNull().default("PENDING"),
+    reportedById: text("reported_by_id")
+      .notNull()
+      .references(() => user.id),
+    resolvedById: text("resolved_by_id").references(() => user.id),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    index("forum_reports_post_id_idx").on(table.postId),
+    index("forum_reports_comment_id_idx").on(table.commentId),
+    index("forum_reports_status_idx").on(table.status),
+  ],
+);
+
 export const forumCategoryRelations = relations(forumCategory, ({ one, many }) => ({
   parent: one(forumCategory, {
     fields: [forumCategory.parentId],
@@ -155,6 +197,13 @@ export const forumCommentRelations = relations(forumComment, ({ one, many }) => 
   replies: many(forumComment, { relationName: "commentReplies" }),
 }));
 
+export const forumReportRelations = relations(forumReport, ({ one }) => ({
+  post: one(forumPost, { fields: [forumReport.postId], references: [forumPost.id] }),
+  comment: one(forumComment, { fields: [forumReport.commentId], references: [forumComment.id] }),
+  reportedBy: one(user, { fields: [forumReport.reportedById], references: [user.id] }),
+  resolvedBy: one(user, { fields: [forumReport.resolvedById], references: [user.id] }),
+}));
+
 export const forumAttachmentRelations = relations(forumAttachment, ({ one }) => ({
   post: one(forumPost, { fields: [forumAttachment.postId], references: [forumPost.id] }),
 }));
@@ -163,3 +212,4 @@ export type ForumCategory = typeof forumCategory.$inferSelect;
 export type ForumPost = typeof forumPost.$inferSelect;
 export type ForumComment = typeof forumComment.$inferSelect;
 export type ForumAttachment = typeof forumAttachment.$inferSelect;
+export type ForumReport = typeof forumReport.$inferSelect;

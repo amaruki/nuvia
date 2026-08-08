@@ -101,6 +101,7 @@ export const postTypeEnum = pgEnum("PostType", [
 
 export const postStatusEnum = pgEnum("PostStatus", [
   "DRAFT",
+  "PENDING_REVIEW",
   "PUBLISHED",
   "ARCHIVED",
   "DELETED",
@@ -114,6 +115,10 @@ export const commentStatusEnum = pgEnum("CommentStatus", [
   "DELETED",
 ]);
 
+export const reportTargetTypeEnum = pgEnum("ReportTargetType", ["POST", "COMMENT"]);
+
+export const reportStatusEnum = pgEnum("ReportStatus", ["PENDING", "RESOLVED", "DISMISSED"]);
+
 // Content
 export const contentTypeEnum = pgEnum("ContentType", [
   "ARTICLE",
@@ -123,6 +128,7 @@ export const contentTypeEnum = pgEnum("ContentType", [
   "TUTORIAL",
   "DOCUMENTATION",
   "RESOURCE",
+  "PUBLICATION",
   "ANNOUNCEMENT",
 ]);
 

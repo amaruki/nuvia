@@ -44,6 +44,8 @@ Wave B preamble: each item = authorized API + service + UI de-mock + tests for t
   - Why: the content hooks today serve `mock-article-data`/`mock-publication-data` (and inline category mocks) instead of database rows.
   - Acceptance: per the wave bar — authorized `content:*` CRUD API + service + UI de-mock + tests across articles/publications/announcements/categories, with the media sub-decision recorded.
   - Deps: none.
+  - Status: done. Articles/publications/announcements/categories served from the `content` table (discriminated by `type`; new `PUBLICATION` enum value in migration 0003) via `/api/v1/content/**` with `content:*` authorization; UI-only fields round-trip through `content.metadata.ui`; the four mock hooks are API-backed. Tests: `tests/content-api.test.ts`.
+  - Execution note (media sub-decision): chose local-disk storage — uploads write to `storage/uploads/` with metadata in a JSON manifest (`storage/uploads/manifest.json`), because no media table exists and migrations were frozen; no new dependency. Served via `/api/v1/media` + `/api/v1/media/[id]` under `content:*` permissions (no media permission module exists). `use-media` uploads POST real multipart; listing/versions/folders remain service-internal until a media table lands.
 
 - **B5 — Forums real.** Posts/comments/categories CRUD + moderation actions with `forum:*` authorization; de-mock `report-list`, `category-manager`, `moderation-queue`; keep per-category `requiredRole` gate.
   - Why: the forum admin components today read `mock-forums` data.

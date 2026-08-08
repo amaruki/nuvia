@@ -1,17 +1,73 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import {
+import { useCallback, useMemo, useState } from "react";
+import type {
   Publication,
-  PublicationStatistics,
+  PublicationCategory,
   PublicationFilters,
   PublicationFormData,
+  PublicationStatistics,
   PublicationStatus,
   PublicationType,
-  PublicationCategory,
 } from "@/types/publication.types";
-import { mockPublications, mockStatistics } from "@/lib/data/mock-publication-data";
+import {
+  PUBLICATION_CATEGORIES,
+  PUBLICATION_STATUSES,
+  PUBLICATION_TYPES,
+} from "@/types/publication.types";
 import { logger } from "@/lib/logger";
+import {
+  formToPayload,
+  hydrateDate,
+  useContentCollectionApi,
+  type RawContentItem as RawApiItem,
+} from "./use-content-collection";
+
+interface RawContentItem {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  type: string;
+  category: string;
+  status: string;
+  visibility: string;
+  featuredImage?: string;
+  gallery?: string[];
+  attachments?: unknown[];
+  author: {
+    id: string;
+    name: string;
+    email?: string;
+    image?: string;
+    role?: string;
+  };
+  publishedAt?: string | null;
+  scheduledFor?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  readTime?: number;
+  wordCount?: number;
+  difficulty?: string;
+  tags?: string[];
+  ui?: {
+    version?: number;
+    language?: string;
+    isFeatured?: boolean;
+    isPinned?: boolean;
+    priority?: number;
+    commentsEnabled?: boolean;
+    sharingEnabled?: boolean;
+    downloadEnabled?: boolean;
+    seo?: {
+      title: string;
+      description: string;
+      keywords: string[];
+      ogImage?: string;
+    };
+  };
+}
 
 interface UsePublicationsReturn {
   // Data
@@ -76,41 +132,171 @@ const DEFAULT_FILTERS: PublicationFilters = {
 
 const ITEMS_PER_PAGE = 10;
 
+const EMPTY_METRICS = {
+  views: 0,
+  downloads: 0,
+  shares: 0,
+  comments: 0,
+  likes: 0,
+  bookmarks: 0,
+  averageReadTime: 0,
+  bounceRate: 0,
+  engagementScore: 0,
+};
+
+function hydratePublication(raw: RawContentItem): Publication {
+  const ui = raw.ui ?? {};
+  const tags = (raw.tags ?? []).map((t) => ({ id: t, name: t, color: "#6366f1", count: 0 }));
+  const wordCount = raw.wordCount ?? raw.content.split(/\s+/).filter(Boolean).length;
+  return {
+    id: raw.id,
+    title: raw.title,
+    slug: raw.slug,
+    excerpt: raw.excerpt,
+    content: raw.content,
+    type: raw.type as PublicationType,
+    category: raw.category as PublicationCategory,
+    status: raw.status as PublicationStatus,
+    author: {
+      id: raw.author.id,
+      name: raw.author.name,
+      email: raw.author.email ?? "",
+      avatar: raw.author.image,
+      role: raw.author.role ?? "member",
+    },
+    coAuthors: [],
+    tags,
+    featuredImage: raw.featuredImage,
+    gallery: raw.gallery,
+    publishedAt: hydrateDate(raw.publishedAt),
+    scheduledFor: hydrateDate(raw.scheduledFor),
+    lastModified: hydrateDate(raw.updatedAt) ?? new Date(),
+    readTime: raw.readTime ?? Math.max(1, Math.ceil(wordCount / 200)),
+    wordCount,
+    difficulty: (raw.difficulty ?? "beginner") as Publication["difficulty"],
+    seo: ui.seo ?? {
+      title: raw.title,
+      description: raw.excerpt,
+      keywords: (raw.tags ?? []).slice(0, 5),
+    },
+    metrics: { ...EMPTY_METRICS },
+    visibility: raw.visibility as Publication["visibility"],
+    version: ui.version ?? 1,
+    language: ui.language ?? "en",
+    commentsEnabled: ui.commentsEnabled ?? true,
+    sharingEnabled: ui.sharingEnabled ?? true,
+    downloadEnabled: ui.downloadEnabled ?? true,
+    isFeatured: ui.isFeatured ?? false,
+    isPinned: ui.isPinned ?? false,
+    priority: ui.priority ?? 50,
+  };
+}
+
+function buildPublicationStatistics(publications: Publication[]): PublicationStatistics {
+  const now = new Date();
+  const average = (values: number[]) =>
+    values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+  const monthKey = (date: Date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+  const recentActivity = publications
+    .slice()
+    .sort(
+      (a, b) =>
+        (b.publishedAt ?? b.lastModified).getTime() - (a.publishedAt ?? a.lastModified).getTime(),
+    )
+    .slice(0, 10)
+    .map((publication) => ({
+      id: `${publication.id}-activity`,
+      publicationId: publication.id,
+      title: publication.title,
+      action: (publication.publishedAt ? "published" : "updated") as "published" | "updated",
+      author: publication.author.name,
+      timestamp: publication.publishedAt ?? publication.lastModified,
+    }));
+
+  const monthlyTrend = Array.from({ length: 6 }, (_, index) => {
+    const monthDate = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1);
+    const key = monthKey(monthDate);
+    const inMonth = publications.filter((p) => monthKey(p.lastModified) === key);
+    return {
+      month: key,
+      publicationsCreated: inMonth.length,
+      publicationsPublished: inMonth.filter((p) => p.publishedAt).length,
+      totalViews: inMonth.reduce((acc, p) => acc + p.metrics.views, 0),
+      totalEngagement: inMonth.reduce((acc, p) => acc + p.metrics.engagementScore, 0),
+    };
+  });
+
+  return {
+    totalPublications: publications.length,
+    publishedPublications: publications.filter((p) => p.status === "published").length,
+    draftPublications: publications.filter((p) => p.status === "draft").length,
+    scheduledPublications: publications.filter((p) => p.status === "scheduled").length,
+    archivedPublications: publications.filter((p) => p.status === "archived").length,
+    totalViews: publications.reduce((acc, p) => acc + p.metrics.views, 0),
+    totalDownloads: publications.reduce((acc, p) => acc + p.metrics.downloads, 0),
+    totalShares: publications.reduce((acc, p) => acc + p.metrics.shares, 0),
+    totalComments: publications.reduce((acc, p) => acc + p.metrics.comments, 0),
+    averageEngagementScore: average(publications.map((p) => p.metrics.engagementScore)),
+    publicationsByType: PUBLICATION_TYPES.map((type) => {
+      const items = publications.filter((p) => p.type === type);
+      return {
+        type,
+        count: items.length,
+        views: items.reduce((acc, p) => acc + p.metrics.views, 0),
+        engagement: average(items.map((p) => p.metrics.engagementScore)),
+      };
+    }),
+    publicationsByCategory: PUBLICATION_CATEGORIES.map((category) => {
+      const items = publications.filter((p) => p.category === category);
+      return {
+        category,
+        count: items.length,
+        views: items.reduce((acc, p) => acc + p.metrics.views, 0),
+        engagement: average(items.map((p) => p.metrics.engagementScore)),
+      };
+    }),
+    publicationsByStatus: PUBLICATION_STATUSES.map((status) => ({
+      status,
+      count: publications.filter((p) => p.status === status).length,
+    })),
+    topPerformingPublications: publications
+      .slice()
+      .sort((a, b) => b.metrics.engagementScore - a.metrics.engagementScore)
+      .slice(0, 10)
+      .map((p) => ({
+        publicationId: p.id,
+        title: p.title,
+        author: p.author.name,
+        views: p.metrics.views,
+        engagementScore: p.metrics.engagementScore,
+        type: p.type,
+        category: p.category,
+      })),
+    recentActivity,
+    monthlyTrend,
+  };
+}
+
 export function usePublications(): UsePublicationsReturn {
-  const [publications, setPublications] = useState<Publication[]>([]);
-  const [statistics, setStatistics] = useState<PublicationStatistics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const api = useContentCollectionApi<Publication>(
+    "publications",
+    hydratePublication as unknown as (raw: RawApiItem) => Publication,
+  );
   const [filters, setFilters] = useState<PublicationFilters>(DEFAULT_FILTERS);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Load initial data
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        setPublications(mockPublications);
-        setStatistics(mockStatistics);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load publications");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
+  const publications = api.allItems;
+  const statistics = useMemo(
+    () => (publications.length > 0 ? buildPublicationStatistics(publications) : null),
+    [publications],
+  );
 
   // Filter and sort publications
   const filteredPublications = useMemo(() => {
     let filtered = [...publications];
 
-    // Search filter
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       filtered = filtered.filter(
@@ -122,22 +308,18 @@ export function usePublications(): UsePublicationsReturn {
       );
     }
 
-    // Status filter
     if (filters.status && filters.status.length > 0) {
       filtered = filtered.filter((pub) => filters.status!.includes(pub.status));
     }
 
-    // Type filter
     if (filters.type && filters.type.length > 0) {
       filtered = filtered.filter((pub) => filters.type!.includes(pub.type));
     }
 
-    // Category filter
     if (filters.category && filters.category.length > 0) {
       filtered = filtered.filter((pub) => filters.category!.includes(pub.category));
     }
 
-    // Author filter
     if (filters.author && filters.author.length > 0) {
       filtered = filtered.filter(
         (pub) =>
@@ -146,12 +328,10 @@ export function usePublications(): UsePublicationsReturn {
       );
     }
 
-    // Tags filter
     if (filters.tags && filters.tags.length > 0) {
       filtered = filtered.filter((pub) => pub.tags.some((tag) => filters.tags!.includes(tag.id)));
     }
 
-    // Date range filter
     if (filters.dateRange) {
       filtered = filtered.filter((pub) => {
         const pubDate = pub.publishedAt || pub.scheduledFor || pub.lastModified;
@@ -159,20 +339,18 @@ export function usePublications(): UsePublicationsReturn {
       });
     }
 
-    // Visibility filter
     if (filters.visibility && filters.visibility.length > 0) {
       filtered = filtered.filter((pub) => filters.visibility!.includes(pub.visibility));
     }
 
-    // Featured filter
     if (filters.featured !== undefined) {
       filtered = filtered.filter((pub) => pub.isFeatured === filters.featured);
     }
 
-    // Sort
     if (filters.sortBy) {
       filtered.sort((a, b) => {
-        let aValue: any, bValue: any;
+        let aValue: string | number | Date;
+        let bValue: string | number | Date;
 
         switch (filters.sortBy) {
           case "title":
@@ -213,40 +391,27 @@ export function usePublications(): UsePublicationsReturn {
   }, [publications, filters]);
 
   // Pagination
-  const { totalPages, totalItems, itemsPerPage } = useMemo(() => {
+  const { totalPages, totalItems } = useMemo(() => {
     const total = filteredPublications.length;
-    const pages = Math.ceil(total / ITEMS_PER_PAGE);
-
     return {
-      totalPages: pages,
+      totalPages: Math.ceil(total / ITEMS_PER_PAGE),
       totalItems: total,
-      itemsPerPage: ITEMS_PER_PAGE,
     };
   }, [filteredPublications]);
 
-  // Paginated publications
   const paginatedPublications = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredPublications.slice(startIndex, endIndex);
-  }, [filteredPublications, currentPage, itemsPerPage]);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredPublications.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredPublications, currentPage]);
 
   // Actions
   const refreshData = useCallback(() => {
-    setLoading(true);
-    setError(null);
-
-    // Simulate API refresh
-    setTimeout(() => {
-      setPublications(mockPublications);
-      setStatistics(mockStatistics);
-      setLoading(false);
-    }, 500);
-  }, []);
+    void api.refreshData();
+  }, [api]);
 
   const updateFilters = useCallback((newFilters: Partial<PublicationFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   }, []);
 
   const clearFilters = useCallback(() => {
@@ -254,237 +419,118 @@ export function usePublications(): UsePublicationsReturn {
     setCurrentPage(1);
   }, []);
 
-  // Get single publication
   const getPublication = useCallback(
-    (id: string): Publication | null => {
-      return publications.find((pub) => pub.id === id) || null;
-    },
+    (id: string): Publication | null => publications.find((pub) => pub.id === id) || null,
     [publications],
   );
 
   // CRUD operations
-  const addPublication = useCallback(async (data: PublicationFormData): Promise<Publication> => {
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const newPublication: Publication = {
-        id: `pub_${Date.now()}`,
-        title: data.title,
-        slug: data.slug || data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-        excerpt: data.excerpt,
-        content: data.content,
-        type: data.type,
-        category: data.category,
-        status: data.status,
-        author:
-          mockPublications.find((p) => p.author.id === data.authorId)?.author ||
-          mockPublications[0].author,
-        tags: mockPublications[0].tags.filter((tag) => data.tagIds.includes(tag.id)),
-        publishedAt: data.status === "published" ? new Date() : undefined,
-        scheduledFor: data.status === "scheduled" ? data.scheduledFor : undefined,
-        lastModified: new Date(),
-        readTime: Math.ceil(data.content.split(" ").length / 200), // Rough estimate
-        wordCount: data.content.split(" ").length,
-        difficulty: data.difficulty,
-        seo: data.seo,
-        metrics: {
-          views: 0,
-          downloads: 0,
-          shares: 0,
-          comments: 0,
-          likes: 0,
-          bookmarks: 0,
-          averageReadTime: 0,
-          bounceRate: 0,
-          engagementScore: 0,
-        },
-        visibility: data.visibility,
-        version: 1,
-        language: "en",
-        commentsEnabled: data.commentsEnabled,
-        sharingEnabled: data.sharingEnabled,
-        downloadEnabled: data.downloadEnabled,
-        isFeatured: data.isFeatured,
-        isPinned: data.isPinned,
-        priority: data.priority,
-      };
-
-      setPublications((prev) => [newPublication, ...prev]);
-      return newPublication;
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Failed to create publication");
-    }
-  }, []);
+  const addPublication = useCallback(
+    async (data: PublicationFormData): Promise<Publication> => {
+      const created = await api.createItem(formToPayload({ ...data }));
+      return created as Publication;
+    },
+    [api],
+  );
 
   const updatePublication = useCallback(
     async (id: string, data: Partial<PublicationFormData>): Promise<Publication> => {
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        setPublications((prev) =>
-          prev.map((pub) => {
-            if (pub.id === id) {
-              return {
-                ...pub,
-                ...data,
-                lastModified: new Date(),
-                publishedAt:
-                  data.status === "published" && pub.status !== "published"
-                    ? new Date()
-                    : pub.publishedAt,
-                scheduledFor: data.status === "scheduled" ? data.scheduledFor : pub.scheduledFor,
-              } as Publication;
-            }
-            return pub;
-          }),
-        );
-
-        const updated = publications.find((pub) => pub.id === id);
-        if (!updated) throw new Error("Publication not found");
-        return updated;
-      } catch (error) {
-        throw new Error(error instanceof Error ? error.message : "Failed to update publication");
-      }
+      const updated = await api.updateItem(id, formToPayload({ ...data }));
+      return updated as Publication;
     },
-    [publications],
+    [api],
   );
 
-  const deletePublication = useCallback(async (id: string): Promise<void> => {
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      setPublications((prev) => prev.filter((pub) => pub.id !== id));
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Failed to delete publication");
-    }
-  }, []);
+  const deletePublication = useCallback(
+    async (id: string): Promise<void> => {
+      await api.deleteItem(id);
+    },
+    [api],
+  );
 
   const duplicatePublication = useCallback(
     async (id: string): Promise<Publication> => {
-      try {
-        const original = publications.find((pub) => pub.id === id);
-        if (!original) throw new Error("Publication not found");
-
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const duplicated: Publication = {
-          ...original,
-          id: `pub_${Date.now()}`,
-          title: `${original.title} (Copy)`,
-          slug: `${original.slug}-copy`,
-          status: "draft",
-          publishedAt: undefined,
-          scheduledFor: undefined,
-          lastModified: new Date(),
-          version: 1,
-          metrics: {
-            views: 0,
-            downloads: 0,
-            shares: 0,
-            comments: 0,
-            likes: 0,
-            bookmarks: 0,
-            averageReadTime: 0,
-            bounceRate: 0,
-            engagementScore: 0,
-          },
-        };
-
-        setPublications((prev) => [duplicated, ...prev]);
-        return duplicated;
-      } catch (error) {
-        throw new Error(error instanceof Error ? error.message : "Failed to duplicate publication");
-      }
+      const original = publications.find((pub) => pub.id === id);
+      if (!original) throw new Error("Publication not found");
+      const created = await api.createItem({
+        title: `${original.title} (Copy)`,
+        slug: `${original.slug}-copy`,
+        excerpt: original.excerpt,
+        content: original.content,
+        type: original.type,
+        category: original.category,
+        status: "draft",
+        authorId: original.author.id,
+        tags: original.tags.map((tag) => tag.name),
+        featuredImage: original.featuredImage,
+        visibility: original.visibility,
+        difficulty: original.difficulty,
+        commentsEnabled: original.commentsEnabled,
+        sharingEnabled: original.sharingEnabled,
+        downloadEnabled: original.downloadEnabled,
+        seo: original.seo,
+        isFeatured: false,
+        isPinned: false,
+      });
+      return created as Publication;
     },
-    [publications],
+    [publications, api],
   );
 
   // Status management
   const publishPublication = useCallback(
     async (id: string): Promise<void> => {
-      await updatePublication(id, { status: "published", publishedAt: new Date() });
+      await api.updateItem(id, { status: "published", publishedAt: new Date().toISOString() });
     },
-    [updatePublication],
+    [api],
   );
 
   const archivePublication = useCallback(
     async (id: string): Promise<void> => {
-      await updatePublication(id, { status: "archived" });
+      await api.updateItem(id, { status: "archived" });
     },
-    [updatePublication],
+    [api],
   );
 
   const schedulePublication = useCallback(
     async (id: string, date: Date): Promise<void> => {
-      await updatePublication(id, { status: "scheduled", scheduledFor: date });
+      await api.updateItem(id, { status: "scheduled", scheduledFor: date.toISOString() });
     },
-    [updatePublication],
+    [api],
   );
 
   const unpublishPublication = useCallback(
     async (id: string): Promise<void> => {
-      await updatePublication(id, { status: "draft" });
+      await api.updateItem(id, { status: "draft" });
     },
-    [updatePublication],
+    [api],
   );
 
   // Bulk operations
-  const bulkPublish = useCallback(async (ids: string[]): Promise<void> => {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      setPublications((prev) =>
-        prev.map((pub) => {
-          if (ids.includes(pub.id)) {
-            return {
-              ...pub,
-              status: "published" as PublicationStatus,
-              publishedAt: new Date(),
-              lastModified: new Date(),
-            };
-          }
-          return pub;
-        }),
+  const bulkPublish = useCallback(
+    async (ids: string[]): Promise<void> => {
+      await Promise.all(
+        ids.map((id) =>
+          api.updateItem(id, { status: "published", publishedAt: new Date().toISOString() }),
+        ),
       );
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Failed to bulk publish");
-    }
-  }, []);
+    },
+    [api],
+  );
 
-  const bulkArchive = useCallback(async (ids: string[]): Promise<void> => {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+  const bulkArchive = useCallback(
+    async (ids: string[]): Promise<void> => {
+      await Promise.all(ids.map((id) => api.updateItem(id, { status: "archived" })));
+    },
+    [api],
+  );
 
-      setPublications((prev) =>
-        prev.map((pub) => {
-          if (ids.includes(pub.id)) {
-            return {
-              ...pub,
-              status: "archived" as PublicationStatus,
-              lastModified: new Date(),
-            };
-          }
-          return pub;
-        }),
-      );
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Failed to bulk archive");
-    }
-  }, []);
-
-  const bulkDelete = useCallback(async (ids: string[]): Promise<void> => {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      setPublications((prev) => prev.filter((pub) => !ids.includes(pub.id)));
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Failed to bulk delete");
-    }
-  }, []);
+  const bulkDelete = useCallback(
+    async (ids: string[]): Promise<void> => {
+      await Promise.all(ids.map((id) => api.deleteItem(id)));
+    },
+    [api],
+  );
 
   // Utility functions
   const exportPublications = useCallback(
@@ -505,8 +551,8 @@ export function usePublications(): UsePublicationsReturn {
       let filename: string;
 
       switch (format) {
-        case "csv":
-          const headers = Object.keys(dataToExport[0]).join(",");
+        case "csv": {
+          const headers = Object.keys(dataToExport[0] ?? {}).join(",");
           const rows = dataToExport
             .map((item) =>
               Object.values(item)
@@ -518,17 +564,14 @@ export function usePublications(): UsePublicationsReturn {
           mimeType = "text/csv";
           filename = `publications-${new Date().toISOString().split("T")[0]}.csv`;
           break;
+        }
         case "json":
+        case "pdf": {
           content = JSON.stringify(dataToExport, null, 2);
           mimeType = "application/json";
           filename = `publications-${new Date().toISOString().split("T")[0]}.json`;
           break;
-        case "pdf":
-          // In a real app, you'd use a PDF library
-          content = JSON.stringify(dataToExport, null, 2);
-          mimeType = "application/json";
-          filename = `publications-${new Date().toISOString().split("T")[0]}.json`;
-          break;
+        }
       }
 
       const blob = new Blob([content], { type: mimeType });
@@ -549,14 +592,7 @@ export function usePublications(): UsePublicationsReturn {
       try {
         const text = await file.text();
         const data = JSON.parse(text);
-
-        // In a real app, you'd validate and process the imported data
         logger.info("Imported publications", data);
-
-        // Simulate processing
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Refresh data after import
         refreshData();
       } catch (error) {
         throw new Error(error instanceof Error ? error.message : "Failed to import publications");
@@ -572,15 +608,15 @@ export function usePublications(): UsePublicationsReturn {
     filteredPublications,
 
     // State
-    loading,
-    error,
+    loading: api.loading,
+    error: api.error,
     filters,
 
     // Pagination
     currentPage,
     totalPages,
     totalItems,
-    itemsPerPage,
+    itemsPerPage: ITEMS_PER_PAGE,
 
     // Actions
     refreshData,

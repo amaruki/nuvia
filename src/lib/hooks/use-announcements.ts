@@ -1,21 +1,88 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import {
+import { useCallback, useMemo, useState } from "react";
+import type {
   Announcement,
-  AnnouncementStatistics,
   AnnouncementFilters,
   AnnouncementFormData,
-  AnnouncementType,
   AnnouncementPriority,
+  AnnouncementStatistics,
   AnnouncementTargetAudience,
-  ANNOUNCEMENT_TYPES,
+  AnnouncementType,
+} from "@/types/announcement.types";
+import {
   ANNOUNCEMENT_PRIORITIES,
   ANNOUNCEMENT_TARGET_AUDIENCES,
+  ANNOUNCEMENT_TYPES,
 } from "@/types/announcement.types";
-import { ArticleStatus } from "@/types/article.types";
-import { mockArticles, mockStatistics, mockAnnouncements } from "@/lib/data/mock-article-data";
+import type { ArticleCategory, ArticleStatus, ArticleType } from "@/types/article.types";
 import { logger } from "@/lib/logger";
+import {
+  formToPayload,
+  hydrateDate,
+  useContentCollectionApi,
+  type RawContentItem as RawApiItem,
+} from "./use-content-collection";
+
+interface RawContentItem {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  type: string;
+  status: string;
+  visibility: string;
+  featuredImage?: string;
+  gallery?: string[];
+  attachments?: { id: string; name: string; url: string; size: number; type: string }[];
+  author: {
+    id: string;
+    name: string;
+    email?: string;
+    image?: string;
+    role?: string;
+  };
+  publishedAt?: string | null;
+  scheduledFor?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  readTime?: number;
+  wordCount?: number;
+  tags?: string[];
+  ui?: {
+    version?: number;
+    language?: string;
+    reviewerId?: string;
+    priority?: AnnouncementPriority;
+    targetAudience?: AnnouncementTargetAudience;
+    targetChapters?: string[];
+    targetCommittees?: string[];
+    expiresAt?: string | null;
+    isPinned?: boolean;
+    isUrgent?: boolean;
+    requiresAcknowledgment?: boolean;
+    acknowledgmentCount?: number;
+    sendEmailNotification?: boolean;
+    sendPushNotification?: boolean;
+    displayOnHomepage?: boolean;
+    displayInDashboard?: boolean;
+    allowedRoles?: string[];
+    allowedChapters?: string[];
+    allowedCommittees?: string[];
+    commentsEnabled?: boolean;
+    sharingEnabled?: boolean;
+    downloadEnabled?: boolean;
+    isFeatured?: boolean;
+    seo?: {
+      title: string;
+      description: string;
+      keywords: string[];
+      ogImage?: string;
+      canonicalUrl?: string;
+    };
+  };
+}
 
 interface UseAnnouncementsReturn {
   // Data
@@ -97,59 +164,124 @@ const DEFAULT_FILTERS: AnnouncementFilters = {
 
 const ITEMS_PER_PAGE = 10;
 
-// Convert article to announcement
-const convertArticleToAnnouncement = (article: any): Announcement => {
-  return {
-    ...article,
-    type: article.type || "general", // Default to general if not specified
-    category: "announcements",
-    priority: article.priority || "medium",
-    targetAudience: article.targetAudience || "all_members",
-    targetChapters: article.targetChapters || [],
-    targetCommittees: article.targetCommittees || [],
-    expiresAt: article.expiresAt,
-    isPinned: article.isPinned || false,
-    isUrgent: article.isUrgent || false,
-    requiresAcknowledgment: article.requiresAcknowledgment || false,
-    acknowledgmentCount: article.acknowledgmentCount || 0,
-    sendEmailNotification: article.sendEmailNotification || true,
-    sendPushNotification: article.sendPushNotification || true,
-    displayOnHomepage: article.displayOnHomepage || false,
-    displayInDashboard: article.displayInDashboard || true,
-  };
+const EMPTY_METRICS = {
+  views: 0,
+  reads: 0,
+  shares: 0,
+  comments: 0,
+  likes: 0,
+  bookmarks: 0,
+  averageReadTime: 0,
+  completionRate: 0,
+  engagementScore: 0,
+  bounceRate: 0,
 };
 
-// Convert article statistics to announcement statistics
-const convertArticleStatisticsToAnnouncementStatistics = (
-  articleStats: any,
-): AnnouncementStatistics => {
-  const announcements = mockAnnouncements.map(convertArticleToAnnouncement);
+function hydrateAnnouncement(raw: RawContentItem): Announcement {
+  const ui = raw.ui ?? {};
+  const tags = (raw.tags ?? []).map((t) => ({ id: t, name: t, color: "#6366f1", count: 0 }));
+  const wordCount = raw.wordCount ?? raw.content.split(/\s+/).filter(Boolean).length;
+  return {
+    id: raw.id,
+    title: raw.title,
+    slug: raw.slug,
+    excerpt: raw.excerpt,
+    content: raw.content,
+    status: raw.status as ArticleStatus,
+    author: {
+      id: raw.author.id,
+      name: raw.author.name,
+      email: raw.author.email ?? "",
+      avatar: raw.author.image,
+      role: raw.author.role ?? "member",
+    },
+    coAuthors: [],
+    reviewer: ui.reviewerId
+      ? { id: ui.reviewerId, name: ui.reviewerId, email: "", role: "reviewer" }
+      : undefined,
+    tags,
+    featuredImage: raw.featuredImage,
+    gallery: raw.gallery,
+    attachments: raw.attachments,
+    publishedAt: hydrateDate(raw.publishedAt),
+    scheduledFor: hydrateDate(raw.scheduledFor),
+    lastModified: hydrateDate(raw.updatedAt) ?? new Date(),
+    readTime: raw.readTime ?? Math.max(1, Math.ceil(wordCount / 200)),
+    wordCount,
+    estimatedReadingSpeed: 200,
+    seo: ui.seo ?? {
+      title: raw.title,
+      description: raw.excerpt,
+      keywords: (raw.tags ?? []).slice(0, 5),
+    },
+    metrics: { ...EMPTY_METRICS },
+    visibility: raw.visibility as Announcement["visibility"],
+    allowedRoles: ui.allowedRoles,
+    allowedChapters: ui.allowedChapters,
+    allowedCommittees: ui.allowedCommittees,
+    version: ui.version ?? 1,
+    language: ui.language ?? "en",
+    commentsEnabled: ui.commentsEnabled ?? true,
+    sharingEnabled: ui.sharingEnabled ?? true,
+    downloadEnabled: ui.downloadEnabled ?? false,
+    isFeatured: ui.isFeatured ?? false,
+
+    // Announcement-specific fields
+    type: (raw.type || "general") as AnnouncementType,
+    category: "announcements",
+    priority: ui.priority ?? "medium",
+    targetAudience: ui.targetAudience ?? "all_members",
+    targetChapters: ui.targetChapters ?? [],
+    targetCommittees: ui.targetCommittees ?? [],
+    expiresAt: hydrateDate(ui.expiresAt),
+    isPinned: ui.isPinned ?? false,
+    isUrgent: ui.isUrgent ?? false,
+    requiresAcknowledgment: ui.requiresAcknowledgment ?? false,
+    acknowledgmentCount: ui.acknowledgmentCount ?? 0,
+    sendEmailNotification: ui.sendEmailNotification ?? true,
+    sendPushNotification: ui.sendPushNotification ?? true,
+    displayOnHomepage: ui.displayOnHomepage ?? false,
+    displayInDashboard: ui.displayInDashboard ?? true,
+  };
+}
+
+function buildAnnouncementStatistics(announcements: Announcement[]): AnnouncementStatistics {
+  const now = new Date();
 
   return {
-    ...articleStats,
+    totalAnnouncements: announcements.length,
     totalArticles: announcements.length,
     publishedArticles: announcements.filter((a) => a.status === "published").length,
     draftArticles: announcements.filter((a) => a.status === "draft").length,
     scheduledArticles: announcements.filter((a) => a.status === "scheduled").length,
     archivedArticles: announcements.filter((a) => a.status === "archived").length,
-
-    // Announcement-specific statistics
+    topPerformingArticles: announcements
+      .slice()
+      .sort((a, b) => b.metrics.engagementScore - a.metrics.engagementScore)
+      .slice(0, 10)
+      .map((a) => ({
+        articleId: a.id,
+        title: a.title,
+        author: a.author.name,
+        views: a.metrics.views,
+        reads: a.metrics.reads,
+        engagementScore: a.metrics.engagementScore,
+        completionRate: a.metrics.completionRate,
+        type: a.type as unknown as ArticleType,
+        category: a.category as unknown as ArticleCategory,
+      })),
     announcementsByType: ANNOUNCEMENT_TYPES.map((type) => ({
       type,
       count: announcements.filter((a) => a.type === type).length,
     })),
-
     announcementsByPriority: ANNOUNCEMENT_PRIORITIES.map((priority) => ({
       priority,
       count: announcements.filter((a) => a.priority === priority).length,
     })),
-
     announcementsByTargetAudience: ANNOUNCEMENT_TARGET_AUDIENCES.map((targetAudience) => ({
       targetAudience,
       count: announcements.filter((a) => a.targetAudience === targetAudience).length,
     })),
-
-    // Additional announcement-specific metrics
     totalAcknowledgments: announcements.reduce((sum, a) => sum + (a.acknowledgmentCount || 0), 0),
     averageAcknowledgmentRate:
       announcements.length > 0
@@ -160,52 +292,31 @@ const convertArticleStatisticsToAnnouncementStatistics = (
         : 0,
     urgentAnnouncements: announcements.filter((a) => a.isUrgent).length,
     pinnedAnnouncements: announcements.filter((a) => a.isPinned).length,
-    expiredAnnouncements: announcements.filter((a) => a.expiresAt && a.expiresAt < new Date())
-      .length,
+    expiredAnnouncements: announcements.filter((a) => a.expiresAt && a.expiresAt < now).length,
     activeAnnouncements: announcements.filter(
-      (a) => a.status === "published" && (!a.expiresAt || a.expiresAt >= new Date()),
+      (a) => a.status === "published" && (!a.expiresAt || a.expiresAt >= now),
     ).length,
   };
-};
+}
 
 export function useAnnouncements(): UseAnnouncementsReturn {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [statistics, setStatistics] = useState<AnnouncementStatistics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const api = useContentCollectionApi<Announcement>(
+    "announcements",
+    hydrateAnnouncement as unknown as (raw: RawApiItem) => Announcement,
+  );
   const [filters, setFilters] = useState<AnnouncementFilters>(DEFAULT_FILTERS);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Load initial data
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Use mock announcements directly and convert to announcement type
-        const announcementArticles = mockAnnouncements.map(convertArticleToAnnouncement);
-
-        setAnnouncements(announcementArticles);
-        setStatistics(convertArticleStatisticsToAnnouncementStatistics(mockStatistics));
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load announcements");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
+  const announcements = api.allItems;
+  const statistics = useMemo(
+    () => (announcements.length > 0 ? buildAnnouncementStatistics(announcements) : null),
+    [announcements],
+  );
 
   // Filter and sort announcements
   const filteredAnnouncements = useMemo(() => {
     let filtered = [...announcements];
 
-    // Search filter
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       filtered = filtered.filter(
@@ -217,38 +328,32 @@ export function useAnnouncements(): UseAnnouncementsReturn {
       );
     }
 
-    // Status filter
     if (filters.status && filters.status.length > 0) {
       filtered = filtered.filter((announcement) => filters.status!.includes(announcement.status));
     }
 
-    // Type filter
     if (filters.type && filters.type.length > 0) {
       filtered = filtered.filter((announcement) => filters.type!.includes(announcement.type));
     }
 
-    // Priority filter
     if (filters.priority && filters.priority.length > 0) {
       filtered = filtered.filter((announcement) =>
         filters.priority!.includes(announcement.priority),
       );
     }
 
-    // Target audience filter
     if (filters.targetAudience && filters.targetAudience.length > 0) {
       filtered = filtered.filter((announcement) =>
         filters.targetAudience!.includes(announcement.targetAudience),
       );
     }
 
-    // Target chapters filter
     if (filters.targetChapters && filters.targetChapters.length > 0) {
       filtered = filtered.filter((announcement) =>
         announcement.targetChapters?.some((chapter) => filters.targetChapters!.includes(chapter)),
       );
     }
 
-    // Target committees filter
     if (filters.targetCommittees && filters.targetCommittees.length > 0) {
       filtered = filtered.filter((announcement) =>
         announcement.targetCommittees?.some((committee) =>
@@ -257,7 +362,6 @@ export function useAnnouncements(): UseAnnouncementsReturn {
       );
     }
 
-    // Author filter
     if (filters.author && filters.author.length > 0) {
       filtered = filtered.filter(
         (announcement) =>
@@ -266,14 +370,12 @@ export function useAnnouncements(): UseAnnouncementsReturn {
       );
     }
 
-    // Tags filter
     if (filters.tags && filters.tags.length > 0) {
       filtered = filtered.filter((announcement) =>
         announcement.tags.some((tag) => filters.tags!.includes(tag.id)),
       );
     }
 
-    // Date range filter
     if (filters.dateRange) {
       filtered = filtered.filter((announcement) => {
         const announcementDate =
@@ -284,7 +386,6 @@ export function useAnnouncements(): UseAnnouncementsReturn {
       });
     }
 
-    // Expiration date filter
     if (filters.expiresAt) {
       filtered = filtered.filter((announcement) => {
         if (!announcement.expiresAt) return false;
@@ -295,14 +396,12 @@ export function useAnnouncements(): UseAnnouncementsReturn {
       });
     }
 
-    // Visibility filter
     if (filters.visibility && filters.visibility.length > 0) {
       filtered = filtered.filter((announcement) =>
         filters.visibility!.includes(announcement.visibility),
       );
     }
 
-    // Boolean filters
     if (filters.isPinned !== undefined) {
       filtered = filtered.filter((announcement) => announcement.isPinned === filters.isPinned);
     }
@@ -347,13 +446,10 @@ export function useAnnouncements(): UseAnnouncementsReturn {
       );
     }
 
-    // Acknowledgment rate filter
     if (filters.minAcknowledgmentRate !== undefined) {
       filtered = filtered.filter((announcement) => {
         const rate =
-          announcement.acknowledgmentCount && announcement.acknowledgmentCount > 0
-            ? 100 // Default to 100% if there are acknowledgments
-            : 0;
+          announcement.acknowledgmentCount && announcement.acknowledgmentCount > 0 ? 100 : 0;
         return rate >= filters.minAcknowledgmentRate!;
       });
     }
@@ -361,17 +457,15 @@ export function useAnnouncements(): UseAnnouncementsReturn {
     if (filters.maxAcknowledgmentRate !== undefined) {
       filtered = filtered.filter((announcement) => {
         const rate =
-          announcement.acknowledgmentCount && announcement.acknowledgmentCount > 0
-            ? 100 // Default to 100% if there are acknowledgments
-            : 0;
+          announcement.acknowledgmentCount && announcement.acknowledgmentCount > 0 ? 100 : 0;
         return rate <= filters.maxAcknowledgmentRate!;
       });
     }
 
-    // Sort
     if (filters.sortBy) {
       filtered.sort((a, b) => {
-        let aValue: any, bValue: any;
+        let aValue: string | Date;
+        let bValue: string | Date;
 
         switch (filters.sortBy) {
           case "title":
@@ -400,42 +494,22 @@ export function useAnnouncements(): UseAnnouncementsReturn {
   }, [announcements, filters]);
 
   // Pagination
-  const { totalPages, totalItems, itemsPerPage } = useMemo(() => {
+  const { totalPages, totalItems } = useMemo(() => {
     const total = filteredAnnouncements.length;
-    const pages = Math.ceil(total / ITEMS_PER_PAGE);
-
     return {
-      totalPages: pages,
+      totalPages: Math.ceil(total / ITEMS_PER_PAGE),
       totalItems: total,
-      itemsPerPage: ITEMS_PER_PAGE,
     };
   }, [filteredAnnouncements]);
 
-  // Paginated announcements
-  const paginatedAnnouncements = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredAnnouncements.slice(startIndex, endIndex);
-  }, [filteredAnnouncements, currentPage, itemsPerPage]);
-
   // Actions
   const refreshData = useCallback(() => {
-    setLoading(true);
-    setError(null);
-
-    // Simulate API refresh
-    setTimeout(() => {
-      const announcementArticles = mockAnnouncements.map(convertArticleToAnnouncement);
-
-      setAnnouncements(announcementArticles);
-      setStatistics(convertArticleStatisticsToAnnouncementStatistics(mockStatistics));
-      setLoading(false);
-    }, 500);
-  }, []);
+    void api.refreshData();
+  }, [api]);
 
   const updateFilters = useCallback((newFilters: Partial<AnnouncementFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   }, []);
 
   const clearFilters = useCallback(() => {
@@ -443,291 +517,146 @@ export function useAnnouncements(): UseAnnouncementsReturn {
     setCurrentPage(1);
   }, []);
 
-  // Get single announcement
   const getAnnouncement = useCallback(
-    (id: string): Announcement | null => {
-      return announcements.find((announcement) => announcement.id === id) || null;
-    },
+    (id: string): Announcement | null =>
+      announcements.find((announcement) => announcement.id === id) || null,
     [announcements],
   );
 
   // CRUD operations
-  const addAnnouncement = useCallback(async (data: AnnouncementFormData): Promise<Announcement> => {
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const newAnnouncement: Announcement = {
-        id: `announcement_${Date.now()}`,
-        title: data.title,
-        slug: data.slug || data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-        excerpt: data.excerpt,
-        content: data.content,
-        type: data.type,
-        category: "announcements",
-        status: data.status,
-        author:
-          mockArticles.find((a) => a.author.id === data.authorId)?.author || mockArticles[0].author,
-        coAuthors: data.coAuthorIds
-          ?.map((id) => mockArticles.find((a) => a.author.id === id)?.author)
-          .filter((author): author is any => author !== undefined),
-        reviewer: data.reviewerId
-          ? mockArticles.find((a) => a.author.id === data.reviewerId)?.author
-          : undefined,
-        tags: mockArticles[0].tags.filter((tag) => data.tagIds.includes(tag.id)),
-        publishedAt: data.status === "published" ? new Date() : undefined,
-        scheduledFor: data.status === "scheduled" ? data.scheduledFor : undefined,
-        lastModified: new Date(),
-        readTime: Math.ceil(data.content.split(" ").length / 200), // Rough estimate
-        wordCount: data.content.split(" ").length,
-        estimatedReadingSpeed: 200,
-        metrics: {
-          views: 0,
-          reads: 0,
-          shares: 0,
-          comments: 0,
-          likes: 0,
-          bookmarks: 0,
-          averageReadTime: 0,
-          completionRate: 0,
-          engagementScore: 0,
-          bounceRate: 0,
-        },
-        seo: data.seo || {
-          title: data.title,
-          description: data.excerpt,
-          keywords: [],
-          ogImage: data.featuredImage,
-          canonicalUrl: undefined,
-        },
-        visibility: data.visibility,
-        version: 1,
-        language: "en",
-        commentsEnabled: data.commentsEnabled,
-        sharingEnabled: data.sharingEnabled,
-        downloadEnabled: data.downloadEnabled,
-        isFeatured: data.isFeatured,
-        isPinned: data.isPinned,
-        priority: data.priority,
-        targetAudience: data.targetAudience,
-        targetChapters: data.targetChapters,
-        targetCommittees: data.targetCommittees,
-        expiresAt: data.expiresAt,
-        isUrgent: data.isUrgent,
-        requiresAcknowledgment: data.requiresAcknowledgment,
-        acknowledgmentCount: 0,
-        sendEmailNotification: data.sendEmailNotification,
-        sendPushNotification: data.sendPushNotification,
-        displayOnHomepage: data.displayOnHomepage,
-        displayInDashboard: data.displayInDashboard,
-      };
-
-      setAnnouncements((prev) => [newAnnouncement, ...prev]);
-      return newAnnouncement;
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Failed to create announcement");
-    }
-  }, []);
+  const addAnnouncement = useCallback(
+    async (data: AnnouncementFormData): Promise<Announcement> => {
+      const created = await api.createItem(formToPayload({ ...data }));
+      return created as Announcement;
+    },
+    [api],
+  );
 
   const updateAnnouncement = useCallback(
     async (id: string, data: Partial<AnnouncementFormData>): Promise<Announcement> => {
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        setAnnouncements((prev) =>
-          prev.map((announcement) => {
-            if (announcement.id === id) {
-              return {
-                ...announcement,
-                ...data,
-                lastModified: new Date(),
-                publishedAt:
-                  data.status === "published" && announcement.status !== "published"
-                    ? new Date()
-                    : announcement.publishedAt,
-                scheduledFor:
-                  data.status === "scheduled" ? data.scheduledFor : announcement.scheduledFor,
-              } as Announcement;
-            }
-            return announcement;
-          }),
-        );
-
-        const updated = announcements.find((announcement) => announcement.id === id);
-        if (!updated) throw new Error("Announcement not found");
-        return updated;
-      } catch (error) {
-        throw new Error(error instanceof Error ? error.message : "Failed to update announcement");
-      }
+      const updated = await api.updateItem(id, formToPayload({ ...data }));
+      return updated as Announcement;
     },
-    [announcements],
+    [api],
   );
 
-  const deleteAnnouncement = useCallback(async (id: string): Promise<void> => {
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      setAnnouncements((prev) => prev.filter((announcement) => announcement.id !== id));
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Failed to delete announcement");
-    }
-  }, []);
+  const deleteAnnouncement = useCallback(
+    async (id: string): Promise<void> => {
+      await api.deleteItem(id);
+    },
+    [api],
+  );
 
   const duplicateAnnouncement = useCallback(
     async (id: string): Promise<Announcement> => {
-      try {
-        const original = announcements.find((announcement) => announcement.id === id);
-        if (!original) throw new Error("Announcement not found");
-
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const duplicated: Announcement = {
-          ...original,
-          id: `announcement_${Date.now()}`,
-          title: `${original.title} (Copy)`,
-          slug: `${original.slug}-copy`,
-          status: "draft",
-          publishedAt: undefined,
-          scheduledFor: undefined,
-          lastModified: new Date(),
-          version: 1,
-          acknowledgmentCount: 0,
-        };
-
-        setAnnouncements((prev) => [duplicated, ...prev]);
-        return duplicated;
-      } catch (error) {
-        throw new Error(
-          error instanceof Error ? error.message : "Failed to duplicate announcement",
-        );
-      }
+      const original = announcements.find((announcement) => announcement.id === id);
+      if (!original) throw new Error("Announcement not found");
+      const created = await api.createItem({
+        title: `${original.title} (Copy)`,
+        slug: `${original.slug}-copy`,
+        excerpt: original.excerpt,
+        content: original.content,
+        type: original.type,
+        category: "announcements",
+        status: "draft",
+        authorId: original.author.id,
+        tags: original.tags.map((tag) => tag.name),
+        featuredImage: original.featuredImage,
+        visibility: original.visibility,
+        priority: original.priority,
+        targetAudience: original.targetAudience,
+        targetChapters: original.targetChapters,
+        targetCommittees: original.targetCommittees,
+        expiresAt: original.expiresAt?.toISOString(),
+        isPinned: false,
+        isUrgent: original.isUrgent,
+        requiresAcknowledgment: original.requiresAcknowledgment,
+        sendEmailNotification: original.sendEmailNotification,
+        sendPushNotification: original.sendPushNotification,
+        displayOnHomepage: original.displayOnHomepage,
+        displayInDashboard: original.displayInDashboard,
+        commentsEnabled: original.commentsEnabled,
+        sharingEnabled: original.sharingEnabled,
+        downloadEnabled: original.downloadEnabled,
+      });
+      return created as Announcement;
     },
-    [announcements],
+    [announcements, api],
   );
 
   // Status management
   const publishAnnouncement = useCallback(
     async (id: string): Promise<void> => {
-      await updateAnnouncement(id, { status: "published", publishedAt: new Date() });
+      await api.updateItem(id, { status: "published", publishedAt: new Date().toISOString() });
     },
-    [updateAnnouncement],
+    [api],
   );
 
   const archiveAnnouncement = useCallback(
     async (id: string): Promise<void> => {
-      await updateAnnouncement(id, { status: "archived" });
+      await api.updateItem(id, { status: "archived" });
     },
-    [updateAnnouncement],
+    [api],
   );
 
   const scheduleAnnouncement = useCallback(
     async (id: string, date: Date): Promise<void> => {
-      await updateAnnouncement(id, { status: "scheduled", scheduledFor: date });
+      await api.updateItem(id, { status: "scheduled", scheduledFor: date.toISOString() });
     },
-    [updateAnnouncement],
+    [api],
   );
 
   const unpublishAnnouncement = useCallback(
     async (id: string): Promise<void> => {
-      await updateAnnouncement(id, { status: "draft" });
+      await api.updateItem(id, { status: "draft" });
     },
-    [updateAnnouncement],
+    [api],
   );
 
   const reviewAnnouncement = useCallback(
     async (id: string, reviewerId: string): Promise<void> => {
-      const reviewer = mockArticles.find((a) => a.author.id === reviewerId)?.author;
-      await updateAnnouncement(id, { status: "review", reviewerId });
+      await api.updateItem(id, { status: "review", reviewerId });
     },
-    [updateAnnouncement],
+    [api],
   );
 
   // Bulk operations
-  const bulkPublish = useCallback(async (ids: string[]): Promise<void> => {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      setAnnouncements((prev) =>
-        prev.map((announcement) => {
-          if (ids.includes(announcement.id)) {
-            return {
-              ...announcement,
-              status: "published" as any,
-              publishedAt: new Date(),
-              lastModified: new Date(),
-            };
-          }
-          return announcement;
-        }),
+  const bulkPublish = useCallback(
+    async (ids: string[]): Promise<void> => {
+      await Promise.all(
+        ids.map((id) =>
+          api.updateItem(id, { status: "published", publishedAt: new Date().toISOString() }),
+        ),
       );
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Failed to bulk publish");
-    }
-  }, []);
+    },
+    [api],
+  );
 
-  const bulkArchive = useCallback(async (ids: string[]): Promise<void> => {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+  const bulkArchive = useCallback(
+    async (ids: string[]): Promise<void> => {
+      await Promise.all(ids.map((id) => api.updateItem(id, { status: "archived" })));
+    },
+    [api],
+  );
 
-      setAnnouncements((prev) =>
-        prev.map((announcement) => {
-          if (ids.includes(announcement.id)) {
-            return {
-              ...announcement,
-              status: "archived" as any,
-              lastModified: new Date(),
-            };
-          }
-          return announcement;
-        }),
-      );
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Failed to bulk archive");
-    }
-  }, []);
+  const bulkDelete = useCallback(
+    async (ids: string[]): Promise<void> => {
+      await Promise.all(ids.map((id) => api.deleteItem(id)));
+    },
+    [api],
+  );
 
-  const bulkDelete = useCallback(async (ids: string[]): Promise<void> => {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      setAnnouncements((prev) => prev.filter((announcement) => !ids.includes(announcement.id)));
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Failed to bulk delete");
-    }
-  }, []);
-
-  const bulkReview = useCallback(async (ids: string[], reviewerId: string): Promise<void> => {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const reviewer = mockArticles.find((a) => a.author.id === reviewerId)?.author;
-
-      setAnnouncements((prev) =>
-        prev.map((announcement) => {
-          if (ids.includes(announcement.id)) {
-            return {
-              ...announcement,
-              status: "review" as any,
-              reviewer,
-              reviewedAt: new Date(),
-              lastModified: new Date(),
-            };
-          }
-          return announcement;
-        }),
-      );
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : "Failed to bulk review");
-    }
-  }, []);
+  const bulkReview = useCallback(
+    async (ids: string[], reviewerId: string): Promise<void> => {
+      await Promise.all(ids.map((id) => api.updateItem(id, { status: "review", reviewerId })));
+    },
+    [api],
+  );
 
   // Utility functions
   const exportAnnouncements = useCallback(
     (format: "csv" | "json" | "pdf") => {
-      const dataToExport = paginatedAnnouncements.map((announcement) => ({
+      const dataToExport = filteredAnnouncements.map((announcement) => ({
         title: announcement.title,
         type: announcement.type,
         priority: announcement.priority,
@@ -746,8 +675,8 @@ export function useAnnouncements(): UseAnnouncementsReturn {
       let filename: string;
 
       switch (format) {
-        case "csv":
-          const headers = Object.keys(dataToExport[0]).join(",");
+        case "csv": {
+          const headers = Object.keys(dataToExport[0] ?? {}).join(",");
           const rows = dataToExport
             .map((item) =>
               Object.values(item)
@@ -759,17 +688,14 @@ export function useAnnouncements(): UseAnnouncementsReturn {
           mimeType = "text/csv";
           filename = `announcements-${new Date().toISOString().split("T")[0]}.csv`;
           break;
+        }
         case "json":
+        case "pdf": {
           content = JSON.stringify(dataToExport, null, 2);
           mimeType = "application/json";
           filename = `announcements-${new Date().toISOString().split("T")[0]}.json`;
           break;
-        case "pdf":
-          // In a real app, you'd use a PDF library
-          content = JSON.stringify(dataToExport, null, 2);
-          mimeType = "application/json";
-          filename = `announcements-${new Date().toISOString().split("T")[0]}.json`;
-          break;
+        }
       }
 
       const blob = new Blob([content], { type: mimeType });
@@ -782,7 +708,7 @@ export function useAnnouncements(): UseAnnouncementsReturn {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     },
-    [paginatedAnnouncements],
+    [filteredAnnouncements],
   );
 
   const importAnnouncements = useCallback(
@@ -790,14 +716,7 @@ export function useAnnouncements(): UseAnnouncementsReturn {
       try {
         const text = await file.text();
         const data = JSON.parse(text);
-
-        // In a real app, you'd validate and process imported data
         logger.info("Imported announcements", data);
-
-        // Simulate processing
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Refresh data after import
         refreshData();
       } catch (error) {
         throw new Error(error instanceof Error ? error.message : "Failed to import announcements");
@@ -813,15 +732,15 @@ export function useAnnouncements(): UseAnnouncementsReturn {
     filteredAnnouncements,
 
     // State
-    loading,
-    error,
+    loading: api.loading,
+    error: api.error,
     filters,
 
     // Pagination
     currentPage,
     totalPages,
     totalItems,
-    itemsPerPage,
+    itemsPerPage: ITEMS_PER_PAGE,
 
     // Actions
     refreshData,

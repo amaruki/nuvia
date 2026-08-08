@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { ExternalLink } from "@/types/auth.types";
 
 // External link validation schema
-const externalLinkSchema: z.ZodType<ExternalLink> = z.object({
+export const externalLinkSchema: z.ZodType<ExternalLink> = z.object({
   platform: z
     .string()
     .min(1, "Platform is required")
@@ -86,6 +86,20 @@ export const updateProfileSchema = z.object({
     .array(externalLinkSchema)
     .max(10, "You can add up to 10 external links")
     .optional(),
+});
+
+// PUT /api/v1/auth/profile accepts the same fields as the form schema
+// above plus the two better-auth core fields it forwards (name, image).
+// The route used to pass the raw body straight to auth.api.updateUser;
+// this schema is the whitelist that stops that. Anything not listed here
+// is stripped by z.object before the body reaches better-auth.
+export const profileApiUpdateSchema = updateProfileSchema.extend({
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters")
+    .optional(),
+  image: z.url("Image must be a valid URL").optional(),
 });
 
 // Change password validation schema

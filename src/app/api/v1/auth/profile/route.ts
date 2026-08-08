@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
 import { AuthUtils } from "@/lib/auth/utils";
-import { problem, problemResponse, problems, successResponse } from "@/lib/http";
+import { profileApiUpdateSchema } from "@/lib/validation/auth.validation";
+import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 import { logger } from "@/lib/logger";
 
 // GET /api/v1/auth/profile - Get user profile
@@ -30,9 +31,18 @@ export async function PUT(request: NextRequest) {
     // Parse request body
     const body = await request.json();
 
+    // Whitelist the fields before they reach better-auth. The previous
+    // version forwarded the raw body, so any key better-auth's updateUser
+    // recognizes could be set through this endpoint unvalidated.
+    const validationResult = profileApiUpdateSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      return problemResponse(validationProblem(validationResult.error));
+    }
+
     // Update user profile using Better Auth API
     const updatedUser = await auth.api.updateUser({
-      body: body,
+      body: validationResult.data,
       headers: request.headers,
     });
 

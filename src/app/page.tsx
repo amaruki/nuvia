@@ -141,20 +141,31 @@ export default function Home() {
           />
 
           <div className="container mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-            <div className="landing-rise">
-              <Badge variant="outline">
-                <CircleCheck />
-                Open source and self-hosted
-              </Badge>
-              <h1 className="mt-6 text-5xl font-semibold leading-none tracking-tighter sm:text-6xl lg:text-7xl">
+            <div>
+              <div className="landing-rise">
+                <Badge variant="outline">
+                  <CircleCheck />
+                  Open source and self-hosted
+                </Badge>
+              </div>
+              <h1
+                className="landing-rise mt-6 text-5xl font-semibold leading-none tracking-tighter sm:text-6xl lg:text-7xl"
+                style={{ animationDelay: "60ms" }}
+              >
                 Run your association.
                 <span className="block text-primary">Own the software.</span>
               </h1>
-              <p className="mt-6 max-w-[48ch] text-lg leading-relaxed text-muted-foreground">
+              <p
+                className="landing-rise mt-6 max-w-[48ch] text-lg leading-relaxed text-muted-foreground"
+                style={{ animationDelay: "120ms" }}
+              >
                 Members, events, content, forums, and jobs are live on PostgreSQL today. Nuvia keeps
                 the rest of the roadmap visible instead of pretending mock screens are finished.
               </p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div
+                className="landing-rise mt-8 flex flex-wrap items-center gap-3"
+                style={{ animationDelay: "180ms" }}
+              >
                 <Button size="lg" asChild>
                   <Link href="/auth/signup">Get started</Link>
                 </Button>
@@ -165,14 +176,20 @@ export default function Home() {
                   </Link>
                 </Button>
               </div>
-              <div className="mt-10 flex flex-wrap gap-x-5 gap-y-2 border-t border-border/60 pt-5 font-mono text-xs text-muted-foreground">
+              <div
+                className="landing-rise mt-10 flex flex-wrap gap-x-5 gap-y-2 border-t border-border/60 pt-5 font-mono text-xs text-muted-foreground"
+                style={{ animationDelay: "240ms" }}
+              >
                 {STACK.map((technology) => (
                   <span key={technology}>{technology}</span>
                 ))}
               </div>
             </div>
 
-            <div className="landing-rise relative mx-auto w-full max-w-xl pb-8 sm:pb-16">
+            <div
+              className="landing-rise relative mx-auto w-full max-w-xl pb-8 sm:pb-16"
+              style={{ animationDelay: "200ms" }}
+            >
               <div
                 aria-hidden="true"
                 className="absolute inset-x-8 bottom-14 top-10 rotate-2 rounded-xl border border-primary/20 bg-primary/5 shadow-lg shadow-primary/10"

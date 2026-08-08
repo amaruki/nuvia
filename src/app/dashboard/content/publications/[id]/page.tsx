@@ -31,12 +31,12 @@ import {
 } from "lucide-react";
 import { usePublications } from "@/lib/hooks/use-publications";
 import { useHeader } from "@/contexts/dashboard-context";
-import { Publication } from "@/types/publication.types";
+import { Publication } from "@/types/publication";
 import {
   PUBLICATION_TYPE_DISPLAY,
   PUBLICATION_CATEGORY_DISPLAY,
   PUBLICATION_STATUS_DISPLAY,
-} from "@/types/publication.types";
+} from "@/types/publication";
 
 export default function PublicationDetailsPage() {
   const params = useParams();

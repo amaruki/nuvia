@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-import type { Publication, PublicationFilters } from "@/types/publication.types";
+import type { Publication, PublicationFilters } from "@/types/publication";
 
 export function useFilteredPublications(
   publications: Publication[],

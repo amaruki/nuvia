@@ -6,7 +6,7 @@
  * and mapped to RFC 9457 problems by src/app/api/v1/committees/_lib.ts —
  * the same split the finance services use.
  *
- * The wire shape is the UI contract from src/types/committee.types.ts:
+ * The wire shape is the UI contract from src/types/committee/:
  * charter/meetings/metrics travel as jsonb columns and are normalized on
  * read; leadership and members share the committee_members table and are
  * split by role on read.

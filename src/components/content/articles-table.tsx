@@ -54,7 +54,7 @@ import {
   ARTICLE_STATUS_DISPLAY,
   ARTICLE_CATEGORY_DISPLAY,
   ARTICLE_DIFFICULTY_DISPLAY,
-} from "@/types/article.types";
+} from "@/types/article";
 import { cn } from "@/lib/utils";
 
 interface ArticlesTableProps {

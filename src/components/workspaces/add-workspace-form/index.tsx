@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { WorkspaceFormData } from "@/types/committee.types";
+import { WorkspaceFormData } from "@/types/committee";
 import { logger } from "@/lib/logger";
 import { workspaceFormSchema, WorkspaceFormValues } from "./schema";
 import { AddWorkspaceFormProps } from "./types";

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import type { ArticleStatus } from "@/types/article.types";
+import type { ArticleStatus } from "@/types/article";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Clock, CheckCircle2, Archive } from "lucide-react";
 import type { FiltersControlProps } from "./types";

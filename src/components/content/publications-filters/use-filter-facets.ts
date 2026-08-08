@@ -1,7 +1,7 @@
 "use client";
 
 import { usePublications } from "@/lib/hooks/use-publications";
-import type { PublicationAuthor, PublicationTag } from "@/types/publication.types";
+import type { PublicationAuthor, PublicationTag } from "@/types/publication";
 
 export interface FilterFacets {
   authors: PublicationAuthor[];

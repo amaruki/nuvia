@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { PublicationFilters } from "@/types/publication.types";
+import type { PublicationFilters } from "@/types/publication";
 import type { FiltersControlProps } from "./types";
 
 export function SortOptions({ filters, onFiltersChange }: FiltersControlProps) {

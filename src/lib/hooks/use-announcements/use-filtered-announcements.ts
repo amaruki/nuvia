@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-import type { Announcement, AnnouncementFilters } from "@/types/announcement.types";
+import type { Announcement, AnnouncementFilters } from "@/types/announcement";
 
 export function useFilteredAnnouncements(
   announcements: Announcement[],

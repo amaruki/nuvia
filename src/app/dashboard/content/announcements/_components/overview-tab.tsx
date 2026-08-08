@@ -1,6 +1,6 @@
 import { BarChart3, Eye, Pin, Zap } from "lucide-react";
 
-import type { AnnouncementStatistics } from "@/types/announcement.types";
+import type { AnnouncementStatistics } from "@/types/announcement";
 
 interface OverviewTabProps {
   statistics: AnnouncementStatistics | null;

@@ -2,7 +2,7 @@
  * Workspaces — committee collaboration spaces (backlog D5, promotion queue).
  *
  * The table is driven by the shape the dashboard already renders
- * (CommitteeWorkspace in src/types/committee.types.ts): identity, a
+ * (CommitteeWorkspace in src/types/committee/): identity, a
  * type/status lifecycle, a settings blob, and the roster + collaboration
  * collections (members, documents, tasks, discussions, meetings, activity).
  * The nested collections travel as jsonb — the same technique C5 used for

@@ -1,9 +1,4 @@
-import type {
-  Article,
-  ArticleFilters,
-  ArticleFormData,
-  ArticleStatistics,
-} from "@/types/article.types";
+import type { Article, ArticleFilters, ArticleFormData, ArticleStatistics } from "@/types/article";
 
 export interface RawContentItem {
   id: string;

@@ -5,7 +5,7 @@ import {
   ARTICLE_STATUSES,
   ARTICLE_DIFFICULTIES,
   ARTICLE_FORMATS,
-} from "@/types/article.types";
+} from "@/types/article";
 
 // Form schema for articles
 export const formSchema = z.object({

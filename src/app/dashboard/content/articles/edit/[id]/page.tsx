@@ -6,7 +6,7 @@ import { useHeader } from "@/contexts/dashboard-context";
 import { useArticles } from "@/lib/hooks/use-articles";
 import { logger } from "@/lib/logger";
 import AddArticleForm from "@/components/content/add-article-form";
-import { ArticleFormData } from "@/types/article.types";
+import { ArticleFormData } from "@/types/article";
 
 export default function EditArticlePage() {
   const params = useParams();

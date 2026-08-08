@@ -8,7 +8,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import PublicationPageForm from "@/components/content/add-publication-form";
 import { usePublications } from "@/lib/hooks/use-publications";
 import { useHeader } from "@/contexts/dashboard-context";
-import { Publication } from "@/types/publication.types";
+import { Publication } from "@/types/publication";
 
 export default function EditPublicationPage() {
   const params = useParams();

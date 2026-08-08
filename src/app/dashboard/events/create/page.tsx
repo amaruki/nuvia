@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Save, X, Plus } from "lucide-react";
-import { EventType, EventStatus } from "@/types/event.types";
+import { EventType, EventStatus } from "@/types/event";
 import { EventLayout } from "@/components/events/event-layout";
 import { logger } from "@/lib/logger";
 

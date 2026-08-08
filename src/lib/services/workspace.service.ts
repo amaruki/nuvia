@@ -3,7 +3,7 @@
  * queue).
  *
  * - Rows map to the UI shape (CommitteeWorkspace in
- *   src/types/committee.types.ts) — the same contract the mock-era hook
+ *   src/types/committee/) — the same contract the mock-era hook
  *   served. The members/documents/tasks/discussions/meetings/activity
  *   collections travel as jsonb and start empty; no backing tables exist
  *   for them yet, the same staging pattern chapters uses for
@@ -24,7 +24,7 @@ import type {
   WorkspaceSettings,
   WorkspaceStatus,
   WorkspaceType,
-} from "@/types/committee.types";
+} from "@/types/committee";
 
 export class WorkspaceServiceError extends Error {
   constructor(public readonly problemDetails: ProblemDetails) {

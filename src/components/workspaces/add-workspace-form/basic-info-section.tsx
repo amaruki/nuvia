@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { WorkspaceType } from "@/types/committee.types";
+import { WorkspaceType } from "@/types/committee";
 import { typeOptions } from "./options";
 import { WorkspaceForm } from "./types";
 

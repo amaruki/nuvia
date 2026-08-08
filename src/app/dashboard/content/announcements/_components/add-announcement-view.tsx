@@ -2,7 +2,7 @@
 
 import { AddAnnouncementForm } from "@/components/content/add-announcement-form";
 import { Button } from "@/components/ui/button";
-import type { AnnouncementFormData } from "@/types/announcement.types";
+import type { AnnouncementFormData } from "@/types/announcement";
 
 interface AddAnnouncementViewProps {
   onSubmit: (data: AnnouncementFormData) => void;

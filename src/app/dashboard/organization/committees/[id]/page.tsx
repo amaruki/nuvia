@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHeader } from "@/contexts/dashboard-context";
 import { logger } from "@/lib/logger";
-import { Committee } from "@/types/committee.types";
+import { Committee } from "@/types/committee";
 import { apiFetch } from "@/lib/api-client";
 import { toCommitteeUi, type WireCommittee } from "@/lib/hooks/use-committees";
 import { CommitteeCharterTab } from "./_components/committee-charter-tab";

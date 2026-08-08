@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TabsContent } from "@/components/ui/tabs";
 import { Award, ExternalLink, Mail, MapPin, Phone, Target, Users } from "lucide-react";
-import type { Committee } from "@/types/committee.types";
+import type { Committee } from "@/types/committee";
 import {
   formatPercentage,
   getAuthorityBadge,

@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft, Save, X, Plus } from "lucide-react";
-import { EventType, EventStatus, Event } from "@/types/event.types";
+import { EventType, EventStatus, Event } from "@/types/event";
 import { EventLayout } from "@/components/events/event-layout";
 import { getEventById } from "@/lib/services/event";
 import { logger } from "@/lib/logger";

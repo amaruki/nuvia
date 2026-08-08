@@ -3,7 +3,7 @@ import type {
   PublicationCategory,
   PublicationStatus,
   PublicationType,
-} from "@/types/publication.types";
+} from "@/types/publication";
 
 import { hydrateDate } from "../use-content-collection";
 

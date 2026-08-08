@@ -1,4 +1,4 @@
-import type { AnnouncementFilters } from "@/types/announcement.types";
+import type { AnnouncementFilters } from "@/types/announcement";
 
 export function getActiveFilterCount(filters: AnnouncementFilters): number {
   let count = 0;

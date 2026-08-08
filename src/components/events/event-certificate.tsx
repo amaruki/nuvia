@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Share2, ExternalLink, Award, Calendar, User, CheckCircle } from "lucide-react";
-import type { EventCertificate } from "@/types/event.types";
-import { Event } from "@/types/event.types";
+import type { EventCertificate } from "@/types/event";
+import { Event } from "@/types/event";
 
 interface EventCertificateProps {
   certificate: EventCertificate;

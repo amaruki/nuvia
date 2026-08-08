@@ -12,7 +12,7 @@ import {
   ANNOUNCEMENT_TYPE_DISPLAY,
   ANNOUNCEMENT_PRIORITY_DISPLAY,
   ANNOUNCEMENT_TARGET_AUDIENCE_DISPLAY,
-} from "@/types/announcement.types";
+} from "@/types/announcement";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import type { FiltersControlProps } from "./types";

@@ -16,7 +16,7 @@ import {
   PublicationFormData,
   PublicationStatus,
   PublicationType,
-} from "@/types/publication.types";
+} from "@/types/publication";
 import { categoryOptions, difficultyOptions, statusOptions, typeOptions } from "./options";
 import { PublicationForm } from "./types";
 

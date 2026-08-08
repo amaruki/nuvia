@@ -38,7 +38,7 @@ import type {
   WorkspaceTask,
   WorkspaceType,
   WorkspaceTypeBreakdown,
-} from "@/types/committee.types";
+} from "@/types/committee";
 
 // ---------------------------------------------------------------------------
 // Wire → UI mapping (ISO date strings → Date)

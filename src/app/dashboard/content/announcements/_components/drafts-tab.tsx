@@ -3,7 +3,7 @@
 import { Megaphone, Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { Announcement } from "@/types/announcement.types";
+import type { Announcement } from "@/types/announcement";
 
 interface DraftsTabProps {
   announcements: Announcement[];

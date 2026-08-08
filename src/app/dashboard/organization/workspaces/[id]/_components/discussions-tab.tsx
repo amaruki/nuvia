@@ -3,7 +3,7 @@ import { MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
-import { CommitteeWorkspace } from "@/types/committee.types";
+import { CommitteeWorkspace } from "@/types/committee";
 import { getDiscussionStatusBadge } from "./status-badges";
 
 interface DiscussionsTabProps {

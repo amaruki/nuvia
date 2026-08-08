@@ -5,7 +5,7 @@ import { WidgetContainer } from "../../ui/widget-container";
 import { EventCertificateList } from "@/components/events";
 import { Button } from "@/components/ui/button";
 import { Award, ArrowRight } from "lucide-react";
-import { EventCertificate, Event } from "@/types/event.types";
+import { EventCertificate, Event } from "@/types/event";
 import { getUserEventRegistrations } from "@/lib/services/event";
 
 interface EnhancedCertificatesWidgetProps {

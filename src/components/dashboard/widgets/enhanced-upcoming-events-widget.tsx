@@ -5,7 +5,7 @@ import { WidgetContainer } from "../../ui/widget-container";
 import { EventCard } from "@/components/events";
 import { Button } from "@/components/ui/button";
 import { Calendar, ArrowRight } from "lucide-react";
-import { Event, EventStatus } from "@/types/event.types";
+import { Event, EventStatus } from "@/types/event";
 import { getEvents } from "@/lib/services/event";
 
 interface EnhancedUpcomingEventsWidgetProps {

@@ -1,6 +1,6 @@
 import { BarChart3, Eye } from "lucide-react";
 
-import type { ArticleStatistics } from "@/types/article.types";
+import type { ArticleStatistics } from "@/types/article";
 
 import { formatNumber } from "./articles-helpers";
 

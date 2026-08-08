@@ -30,7 +30,7 @@ import { AddWorkspaceForm } from "@/components/workspaces/add-workspace-form";
 import { useWorkspaces } from "@/lib/hooks/use-workspaces";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
-import { CommitteeWorkspace } from "@/types/committee.types";
+import { CommitteeWorkspace } from "@/types/committee";
 import { useRouter } from "next/navigation";
 
 export default function OrganizationWorkspaces() {

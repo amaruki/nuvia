@@ -1,4 +1,4 @@
-import { CommitteeRole, Permission, WorkspaceType } from "@/types/committee.types";
+import { CommitteeRole, Permission, WorkspaceType } from "@/types/committee";
 
 export const typeOptions: { value: WorkspaceType; label: string; description: string }[] = [
   {

@@ -1,4 +1,4 @@
-import type { ArticleFilters } from "@/types/article.types";
+import type { ArticleFilters } from "@/types/article";
 
 export function hasActiveFilters(filters: ArticleFilters): boolean {
   return !!(

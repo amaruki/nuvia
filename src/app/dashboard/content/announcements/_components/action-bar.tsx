@@ -4,7 +4,7 @@ import { Download, Filter, Plus, RefreshCw } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { AnnouncementStatistics } from "@/types/announcement.types";
+import type { AnnouncementStatistics } from "@/types/announcement";
 
 interface ActionBarProps {
   totalItems: number;

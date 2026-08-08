@@ -1,4 +1,4 @@
-import { EventCertificate } from "@/types/event.types";
+import { EventCertificate } from "@/types/event";
 import { API_PREFIX } from "@/lib/api-prefix";
 import { ValidationError } from "@/lib/errors";
 import { logger } from "@/lib/logger";

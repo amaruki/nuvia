@@ -1,4 +1,4 @@
-import type { AnnouncementFilters } from "@/types/announcement.types";
+import type { AnnouncementFilters } from "@/types/announcement";
 
 export const DEFAULT_FILTERS: AnnouncementFilters = {
   search: "",

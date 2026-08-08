@@ -2,7 +2,7 @@
 
 import { ArticlesTable } from "@/components/content/articles-table";
 import { Button } from "@/components/ui/button";
-import type { Article, ArticleFilters } from "@/types/article.types";
+import type { Article, ArticleFilters } from "@/types/article";
 
 interface ArticlesTabProps {
   articles: Article[];

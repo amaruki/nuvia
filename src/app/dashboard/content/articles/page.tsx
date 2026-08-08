@@ -9,7 +9,7 @@ import { ArticlesFilters } from "@/components/content/articles-filters";
 import { useArticles } from "@/lib/hooks/use-articles";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
-import { Article } from "@/types/article.types";
+import { Article } from "@/types/article";
 import { ActionBar } from "./_components/action-bar";
 import { AnalyticsTab } from "./_components/analytics-tab";
 import { ArticlesTab } from "./_components/articles-tab";

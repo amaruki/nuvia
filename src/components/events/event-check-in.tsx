@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { QrCode, UserCheck, AlertCircle, CheckCircle, Search } from "lucide-react";
-import { Event, EventRegistration } from "@/types/event.types";
-import type { EventCheckIn } from "@/types/event.types";
+import { Event, EventRegistration } from "@/types/event";
+import type { EventCheckIn } from "@/types/event";
 import { eventCheckInSchema, type EventCheckInInput } from "@/lib/validation/event.validation";
 
 interface EventCheckInProps {

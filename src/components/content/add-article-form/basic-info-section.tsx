@@ -18,7 +18,7 @@ import type {
   ArticleFormat,
   ArticleDifficulty,
   ArticleStatus,
-} from "@/types/article.types";
+} from "@/types/article";
 import {
   TYPE_OPTIONS,
   CATEGORY_OPTIONS,

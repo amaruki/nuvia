@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import type { Publication, PublicationFilters } from "@/types/publication.types";
+import type { Publication, PublicationFilters } from "@/types/publication";
 
 import {
   useContentCollectionApi,

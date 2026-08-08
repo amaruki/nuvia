@@ -1,4 +1,4 @@
-import { CommitteeAuthorityLevel, CommitteeStatus, CommitteeType } from "@/types/committee.types";
+import { CommitteeAuthorityLevel, CommitteeStatus, CommitteeType } from "@/types/committee";
 
 export const statusOptions: { value: CommitteeStatus; label: string; description: string }[] = [
   { value: "active", label: "Active", description: "Fully operational committee" },

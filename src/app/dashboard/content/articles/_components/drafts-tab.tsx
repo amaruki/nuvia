@@ -3,7 +3,7 @@
 import { FileText, Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { Article } from "@/types/article.types";
+import type { Article } from "@/types/article";
 
 interface DraftsTabProps {
   articles: Article[];

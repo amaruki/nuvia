@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-import type { Article, ArticleFilters } from "@/types/article.types";
+import type { Article, ArticleFilters } from "@/types/article";
 
 export function useFilteredArticles(articles: Article[], filters: ArticleFilters): Article[] {
   // Filter and sort articles

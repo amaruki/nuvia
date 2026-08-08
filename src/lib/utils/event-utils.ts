@@ -2,13 +2,13 @@
  * Utility functions for event-related operations
  */
 
-import { EventStatus, EventType, RegistrationStatus } from "@/types/event.types";
+import { EventStatus, EventType, RegistrationStatus } from "@/types/event";
 
 // ---------------------------------------------------------------------------
 // DB <-> UI enum translation (backlog B2)
 //
 // The event tables store uppercase enum values (src/db/schema/enums.ts) while
-// the UI types use lowercase values (src/types/event.types.ts). The tables
+// the UI types use lowercase values (src/types/event/). The tables
 // below are the single translation point between the two vocabularies.
 //
 // The Db* unions mirror src/db/schema/enums.ts by hand: this module is

@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useArticles } from "@/lib/hooks/use-articles";
-import { Article } from "@/types/article.types";
+import { Article } from "@/types/article";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

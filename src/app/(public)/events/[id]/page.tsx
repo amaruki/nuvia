@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AsyncContent } from "@/components/ui/async-content";
 import { ArrowLeft, Ban, Edit, Share2, QrCode } from "lucide-react";
-import { RegistrationStatus } from "@/types/event.types";
+import { RegistrationStatus } from "@/types/event";
 import { useEvent } from "@/lib/hooks/use-events";
 import { cancelEventRegistration } from "@/lib/services/event";
 

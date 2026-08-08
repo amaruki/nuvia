@@ -20,7 +20,7 @@ import {
   WorkspaceStatus,
   WorkspaceType,
   CommitteeRole,
-} from "@/types/committee.types";
+} from "@/types/committee";
 
 interface WorkspacesFiltersProps {
   filters: WorkspaceFilterOptions;

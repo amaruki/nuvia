@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { committee } from "@/db/schema";
 import { BusinessLogicError, NotFoundError } from "@/lib/errors";
-import type { Committee } from "@/types/committee.types";
+import type { Committee } from "@/types/committee";
 import { loadCommitteeParts } from "./batch-loaders";
 import { pgErrorCode, throwUniqueNameViolation, UNIQUE_VIOLATION, UUID_RE } from "./errors";
 import { toCommitteeDto, type CommitteeRow } from "./mappers";

@@ -17,7 +17,7 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
-import { Event, EventStatus, EventType, RegistrationStatus } from "@/types/event.types";
+import { Event, EventStatus, EventType, RegistrationStatus } from "@/types/event";
 
 interface EventDetailsProps {
   event: Event;

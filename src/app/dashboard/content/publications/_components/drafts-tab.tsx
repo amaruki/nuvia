@@ -3,7 +3,7 @@
 import { FileText, Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { Publication } from "@/types/publication.types";
+import type { Publication } from "@/types/publication";
 
 interface DraftsTabProps {
   publications: Publication[];

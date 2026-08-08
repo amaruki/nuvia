@@ -50,7 +50,7 @@ import {
   Publication,
   PUBLICATION_TYPE_DISPLAY,
   PUBLICATION_STATUS_DISPLAY,
-} from "@/types/publication.types";
+} from "@/types/publication";
 import { cn } from "@/lib/utils";
 
 interface PublicationsTableProps {

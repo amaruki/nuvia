@@ -12,7 +12,7 @@ import type {
   CommitteeRole,
   CommitteeStatus,
   CommitteeType,
-} from "@/types/committee.types";
+} from "@/types/committee";
 import { COMMITTEE_AUTHORITY_LEVELS } from "./schemas";
 
 export type CommitteeRow = typeof committee.$inferSelect;

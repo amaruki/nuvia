@@ -8,7 +8,7 @@
  * resource: POST /api/v1/committees, PATCH/DELETE /api/v1/committees/:id.
  *
  * The API serializes dates as ISO strings; `toCommitteeUi` converts them to
- * Date objects to satisfy the UI contract in src/types/committee.types.ts.
+ * Date objects to satisfy the UI contract in src/types/committee/.
  * Statistics are computed client-side from the fetched committees — nothing
  * is invented.
  */
@@ -32,7 +32,7 @@ import type {
   CommitteeStatus,
   CommitteeType,
   CommitteeTypeBreakdown,
-} from "@/types/committee.types";
+} from "@/types/committee";
 
 // ---------------------------------------------------------------------------
 // Wire → UI mapping (ISO date strings → Date)

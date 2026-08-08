@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
-import type { Committee, CommitteeMeeting } from "@/types/committee.types";
+import type { Committee, CommitteeMeeting } from "@/types/committee";
 
 interface CommitteeMeetingsTabProps {
   committee: Committee;

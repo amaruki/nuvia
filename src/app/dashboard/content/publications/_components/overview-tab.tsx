@@ -1,6 +1,6 @@
 import { BarChart3, Eye } from "lucide-react";
 
-import type { PublicationStatistics } from "@/types/publication.types";
+import type { PublicationStatistics } from "@/types/publication";
 import { formatNumber } from "./publications-helpers";
 
 interface OverviewTabProps {

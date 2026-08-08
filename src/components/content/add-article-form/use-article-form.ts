@@ -5,7 +5,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import type { ArticleAuthor, ArticleFormData } from "@/types/article.types";
+import type { ArticleAuthor, ArticleFormData } from "@/types/article";
 import { useArticles } from "@/lib/hooks/use-articles";
 import { formSchema } from "./schema";
 import type { ArticleForm } from "./types";

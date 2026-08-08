@@ -2,7 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { PublicationAuthor, PublicationTag } from "@/types/publication.types";
+import type { PublicationAuthor, PublicationTag } from "@/types/publication";
 import type { FiltersControlProps } from "./types";
 
 export interface FacetFiltersProps extends FiltersControlProps {

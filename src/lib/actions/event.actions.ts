@@ -15,7 +15,7 @@ import {
   Event,
   EventRegistrationResponse,
   EventCheckInResponse,
-} from "@/types/event.types";
+} from "@/types/event";
 import {
   createEvent,
   updateEvent,

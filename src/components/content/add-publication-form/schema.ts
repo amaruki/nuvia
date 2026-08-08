@@ -3,7 +3,7 @@ import {
   PUBLICATION_TYPES,
   PUBLICATION_CATEGORIES,
   PUBLICATION_STATUSES,
-} from "@/types/publication.types";
+} from "@/types/publication";
 
 // Form schema for publications
 export const publicationFormSchema = z.object({

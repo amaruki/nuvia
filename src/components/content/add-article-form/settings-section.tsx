@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TabsContent } from "@/components/ui/tabs";
-import type { ArticleFormData } from "@/types/article.types";
+import type { ArticleFormData } from "@/types/article";
 import { VISIBILITY_OPTIONS } from "./options";
 import type { ArticleFormSectionProps } from "./types";
 

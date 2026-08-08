@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePublications } from "@/lib/hooks/use-publications";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
-import { Publication } from "@/types/publication.types";
+import { Publication } from "@/types/publication";
 import { PublicationsOverviewCards } from "@/components/content/publications-overview-cards";
 import { PublicationsFilters } from "@/components/content/publications-filters";
 import { ActionBar } from "./_components/action-bar";

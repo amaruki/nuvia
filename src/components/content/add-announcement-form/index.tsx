@@ -13,7 +13,7 @@ import {
   type AnnouncementFormData,
   type AnnouncementFormValues,
   type Attachment,
-} from "@/types/announcement.types";
+} from "@/types/announcement";
 
 import { AttachmentsTab } from "./attachments-tab";
 import { ContentTab } from "./content-tab";

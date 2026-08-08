@@ -1,5 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
-import { CommitteeFormData } from "@/types/committee.types";
+import { CommitteeFormData } from "@/types/committee";
 import { CommitteeFormValues } from "./schema";
 
 export interface AddCommitteeFormProps {

@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CommitteeAuthorityLevel } from "@/types/committee.types";
+import { CommitteeAuthorityLevel } from "@/types/committee";
 import { Plus, Trash2 } from "lucide-react";
 import { authorityOptions } from "./options";
 import { CommitteeForm } from "./types";

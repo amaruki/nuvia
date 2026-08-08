@@ -1,6 +1,6 @@
 import { CheckSquare, FileText, MessageSquare, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { CommitteeWorkspace } from "@/types/committee.types";
+import { CommitteeWorkspace } from "@/types/committee";
 
 interface WorkspaceStatsProps {
   workspace: CommitteeWorkspace;

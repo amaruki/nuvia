@@ -1,11 +1,11 @@
-import type { Article, ArticleStatistics } from "@/types/article.types";
+import type { Article, ArticleStatistics } from "@/types/article";
 
 import {
   ARTICLE_CATEGORIES,
   ARTICLE_DIFFICULTIES,
   ARTICLE_STATUSES,
   ARTICLE_TYPES,
-} from "@/types/article.types";
+} from "@/types/article";
 
 export function buildArticleStatistics(articles: Article[]): ArticleStatistics {
   const now = new Date();

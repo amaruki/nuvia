@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, CheckSquare, Target, Users } from "lucide-react";
-import type { Committee } from "@/types/committee.types";
+import type { Committee } from "@/types/committee";
 import { formatPercentage } from "./committee-helpers";
 
 interface CommitteeQuickStatsProps {

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
 
-import type { Attachment } from "@/types/announcement.types";
+import type { Attachment } from "@/types/announcement";
 
 interface NewAttachment {
   name: string;

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
-import type { Committee } from "@/types/committee.types";
+import type { Committee } from "@/types/committee";
 
 interface CommitteeCharterTabProps {
   committee: Committee;

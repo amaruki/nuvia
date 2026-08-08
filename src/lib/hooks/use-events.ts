@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { Event, EventFilter, EventListResponse, EventDetailsResponse } from "@/types/event.types";
+import { Event, EventFilter, EventListResponse, EventDetailsResponse } from "@/types/event";
 import { getEvents, getEventById } from "@/lib/services/event";
 import { logger } from "@/lib/logger";
 

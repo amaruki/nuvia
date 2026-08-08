@@ -1,11 +1,11 @@
-import type { Announcement, AnnouncementStatistics } from "@/types/announcement.types";
-import type { ArticleCategory, ArticleType } from "@/types/article.types";
+import type { Announcement, AnnouncementStatistics } from "@/types/announcement";
+import type { ArticleCategory, ArticleType } from "@/types/article";
 
 import {
   ANNOUNCEMENT_PRIORITIES,
   ANNOUNCEMENT_TARGET_AUDIENCES,
   ANNOUNCEMENT_TYPES,
-} from "@/types/announcement.types";
+} from "@/types/announcement";
 
 export function buildAnnouncementStatistics(announcements: Announcement[]): AnnouncementStatistics {
   const now = new Date();

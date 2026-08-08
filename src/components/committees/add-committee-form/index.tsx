@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CommitteeFormData } from "@/types/committee.types";
+import { CommitteeFormData } from "@/types/committee";
 import { committeeFormSchema, CommitteeFormValues } from "./schema";
 import { AddCommitteeFormProps } from "./types";
 import { BasicInfoSection } from "./basic-info-section";

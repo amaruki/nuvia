@@ -24,7 +24,7 @@ import {
   toUiEvent,
   type ListEventsParams,
 } from "@/lib/services/event-read.service";
-import { EventStatus, EventType, RegistrationStatus } from "@/types/event.types";
+import { EventStatus, EventType, RegistrationStatus } from "@/types/event";
 
 const runSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 const searchToken = `b2-read-${runSuffix}`;

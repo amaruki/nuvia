@@ -1,5 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
-import { WorkspaceFormData } from "@/types/committee.types";
+import { WorkspaceFormData } from "@/types/committee";
 import { WorkspaceFormValues } from "./schema";
 
 export interface AddWorkspaceFormProps {

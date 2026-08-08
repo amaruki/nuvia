@@ -3,7 +3,7 @@ import type {
   PublicationFilters,
   PublicationFormData,
   PublicationStatistics,
-} from "@/types/publication.types";
+} from "@/types/publication";
 
 export interface RawContentItem {
   id: string;

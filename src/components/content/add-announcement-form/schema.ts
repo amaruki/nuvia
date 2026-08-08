@@ -4,7 +4,7 @@ import {
   ANNOUNCEMENT_TYPES,
   ANNOUNCEMENT_PRIORITIES,
   ANNOUNCEMENT_TARGET_AUDIENCES,
-} from "@/types/announcement.types";
+} from "@/types/announcement";
 
 // Form validation schema
 export const announcementFormSchema = z.object({

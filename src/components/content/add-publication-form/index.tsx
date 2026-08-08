@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft } from "lucide-react";
-import { PublicationFormData } from "@/types/publication.types";
+import { PublicationFormData } from "@/types/publication";
 import { usePublications } from "@/lib/hooks/use-publications";
 import { publicationFormSchema } from "./schema";
 import { PublicationPageFormProps } from "./types";

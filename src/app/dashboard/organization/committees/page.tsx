@@ -26,7 +26,7 @@ import { AddCommitteeForm } from "@/components/committees/add-committee-form";
 import { useCommittees } from "@/lib/hooks/use-committees";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
-import { Committee } from "@/types/committee.types";
+import { Committee } from "@/types/committee";
 import { useRouter } from "next/navigation";
 
 export default function OrganizationCommittees() {

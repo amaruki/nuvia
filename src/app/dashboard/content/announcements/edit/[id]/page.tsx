@@ -6,7 +6,7 @@ import { useHeader } from "@/contexts/dashboard-context";
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
 import { logger } from "@/lib/logger";
 import { AddAnnouncementForm } from "@/components/content/add-announcement-form";
-import { AnnouncementFormData } from "@/types/announcement.types";
+import { AnnouncementFormData } from "@/types/announcement";
 
 export default function EditAnnouncementPage() {
   const params = useParams();

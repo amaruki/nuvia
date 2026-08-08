@@ -5,7 +5,7 @@ import type {
   AnnouncementPriority,
   AnnouncementStatistics,
   AnnouncementTargetAudience,
-} from "@/types/announcement.types";
+} from "@/types/announcement";
 
 export interface RawContentItem {
   id: string;

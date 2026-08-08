@@ -1,5 +1,5 @@
-import type { Announcement, AnnouncementType } from "@/types/announcement.types";
-import type { ArticleStatus } from "@/types/article.types";
+import type { Announcement, AnnouncementType } from "@/types/announcement";
+import type { ArticleStatus } from "@/types/article";
 
 import { hydrateDate } from "../use-content-collection";
 

@@ -7,7 +7,7 @@ Committee workspaces (backlog D5). All handlers wrap service work in
 
 Route files: `src/app/api/v1/workspaces/**`. Schemas and enum values:
 `src/lib/services/workspace.service.ts`; UI shapes:
-`src/types/committee.types.ts`. Permissions: `workspaces:read`,
+`src/types/committee/`. Permissions: `workspaces:read`,
 `workspaces:create`, `workspaces:update`, `workspaces:delete`.
 
 ## Endpoints

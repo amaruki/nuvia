@@ -1,6 +1,6 @@
 import { UseFormReturn } from "react-hook-form";
 import * as z from "zod";
-import { PublicationFormData } from "@/types/publication.types";
+import { PublicationFormData } from "@/types/publication";
 import { publicationFormSchema } from "./schema";
 
 export interface PublicationPageFormProps {

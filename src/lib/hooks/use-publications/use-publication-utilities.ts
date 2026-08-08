@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 
-import type { Publication } from "@/types/publication.types";
+import type { Publication } from "@/types/publication";
 
 import { logger } from "@/lib/logger";
 

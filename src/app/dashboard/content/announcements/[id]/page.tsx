@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
 import { logger } from "@/lib/logger";
-import { Announcement } from "@/types/announcement.types";
+import { Announcement } from "@/types/announcement";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

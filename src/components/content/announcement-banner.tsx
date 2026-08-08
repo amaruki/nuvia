@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Announcement } from "@/types/announcement.types";
+import { Announcement } from "@/types/announcement";
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

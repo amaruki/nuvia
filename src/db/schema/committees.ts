@@ -3,7 +3,7 @@
  * Served by src/lib/services/committee/ and the
  * /api/v1/committees/** routes.
  *
- * The UI shape in src/types/committee.types.ts stays the API contract:
+ * The UI shape in src/types/committee/ stays the API contract:
  * charter, meetings and metrics travel as jsonb (the same technique
  * events/content/membership use for nested documents), and leadership and
  * regular members share one `committee_members` table, split by `role` in

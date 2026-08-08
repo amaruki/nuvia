@@ -9,7 +9,7 @@ import {
   type PublicationStatus,
   type PublicationType,
   type PublicationCategory,
-} from "@/types/publication.types";
+} from "@/types/publication";
 import type { FiltersControlProps } from "./types";
 
 export function CheckboxFilters({ filters, onFiltersChange }: FiltersControlProps) {

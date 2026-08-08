@@ -15,7 +15,7 @@ import {
   ArrowRight,
   Award,
 } from "lucide-react";
-import { Event, EventRegistration, EventStatistics } from "@/types/event.types";
+import { Event, EventRegistration, EventStatistics } from "@/types/event";
 import { getEventDashboardData, getEventStatistics } from "@/lib/services/event";
 import { EventListLayout } from "@/components/events/event-list-layout";
 

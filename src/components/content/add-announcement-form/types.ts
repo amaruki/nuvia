@@ -1,7 +1,7 @@
 import type { UseFormReturn } from "react-hook-form";
 import type * as z from "zod";
 
-import type { AnnouncementFormData, AnnouncementFormValues } from "@/types/announcement.types";
+import type { AnnouncementFormData, AnnouncementFormValues } from "@/types/announcement";
 
 import type { announcementFormSchema } from "./schema";
 

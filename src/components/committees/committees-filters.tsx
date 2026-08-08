@@ -20,7 +20,7 @@ import {
   CommitteeStatus,
   CommitteeType,
   CommitteeAuthorityLevel,
-} from "@/types/committee.types";
+} from "@/types/committee";
 
 interface CommitteesFiltersProps {
   filters: CommitteeFilterOptions;

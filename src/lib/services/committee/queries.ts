@@ -8,7 +8,7 @@ import type {
   CommitteeRole,
   CommitteeStatus,
   CommitteeType,
-} from "@/types/committee.types";
+} from "@/types/committee";
 import { loadCommitteeParts } from "./batch-loaders";
 import { UUID_RE } from "./errors";
 import { toCommitteeDto } from "./mappers";

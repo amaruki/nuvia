@@ -3,7 +3,7 @@ import {
   CheckInToEventRequest,
   EventRegistrationResponse,
   EventCheckInResponse,
-} from "@/types/event.types";
+} from "@/types/event";
 import { API_PREFIX } from "@/lib/api-prefix";
 import { type DbRegistrationStatus } from "@/lib/utils/event-utils";
 import { ValidationError, BusinessLogicError } from "@/lib/errors";

@@ -1,4 +1,4 @@
-import { Event, EventRegistration } from "@/types/event.types";
+import { Event, EventRegistration } from "@/types/event";
 import {
   DB_TO_UI_EVENT_STATUS,
   DB_TO_UI_EVENT_TYPE,

@@ -1,7 +1,7 @@
 import type { ChangeEvent, Dispatch, SetStateAction } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import * as z from "zod";
-import type { ArticleAuthor, ArticleFormData } from "@/types/article.types";
+import type { ArticleAuthor, ArticleFormData } from "@/types/article";
 import { formSchema } from "./schema";
 
 export interface ArticlePageFormProps {

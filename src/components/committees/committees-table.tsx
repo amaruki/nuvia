@@ -41,7 +41,7 @@ import {
   Briefcase,
   Award,
 } from "lucide-react";
-import { Committee } from "@/types/committee.types";
+import { Committee } from "@/types/committee";
 import { formatDistanceToNow } from "date-fns";
 
 interface CommitteesTableProps {

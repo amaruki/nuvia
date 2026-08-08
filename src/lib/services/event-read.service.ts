@@ -31,7 +31,7 @@ import {
   Event as UiEvent,
   EventRegistration as UiEventRegistration,
   RegistrationStatus,
-} from "@/types/event.types";
+} from "@/types/event";
 
 // Drizzle select-row shapes for the tables this module reads.
 type EventSelect = typeof event.$inferSelect;

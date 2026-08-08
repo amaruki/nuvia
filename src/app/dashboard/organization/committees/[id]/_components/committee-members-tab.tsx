@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
 import { Users } from "lucide-react";
-import type { Committee, CommitteeMember } from "@/types/committee.types";
+import type { Committee, CommitteeMember } from "@/types/committee";
 
 interface CommitteeMembersTabProps {
   committee: Committee;

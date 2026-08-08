@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import type { Article, ArticleFilters } from "@/types/article.types";
+import type { Article, ArticleFilters } from "@/types/article";
 
 import { logger } from "@/lib/logger";
 

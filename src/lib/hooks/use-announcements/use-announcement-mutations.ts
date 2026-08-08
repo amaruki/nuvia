@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 
-import type { Announcement, AnnouncementFormData } from "@/types/announcement.types";
+import type { Announcement, AnnouncementFormData } from "@/types/announcement";
 
 import { formToPayload, type ContentCollectionApi } from "../use-content-collection";
 

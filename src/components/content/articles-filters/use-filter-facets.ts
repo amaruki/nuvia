@@ -1,7 +1,7 @@
 "use client";
 
 import { useArticles } from "@/lib/hooks/use-articles";
-import type { ArticleAuthor, ArticleTag } from "@/types/article.types";
+import type { ArticleAuthor, ArticleTag } from "@/types/article";
 
 export interface FilterFacets {
   authors: ArticleAuthor[];

@@ -1,4 +1,4 @@
-import { PublicationCategory, PublicationStatus, PublicationType } from "@/types/publication.types";
+import { PublicationCategory, PublicationStatus, PublicationType } from "@/types/publication";
 
 export const typeOptions: { value: PublicationType; label: string }[] = [
   { value: "article", label: "Article" },

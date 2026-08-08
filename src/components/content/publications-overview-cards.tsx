@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PublicationStatistics } from "@/types/publication.types";
+import { PublicationStatistics } from "@/types/publication";
 import {
   FileText,
   Eye,

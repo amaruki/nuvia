@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { QrCode, Download, ExternalLink, XCircle, CheckCircle, Clock } from "lucide-react";
-import { Event, EventRegistration, RegistrationStatus } from "@/types/event.types";
+import { Event, EventRegistration, RegistrationStatus } from "@/types/event";
 
 interface EventRegistrationStatusProps {
   event: Event;

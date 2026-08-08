@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CommitteeRole, Permission } from "@/types/committee.types";
+import { CommitteeRole, Permission } from "@/types/committee";
 import { Plus, Trash2 } from "lucide-react";
 import { roleOptions, permissionOptions } from "./options";
 import { WorkspaceForm } from "./types";

@@ -1,4 +1,4 @@
-import type { PublicationFilters } from "@/types/publication.types";
+import type { PublicationFilters } from "@/types/publication";
 
 export interface FiltersControlProps {
   filters: PublicationFilters;

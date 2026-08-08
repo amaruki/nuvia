@@ -40,8 +40,8 @@ import {
   Shield,
   Gift,
 } from "lucide-react";
-import { Announcement } from "@/types/announcement.types";
-import { ArticleStatus } from "@/types/article.types";
+import { Announcement } from "@/types/announcement";
+import { ArticleStatus } from "@/types/article";
 import { formatDistanceToNow } from "date-fns";
 
 interface AnnouncementsTableProps {

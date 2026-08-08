@@ -1,4 +1,4 @@
-import { Event, CreateEventRequest, UpdateEventRequest } from "@/types/event.types";
+import { Event, CreateEventRequest, UpdateEventRequest } from "@/types/event";
 import { API_PREFIX } from "@/lib/api-prefix";
 import {
   UI_TO_DB_EVENT_STATUS,

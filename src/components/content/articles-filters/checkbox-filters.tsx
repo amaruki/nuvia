@@ -13,7 +13,7 @@ import {
   type ArticleCategory,
   type ArticleDifficulty,
   type ArticleFormat,
-} from "@/types/article.types";
+} from "@/types/article";
 import type { FiltersControlProps } from "./types";
 
 export function CheckboxFilters({ filters, onFiltersChange }: FiltersControlProps) {

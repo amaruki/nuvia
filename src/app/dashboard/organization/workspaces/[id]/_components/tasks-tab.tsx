@@ -2,7 +2,7 @@ import { formatDistanceToNow } from "date-fns";
 import { CheckSquare } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
-import { CommitteeWorkspace } from "@/types/committee.types";
+import { CommitteeWorkspace } from "@/types/committee";
 import { getTaskPriorityBadge, getTaskStatusBadge } from "./status-badges";
 
 interface TasksTabProps {

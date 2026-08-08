@@ -27,7 +27,7 @@ import {
   type AnnouncementPriority,
   type AnnouncementTargetAudience,
   type AnnouncementType,
-} from "@/types/announcement.types";
+} from "@/types/announcement";
 
 import { AUDIENCE_ICON_MAP, PRIORITY_ICON_MAP, TYPE_ICON_MAP } from "./icon-maps";
 import type { AnnouncementForm, AnnouncementFormFields } from "./types";

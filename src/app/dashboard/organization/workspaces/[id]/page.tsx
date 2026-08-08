@@ -6,7 +6,7 @@ import { useHeader } from "@/contexts/dashboard-context";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CommitteeWorkspace } from "@/types/committee.types";
+import { CommitteeWorkspace } from "@/types/committee";
 import { ArrowLeft, Briefcase } from "lucide-react";
 import { apiFetch } from "@/lib/api-client";
 import { toWorkspaceUi, type WireWorkspace } from "@/lib/hooks/use-workspaces";

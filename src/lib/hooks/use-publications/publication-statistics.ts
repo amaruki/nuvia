@@ -1,10 +1,10 @@
-import type { Publication, PublicationStatistics } from "@/types/publication.types";
+import type { Publication, PublicationStatistics } from "@/types/publication";
 
 import {
   PUBLICATION_CATEGORIES,
   PUBLICATION_STATUSES,
   PUBLICATION_TYPES,
-} from "@/types/publication.types";
+} from "@/types/publication";
 
 export function buildPublicationStatistics(publications: Publication[]): PublicationStatistics {
   const now = new Date();

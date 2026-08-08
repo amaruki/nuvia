@@ -4,7 +4,7 @@ import type {
   ArticleDifficulty,
   ArticleStatus,
   ArticleType,
-} from "@/types/article.types";
+} from "@/types/article";
 
 import { hydrateDate } from "../use-content-collection";
 

@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TabsContent } from "@/components/ui/tabs";
-import { PublicationFormData } from "@/types/publication.types";
+import { PublicationFormData } from "@/types/publication";
 import { visibilityOptions } from "./options";
 import { PublicationForm } from "./types";
 

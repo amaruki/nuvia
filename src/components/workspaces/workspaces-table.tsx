@@ -41,7 +41,7 @@ import {
   Activity,
   Target,
 } from "lucide-react";
-import { CommitteeWorkspace } from "@/types/committee.types";
+import { CommitteeWorkspace } from "@/types/committee";
 import { formatDistanceToNow } from "date-fns";
 
 interface WorkspacesTableProps {

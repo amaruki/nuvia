@@ -1,4 +1,4 @@
-import type { ArticleFilters } from "@/types/article.types";
+import type { ArticleFilters } from "@/types/article";
 
 export const DEFAULT_FILTERS: ArticleFilters = {
   search: "",

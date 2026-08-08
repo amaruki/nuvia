@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CommitteeStatus, CommitteeType } from "@/types/committee.types";
+import { CommitteeStatus, CommitteeType } from "@/types/committee";
 import { statusOptions, typeOptions } from "./options";
 import { CommitteeForm } from "./types";
 

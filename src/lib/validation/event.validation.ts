@@ -3,7 +3,7 @@
  */
 
 import { z } from "zod";
-import { EventStatus, EventType, RegistrationStatus } from "@/types/event.types";
+import { EventStatus, EventType, RegistrationStatus } from "@/types/event";
 
 // Event status validation
 const eventStatusSchema = z.enum(EventStatus, {

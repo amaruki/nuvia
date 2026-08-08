@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { WorkspaceOverallStatistics } from "@/types/committee.types";
+import { WorkspaceOverallStatistics } from "@/types/committee";
 import {
   Users,
   FileText,

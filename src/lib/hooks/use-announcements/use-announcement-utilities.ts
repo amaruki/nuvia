@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 
-import type { Announcement } from "@/types/announcement.types";
+import type { Announcement } from "@/types/announcement";
 
 import { logger } from "@/lib/logger";
 

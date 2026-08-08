@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import type { Announcement, AnnouncementFilters } from "@/types/announcement.types";
+import type { Announcement, AnnouncementFilters } from "@/types/announcement";
 
 import {
   useContentCollectionApi,

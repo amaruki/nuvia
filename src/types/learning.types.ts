@@ -3,7 +3,7 @@
  *
  * Moved out of `src/app/dashboard/learning/courses/_types` so the service,
  * hooks, and pages share one definition (same arrangement as
- * chapter.types.ts / committee.types.ts). The API returns these shapes
+ * chapter.types.ts). The API returns these shapes
  * directly, with dates as ISO strings until the hooks hydrate the display
  * labels the pages render (`Course.updatedAt`, `Certificate.issueDate`).
  */

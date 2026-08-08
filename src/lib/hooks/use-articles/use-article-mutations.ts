@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 
-import type { Article, ArticleFormData } from "@/types/article.types";
+import type { Article, ArticleFormData } from "@/types/article";
 
 import { formToPayload, type ContentCollectionApi } from "../use-content-collection";
 

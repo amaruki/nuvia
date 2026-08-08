@@ -7,7 +7,7 @@ import {
   ANNOUNCEMENT_TYPE_DISPLAY,
   ANNOUNCEMENT_PRIORITY_DISPLAY,
   ANNOUNCEMENT_TARGET_AUDIENCE_DISPLAY,
-} from "@/types/announcement.types";
+} from "@/types/announcement";
 import { X } from "lucide-react";
 import type { FiltersControlProps } from "./types";
 import { removeArrayFilterValue } from "./filter-helpers";

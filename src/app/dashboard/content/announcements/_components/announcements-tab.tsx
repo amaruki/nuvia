@@ -1,8 +1,8 @@
 "use client";
 
 import { AnnouncementsTable } from "@/components/content/announcements-table";
-import type { Announcement } from "@/types/announcement.types";
-import type { ArticleStatus } from "@/types/article.types";
+import type { Announcement } from "@/types/announcement";
+import type { ArticleStatus } from "@/types/article";
 
 interface AnnouncementsTabProps {
   announcements: Announcement[];

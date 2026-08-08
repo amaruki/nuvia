@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { PublicationsTable } from "@/components/content/publications-table";
-import type { Publication, PublicationFilters } from "@/types/publication.types";
+import type { Publication, PublicationFilters } from "@/types/publication";
 
 interface PublicationsTabProps {
   publications: Publication[];

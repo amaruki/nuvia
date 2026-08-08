@@ -126,7 +126,7 @@ Four collections on one table, plus disk-backed uploads.
   - list query schemas).
 - **Spec:** [`api-specs/content.md`](api-specs/content.md),
   [`api-specs/media.md`](api-specs/media.md).
-- **Tests:** `tests/content-api.test.ts`.
+- **Tests:** `tests/content-api/`.
 
 ## 7. Forums (backlog B5)
 

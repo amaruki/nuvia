@@ -61,6 +61,8 @@
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* Dark mode */
@@ -516,14 +518,14 @@ html {
 }
 
 .landing-rise {
-  animation: landing-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: landing-rise 0.7s var(--ease-out) both;
 }
 
 .landing-hover {
   transition:
-    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transform 0.3s var(--ease-out),
+    box-shadow 0.3s var(--ease-out),
+    border-color 0.3s var(--ease-out);
 }
 
 .landing-hover:hover {

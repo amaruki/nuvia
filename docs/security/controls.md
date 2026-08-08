@@ -2,9 +2,17 @@
 
 ## Framework Choice
 
-This project uses OWASP ASVS, NIST SSDF (SP 800-218), and ISO/IEC 27001 Annex A **A.8 only**. ASVS and SSDF are free, self-assessable, and map to checkable engineering practices. This pairing is realistic for a small OSS project without an audit budget. SLSA build provenance covers the supply-chain and artifact-signing requirements separately (`docs/supply-chain.md`, `docs/release.md`).
+This project uses OWASP ASVS and NIST SSDF (SP 800-218) as its working frameworks. It references ISO/IEC 27001 Annex A.8 (technological controls) only, as a mapping reference, not as a conformance claim (see the ISO statement below). ASVS and SSDF are free, self-assessable, and map to checkable engineering practices. This pairing is realistic for a small OSS project without an audit budget. SLSA build provenance covers the supply-chain and artifact-signing requirements separately (`docs/supply-chain.md`, `docs/release.md`).
 
-This document limits ISO 27001 Annex A to a narrow, honest scope. A.5 (organizational controls), A.6 (people controls, such as screening and NDAs), and A.7 (physical controls, such as facilities) describe an _organization_, not a _codebase_. A repository cannot satisfy them. Certification always requires an external auditor. This requirement holds regardless of what the code does. Only **A.8 (technological controls)** is meaningful here. The ASVS and SSDF mapping below covers A.8. This document does not duplicate that coverage. A claim of broader ISO 27001 coverage than this would violate the "transparent" principle in `docs/PRINCIPLES.md`.
+## ISO/IEC 27001 Statement (Annex A.8 Only)
+
+**No certification, no conformance claim.** This project is not ISO/IEC 27001 certified, and it does not claim conformance to ISO/IEC 27001. Certification can only be granted by an external, accredited certification body, and no such body has been engaged. No artifact in this repository substitutes for that audit. This holds regardless of what the code does.
+
+**Scope: A.8 technological controls only.** The only ISO/IEC 27001 Annex A controls this document maps are the A.8 technological controls, and it maps them indirectly: the ASVS and SSDF tables below are the working mapping, and this document does not duplicate that coverage. Even within A.8, the mapping is a maintainer self-assessment, not an audit finding.
+
+**A.5–A.7 are out of scope, and a repository cannot satisfy them.** A.5 (organizational controls, such as policies and risk management), A.6 (people controls, such as screening and confidentiality agreements), and A.7 (physical controls, such as facilities) describe an _organization_, not a _codebase_. This project makes no claim over them. An organization that deploys Nuvia and pursues certification must satisfy A.5–A.7 itself, at the organizational level.
+
+**Why this narrow scope.** A claim of broader ISO 27001 coverage than the above would violate the "Transparent" principle in `docs/PRINCIPLES.md`. Listing a framework and letting the reader assume full coverage is exactly the overclaim that principle forbids.
 
 ## Control Verification Status
 

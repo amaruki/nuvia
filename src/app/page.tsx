@@ -69,7 +69,7 @@ export default function Home() {
     <div className="min-h-[100dvh] bg-background text-foreground">
       {/* Navigation */}
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
-        <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        <div className="container mx-auto flex h-16 max-w-5xl items-center justify-between px-6 md:px-8">
           <Link href="/" className="flex items-center gap-2.5">
             <Image src="/logo.png" alt="Nuvia logo" width={32} height={32} className="rounded-md" />
             <span className="text-lg font-semibold tracking-tight">Nuvia</span>
@@ -117,10 +117,10 @@ export default function Home() {
       {/* Hero: value proposition on the left, a live component preview on
           the right. The preview uses the same Card, Table, Avatar, and
           Badge components the dashboard renders with. */}
-      <section className="overflow-hidden px-6 pb-16 pt-16 md:pb-20 md:pt-20">
-        <div className="container mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-2">
+      <section className="overflow-hidden px-6 md:px-8 pb-16 pt-16 md:pb-20 md:pt-20">
+        <div className="container mx-auto grid max-w-5xl items-center gap-16 lg:grid-cols-2">
           <div>
-            <h1 className="landing-rise text-4xl font-bold tracking-tighter md:text-5xl lg:text-6xl">
+            <h1 className="landing-rise text-4xl font-bold tracking-tighter md:text-5xl">
               Run your association on software you own.
             </h1>
             <p
@@ -202,8 +202,8 @@ export default function Home() {
 
       {/* Features: bento grid. Cell sizes vary so the section has rhythm
           instead of six identical tiles. */}
-      <section id="features" className="border-t border-border/60 px-6 py-16 md:py-20">
-        <div className="container mx-auto max-w-6xl">
+      <section id="features" className="border-t border-border/60 px-6 md:px-8 py-16 md:py-20">
+        <div className="container mx-auto max-w-5xl">
           <h2 className="max-w-[24ch] text-3xl font-bold tracking-tight md:text-4xl">
             Everything an association runs on
           </h2>
@@ -306,8 +306,11 @@ export default function Home() {
 
       {/* Modules: what is backed by a real database today, and what ships
           later. Mirrors the honest status in README and TODO.md. */}
-      <section id="modules" className="border-t border-border/60 bg-muted/30 px-6 py-16 md:py-20">
-        <div className="container mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-start">
+      <section
+        id="modules"
+        className="border-t border-border/60 bg-muted/30 px-6 md:px-8 py-16 md:py-20"
+      >
+        <div className="container mx-auto grid max-w-5xl gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-start">
           <div>
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Real where it counts</h2>
             <p className="mt-4 max-w-[52ch] text-muted-foreground">
@@ -351,8 +354,8 @@ export default function Home() {
       </section>
 
       {/* Community */}
-      <section id="community" className="border-t border-border/60 px-6 py-16 md:py-20">
-        <div className="container mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
+      <section id="community" className="border-t border-border/60 px-6 md:px-8 py-16 md:py-20">
+        <div className="container mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-2">
           <Image
             src="https://picsum.photos/seed/nuvia-association-meeting/1200/900"
             alt="Attendees talking at an association meeting"
@@ -409,9 +412,9 @@ export default function Home() {
       {/* Contribute */}
       <section
         id="contribute"
-        className="border-t border-border/60 bg-muted/30 px-6 py-16 md:py-20"
+        className="border-t border-border/60 bg-muted/30 px-6 md:px-8 py-16 md:py-20"
       >
-        <div className="container mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
+        <div className="container mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-2">
           <div>
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
               Your first contribution is one clone away
@@ -441,8 +444,8 @@ export default function Home() {
       </section>
 
       {/* Final call to action */}
-      <section className="px-6 py-16 md:py-20">
-        <div className="container mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 rounded-xl border border-border/60 bg-card p-8 shadow-sm md:flex-row md:items-center md:p-10">
+      <section className="px-6 md:px-8 py-16 md:py-20">
+        <div className="container mx-auto flex max-w-5xl flex-col items-start justify-between gap-6 rounded-xl border border-border/60 bg-card p-8 shadow-sm md:flex-row md:items-center md:p-10">
           <div>
             <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
               Run your association on Nuvia
@@ -458,8 +461,8 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/60 px-6 py-12">
-        <div className="container mx-auto max-w-6xl">
+      <footer className="border-t border-border/60 px-6 md:px-8 py-12">
+        <div className="container mx-auto max-w-5xl">
           <div className="flex flex-col justify-between gap-10 md:flex-row">
             <div className="max-w-xs">
               <div className="flex items-center gap-2.5">

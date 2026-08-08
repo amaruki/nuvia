@@ -257,15 +257,12 @@ dd {
    Utility Classes
    ============================================================================ */
 
-/* Container for consistent max-width and centering */
-.container {
-  width: 100%;
-  max-width: var(--container-max-width);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
+/* NOTE: a hand-rolled `.container` override used to live here. It set
+   `max-width: var(--container-max-width)` with the variable never defined,
+   which resolves to `none` and, being later in the cascade, also clobbered
+   every Tailwind `max-w-*` utility placed on the same element. Every
+   container in the app rendered full-bleed as a result. Layout width is now
+   owned by Tailwind's `container` + explicit `max-w-*` per usage. */
 
 /* Smooth scrolling for the entire document */
 html {

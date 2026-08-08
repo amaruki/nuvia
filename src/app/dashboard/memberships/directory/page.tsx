@@ -45,7 +45,7 @@ export default function MembershipDirectory() {
 
   if (error) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 py-8">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
           <h2 className="text-red-800 font-semibold mb-2">Error Loading Members</h2>
           <p className="text-red-600 mb-4">
@@ -63,7 +63,7 @@ export default function MembershipDirectory() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Filters */}
       <MembershipFilter
         filters={filters}

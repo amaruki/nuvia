@@ -175,10 +175,6 @@
    Base Styles
    ============================================================================ */
 
-* {
-  border-color: var(--border);
-}
-
 body {
   /* next/font loads Geist and Geist Mono in src/app/layout.tsx and sets the
      variables on this element. Declare the stacks here, where the variables
@@ -200,20 +196,6 @@ body {
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-figure,
-blockquote,
-dl,
-dd {
-  margin: 0;
 }
 
 ::selection {
@@ -239,20 +221,6 @@ dd {
   background: var(--foreground);
 }
 
-/* Remove default margins */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-figure,
-blockquote,
-dl,
-dd {
-  margin: 0;
-}
 /* ============================================================================
    Utility Classes
    ============================================================================ */

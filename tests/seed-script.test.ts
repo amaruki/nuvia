@@ -20,17 +20,29 @@ async function runSeed(env: Record<string, string | undefined>) {
 }
 
 describe("scripts/seed.ts", () => {
-  test("exits non-zero when SEED_ADMIN_PASSWORD is not set", async () => {
-    const { exitCode, stderr } = await runSeed({ SEED_ADMIN_PASSWORD: undefined });
+  // Both tests spawn a real bun subprocess that cold-loads the whole
+  // auth stack (react-email templates included). On a loaded machine
+  // that can exceed bun's 5s default test timeout even though the script
+  // itself exits in milliseconds once loaded, so give the spawn room.
+  test(
+    "exits non-zero when SEED_ADMIN_PASSWORD is not set",
+    async () => {
+      const { exitCode, stderr } = await runSeed({ SEED_ADMIN_PASSWORD: undefined });
 
-    expect(exitCode).toBe(1);
-    expect(stderr).toContain("SEED_ADMIN_PASSWORD is not set");
-  });
+      expect(exitCode).toBe(1);
+      expect(stderr).toContain("SEED_ADMIN_PASSWORD is not set");
+    },
+    { timeout: 30_000 },
+  );
 
-  test("exits non-zero when SEED_ADMIN_PASSWORD is too weak", async () => {
-    const { exitCode, stderr } = await runSeed({ SEED_ADMIN_PASSWORD: "weak" });
+  test(
+    "exits non-zero when SEED_ADMIN_PASSWORD is too weak",
+    async () => {
+      const { exitCode, stderr } = await runSeed({ SEED_ADMIN_PASSWORD: "weak" });
 
-    expect(exitCode).toBe(1);
-    expect(stderr).toContain("does not meet password requirements");
-  });
+      expect(exitCode).toBe(1);
+      expect(stderr).toContain("does not meet password requirements");
+    },
+    { timeout: 30_000 },
+  );
 });

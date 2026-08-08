@@ -97,6 +97,12 @@ const PAGES = [
     auth: true,
   },
   { slug: "finance-gateways", path: "/dashboard/finance/gateways", module: "finance", auth: true },
+  {
+    slug: "chapters-directory",
+    path: "/dashboard/organization/chapters",
+    module: "chapters",
+    auth: true,
+  },
 ] as const;
 
 const SEVERITIES_FAILING: Record<string, true> = { critical: true, serious: true };

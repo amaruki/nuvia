@@ -32,12 +32,12 @@ export const MODULE_NAMES = [
 export type ModuleName = (typeof MODULE_NAMES)[number];
 
 /**
- * §13.3 registry. members/events/content/forums/jobs plus finance are
- * Promoted: backing schema + authorized API + tests + docs (finance
- * promoted 2026-08-08, backlog C5, docs/modules/finance.md). The
- * remaining five render from src/lib/data/mock-*.ts and stay off until
- * promoted (§13.4 order: chapters, committees, learning, awards,
- * workspaces).
+ * §13.3 registry. members/events/content/forums/jobs, finance and chapters
+ * are Promoted: backing schema + authorized API + tests + docs (finance
+ * promoted 2026-08-08, backlog C5, docs/modules/finance.md; chapters
+ * promoted 2026-08-08, backlog D1, docs/modules/chapters.md). The remaining
+ * four render from src/lib/data/mock-*.ts and stay off until promoted
+ * (§13.4 order: committees, learning, awards, workspaces).
  */
 export const MODULE_FLAGS: Record<ModuleName, boolean> = {
   members: true,
@@ -48,7 +48,7 @@ export const MODULE_FLAGS: Record<ModuleName, boolean> = {
   finance: true,
   awards: false,
   learning: false,
-  chapters: false,
+  chapters: true,
   committees: false,
   workspaces: false,
 };

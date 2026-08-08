@@ -93,6 +93,7 @@ Wave C preamble: finance/dues is the product core for an AMS and the first modul
   - Why: chapters is the first module after finance in the declared promotion order, and its UI currently renders mock data rather than real records.
   - Acceptance: chapters clears the same promotion bar as C5 — schema + authorized API + UI de-mock of `mock-chapter-data` + tests + docs, with the module flag flipped on.
   - Deps: C5 pattern.
+  - Status: done 2026-08-08. Chapters cleared the C5 promotion bar: schema (`chapters` + `chapter_members` tables, `ChapterStatus`/`ChapterRole` enums, migration 0005), authorized API `/api/v1/chapters/**` on `chapters:*` permissions, UI de-mocked (`mock-chapter-data.ts` deleted; hooks and pages on `apiFetch`), 22 tests in `tests/chapters-api.test.ts`, module docs at `docs/modules/chapters.md`, and `chapters: true` in `config/features.ts` with `/dashboard/organization/chapters` added to the axe smoke (14 pages PASS, 0 critical/serious).
 
 - **D2 — Committees real (same bar; `mock-committee-data`).**
   - Why: committees is the next module in the post-1.0 promotion order, and its UI currently renders mock data rather than real records.

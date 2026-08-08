@@ -103,6 +103,12 @@ const PAGES = [
     module: "chapters",
     auth: true,
   },
+  {
+    slug: "committees-directory",
+    path: "/dashboard/organization/committees",
+    module: "committees",
+    auth: true,
+  },
 ] as const;
 
 const SEVERITIES_FAILING: Record<string, true> = { critical: true, serious: true };

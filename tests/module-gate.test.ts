@@ -14,8 +14,8 @@ import {
 // The two module sets ADR-0008 / docs/technical-specs/13-module-maturity-gate.md
 // §13.3 fixes: promoted modules ship enabled, Mock-tier modules stay off
 // until they clear the promotion bar. Finance joined the promoted set on
-// 2026-08-08 (backlog C5) and chapters on 2026-08-08 (backlog D1); the
-// remaining four stay Mock tier.
+// 2026-08-08 (backlog C5), chapters (backlog D1) and committees (backlog D2)
+// on the same day; the remaining three stay Mock tier.
 const PROMOTED: readonly ModuleName[] = [
   "members",
   "events",
@@ -24,8 +24,9 @@ const PROMOTED: readonly ModuleName[] = [
   "jobs",
   "finance",
   "chapters",
+  "committees",
 ];
-const MOCK_TIER: readonly ModuleName[] = ["awards", "learning", "committees", "workspaces"];
+const MOCK_TIER: readonly ModuleName[] = ["awards", "learning", "workspaces"];
 
 describe("MODULE_FLAGS registry (§13.3 shape)", () => {
   test("covers exactly the eleven known modules, no more and no fewer", () => {
@@ -97,7 +98,7 @@ describe("getEnabledModules / getDisabledModules (enabled set)", () => {
 
   test("the partition follows flag overrides", () => {
     const promoted: Record<ModuleName, boolean> = { ...MODULE_FLAGS, awards: true };
-    // MODULE_NAMES order: awards sorts before chapters.
+    // MODULE_NAMES order: awards sorts before chapters and committees.
     expect(getEnabledModules(promoted)).toEqual([
       "members",
       "events",
@@ -107,6 +108,7 @@ describe("getEnabledModules / getDisabledModules (enabled set)", () => {
       "finance",
       "awards",
       "chapters",
+      "committees",
     ]);
     expect(getDisabledModules(promoted)).toEqual(MOCK_TIER.filter((m) => m !== "awards"));
   });

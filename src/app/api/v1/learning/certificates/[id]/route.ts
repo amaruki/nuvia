@@ -10,7 +10,7 @@ import {
   getCertificate,
   updateCertificate,
   updateCertificateSchema,
-} from "@/lib/services/learning.service";
+} from "@/lib/services/learning";
 import { handleLearningRoute } from "../../_lib";
 
 interface RouteContext {

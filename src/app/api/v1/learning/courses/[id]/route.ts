@@ -7,12 +7,7 @@
 import type { NextRequest } from "next/server";
 import { requirePermission } from "@/lib/rbac";
 import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
-import {
-  deleteCourse,
-  getCourse,
-  updateCourse,
-  updateCourseSchema,
-} from "@/lib/services/learning.service";
+import { deleteCourse, getCourse, updateCourse, updateCourseSchema } from "@/lib/services/learning";
 import { handleLearningRoute } from "../../_lib";
 
 interface RouteContext {

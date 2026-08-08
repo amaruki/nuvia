@@ -10,7 +10,7 @@ import {
   issueCertificate,
   issueCertificateSchema,
   listCertificates,
-} from "@/lib/services/learning.service";
+} from "@/lib/services/learning";
 import { handleLearningRoute, parsePagination } from "../_lib";
 
 export async function GET(request: NextRequest) {

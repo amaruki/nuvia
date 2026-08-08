@@ -56,7 +56,7 @@ import {
   getCertificate as getCertificateDirect,
   getCourse as getCourseDirect,
   updateCourse as updateCourseDirect,
-} from "@/lib/services/learning.service";
+} from "@/lib/services/learning";
 
 // ---------------------------------------------------------------------------
 // Fixtures

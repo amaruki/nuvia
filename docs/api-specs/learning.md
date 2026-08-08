@@ -6,7 +6,7 @@ handlers wrap service work in `handleLearningRoute()`
 its embedded problem and anything else to 500 `internal-error`.
 
 Route files: `src/app/api/v1/learning/**`. Schemas:
-`src/lib/services/learning.service.ts`; UI shapes:
+`src/lib/services/learning/`; UI shapes:
 `src/types/learning.types.ts`. Permissions: `learning:read`,
 `learning:create`, `learning:update`, `learning:delete`.
 

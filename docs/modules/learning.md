@@ -49,7 +49,7 @@ Permission holders among predefined roles (`src/types/role.types.ts`): `superadm
 
 ## Services
 
-- `src/lib/services/learning.service.ts` — the whole module's data access: zod create/update/issue schemas, list with filters/pagination (`paginate`, default limit 20, max 100), get/create/update/delete for courses, issue/get/update/list for certificates, `computeDuration` (lesson-duration summing), the verification-code builder, and the row→DTO mappers that hydrate `metadata.ui` (color/features/modules/reviews) with safe fallbacks and map the SCREAMING_SNAKE DB enums to UI casing. Errors are `LearningServiceError` carrying RFC 9457 problem details; PG `23505` maps to a 409 conflict.
+- `src/lib/services/learning/` — the whole module's data access: zod create/update/issue schemas, list with filters/pagination (`paginate`, default limit 20, max 100), get/create/update/delete for courses, issue/get/update/list for certificates, `computeDuration` (lesson-duration summing), the verification-code builder, and the row→DTO mappers that hydrate `metadata.ui` (color/features/modules/reviews) with safe fallbacks and map the SCREAMING_SNAKE DB enums to UI casing. Errors are `LearningServiceError` carrying RFC 9457 problem details; PG `23505` maps to a 409 conflict.
 
 Routes map service errors in `src/app/api/v1/learning/_lib.ts`: `LearningServiceError.problemDetails` → `problemResponse`, anything else → 500.
 

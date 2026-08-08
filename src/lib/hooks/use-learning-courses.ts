@@ -14,7 +14,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { apiFetch, ApiClientError } from "@/lib/api-client";
 import type { Course } from "@/types/learning.types";
-import type { CreateCourseInput, UpdateCourseInput } from "@/lib/services/learning.service";
+import type { CreateCourseInput, UpdateCourseInput } from "@/lib/services/learning";
 
 // ---------------------------------------------------------------------------
 // Wire → UI mapping (ISO date strings → display labels)

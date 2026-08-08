@@ -12,7 +12,7 @@ Conventions used below:
   `route.ts` per endpoint group, exporting the HTTP verbs.
 - **Permissions** come from `AVAILABLE_PERMISSIONS` in
   `src/types/role.types.ts` and are enforced through `requirePermission` /
-  `requireRole` (`src/lib/rbac.ts`).
+  `requireRole` (`src/lib/rbac/`).
 - **Errors** are RFC 9457 problems built only through `src/lib/http.ts`.
 - All 48 tables were created by migrations `drizzle/0000`–`0009`.
 
@@ -24,7 +24,7 @@ Cross-cutting infrastructure every other module imports.
 | ------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Environment validation   | `src/lib/env.ts`           | Zod schema; required vs defaulted vars; `superRefine` pairs (Stripe, Redis); see `DEPLOYMENT_PLAN.md`                     |
 | HTTP envelope + problems | `src/lib/http.ts`          | `successResponse`, `problemResponse`, `problems.*`, `validationProblem` (ADR-0002)                                        |
-| Authorization            | `src/lib/rbac.ts`          | `requirePermission`, `requireRole`, `hasPermission`, `getCurrentUser`, `changeUserRole`, `canGrantPermissions` (ADR-0001) |
+| Authorization            | `src/lib/rbac/`            | `requirePermission`, `requireRole`, `hasPermission`, `getCurrentUser`, `changeUserRole`, `canGrantPermissions` (ADR-0001) |
 | Rate limiting            | `src/lib/rate-limit.ts`    | Redis sliding-window log; `RATE_LIMITS` buckets (ADR-0003)                                                                |
 | Logging                  | `src/lib/logger.ts`        | One structured logger, `no-console` lint rule (ADR-0004)                                                                  |
 | Session cache            | `src/lib/session-cache.ts` | Redis-backed session cache used by the auth v1 routes                                                                     |
@@ -65,7 +65,7 @@ Roles, permissions, and user management for administrators.
 - **Entry points:** `src/app/api/v1/admin/**` (permissions, roles, users,
   role assignment, bulk role update), `src/types/role.types.ts`
   (`AVAILABLE_PERMISSIONS`, `ROLE_PERMISSIONS`, `canManageRole`),
-  `src/lib/rbac.ts` (`changeUserRole` with audit-trail transaction).
+  `src/lib/rbac/` (`changeUserRole` with audit-trail transaction).
 - **Schema tables:** `custom_roles`, `role_change_history`,
   `user_role_assignments` (plus reads/writes on `users`, `auth_logs`).
 - **Spec:** [`api-specs/admin.md`](api-specs/admin.md).

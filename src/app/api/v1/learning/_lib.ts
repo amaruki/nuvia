@@ -5,7 +5,7 @@
 import type { NextResponse } from "next/server";
 import { problemResponse, problems } from "@/lib/http";
 import { logger } from "@/lib/logger";
-import { LearningServiceError } from "@/lib/services/learning.service";
+import { LearningServiceError } from "@/lib/services/learning";
 
 /** Maps LearningServiceError to its RFC 9457 response; anything else is a 500. */
 export async function handleLearningRoute(

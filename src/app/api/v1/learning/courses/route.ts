@@ -6,7 +6,7 @@
 import type { NextRequest } from "next/server";
 import { requirePermission } from "@/lib/rbac";
 import { problem, problemResponse, successResponse, validationProblem } from "@/lib/http";
-import { createCourseSchema, createCourse, listCourses } from "@/lib/services/learning.service";
+import { createCourseSchema, createCourse, listCourses } from "@/lib/services/learning";
 import { handleLearningRoute, parsePagination } from "../_lib";
 
 export async function GET(request: NextRequest) {

@@ -1,0 +1,80 @@
+/**
+ * GET    /api/v1/learning/courses/[id] — fetch one course
+ * PATCH  /api/v1/learning/courses/[id] — update a course
+ * DELETE /api/v1/learning/courses/[id] — delete a course (certificates keep their denormalized record)
+ */
+
+import type { NextRequest } from "next/server";
+import { requirePermission } from "@/lib/rbac";
+import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
+import {
+  deleteCourse,
+  getCourse,
+  updateCourse,
+  updateCourseSchema,
+} from "@/lib/services/learning.service";
+import { handleLearningRoute } from "../../_lib";
+
+interface RouteContext {
+  params: Promise<{ id: string }>;
+}
+
+export async function GET(request: NextRequest, { params }: RouteContext) {
+  return handleLearningRoute(async () => {
+    const auth = await requirePermission("learning:read", request.headers);
+    if (!auth.success) {
+      return problemResponse(auth.error!);
+    }
+
+    const { id } = await params;
+    const found = await getCourse(id);
+    if (!found) {
+      return problemResponse(problems.notFound("Course not found"));
+    }
+    return successResponse(found);
+  }, "GET /api/v1/learning/courses/[id]");
+}
+
+export async function PATCH(request: NextRequest, { params }: RouteContext) {
+  return handleLearningRoute(async () => {
+    const auth = await requirePermission("learning:update", request.headers);
+    if (!auth.success) {
+      return problemResponse(auth.error!);
+    }
+
+    const { id } = await params;
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return problemResponse(
+        problem("validation-error", 422, "Validation failed", "Request body must be valid JSON"),
+      );
+    }
+
+    const parsed = updateCourseSchema.safeParse(body);
+    if (!parsed.success) {
+      return problemResponse(validationProblem(parsed.error));
+    }
+
+    const updated = await updateCourse(id, parsed.data, auth.user!.email);
+    return successResponse(updated);
+  }, "PATCH /api/v1/learning/courses/[id]");
+}
+
+export async function DELETE(request: NextRequest, { params }: RouteContext) {
+  return handleLearningRoute(async () => {
+    const auth = await requirePermission("learning:delete", request.headers);
+    if (!auth.success) {
+      return problemResponse(auth.error!);
+    }
+
+    const { id } = await params;
+    const deleted = await deleteCourse(id);
+    if (!deleted) {
+      return problemResponse(problems.notFound("Course not found"));
+    }
+    return successResponse({ id, deleted: true });
+  }, "DELETE /api/v1/learning/courses/[id]");
+}

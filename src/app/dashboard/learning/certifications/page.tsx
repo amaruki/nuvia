@@ -5,12 +5,13 @@ import { Search, Award } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { CertificateCard } from "./_components/certificate-card";
-import { certificates } from "../courses/_data/mock-data";
+import { useLearningCertificates } from "@/lib/hooks/use-learning-certificates";
 import { useHeader } from "@/contexts/dashboard-context";
 
 export default function CertificationsPage() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setHeader, clearHeader } = useHeader();
+  const { certificates, loading, error } = useLearningCertificates();
 
   useEffect(() => {
     setHeader({
@@ -43,7 +44,11 @@ export default function CertificationsPage() {
 
       <Separator />
 
-      {filteredCertificates.length > 0 ? (
+      {loading ? (
+        <div className="text-center py-24 text-sm text-muted-foreground">Loading certificates…</div>
+      ) : error ? (
+        <div className="text-center py-24 text-sm text-destructive">{error}</div>
+      ) : filteredCertificates.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCertificates.map((cert) => (
             <CertificateCard key={cert.id} certificate={cert} />

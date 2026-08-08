@@ -13,7 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Upload, X, Save } from "lucide-react";
 import { useHeader } from "@/contexts/dashboard-context";

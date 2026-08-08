@@ -5,17 +5,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import * as z from "zod";
-import {
-  Save,
-  Loader2,
-  Plus,
-  Trash,
-  GripVertical,
-  Video,
-  FileText,
-  HelpCircle,
-  X,
-} from "lucide-react";
+import { Loader2, Plus, Trash, GripVertical, Video, FileText, HelpCircle, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +27,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
   Accordion,
   AccordionContent,
@@ -46,8 +35,8 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 
-import { Course } from "../../courses/_types";
-import { logger } from "@/lib/logger";
+import type { Course } from "@/types/learning.types";
+import { useLearningCourses } from "@/lib/hooks/use-learning-courses";
 
 const lessonSchema = z.object({
   id: z.string().optional(),
@@ -97,19 +86,26 @@ interface CourseFormProps {
 export function CourseForm({ initialData }: CourseFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
+  const { createCourse, updateCourse } = useLearningCourses();
 
-  // This would handle submission to API
   const onSubmit = async (data: CourseFormValues) => {
     setIsLoading(true);
-    // Simulate API call
-    logger.info("Submitting Course Data", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
-    router.push("/dashboard/learning/admin");
-    router.refresh();
+    try {
+      if (initialData?.id) {
+        await updateCourse(initialData.id, data);
+      } else {
+        await createCourse(data);
+      }
+      router.push("/dashboard/learning/admin");
+      router.refresh();
+    } catch {
+      // Hook already surfaced the error via toast.
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const form = useForm<CourseFormInput, any, CourseFormValues>({
+  const form = useForm<CourseFormInput, unknown, CourseFormValues>({
     resolver: zodResolver(courseFormSchema),
     defaultValues: initialData
       ? {

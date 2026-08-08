@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { UserStat } from "../_types";
+import type { UserStat } from "@/types/learning.types";
 
 interface CourseStatsProps {
   stats: UserStat[];

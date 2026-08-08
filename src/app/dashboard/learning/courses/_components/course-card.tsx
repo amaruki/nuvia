@@ -4,7 +4,7 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/comp
 import { Progress } from "@/components/ui/progress";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Clock, Star, Users } from "lucide-react";
-import { Course } from "../_types";
+import type { Course } from "@/types/learning.types";
 
 interface CourseCardProps {
   course: Course;

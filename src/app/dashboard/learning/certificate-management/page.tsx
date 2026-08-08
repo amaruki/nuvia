@@ -24,13 +24,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { certificates } from "../courses/_data/mock-data";
-import { toast } from "sonner";
+import { useLearningCertificates } from "@/lib/hooks/use-learning-certificates";
 import { MoreHorizontal } from "lucide-react";
 
 export default function AdminCertificationsPage() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setHeader, clearHeader } = useHeader();
+  const { certificates, loading, error, revokeCertificate } = useLearningCertificates();
 
   useEffect(() => {
     setHeader({
@@ -51,9 +51,9 @@ export default function AdminCertificationsPage() {
   );
 
   const handleRevoke = (id: string) => {
-    toast.error("Certificate revoked (Mock Action)", {
-      description: `Certificate ${id} has been marked as revoked.`,
-    });
+    if (window.confirm("Revoke this certificate? This cannot be undone.")) {
+      void revokeCertificate(id);
+    }
   };
 
   const totalCertificates = certificates.length;
@@ -83,7 +83,6 @@ export default function AdminCertificationsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalCertificates}</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
           </CardContent>
         </Card>
         <Card>
@@ -109,7 +108,6 @@ export default function AdminCertificationsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{revokedCertificates}</div>
-            <p className="text-xs text-muted-foreground">Action required on 0 items</p>
           </CardContent>
         </Card>
       </div>
@@ -144,81 +142,99 @@ export default function AdminCertificationsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredCertificates.length > 0 ? (
-              filteredCertificates.map((cert) => (
-                <TableRow key={cert.id} className="hover:bg-muted/5">
-                  <TableCell className="font-mono text-xs font-medium text-primary">
-                    {cert.verificationCode}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-sm">{cert.studentName}</span>
-                      <span className="text-xs text-muted-foreground">{cert.studentEmail}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell
-                    className="max-w-[200px] truncate font-medium text-sm"
-                    title={cert.courseName}
-                  >
-                    {cert.courseName}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{cert.issueDate}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={`${
-                        cert.status === "active"
-                          ? "bg-green-500/10 text-green-600 border-green-500/20"
-                          : "bg-destructive/10 text-destructive border-destructive/20"
-                      } transition-colors`}
-                    >
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full mr-2 ${cert.status === "active" ? "bg-green-600" : "bg-destructive"}`}
-                      />
-                      {cert.status === "active" ? "Active" : "Revoked"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                          <Link
-                            href={`/dashboard/learning/certifications/${cert.id}`}
-                            target="_blank"
-                            className="cursor-pointer"
-                          >
-                            <Eye className="mr-2 h-4 w-4" /> View Details
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-destructive focus:text-destructive cursor-pointer"
-                          onClick={() => handleRevoke(cert.id)}
-                        >
-                          <Ban className="mr-2 h-4 w-4" /> Revoke Certificate
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
+            {loading && (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <Search className="h-8 w-8 opacity-20" />
-                    <p>No certificates found matching your criteria.</p>
-                  </div>
+                  Loading certificates…
                 </TableCell>
               </TableRow>
             )}
+            {error && (
+              <TableRow>
+                <TableCell colSpan={6} className="h-32 text-center text-destructive">
+                  {error}
+                </TableCell>
+              </TableRow>
+            )}
+            {!loading &&
+              !error &&
+              (filteredCertificates.length > 0 ? (
+                filteredCertificates.map((cert) => (
+                  <TableRow key={cert.id} className="hover:bg-muted/5">
+                    <TableCell className="font-mono text-xs font-medium text-primary">
+                      {cert.verificationCode}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm">{cert.studentName}</span>
+                        <span className="text-xs text-muted-foreground">{cert.studentEmail}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell
+                      className="max-w-[200px] truncate font-medium text-sm"
+                      title={cert.courseName}
+                    >
+                      {cert.courseName}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {cert.issueDate}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={`${
+                          cert.status === "active"
+                            ? "bg-green-500/10 text-green-600 border-green-500/20"
+                            : "bg-destructive/10 text-destructive border-destructive/20"
+                        } transition-colors`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full mr-2 ${cert.status === "active" ? "bg-green-600" : "bg-destructive"}`}
+                        />
+                        {cert.status === "active" ? "Active" : "Revoked"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href={`/dashboard/learning/certifications/${cert.id}`}
+                              target="_blank"
+                              className="cursor-pointer"
+                            >
+                              <Eye className="mr-2 h-4 w-4" /> View Details
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive cursor-pointer"
+                            onClick={() => handleRevoke(cert.id)}
+                          >
+                            <Ban className="mr-2 h-4 w-4" /> Revoke Certificate
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Search className="h-8 w-8 opacity-20" />
+                      <p>No certificates found matching your criteria.</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </div>

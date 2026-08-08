@@ -5,7 +5,7 @@ import { ShieldCheck, Calendar, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Certificate } from "../../courses/_types";
+import type { Certificate } from "@/types/learning.types";
 
 interface CertificateCardProps {
   certificate: Certificate;
@@ -24,7 +24,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
             variant="secondary"
             className="font-normal opacity-0 group-hover:opacity-100 transition-opacity"
           >
-            Verified
+            {certificate.status === "active" ? "Verified" : "Revoked"}
           </Badge>
         </div>
         <div>

@@ -18,4 +18,5 @@ export * from "./committees";
 export * from "./chapters";
 export * from "./workspaces";
 export * from "./awards";
+export * from "./learning";
 export * from "./relations";

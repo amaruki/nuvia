@@ -64,6 +64,13 @@
       "when": 1786197691969,
       "tag": "0008_wonderful_sage",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1786197912915,
+      "tag": "0009_slimy_mole_man",
+      "breakpoints": true
     }
   ]
 }

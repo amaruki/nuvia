@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Certificate } from "../../courses/_types";
+import type { Certificate } from "@/types/learning.types";
 
 interface CertificateViewProps {
   certificate: Certificate;
@@ -64,7 +64,7 @@ export function CertificateView({ certificate }: CertificateViewProps) {
         <div className="space-y-6">
           <p className="text-muted-foreground font-serif italic text-lg">This is to certify that</p>
           <h2 className="text-4xl md:text-5xl font-bold font-serif text-primary tracking-tight">
-            User Name
+            {certificate.studentName}
           </h2>
           <p className="text-muted-foreground font-serif italic text-lg">
             has successfully completed the course
@@ -88,12 +88,14 @@ export function CertificateView({ certificate }: CertificateViewProps) {
           <div className="text-center space-y-2 flex flex-col items-center">
             {/* Placeholder for Signature */}
             <div className="h-12 w-32 relative">
-              <Image
-                src={certificate.instructorSignature}
-                alt="Signature"
-                fill
-                className="object-contain opacity-70"
-              />
+              {certificate.instructorSignature ? (
+                <Image
+                  src={certificate.instructorSignature}
+                  alt="Instructor signature"
+                  fill
+                  className="object-contain opacity-70"
+                />
+              ) : null}
             </div>
             <Separator className="w-40 bg-border" />
             <div>

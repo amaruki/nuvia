@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useHeader } from "@/contexts/dashboard-context";
 import {
@@ -15,21 +15,13 @@ import {
   Heart,
   Award,
   Globe,
-  MessageSquare,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -40,14 +32,36 @@ import {
 } from "@/components/ui/accordion";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
-import { courses } from "../_data/mock-data";
+import { useCourse } from "@/lib/hooks/use-learning-courses";
+import type { Module } from "@/types/learning.types";
+
+function parseDurationMinutes(duration: string): number {
+  let minutes = 0;
+  const hours = /(\d+(?:\.\d+)?)\s*h/i.exec(duration)?.[1];
+  if (hours) minutes += Number.parseFloat(hours) * 60;
+  const mins = /(\d+)\s*m(?:in)?/i.exec(duration)?.[1];
+  if (mins) minutes += Number.parseInt(mins, 10);
+  return minutes;
+}
+
+function moduleDuration(module: Module): string {
+  const minutes = module.lessons.reduce(
+    (sum, lesson) => sum + parseDurationMinutes(lesson.duration),
+    0,
+  );
+  if (minutes <= 0) return "0m";
+  const h = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (h === 0) return `${rest}m`;
+  return rest === 0 ? `${h}h` : `${h}h ${rest}m`;
+}
 
 export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
-  const courseId = Number(params.courseId);
-  const course = courses.find((c) => c.id === courseId);
+  const courseId = params.courseId as string;
+  const { data: course, isPending } = useCourse(courseId);
 
   useEffect(() => {
     if (course) {
@@ -61,6 +75,28 @@ export default function CourseDetailPage() {
       clearHeader();
     };
   }, [course, setHeader, clearHeader]);
+
+  // Rating distribution computed from the fetched reviews — never invented.
+  const ratingDistribution = useMemo(() => {
+    const reviews = course?.reviews ?? [];
+    return [5, 4, 3, 2, 1].map((star) =>
+      reviews.length === 0
+        ? 0
+        : Math.round(
+            (reviews.filter((review) => Math.round(review.rating) === star).length /
+              reviews.length) *
+              100,
+          ),
+    );
+  }, [course]);
+
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh] text-sm text-muted-foreground">
+        Loading course…
+      </div>
+    );
+  }
 
   if (!course) {
     return (
@@ -92,7 +128,7 @@ export default function CourseDetailPage() {
               <div className="flex items-center gap-1.5">
                 <Star className="h-4 w-4 text-amber-500 fill-current" />
                 <span className="font-medium text-foreground">{course.rating}</span>
-                <span>(128 ratings)</span>
+                <span>({course.reviews?.length ?? 0} reviews)</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Users className="h-4 w-4" />
@@ -169,7 +205,7 @@ export default function CourseDetailPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <BookOpen className="h-4 w-4 text-muted-foreground" />
-                    <span>85 downloadable resources</span>
+                    <span>Downloadable resources</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <FileText className="h-4 w-4 text-muted-foreground" />
@@ -233,7 +269,9 @@ export default function CourseDetailPage() {
                 <div>
                   <h3 className="text-xl font-bold">Course Content</h3>
                   <p className="text-sm text-muted-foreground">
-                    5 sections • 18 lectures • {course.duration} total length
+                    {course.modules?.length ?? 0} sections •{" "}
+                    {course.modules?.reduce((sum, module) => sum + module.lessons.length, 0) ?? 0}{" "}
+                    lectures • {course.duration} total length
                   </p>
                 </div>
                 <Button
@@ -260,7 +298,7 @@ export default function CourseDetailPage() {
                       <div className="text-left">
                         <div className="font-semibold text-base">{module.title}</div>
                         <div className="text-xs font-normal text-muted-foreground mt-1">
-                          {module.lessons.length} lectures • 45min
+                          {module.lessons.length} lectures • {moduleDuration(module)}
                         </div>
                       </div>
                     </AccordionTrigger>
@@ -292,7 +330,7 @@ export default function CourseDetailPage() {
                   </AccordionItem>
                 ))}
 
-                {!course.modules && (
+                {(!course.modules || course.modules.length === 0) && (
                   <div className="p-8 text-center text-muted-foreground">
                     Curriculum details not available for this course yet.
                   </div>
@@ -319,20 +357,25 @@ export default function CourseDetailPage() {
                           {course.instructor.role}
                         </p>
                       </div>
-                      <div className="flex items-center gap-6 text-sm">
-                        <div className="flex items-center gap-1.5">
-                          <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
-                          <span>4.8 Rating</span>
+                      {(course.instructor.coursesCount !== undefined ||
+                        course.instructor.studentsCount !== undefined) && (
+                        <div className="flex items-center gap-6 text-sm">
+                          {course.instructor.coursesCount !== undefined && (
+                            <div className="flex items-center gap-1.5">
+                              <Award className="h-4 w-4 text-muted-foreground" />
+                              <span>{course.instructor.coursesCount} Courses</span>
+                            </div>
+                          )}
+                          {course.instructor.studentsCount !== undefined && (
+                            <div className="flex items-center gap-1.5">
+                              <Users className="h-4 w-4 text-muted-foreground" />
+                              <span>
+                                {course.instructor.studentsCount.toLocaleString()} Students
+                              </span>
+                            </div>
+                          )}
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Award className="h-4 w-4 text-muted-foreground" />
-                          <span>{course.instructor.coursesCount} Courses</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Users className="h-4 w-4 text-muted-foreground" />
-                          <span>{course.instructor.studentsCount.toLocaleString()} Students</span>
-                        </div>
-                      </div>
+                      )}
                       <p className="text-sm leading-relaxed">{course.instructor.bio}</p>
                     </div>
                   </div>
@@ -362,7 +405,7 @@ export default function CourseDetailPage() {
                   <div className="space-y-2">
                     {[5, 4, 3, 2, 1].map((rating, i) => (
                       <div key={rating} className="flex items-center gap-2">
-                        <Progress value={[70, 20, 5, 2, 3][i]} className="h-2" />
+                        <Progress value={ratingDistribution[i]} className="h-2" />
                         <div className="flex items-center w-24 gap-1 text-sm text-muted-foreground">
                           <div className="flex text-amber-500">
                             {[...Array(5)].map((_, starIndex) => (
@@ -372,7 +415,7 @@ export default function CourseDetailPage() {
                               />
                             ))}
                           </div>
-                          <span className="ml-auto">{[70, 20, 5, 2, 3][i]}%</span>
+                          <span className="ml-auto">{ratingDistribution[i]}%</span>
                         </div>
                       </div>
                     ))}
@@ -422,10 +465,6 @@ export default function CourseDetailPage() {
                       <span>{feature}</span>
                     </div>
                   ))}
-                  <div className="flex items-start gap-2 text-sm">
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />
-                    <span>Detailed explanation of concepts</span>
-                  </div>
                 </div>
 
                 <h3 className="text-xl font-bold mt-8">Description</h3>

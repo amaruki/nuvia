@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Download, Printer, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CertificateView } from "../_components/certificate-view";
-import { certificates } from "../../courses/_data/mock-data";
+import { useCertificate } from "@/lib/hooks/use-learning-certificates";
 import { toast } from "sonner";
 
 export default function CertificateDetailPage() {
@@ -14,7 +14,15 @@ export default function CertificateDetailPage() {
   const router = useRouter();
   const certificateId = params.certificateId as string;
 
-  const certificate = certificates.find((c) => c.id === certificateId);
+  const { data: certificate, isPending } = useCertificate(certificateId);
+
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] text-sm text-muted-foreground">
+        Loading certificate…
+      </div>
+    );
+  }
 
   if (!certificate) {
     return (
@@ -31,11 +39,7 @@ export default function CertificateDetailPage() {
   };
 
   const handleDownload = () => {
-    toast.promise(new Promise((resolve) => setTimeout(resolve, 2000)), {
-      loading: "Generating PDF...",
-      success: "Certificate downloaded successfully",
-      error: "Failed to download certificate",
-    });
+    toast.info("PDF download is not available yet.");
   };
 
   const handleShare = () => {

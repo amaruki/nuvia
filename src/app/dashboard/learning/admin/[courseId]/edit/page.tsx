@@ -3,14 +3,14 @@
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { CourseForm } from "../../_components/course-form";
-import { courses } from "../../../courses/_data/mock-data";
+import { useCourse } from "@/lib/hooks/use-learning-courses";
 import { useHeader } from "@/contexts/dashboard-context";
 
 export default function EditCoursePage() {
   const params = useParams();
   const { setHeader, clearHeader } = useHeader();
-  const courseId = Number(params.courseId);
-  const course = courses.find((c) => c.id === courseId);
+  const courseId = params.courseId as string;
+  const { data: course, isPending } = useCourse(courseId);
 
   useEffect(() => {
     setHeader({
@@ -22,6 +22,10 @@ export default function EditCoursePage() {
       clearHeader();
     };
   }, [setHeader, clearHeader]);
+
+  if (isPending) {
+    return <div className="text-sm text-muted-foreground">Loading course…</div>;
+  }
 
   if (!course) {
     return <div>Course not found</div>;

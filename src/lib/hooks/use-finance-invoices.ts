@@ -23,7 +23,7 @@ import type {
   InvoiceFilterOptions,
   InvoicePayment,
   InvoiceStatistics,
-} from "@/types/finance.types";
+} from "@/types/finance";
 
 /** Wire shape of src/lib/services/finance-report.service.ts InvoiceClientRow. */
 interface InvoiceClientRow {

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DonationStatistics } from "@/types/finance.types";
+import { DonationStatistics } from "@/types/finance";
 import {
   DollarSign,
   Users,

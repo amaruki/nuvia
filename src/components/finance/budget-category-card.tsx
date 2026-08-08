@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
-import { BudgetCategory } from "@/types/finance.types";
+import { BudgetCategory } from "@/types/finance";
 
 interface BudgetCategoryCardProps {
   category: BudgetCategory;

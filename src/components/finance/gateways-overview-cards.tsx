@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GatewayOverallStatistics } from "@/types/finance.types";
+import { GatewayOverallStatistics } from "@/types/finance";
 import {
   CreditCard,
   DollarSign,

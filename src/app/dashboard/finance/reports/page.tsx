@@ -24,7 +24,7 @@ import { ReportsTable } from "@/components/finance/reports-table";
 import { ReportsFilters } from "@/components/finance/reports-filters";
 import { useFinanceReports } from "@/lib/hooks/use-finance-reports";
 import { useHeader } from "@/contexts/dashboard-context";
-import type { FinancialReport } from "@/types/finance.types";
+import type { FinancialReport } from "@/types/finance";
 
 export default function FinanceReports() {
   const router = useRouter();

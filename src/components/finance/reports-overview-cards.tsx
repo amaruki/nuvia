@@ -16,7 +16,7 @@ import {
   DollarSign,
   Shield,
 } from "lucide-react";
-import { ReportStatistics } from "@/types/finance.types";
+import { ReportStatistics } from "@/types/finance";
 
 interface ReportsOverviewCardsProps {
   statistics: ReportStatistics;

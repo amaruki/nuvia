@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, TrendingDown, DollarSign, AlertTriangle } from "lucide-react";
-import { BudgetOverview } from "@/types/finance.types";
+import { BudgetOverview } from "@/types/finance";
 
 interface BudgetOverviewCardProps {
   overview: BudgetOverview;

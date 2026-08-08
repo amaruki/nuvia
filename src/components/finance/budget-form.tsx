@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X } from "lucide-react";
-import { BudgetFormData, BudgetCategory } from "@/types/finance.types";
+import { BudgetFormData, BudgetCategory } from "@/types/finance";
 
 interface BudgetFormProps {
   isOpen: boolean;

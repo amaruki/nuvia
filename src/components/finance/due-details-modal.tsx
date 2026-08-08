@@ -22,7 +22,7 @@ import {
   XCircle,
   FileText,
 } from "lucide-react";
-import { MemberDue, DuePayment } from "@/types/finance.types";
+import { MemberDue, DuePayment } from "@/types/finance";
 
 interface DueDetailsModalProps {
   due: MemberDue | null;

@@ -17,7 +17,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { apiFetch, ApiClientError } from "@/lib/api-client";
-import type { FinancialReport, ReportFilterOptions, ReportStatistics } from "@/types/finance.types";
+import type { FinancialReport, ReportFilterOptions, ReportStatistics } from "@/types/finance";
 
 /** Wire shape of src/lib/services/finance-report.service.ts FinanceReportSummary. */
 interface FinanceReportSummary {

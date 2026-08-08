@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye, Edit, Trash2, Receipt } from "lucide-react";
-import { BudgetTransaction } from "@/types/finance.types";
+import { BudgetTransaction } from "@/types/finance";
 
 interface BudgetTransactionTableProps {
   transactions: BudgetTransaction[];

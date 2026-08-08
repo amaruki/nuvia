@@ -18,7 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, X, Filter } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { DueFilterOptions } from "@/types/finance.types";
+import { DueFilterOptions } from "@/types/finance";
 import { MembershipTier } from "@/types/membership.types";
 
 interface DuesFiltersProps {

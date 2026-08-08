@@ -35,7 +35,7 @@ import {
   XCircle,
   Clock,
 } from "lucide-react";
-import { PaymentGateway } from "@/types/finance.types";
+import { PaymentGateway } from "@/types/finance";
 import { formatDistanceToNow } from "date-fns";
 
 interface GatewaysTableProps {

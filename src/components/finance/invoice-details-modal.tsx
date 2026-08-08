@@ -24,7 +24,7 @@ import {
   Send,
   Download,
 } from "lucide-react";
-import { Invoice, InvoicePayment } from "@/types/finance.types";
+import { Invoice, InvoicePayment } from "@/types/finance";
 
 interface InvoiceDetailsModalProps {
   invoice: Invoice | null;

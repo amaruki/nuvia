@@ -46,7 +46,7 @@ import {
   Clock,
   XCircle,
 } from "lucide-react";
-import { MemberDue, DuePayment } from "@/types/finance.types";
+import { MemberDue, DuePayment } from "@/types/finance";
 import { DueDetailsModal } from "@/components/finance/due-details-modal";
 
 interface DuesTableProps {

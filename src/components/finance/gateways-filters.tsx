@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp, Search, X, Filter, RotateCcw } from "lucide-react";
-import { GatewayFilterOptions } from "@/types/finance.types";
+import { GatewayFilterOptions } from "@/types/finance";
 
 interface GatewaysFiltersProps {
   filters: GatewayFilterOptions;

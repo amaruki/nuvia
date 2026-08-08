@@ -11,7 +11,7 @@ import {
   Calendar,
   CreditCard,
 } from "lucide-react";
-import { InvoiceStatistics } from "@/types/finance.types";
+import { InvoiceStatistics } from "@/types/finance";
 
 interface InvoicesOverviewCardsProps {
   statistics: InvoiceStatistics;

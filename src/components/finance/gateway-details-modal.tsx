@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PaymentGateway, GatewayTransaction, GatewayTestResult } from "@/types/finance.types";
+import { PaymentGateway, GatewayTransaction, GatewayTestResult } from "@/types/finance";
 import {
   CreditCard,
   DollarSign,

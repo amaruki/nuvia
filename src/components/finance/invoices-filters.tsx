@@ -18,7 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, X, Filter } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { InvoiceFilterOptions } from "@/types/finance.types";
+import { InvoiceFilterOptions } from "@/types/finance";
 
 interface InvoicesFiltersProps {
   filters: InvoiceFilterOptions;

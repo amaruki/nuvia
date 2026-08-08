@@ -49,7 +49,7 @@ import {
   FileText,
   Download,
 } from "lucide-react";
-import { Invoice, InvoicePayment } from "@/types/finance.types";
+import { Invoice, InvoicePayment } from "@/types/finance";
 import { InvoiceDetailsModal } from "./invoice-details-modal";
 
 interface InvoicesTableProps {

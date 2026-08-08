@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { DollarSign, Users, TrendingUp, AlertTriangle, Calendar, CreditCard } from "lucide-react";
-import { DueStatistics } from "@/types/finance.types";
+import { DueStatistics } from "@/types/finance";
 
 interface DuesOverviewCardsProps {
   statistics: DueStatistics;

@@ -35,7 +35,7 @@ import {
   User,
   Tag,
 } from "lucide-react";
-import { FinancialReport } from "@/types/finance.types";
+import { FinancialReport } from "@/types/finance";
 import { cn } from "@/lib/utils";
 
 interface ReportsTableProps {

@@ -19,7 +19,7 @@ import {
 import { CalendarIcon, X, Filter } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ReportFilterOptions } from "@/types/finance.types";
+import { ReportFilterOptions } from "@/types/finance";
 
 interface ReportsFiltersProps {
   filters: ReportFilterOptions;

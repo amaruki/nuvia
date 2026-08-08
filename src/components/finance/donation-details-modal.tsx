@@ -44,7 +44,7 @@ import {
   Printer,
   Share2,
 } from "lucide-react";
-import { Donation, DonationPayment } from "@/types/finance.types";
+import { Donation, DonationPayment } from "@/types/finance";
 
 interface DonationDetailsModalProps {
   donation: Donation | null;

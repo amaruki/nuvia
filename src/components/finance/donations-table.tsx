@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Donation, DonationPayment } from "@/types/finance.types";
+import { Donation, DonationPayment } from "@/types/finance";
 import {
   MoreHorizontal,
   Eye,

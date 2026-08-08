@@ -40,7 +40,7 @@ import {
   Bell,
   Info,
 } from "lucide-react";
-import { DonationFormData, DonationCampaign } from "@/types/finance.types";
+import { DonationFormData, DonationCampaign } from "@/types/finance";
 import { logger } from "@/lib/logger";
 
 interface AddDonationFormProps {

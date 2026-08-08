@@ -154,3 +154,34 @@ the entire 32-file set because no lawful ASD-STE100 Part 2 dictionary or
 populated project glossary exists in this environment — closing that gap
 requires either a lawfully licensed dictionary source or an explicit
 owner decision to accept the risk.
+
+## Targeted re-audit: integration test instructions
+
+- Documents: `README.md`, `CONTRIBUTING.md`, and
+  `docs/adr/0010-ai-agent-commit-guard.md`.
+- Change: Add the isolated integration test command and its service
+  requirements.
+- ASD source and issue: ASD-STE100 Issue 9 workflow. No lawful Part 2
+  dictionary source was available.
+- Dictionary/glossary and version: none.
+- Mechanical scan: run on 2026-07-27 after the final text change.
+- Reviewer/date: Codex, 2026-07-27.
+- Result: **`STE findings unresolved`** because vocabulary approval stays
+  `UNVERIFIED`.
+
+The new instructions preserve the command names and service names as
+literals or technical nouns. The source for each technical behavior is
+`package.json`, `lefthook.yml`, `compose.test.yml`, or
+`.github/workflows/ci.yml`.
+
+The scan reported no candidate on a new line in `README.md` or the ADR.
+The scan reported two candidates on changed lines in `CONTRIBUTING.md`.
+The scanner counted all sentences on each physical line as one sentence.
+Manual sentence counts show that each new sentence stays within its
+applicable limit.
+
+The changed passages contain no safety instruction, semicolon,
+contraction, synonym drift, or hidden command. The terminology is
+consistent: "integration test command," "PostgreSQL," "Redis," and
+"Docker Compose." The absence of an approved vocabulary source remains
+an open `UNVERIFIED` finding. No new `BLOCKER` or `MAJOR` finding remains.

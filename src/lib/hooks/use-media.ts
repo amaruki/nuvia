@@ -496,18 +496,37 @@ export const useMedia = (): UseMediaReturn => {
   );
 
   // Bulk operations
-  const bulkDelete = useCallback(async (ids: string[]) => {
+  const bulkDelete = useCallback(async (ids: string[]): Promise<void> => {
     try {
-      for (const id of ids) {
-        await apiFetch<{ id: string; deleted: boolean }>(
-          `/api/v1/media/${encodeURIComponent(id)}`,
-          { method: "DELETE" },
-        );
-      }
+      // Fire deletes in parallel and settle every attempt before reporting:
+      // a sequential loop would abandon the remaining items on the first
+      // failure. Successful deletes must still land (and leave local state)
+      // when other items fail, so failures are aggregated into a single error
+      // thrown only after all attempts.
+      const results = await Promise.allSettled(
+        ids.map((id) =>
+          apiFetch<{ id: string; deleted: boolean }>(`/api/v1/media/${encodeURIComponent(id)}`, {
+            method: "DELETE",
+          }),
+        ),
+      );
+
+      // O(1) membership so both state cleanups below stay linear in state size.
+      const deletedIds = new Set(ids);
 
       // Remove from state
-      setMedia((prev) => prev.filter((item) => !ids.includes(item.id)));
-      setSelectedMedia((prev) => prev.filter((id) => !ids.includes(id)));
+      setMedia((prev) => prev.filter((item) => !deletedIds.has(item.id)));
+      setSelectedMedia((prev) => prev.filter((id) => !deletedIds.has(id)));
+
+      const failed = results.filter(
+        (result): result is PromiseRejectedResult => result.status === "rejected",
+      );
+      if (failed.length > 0) {
+        throw new AggregateError(
+          failed.map((result) => result.reason),
+          `${failed.length} of ${ids.length} media item(s) failed to delete`,
+        );
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Bulk delete failed");
       throw err;

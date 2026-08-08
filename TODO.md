@@ -43,10 +43,31 @@ The earlier claim came from a search for `middleware.ts` only. That file no long
 
 ### Found along the way, not yet fixed (small, out of this pass's scope)
 
-- ☐ `POST /api/v1/auth/verify-email` is a placeholder, in the same shape the delete-account route was before its fix. better-auth does have a real `verifyEmail` endpoint (`auth.api.verifyEmail({ query: { token } })`). This route never calls it. `src/app/api/v1/auth/verify-email/route.ts`.
-- ☐ `GET /api/v1/auth/login-activities` is the same kind of placeholder. The `userLoginActivity` table in `src/db/schema/users.ts` already exists for exactly this purpose. The route never queries it. `src/app/api/v1/auth/login-activities/route.ts`.
-- ☐ `src/proxy.ts:isPublicEndpoint` lists `/api/v1/auth/register`, which does not exist. The real route is `/api/v1/auth/signup`. This is a dead, stale list entry. It is harmless, because the real login and session flow never needs to skip auth for the signup route.
-- ☐ The Finance section role list in `navigation-data.ts` (`admin`, `treasurer`, `staff`) does not include `superadmin`, though every other section does. This is a pre-existing inconsistency. The role-enforcement work reused these lists exactly as they were, so it did not change this inconsistency. A superadmin cannot reach `/dashboard/finance/**` until this list is corrected.
+All four items below were fixed in the business-logic hardening pass of
+2026-07-29. They stay listed here, checked off, so the history is not lost.
+
+- ☑ `POST /api/v1/auth/verify-email` is a placeholder, in the same shape the delete-account route was before its fix. better-auth does have a real `verifyEmail` endpoint (`auth.api.verifyEmail({ query: { token } })`). This route never calls it. `src/app/api/v1/auth/verify-email/route.ts`. **Fixed:** the route now calls the real endpoint, is rate-limited, and `emailVerification.sendVerificationEmail` in `src/lib/auth.ts` actually sends the mail through the existing `EmailService`. Tests: `tests/verify-email.test.ts`.
+- ☑ `GET /api/v1/auth/login-activities` is the same kind of placeholder. The `userLoginActivity` table in `src/db/schema/users.ts` already exists for exactly this purpose. The route never queries it. `src/app/api/v1/auth/login-activities/route.ts`. **Fixed:** the route now queries the table scoped to the caller, and `src/lib/auth/login-activity.ts` records successful and failed sign-in attempts from both the API route and `loginAction`. Tests: `tests/login-activity.test.ts`.
+- ☑ `src/proxy.ts:isPublicEndpoint` lists `/api/v1/auth/register`, which does not exist. The real route is `/api/v1/auth/signup`. This is a dead, stale list entry. It is harmless, because the real login and session flow never needs to skip auth for the signup route. **Fixed — and it was not harmless:** the stale entry meant `signup`, `forgot-password`, and all `/api/auth/**` better-auth endpoints returned 401 to anonymous callers. The list now matches reality and `/api/auth/**` is passed through untouched. Tests: `tests/auth-route-coverage.test.ts`.
+- ☑ The Finance section role list in `navigation-data.ts` (`admin`, `treasurer`, `staff`) does not include `superadmin`, though every other section does. This is a pre-existing inconsistency. The role-enforcement work reused these lists exactly as they were, so it did not change this inconsistency. A superadmin cannot reach `/dashboard/finance/**` until this list is corrected. **Fixed at the gate:** `isRoleAllowedForPath` and the sidebar now treat superadmin as allowed everywhere, matching rbac.ts semantics. The inconsistency was wider than finance — most nav entries omit superadmin — so a per-list patch would have been fragile. The lists themselves are still inconsistent and may be cleaned up as a good-first-issue, but they can no longer lock superadmin out.
+
+### Business-logic hardening pass (2026-07-29)
+
+A dedicated pass over the authorization and auth business logic, ahead of
+open-sourcing. Everything below is shipped and test-covered. The integration
+suite grew from 115 to 147 tests.
+
+- ☑ **Role assignment enforced on every mutation path.** `changeUserRole` previously only compared the assigner's role against the target's _current_ role — an admin could promote anyone to superadmin, and `POST /api/v1/admin/users` accepted any role string. `rbac.ts` now has `canAssignRole` (hierarchy for predefined roles, permission-subset check for custom roles, superadmin-only grant of superadmin), `canGrantPermissions` (a custom role cannot carry permissions its creator lacks), and `checkRoleAssignable`, called from the single-role route, the bulk-role route, and admin user creation. The dead `validateRoleAssignment` duplicate was deleted. Tests: `tests/role-assignment.test.ts`.
+- ☑ **Last-superadmin lockout guard.** Neither a role change nor account deletion can remove the last superadmin. Tests in `tests/role-assignment.test.ts` and `tests/delete-account.test.ts`.
+- ☑ **Session-cache endpoints hardened.** `/api/auth/cache-session` let any signed-in user write arbitrary JSON into Redis under any session token — a session-spoofing primitive for `validateSessionWithCache`. It now only ever caches the caller's own, freshly revalidated session and ignores client-supplied user data. `invalidate-session-cache` only evicts the caller's sessions. `cache-status` is admin-only. All three speak RFC 9457.
+- ☑ **`auth_logs` cascade.** Deleting a user no longer fails on the auth_logs foreign key; the logs cascade with the user.
+- ☑ **Profile update whitelisted.** `PUT /api/v1/auth/profile` forwarded the raw body to better-auth; it now parses through `profileApiUpdateSchema`, so fields like `role` or `emailVerified` cannot be self-assigned. Tests: `tests/profile-update.test.ts`.
+- ☑ **Username sign-in works.** The login contract always said "email or username", but the value went to better-auth's email-only `signInEmail`, so username login never worked. Both `loginAction` and the login route now resolve usernames to emails first. Tests in `tests/login-activity.test.ts`.
+- ☑ **Dead code removed.** `src/lib/services/role.service.ts` (a divergent second copy of the role-mutation logic; only one type from it was live) and `src/lib/actions/session-cache.actions.ts` (zero importers, wrong cookie prefix) deleted, per ADR-0001.
+
+Still open from this pass:
+
+- ☐ **Username uniqueness.** `users.username` is not unique in the schema, so two accounts can share a username. The login resolver picks the oldest account deterministically, but the real fix is a schema constraint plus a migration decision about existing duplicates.
 
 ---
 
@@ -81,7 +102,7 @@ This exit criterion is verified end to end. `bun run guard:heavy` exits 0: lint,
   7. The rate limiter returns 429 past the threshold, and survives a simulated process restart. Test: `tests/rate-limit.test.ts`.
   8. Deleting an account removes the user row. Test: `tests/delete-account.test.ts`.
   9. Each nav link resolves to a real page. Test: `tests/nav-links.test.ts`.
-  10. Each auth route has an authorization call. Test: `tests/auth-route-coverage.test.ts`. This test allows one named exception, `verify-email`. See the placeholder note above. The exception is named explicitly, not a silent gap.
+  10. Each auth route has an authorization call. Test: `tests/auth-route-coverage.test.ts`. This test originally allowed one named exception, `verify-email`. The hardening pass of 2026-07-29 implemented the real route and deleted the exception.
 
   Two more tests landed along the way, outside the original list of ten: `tests/dashboard-access.test.ts`, for the new role-authorization gate, and `tests/custom-roles.test.ts`.
 
@@ -168,6 +189,7 @@ This gap is the same gap as the unchecked "Module promotion gate" item in M3 abo
 ## Good first issues
 
 - Remove any dead nav links, or point them at real pages, in `navigation-config.tsx`. Verify the current count first: `tests/nav-links.test.ts` only checks that leaf paths resolve to a real page, so a stale count here could be off if a parent-only nav item is involved.
+- Clean up the role lists in `navigation-data.ts`: most of them omit `superadmin`, which the nav gate and sidebar now special-case anyway. Adding the role back to the lists removes the inconsistency at its source.
 - Fix the singular-versus-plural mismatch in the Awards nav item.
 - ~~Pick and migrate off one duplicate dependency, once its ADR lands.~~ **Stale as of the M2 "Duplicate dependencies, re-examined" finding above**: all three flagged pairs (toast library, mail transport, animation library) are already resolved, and none needed an ADR. No open duplicate-dependency item remains here.
 - Add the `weeks` react-day-picker `classNames` key to `src/components/ui/calendar.tsx`, for visual parity with version 10's new grid-based rendering. The calendar is functional already. This is a polish pass.

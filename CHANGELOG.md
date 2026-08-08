@@ -31,8 +31,28 @@ All notable changes to this project are documented here. Format follows [Keep a 
 - Fallout from the dependency bump: `lucide-react` v1 dropped brand icons, `react-day-picker` v10 renamed `initialFocus`→`autoFocus` and `table`→`month_grid`, `better-auth` renamed `forgetPassword`→`requestPasswordReset`. All are fixed. See the corresponding commit for the full file list.
 - A pre-existing case-collision between `Card.tsx`/`card.tsx` and `Badge.tsx`/`badge.tsx` — resolvable only on case-insensitive filesystems — is resolved in favor of the lowercase, shadcn-standard names.
 
+### Security
+
+- Role assignment is now validated against the role being granted, on every mutation path (single role change, bulk role change, admin user creation). Previously only the target's current role was checked, so an admin could promote anyone to superadmin, and custom roles could be created carrying permissions their creator did not hold.
+- The last superadmin can no longer be demoted or delete their account, preventing lockout of the only role that can manage everything.
+- `/api/auth/cache-session` no longer accepts a client-supplied session payload, which allowed writing arbitrary JSON into the Redis session cache under any token. It now caches only the caller's own revalidated session. `/api/auth/invalidate-session-cache` evicts only the caller's sessions, and `/api/auth/cache-status` requires `system:read`.
+- `PUT /api/v1/auth/profile` whitelists the body through a zod schema before it reaches better-auth; the raw body used to be forwarded, so undeclared fields could be set.
+
+### Fixed
+
+- Username sign-in now works. The login contract's "email or username" value was forwarded verbatim to better-auth's email-only sign-in; both the API route and the server action now resolve usernames to emails first, deterministically.
+- `GET /api/v1/auth/login-activities` returns real data from the `userLoginActivity` table, which had zero writers before. Successful and failed sign-in attempts are now recorded from both the API route and the login server action.
+- `POST /api/v1/auth/verify-email` now calls better-auth's real verification endpoint and is rate-limited; verification mail is actually sent through the configured email provider on signup and on request.
+- Anonymous callers can reach `/api/v1/auth/signup`, `/api/v1/auth/forgot-password`, and the `/api/auth/**` better-auth endpoints. The proxy's public-endpoint list carried a nonexistent `register` entry and gated all of these behind a session, so signup was unusable outside the server action.
+- Deleting a user cascades into their `auth_logs` rows instead of failing the foreign key.
+- Superadmin is no longer locked out of dashboard sections whose navigation role list omitted it (finance and most others), in both the server gate and the sidebar.
+- Bulk role updates deduplicate user ids and run sequentially instead of unbounded parallel transactions, which could exhaust the connection pool.
+- Admin user creation normalizes username/email case, returns 409 on duplicates, and writes a `USER_CREATED` audit entry.
+
 ### Removed
 
+- `src/lib/services/role.service.ts` — a dead parallel copy of the role-mutation logic; its only live export was the `UserWithRoleInfo` type, moved to `src/types/role.types.ts`.
+- `src/lib/actions/session-cache.actions.ts` — zero importers, and it read the session cookie under the wrong name.
 - Prisma, `@prisma/client`, `tsx`, `ts-node`, `bcrypt`, and the deprecated `shadcn-ui` package.
 
 ## Prior history

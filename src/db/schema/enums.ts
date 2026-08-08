@@ -193,3 +193,29 @@ export const applicationStatusEnum = pgEnum("ApplicationStatus", [
   "HIRED",
   "WITHDRAWN",
 ]);
+
+// ---------------------------------------------------------------------------
+// Chapters (backlog D1)
+// ---------------------------------------------------------------------------
+
+/**
+ * ChapterStatus — chapter lifecycle. Stored SCREAMING_SNAKE; the UI works in
+ * lowercase ("active" | "inactive" | "pending" | "suspended"), the service
+ * maps across the boundary.
+ */
+export const chapterStatusEnum = pgEnum("ChapterStatus", [
+  "ACTIVE",
+  "INACTIVE",
+  "PENDING",
+  "SUSPENDED",
+]);
+
+/** ChapterRole — a member's leadership role within a chapter. */
+export const chapterRoleEnum = pgEnum("ChapterRole", [
+  "PRESIDENT",
+  "VICE_PRESIDENT",
+  "SECRETARY",
+  "TREASURER",
+  "ADMIN",
+  "MEMBER",
+]);

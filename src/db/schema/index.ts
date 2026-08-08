@@ -14,4 +14,6 @@ export * from "./events";
 export * from "./forum";
 export * from "./content";
 export * from "./jobs";
+export * from "./committees";
+export * from "./chapters";
 export * from "./relations";

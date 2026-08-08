@@ -36,6 +36,13 @@
       "when": 1786186879672,
       "tag": "0004_plain_ultimo",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786193584130,
+      "tag": "0005_nosy_the_fallen",
+      "breakpoints": true
     }
   ]
 }

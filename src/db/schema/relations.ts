@@ -13,6 +13,7 @@
 
 import { relations } from "drizzle-orm";
 import { authLog, account, roleChangeHistory, session, userRoleAssignment } from "./auth";
+import { chapterMember } from "./chapters";
 import { content } from "./content";
 import { event, eventRegistration } from "./events";
 import { forumComment, forumPost } from "./forum";
@@ -38,4 +39,5 @@ export const userRelations = relations(user, ({ many }) => ({
   createdContent: many(content),
   postedJobs: many(jobPosting),
   jobApplications: many(jobApplication),
+  chapterMemberships: many(chapterMember),
 }));

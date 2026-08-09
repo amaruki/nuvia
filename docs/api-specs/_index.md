@@ -117,7 +117,7 @@ this doc set's scope (F4 is docs-only).
   `NextResponse.json` serializes the Response object and the body arrives as
   `{}` with the intended status code (verified 2026-08-08). Error paths are
   unaffected (`problemResponse` is returned directly), and the forum service
-  layer itself is fully tested (`tests/forums-api.test.ts`). The tables in
+  layer itself is fully tested (`tests/forums-api/`). The tables in
   [`forums.md`](forums.md) describe the intended contract.
 - **Finance list endpoints nest pagination inside `data`.** The reports list,
   invoice list, and payment list return `data: { rows|invoices|payments,

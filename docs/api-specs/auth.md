@@ -5,7 +5,7 @@ Session and credential management. Two layers coexist:
 - **better-auth infrastructure** under `/api/auth/**` — the catch-all
   better-auth handler and its callbacks, plus the Redis session-cache helpers.
 - **Custom auth routes** under `/api/v1/auth/**` — thin wrappers over
-  `auth.api.*` (`src/lib/auth.ts`) with RFC 9457 errors and rate limiting.
+  `auth.api.*` (`src/lib/auth/index.ts`) with RFC 9457 errors and rate limiting.
 
 Route files: `src/app/api/auth/**`, `src/app/api/v1/auth/**`,
 `src/app/api/debug/**`. Request schemas live in

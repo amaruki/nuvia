@@ -4,7 +4,7 @@ Role and user administration for the admin dashboard. Routes:
 `src/app/api/v1/admin/**`. These routes build errors with the `problems.*`
 factory helpers from `src/lib/http.ts` and write audit rows to the
 `auth_log` table. Permissions come from the `users:*` family defined in
-`src/types/role.types.ts`.
+`src/types/role/index.ts`.
 
 ## Permissions catalog
 

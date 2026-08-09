@@ -1,13 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
-import { FOOTER_LINK_CLASS, GITHUB_URL } from "./landing-data";
+import { FOOTER_LINK_CLASS, GITHUB_URL, LIVE_MODULES } from "./landing-data";
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-border/60 bg-muted/30 px-4 py-12 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-6xl">
-        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2.5">
               <Image
@@ -20,8 +20,8 @@ export function SiteFooter() {
               <span className="font-semibold tracking-tight">Nuvia</span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-              Open-source association management with five database-backed modules and an honest
-              public roadmap.
+              Open-source association management with {LIVE_MODULES.length} database-backed modules
+              and an honest public roadmap.
             </p>
             <p className="mt-5 flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
               <span aria-hidden="true" className="size-1.5 rounded-full bg-primary" />
@@ -33,6 +33,11 @@ export function SiteFooter() {
             <h3 className="text-sm font-semibold">Explore</h3>
             <ul className="mt-3 flex flex-col gap-2.5 text-sm">
               <li>
+                <Link href="/news" className={FOOTER_LINK_CLASS}>
+                  News
+                </Link>
+              </li>
+              <li>
                 <Link href="/events" className={FOOTER_LINK_CLASS}>
                   Events
                 </Link>
@@ -43,8 +48,39 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
+                <Link href="/forums" className={FOOTER_LINK_CLASS}>
+                  Forums
+                </Link>
+              </li>
+              <li>
                 <Link href="/auth/login" className={FOOTER_LINK_CLASS}>
                   Sign in
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
+          <nav aria-label="Community">
+            <h3 className="text-sm font-semibold">Community</h3>
+            <ul className="mt-3 flex flex-col gap-2.5 text-sm">
+              <li>
+                <Link href="/members" className={FOOTER_LINK_CLASS}>
+                  Members
+                </Link>
+              </li>
+              <li>
+                <Link href="/membership" className={FOOTER_LINK_CLASS}>
+                  Membership
+                </Link>
+              </li>
+              <li>
+                <Link href="/chapters" className={FOOTER_LINK_CLASS}>
+                  Chapters
+                </Link>
+              </li>
+              <li>
+                <Link href="/committees" className={FOOTER_LINK_CLASS}>
+                  Committees
                 </Link>
               </li>
             </ul>

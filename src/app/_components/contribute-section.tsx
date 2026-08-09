@@ -28,7 +28,10 @@ export function ContributeSection() {
           </Button>
         </div>
 
-        <Card className="gap-0 overflow-hidden border-border/80 bg-card py-0 shadow-xl">
+        <Card
+          id="quick-start"
+          className="scroll-mt-24 gap-0 overflow-hidden border-border/80 bg-card py-0 shadow-xl"
+        >
           <CardHeader className="flex flex-row items-center justify-between gap-4 border-b bg-muted/60 px-5 py-4">
             <CardTitle className="flex items-center gap-2 font-mono text-sm font-medium">
               <Terminal className="size-4 text-primary" />

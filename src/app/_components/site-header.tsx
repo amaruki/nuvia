@@ -14,7 +14,7 @@ export function SiteHeader() {
           <span className="text-lg font-semibold tracking-tight">Nuvia</span>
         </Link>
 
-        <nav aria-label="Page sections" className="hidden items-center gap-8 md:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
           {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className={NAV_LINK_CLASS}>
               {link.label}

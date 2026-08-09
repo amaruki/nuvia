@@ -1,7 +1,7 @@
 import { Database, Layers } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { LIVE_MODULES, ROADMAP_MODULES } from "./landing-data";
+import { LIVE_MODULES, PROMOTION_GATE, ROADMAP_MODULES } from "./landing-data";
 
 export function ModulesSection() {
   return (
@@ -15,9 +15,9 @@ export function ModulesSection() {
             </h2>
           </div>
           <p className="max-w-[62ch] text-base leading-relaxed text-muted-foreground lg:justify-self-end">
-            Five modules run on real PostgreSQL today, behind authentication and role checks. The
-            roadmap promotes in value order only after each module has a schema, authorized API,
-            tests, and documentation.
+            Modules are listed exactly as the maturity registry reports them. Live entries run on
+            real PostgreSQL behind authentication and role checks, and an entry appears on the
+            roadmap only while its flag says it has not cleared the gate yet.
           </p>
         </div>
 
@@ -48,25 +48,46 @@ export function ModulesSection() {
               <div className="flex items-center gap-3">
                 <Layers className="size-5 text-primary" />
                 <div>
-                  <h3 className="font-semibold">Roadmap promotion order</h3>
+                  <h3 className="font-semibold">Roadmap</h3>
                   <p className="text-sm text-muted-foreground">
-                    Ordered by value to an association.
+                    {ROADMAP_MODULES.length > 0
+                      ? "Listed only while the maturity flag says a module is not live yet."
+                      : "The promotion queue is empty right now."}
                   </p>
                 </div>
               </div>
-              <ol className="mt-6 grid gap-3 sm:grid-cols-2">
-                {ROADMAP_MODULES.map((module, index) => (
-                  <li
-                    key={module}
-                    className="flex items-center gap-3 rounded-lg border bg-muted/40 p-3"
-                  >
-                    <span className="font-mono text-xs tabular-nums text-primary">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-sm font-medium">{module}</span>
-                  </li>
-                ))}
-              </ol>
+              {ROADMAP_MODULES.length > 0 ? (
+                <ul className="mt-6 flex flex-col gap-3">
+                  {ROADMAP_MODULES.map((module) => (
+                    <li
+                      key={module}
+                      className="flex items-center justify-between gap-4 rounded-lg border bg-muted/40 px-4 py-3"
+                    >
+                      <span className="font-medium">{module}</span>
+                      <Badge variant="outline">Upcoming</Badge>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="mt-6 flex flex-col gap-5">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Every module in the registry has cleared the promotion gate, so nothing is
+                    presented as upcoming today. A new module appears here only while its maturity
+                    flag says it has not cleared the gate yet.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {PROMOTION_GATE.map((requirement) => (
+                      <span
+                        key={requirement}
+                        className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2 text-xs"
+                      >
+                        <span aria-hidden="true" className="size-1.5 rounded-full bg-primary/60" />
+                        {requirement}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

@@ -12,13 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
-const SECTIONS = [
-  { href: "#features", label: "Features" },
-  { href: "#modules", label: "Modules" },
-  { href: "#community", label: "Community" },
-  { href: "#contribute", label: "Contribute" },
-] as const;
+import { NAV_LINKS } from "@/app/_components/landing-data";
 
 /** Mobile-only section navigation for the landing page. Hidden on md+ where
     the inline nav renders. */
@@ -33,10 +27,12 @@ export function MobileNav() {
       <SheetContent side="right" className="flex w-72 flex-col">
         <SheetHeader className="text-left">
           <SheetTitle>Nuvia</SheetTitle>
-          <SheetDescription>Jump to a section, or sign in to the app.</SheetDescription>
+          <SheetDescription>
+            Jump to a section or a public page, or sign in to the app.
+          </SheetDescription>
         </SheetHeader>
-        <nav aria-label="Page sections" className="mt-4 flex flex-col gap-1">
-          {SECTIONS.map((section) => (
+        <nav aria-label="Primary" className="mt-4 flex flex-col gap-1">
+          {NAV_LINKS.map((section) => (
             <SheetClose key={section.href} asChild>
               <Link
                 href={section.href}

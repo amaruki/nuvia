@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function CtaSection() {
@@ -25,15 +25,28 @@ export function CtaSection() {
               </h2>
               <p className="mt-3 max-w-[56ch] text-primary-foreground/75">
                 Create an account on this instance, or take the MIT-licensed source and run your
-                own.
+                own. Both paths start here.
               </p>
             </div>
-            <Button size="lg" variant="secondary" asChild className="group shrink-0">
-              <Link href="/auth/signup">
-                Get started
-                <ArrowRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none motion-reduce:transition-none" />
-              </Link>
-            </Button>
+            <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto">
+              <Button size="lg" variant="secondary" asChild className="group">
+                <Link href="/auth/signup">
+                  Create an account on this instance
+                  <ArrowRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none motion-reduce:transition-none" />
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className="group border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground dark:border-primary-foreground/40 dark:bg-transparent dark:hover:bg-primary-foreground/10"
+              >
+                <Link href="/#quick-start">
+                  <Terminal className="size-4" />
+                  Self-host with the MIT source
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>

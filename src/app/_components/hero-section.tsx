@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { GITHUB_URL, MEMBERS, STACK } from "./landing-data";
+import { GITHUB_URL, LIVE_MODULES, MEMBERS, REGISTRY_MODULE_COUNT, STACK } from "./landing-data";
 
 export function HeroSection() {
   return (
@@ -46,8 +46,9 @@ export function HeroSection() {
             className="landing-rise mt-6 max-w-[48ch] text-lg leading-relaxed text-muted-foreground"
             style={{ animationDelay: "120ms" }}
           >
-            Members, events, content, forums, and jobs are live on PostgreSQL today. Nuvia keeps the
-            rest of the roadmap visible instead of pretending mock screens are finished.
+            {LIVE_MODULES.length} of {REGISTRY_MODULE_COUNT} modules are live on PostgreSQL today.
+            The roadmap shows exactly what the maturity flags say, so nothing is presented as
+            finished before it clears the promotion gate.
           </p>
           <div
             className="landing-rise mt-8 flex flex-wrap items-center gap-3"

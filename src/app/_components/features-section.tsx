@@ -60,7 +60,8 @@ export function FeaturesSection() {
                   <LockKeyhole className="size-4 text-primary" />
                   <p className="mt-3 text-sm font-medium">Built-in starting points</p>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Six predefined roles cover common association responsibilities.
+                    {PREDEFINED_ROLES.length} predefined roles cover common association
+                    responsibilities.
                   </p>
                 </div>
                 <div className="rounded-lg border bg-background/70 p-4">
@@ -80,12 +81,12 @@ export function FeaturesSection() {
                 <span className="flex size-10 items-center justify-center rounded-lg bg-background text-primary shadow-xs">
                   <Layers className="size-5" />
                 </span>
-                <Badge variant="outline">Roadmap</Badge>
+                <Badge variant="outline">How promotion works</Badge>
               </div>
-              <CardTitle className="mt-3">Membership tiers</CardTitle>
+              <CardTitle className="mt-3">The promotion gate</CardTitle>
               <CardDescription className="leading-relaxed">
-                Tier, renewal, and dues models promote together only after schema, API, tests, and
-                documentation exist.
+                A module is promoted only once it has a schema, authorized API, tests, and
+                documentation. The landing shows exactly what the registry says.
               </CardDescription>
             </CardHeader>
             <CardContent className="mt-auto grid grid-cols-2 gap-2">
@@ -122,7 +123,7 @@ export function FeaturesSection() {
                 <span className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <MessagesSquare className="size-5" />
                 </span>
-                <Badge>Two live modules</Badge>
+                <Badge>Live</Badge>
               </div>
               <CardTitle className="mt-3">Content and forums</CardTitle>
               <CardDescription className="leading-relaxed">
@@ -138,12 +139,12 @@ export function FeaturesSection() {
                 <span className="flex size-10 items-center justify-center rounded-lg bg-background text-primary shadow-xs">
                   <HandCoins className="size-5" />
                 </span>
-                <Badge variant="outline">Next to promote</Badge>
+                <Badge>Live</Badge>
               </div>
               <CardTitle className="mt-3">Dues and finance</CardTitle>
               <CardDescription className="leading-relaxed">
-                Highest product value, first in the promotion queue, and still clearly marked as
-                roadmap work.
+                Promoted through the maturity gate, so dues, invoices, and payments run on the same
+                PostgreSQL database as the rest of the product.
               </CardDescription>
             </CardHeader>
           </Card>

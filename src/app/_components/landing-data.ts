@@ -1,3 +1,12 @@
+import {
+  MODULE_FLAGS,
+  MODULE_LABELS,
+  MODULE_NAMES,
+  getDisabledModules,
+  getEnabledModules,
+  type ModuleName,
+} from "../../../config/features";
+
 export const GITHUB_URL = "https://github.com/amaruki/nuvia";
 
 export const NAV_LINKS = [
@@ -5,6 +14,8 @@ export const NAV_LINKS = [
   { href: "#modules", label: "Modules" },
   { href: "#community", label: "Community" },
   { href: "#contribute", label: "Contribute" },
+  { href: "/news", label: "News" },
+  { href: "/forums", label: "Forums" },
 ] as const;
 
 // Animated underline on hover; transform-only so it stays GPU-composited.
@@ -29,17 +40,27 @@ export const PREDEFINED_ROLES = [
   "Member",
 ] as const;
 
-export const LIVE_MODULES = ["Members", "Events", "Content", "Forums", "Jobs"] as const;
+/**
+ * Module claims derive from the maturity registry (config/features.ts,
+ * ADR-0008, decision R5): exposure state comes from the flags, never from
+ * hand-maintained copy. A module is claimed as live only while its flag is
+ * on, and listed on the roadmap only while its flag is off. To change the
+ * landing, flip a flag and redeploy; do not edit these lists.
+ */
+export function deriveModuleLists(flags: Record<ModuleName, boolean> = MODULE_FLAGS) {
+  return {
+    live: getEnabledModules(flags).map((name) => MODULE_LABELS[name]),
+    upcoming: getDisabledModules(flags).map((name) => MODULE_LABELS[name]),
+  };
+}
 
-// Promotion order comes from TODO.md: by value to an association.
-export const ROADMAP_MODULES = [
-  "Finance and dues",
-  "Chapters",
-  "Committees",
-  "Learning",
-  "Awards",
-  "Workspaces",
-] as const;
+const moduleLists = deriveModuleLists();
+
+export const LIVE_MODULES = moduleLists.live;
+export const ROADMAP_MODULES = moduleLists.upcoming;
+
+/** Total modules in the maturity registry, for honest "N of M" copy. */
+export const REGISTRY_MODULE_COUNT = MODULE_NAMES.length;
 
 export const PROMOTION_GATE = ["Schema", "Authorized API", "Tests", "Documentation"] as const;
 

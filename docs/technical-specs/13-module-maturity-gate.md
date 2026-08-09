@@ -43,7 +43,7 @@ By value to an association, per `TODO.md` M3: finance/dues, then chapters, then 
 
 ## 13.5 Current state (as of this document)
 
-**The gate is not implemented.** `config/features.ts` does not exist. This is a narrower gap than "unrestricted," though: the six Mock modules are still role-gated the same as every other dashboard section (Section 2.4) — `src/proxy.ts` calling `isRoleAllowedForPath` against `src/lib/navigation-data.ts` still applies. What is missing is a maturity flag independent of role. A user whose role permits a Mock module's section (which ranges from admin-only to any member, depending on the module) sees a fully mock UI with no real schema behind it, with nothing in the UI marking it as such.
+**The gate is not implemented.** `config/features.ts` does not exist. This is a narrower gap than "unrestricted," though: the six Mock modules are still role-gated the same as every other dashboard section (Section 2.4) — `src/proxy.ts` calling `isRoleAllowedForPath` against `src/lib/navigation-data/index.ts` still applies. What is missing is a maturity flag independent of role. A user whose role permits a Mock module's section (which ranges from admin-only to any member, depending on the module) sees a fully mock UI with no real schema behind it, with nothing in the UI marking it as such.
 
 ## 13.6 What this does NOT do
 

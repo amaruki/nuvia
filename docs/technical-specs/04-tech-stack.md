@@ -35,12 +35,12 @@ Every choice below was already made and recorded in an ADR before this document 
 
 ## 4.4 Datastores
 
-| Component             | Technology     | Justification                                                                                                           |
-| --------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Primary database      | PostgreSQL     | Via Drizzle ORM ([ADR-0011](../adr/0011-prisma-to-drizzle.md))                                                          |
-| Cache / rate limiting | Redis          | Required in production ([ADR-0003](../adr/0003-single-rate-limiter.md)); optional in development                        |
-| Object storage        | None installed | `src/lib/services/media.service.ts` never writes a file yet; S3/Cloudinary/local-disk is an open decision, not yet made |
-| Search                | None           | No full-text search engine in use; Postgres `ILIKE`/basic queries only                                                  |
+| Component             | Technology     | Justification                                                                                                                  |
+| --------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Primary database      | PostgreSQL     | Via Drizzle ORM ([ADR-0011](../adr/0011-prisma-to-drizzle.md))                                                                 |
+| Cache / rate limiting | Redis          | Required in production ([ADR-0003](../adr/0003-single-rate-limiter.md)); optional in development                               |
+| Object storage        | None installed | `src/lib/services/media-upload.service.ts` never writes a file yet; S3/Cloudinary/local-disk is an open decision, not yet made |
+| Search                | None           | No full-text search engine in use; Postgres `ILIKE`/basic queries only                                                         |
 
 ### Migration and seed mechanism
 
@@ -58,12 +58,12 @@ Every choice below was already made and recorded in an ADR before this document 
 
 ## 4.6 Infra and integrations
 
-| Component        | Technology                                            | Justification                                                                                                                                                        |
-| ---------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Hosting target   | Not yet fixed                                         | No deployment target is pinned in this repository today                                                                                                              |
-| Containerization | Not yet defined                                       | No Dockerfile exists yet                                                                                                                                             |
-| Email            | Resend or nodemailer                                  | Picked per-deployment based on which environment variables are configured (`RESEND_API_KEY` versus `EMAIL_HOST` and related), via `src/lib/auth.ts`'s `EmailService` |
-| OAuth providers  | Google (required-optional), GitHub/LinkedIn (planned) | Enabled only when their client ID/secret pair is present                                                                                                             |
+| Component        | Technology                                            | Justification                                                                                                                                                              |
+| ---------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hosting target   | Not yet fixed                                         | No deployment target is pinned in this repository today                                                                                                                    |
+| Containerization | Not yet defined                                       | No Dockerfile exists yet                                                                                                                                                   |
+| Email            | Resend or nodemailer                                  | Picked per-deployment based on which environment variables are configured (`RESEND_API_KEY` versus `EMAIL_HOST` and related), via `src/lib/auth/index.ts`'s `EmailService` |
+| OAuth providers  | Google (required-optional), GitHub/LinkedIn (planned) | Enabled only when their client ID/secret pair is present                                                                                                                   |
 
 ## 4.7 What we deliberately do NOT use
 

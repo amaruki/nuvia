@@ -52,7 +52,7 @@ No specific latency budget is set for this resolution path today. The predefined
 ## 12.6 What this does NOT do
 
 - It does not cache the custom-role database lookup. Every request that resolves a custom-role user re-reads `custom_roles`. Adding a cache is an open follow-up if this becomes measurably slow, not a current requirement.
-- It does not derive dashboard nav visibility from this same resolved permission set today. `src/lib/navigation-data.ts`'s per-item `roles` list is a separate, hand-maintained vocabulary (Section 2.4); ADR-0005 accepts unifying the two but it is not yet implemented project-wide.
+- It does not derive dashboard nav visibility from this same resolved permission set today. `src/lib/navigation-data/index.ts`'s per-item `roles` list is a separate, hand-maintained vocabulary (Section 2.4); ADR-0005 accepts unifying the two but it is not yet implemented project-wide.
 - It does not support a user holding more than one role or custom role simultaneously. `users.role` is a single column.
 
 ## 12.7 Cross-references

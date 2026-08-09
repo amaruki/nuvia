@@ -2,7 +2,7 @@
 
 ## 9.1 Mechanism
 
-better-auth issues and validates sessions via `httpOnly`, `SameSite=Lax` cookies. `src/lib/auth.ts` configures the `drizzleAdapter` against the `accounts`, `sessions`, `verification` tables (Section 6.5). Password auth and OAuth (Google now, GitHub/LinkedIn planned) are both supported; a user with only an OAuth-linked account has a null `password_hash`.
+better-auth issues and validates sessions via `httpOnly`, `SameSite=Lax` cookies. `src/lib/auth/index.ts` configures the `drizzleAdapter` against the `accounts`, `sessions`, `verification` tables (Section 6.5). Password auth and OAuth (Google now, GitHub/LinkedIn planned) are both supported; a user with only an OAuth-linked account has a null `password_hash`.
 
 ## 9.2 Token/session strategy
 

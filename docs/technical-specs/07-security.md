@@ -15,7 +15,7 @@ Supersedes `docs/security/controls.md` and `docs/security/threat-model.md`'s con
 | Concern         | Implementation                                                                                                                             |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | API routes      | `requirePermission` / `requireRole` (`src/lib/rbac/`), the sole authorization helper ([ADR-0001](../adr/0001-one-authorization-helper.md)) |
-| Dashboard pages | `src/proxy.ts` calls `isRoleAllowedForPath` against `src/lib/navigation-data.ts`'s per-path role list (Section 2.4)                        |
+| Dashboard pages | `src/proxy.ts` calls `isRoleAllowedForPath` against `src/lib/navigation-data/index.ts`'s per-path role list (Section 2.4)                  |
 | Custom roles    | Resolved via database lookup when `role` is not one of the 14 predefined values; see Section 12                                            |
 
 ## 7.3 Rate limiting
@@ -28,7 +28,7 @@ Redis-backed, one limiter ([ADR-0003](../adr/0003-single-rate-limiter.md)). Per-
 
 ## 7.5 Object-store access
 
-No object storage is wired yet (Section 4.4). `src/lib/services/media.service.ts` never writes a file today, so there is no access-control surface to document until that module is built.
+No object storage is wired yet (Section 4.4). `src/lib/services/media-upload.service.ts` never writes a file today, so there is no access-control surface to document until that module is built.
 
 ## 7.6 Operational-endpoint policy
 

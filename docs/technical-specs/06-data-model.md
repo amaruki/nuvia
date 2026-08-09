@@ -101,7 +101,7 @@ Example: `{ id: "usr_...", username: "jsmith", email: "j@example.org", role: "me
 
 ### ACCOUNTS, SESSIONS, VERIFICATION
 
-Owned and read directly by better-auth's `drizzleAdapter`; their column set must keep matching what better-auth expects (`src/lib/auth.ts`). `verification_token` is a legacy pre-better-auth table with no current reader, flagged for removal in `TODO.md` rather than dropped here.
+Owned and read directly by better-auth's `drizzleAdapter`; their column set must keep matching what better-auth expects (`src/lib/auth/index.ts`). `verification_token` is a legacy pre-better-auth table with no current reader, flagged for removal in `TODO.md` rather than dropped here.
 
 ### AUTH_LOGS
 

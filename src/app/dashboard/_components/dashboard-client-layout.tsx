@@ -1,15 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
 import { DashboardHeader } from "@/components/dashboard/layout/dashboard-header";
 import { DashboardFooter } from "@/components/dashboard/layout/dashboard-footer";
 import { DashboardSidebar } from "@/components/dashboard/layout/dashboard-sidebar";
 import { DashboardProvider, useHeader } from "@/contexts/dashboard-context";
-import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { UserRole } from "@/types/dashboard.types";
 import { AnnouncementBanner } from "@/components/content/announcement-banner";
 
 /**
@@ -18,65 +14,19 @@ import { AnnouncementBanner } from "@/components/content/announcement-banner";
 interface DashboardClientLayoutProps {
   /** Child components to be rendered within the layout */
   children: React.ReactNode;
-  /** User information for display in the header */
-  user?: {
-    name: string;
-    email: string;
-    avatar?: string;
-  };
-  /** User role for role-based features */
-  role?: UserRole;
-  /** Additional CSS classes for styling */
-  className?: string;
 }
 
 /**
- * Dashboard Header Wrapper - uses header context for dynamic headers
+ * Dashboard Header Wrapper - uses header context for dynamic headers.
+ * Renders immediately: as soon as a page sets a header through useHeader()
+ * it is shown, and routes that never set one get the fallback title without
+ * an artificial skeleton delay (UI-20).
  */
-function DashboardHeaderWrapper({ user }: { user?: DashboardClientLayoutProps["user"] }) {
+function DashboardHeaderWrapper() {
   const { title, description, actions } = useHeader();
-  const [isHeaderLoaded, setIsHeaderLoaded] = useState(false);
-
-  // Track if header has been set by a page
-  useEffect(() => {
-    if (title || description) {
-      setIsHeaderLoaded(true);
-    } else {
-      // Small delay to show skeleton on fast loads for better UX
-      const timer = setTimeout(() => {
-        setIsHeaderLoaded(true);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [title, description]);
-
-  // Show skeleton while header is loading
-  if (!isHeaderLoaded) {
-    return (
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="space-y-2">
-              <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-4 w-64" />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Skeleton className="h-8 w-8 rounded-full" />
-              <Skeleton className="h-8 w-20" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <DashboardHeader
-      title={title || "Dashboard"}
-      description={description}
-      user={user}
-      actions={actions}
-    />
+    <DashboardHeader title={title || "Dashboard"} description={description} actions={actions} />
   );
 }
 
@@ -86,21 +36,15 @@ function DashboardHeaderWrapper({ user }: { user?: DashboardClientLayoutProps["u
  * banner above the client tree). Provides sidebar, header, main content area
  * and footer with proper responsive design.
  */
-export function DashboardClientLayout({
-  children,
-  user,
-  role = "member",
-  className,
-}: DashboardClientLayoutProps) {
-  void role;
+export function DashboardClientLayout({ children }: DashboardClientLayoutProps) {
   return (
     <SidebarProvider>
       <DashboardProvider>
         <DashboardSidebar />
-        <SidebarInset className={cn("flex-1", className)}>
+        <SidebarInset className="flex-1">
           {/* Main content */}
           <div className="flex flex-col h-full">
-            <DashboardHeaderWrapper user={user} />
+            <DashboardHeaderWrapper />
 
             {/* UI-11: skip-to-content link target (see src/app/layout.tsx).
                 tabIndex={-1} lets activation of the skip link move focus

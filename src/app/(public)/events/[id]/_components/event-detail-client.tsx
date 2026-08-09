@@ -12,6 +12,7 @@ import { EventLayout } from "@/components/events";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AsyncContent } from "@/components/ui/async-content";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { ArrowLeft, Ban, Edit, Share2, QrCode } from "lucide-react";
 import { RegistrationStatus } from "@/types/event";
 import { useEvent } from "@/lib/hooks/use-events";
@@ -99,7 +100,7 @@ export function EventDetailClient({ currentUserId, organizerCredit }: EventDetai
       loadingComponent={
         <div className="container mx-auto px-4 py-8">
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <LoadingSpinner size="lg" />
           </div>
         </div>
       }

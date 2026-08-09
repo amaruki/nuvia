@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -23,7 +24,7 @@ function AuthLoading() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-background">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+        <LoadingSpinner size="md" className="mx-auto mb-4" />
         <p className="text-muted-foreground">Checking authentication...</p>
       </div>
     </div>

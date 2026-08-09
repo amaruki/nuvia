@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useHeader } from "@/contexts/dashboard-context";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CommitteeWorkspace } from "@/types/committee";
 import { ArrowLeft, Briefcase } from "lucide-react";
@@ -64,10 +65,10 @@ export default function WorkspaceDetailPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-muted rounded w-48 mb-4"></div>
-          <div className="h-4 bg-muted rounded w-32 mb-2"></div>
-          <div className="h-64 bg-muted rounded"></div>
+        <div>
+          <Skeleton className="h-8 w-48 mb-4" />
+          <Skeleton className="h-4 w-32 mb-2" />
+          <Skeleton className="h-64" />
         </div>
       </div>
     );

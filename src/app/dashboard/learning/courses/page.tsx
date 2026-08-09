@@ -22,7 +22,7 @@ import { useMyEnrollments } from "@/lib/hooks/use-learning-enrollments";
 import type { UserStat } from "@/types/learning.types";
 import { CourseCard } from "./_components/course-card";
 import { CourseStats } from "./_components/course-stats";
-import { EmptyState } from "./_components/empty-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function LearningPage() {
   const [activeTab, setActiveTab] = useState("all");
@@ -142,7 +142,14 @@ export default function LearningPage() {
               Loading courses…
             </div>
           )}
-          {!loading && error && <EmptyState title="Couldn't load courses" description={error} />}
+          {!loading && error && (
+            <EmptyState
+              title="Couldn't load courses"
+              description={error}
+              icon={<BookOpen className="h-6 w-6 text-muted-foreground" />}
+              className="col-span-full border-2 border-dashed rounded-lg bg-muted/10 p-12"
+            />
+          )}
           {!loading && !error && (
             <Tabs defaultValue="all" onValueChange={setActiveTab} className="w-full">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -203,6 +210,8 @@ export default function LearningPage() {
                     <EmptyState
                       title="No courses found"
                       description="Try adjusting your search or filters to find what you're looking for."
+                      icon={<BookOpen className="h-6 w-6 text-muted-foreground" />}
+                      className="col-span-full border-2 border-dashed rounded-lg bg-muted/10 p-12"
                     />
                   )}
                 </div>
@@ -223,6 +232,8 @@ export default function LearningPage() {
                     <EmptyState
                       title="No courses in progress"
                       description="Start learning today! Browse our catalog to find your first course."
+                      icon={<BookOpen className="h-6 w-6 text-muted-foreground" />}
+                      className="col-span-full border-2 border-dashed rounded-lg bg-muted/10 p-12"
                     />
                   )}
                 </div>
@@ -243,6 +254,8 @@ export default function LearningPage() {
                     <EmptyState
                       title="No completed courses yet"
                       description="Keep learning! Your achievements will appear here once you finish a course."
+                      icon={<BookOpen className="h-6 w-6 text-muted-foreground" />}
+                      className="col-span-full border-2 border-dashed rounded-lg bg-muted/10 p-12"
                     />
                   )}
                 </div>
@@ -263,6 +276,8 @@ export default function LearningPage() {
                     <EmptyState
                       title="No saved courses"
                       description="Save interesting courses to watch later."
+                      icon={<BookOpen className="h-6 w-6 text-muted-foreground" />}
+                      className="col-span-full border-2 border-dashed rounded-lg bg-muted/10 p-12"
                     />
                   )}
                 </div>

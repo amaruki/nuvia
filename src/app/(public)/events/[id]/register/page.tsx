@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { EventRegistrationForm } from "@/components/events";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { ArrowLeft, CheckCircle, AlertCircle, Clock, Hourglass, LogIn } from "lucide-react";
 import { Event, EventRegistration } from "@/types/event";
 import { getEventById, registerForEvent } from "@/lib/services/event";
@@ -129,7 +130,7 @@ export default function EventRegistrationPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <LoadingSpinner size="lg" />
         </div>
       </div>
     );

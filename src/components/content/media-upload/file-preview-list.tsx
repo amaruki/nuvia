@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Check, X } from "lucide-react";
+import { AlertTriangle, Check, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -23,7 +23,7 @@ export default function FilePreviewList({ files, isUploading, onRemove }: FilePr
           <Card key={file.id} className="p-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="text-blue-600">
+                <div className="text-primary">
                   <Icon className="h-8 w-8" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -37,9 +37,7 @@ export default function FilePreviewList({ files, isUploading, onRemove }: FilePr
               <div className="flex items-center gap-2">
                 {file.status === "success" && <Check className="h-4 w-4 text-green-600" />}
                 {file.status === "error" && <AlertTriangle className="h-4 w-4 text-red-600" />}
-                {file.status === "uploading" && (
-                  <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full" />
-                )}
+                {file.status === "uploading" && <Loader2 className="h-4 w-4 animate-spin" />}
               </div>
 
               <Button

@@ -1,6 +1,8 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
+import { LoadingSpinner } from "./loading-spinner";
+import { EmptyState } from "./empty-state";
 import { WidgetType } from "@/types/dashboard.types";
 
 interface WidgetContainerProps {
@@ -43,15 +45,10 @@ export function WidgetContainer({
         <CardContent>
           {loading ? (
             <div className="flex justify-center items-center h-32">
-              <div
-                className="animate-spin rounded-full h-8 w-8 border-2 border-muted-foreground"
-                style={{ borderTopColor: "var(--primary)" }}
-              ></div>
+              <LoadingSpinner size="md" />
             </div>
           ) : empty ? (
-            <div className="flex justify-center items-center h-32 text-muted-foreground">
-              <p>{emptyMessage}</p>
-            </div>
+            <EmptyState title={emptyMessage} className="h-32 justify-center p-0" />
           ) : (
             children
           )}

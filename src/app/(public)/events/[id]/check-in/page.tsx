@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { EventCheckIn } from "@/components/events";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { ArrowLeft, AlertCircle, CheckCircle, QrCode } from "lucide-react";
 import { Event, EventRegistration } from "@/types/event";
 import { getEventById, checkInToEvent } from "@/lib/services/event";
@@ -115,7 +116,7 @@ export default function EventCheckInPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <LoadingSpinner size="lg" />
         </div>
       </div>
     );

@@ -2,16 +2,17 @@ import { AlertTriangle, RefreshCw } from "lucide-react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function WorkspacesLoading() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="animate-pulse">
-            <div className="h-4 bg-muted rounded w-20 mb-2"></div>
-            <div className="h-8 bg-muted rounded w-32 mb-2"></div>
-            <div className="h-3 bg-muted rounded w-24"></div>
+          <div key={i}>
+            <Skeleton className="h-4 w-20 mb-2" />
+            <Skeleton className="h-8 w-32 mb-2" />
+            <Skeleton className="h-3 w-24" />
           </div>
         ))}
       </div>

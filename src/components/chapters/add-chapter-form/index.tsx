@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2 } from "lucide-react";
+import { Building2, Loader2 } from "lucide-react";
 import { chapterFormSchema, ChapterFormValues } from "./schema";
 import { AddChapterFormProps } from "./types";
 import { BasicInfoTab } from "./basic-info-tab";
@@ -132,7 +132,7 @@ export function AddChapterForm({
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   {isEditing ? "Updating..." : "Creating..."}
                 </>
               ) : (

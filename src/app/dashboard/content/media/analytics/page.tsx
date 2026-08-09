@@ -5,6 +5,7 @@ import { MediaAnalytics } from "@/components/content/media-analytics";
 import { useMedia } from "@/lib/hooks/use-media";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { ArrowLeft, BarChart3 } from "lucide-react";
 import Link from "next/link";
 
@@ -72,7 +73,7 @@ export default function MediaAnalyticsPage() {
       {loading && (
         <div className="fixed inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="flex items-center gap-3 bg-card p-6 rounded-lg shadow-lg">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-info"></div>
+            <LoadingSpinner size="sm" className="h-6 w-6 border-info" />
             <span className="text-sm font-medium">Loading analytics data...</span>
           </div>
         </div>

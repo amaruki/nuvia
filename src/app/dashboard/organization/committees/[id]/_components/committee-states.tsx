@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Briefcase } from "lucide-react";
 
 export function CommitteeLoading() {
   return (
     <div className="space-y-6">
-      <div className="animate-pulse">
-        <div className="h-8 bg-muted rounded w-48 mb-4"></div>
-        <div className="h-4 bg-muted rounded w-32 mb-2"></div>
-        <div className="h-64 bg-muted rounded"></div>
+      <div>
+        <Skeleton className="h-8 w-48 mb-4" />
+        <Skeleton className="h-4 w-32 mb-2" />
+        <Skeleton className="h-64" />
       </div>
     </div>
   );

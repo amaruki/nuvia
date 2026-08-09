@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -79,7 +80,7 @@ export function OutstandingReceivablesSection({ summary }: OutstandingReceivable
         </CardHeader>
         <CardContent>
           {receivablesQuery.isPending ? (
-            <div className="h-32 bg-muted rounded animate-pulse"></div>
+            <Skeleton className="h-32" />
           ) : (receivablesQuery.data ?? []).length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center">
               No open invoices — everything issued has been paid or voided.

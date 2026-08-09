@@ -4,6 +4,7 @@ import * as React from "react";
 import { WidgetContainer } from "../../ui/widget-container";
 import { EventCard } from "@/components/events";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Calendar, ArrowRight } from "lucide-react";
 import { Event, EventStatus } from "@/types/event";
 import { getEvents } from "@/lib/services/event";
@@ -104,10 +105,7 @@ export function EnhancedUpcomingEventsWidget({
         <div className="space-y-4">
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <div
-                className="animate-spin rounded-full h-8 w-8 border-2 border-muted-foreground"
-                style={{ borderTopColor: "var(--primary)" }}
-              ></div>
+              <LoadingSpinner size="md" />
             </div>
           ) : error ? (
             <div className="text-center py-8 text-destructive">

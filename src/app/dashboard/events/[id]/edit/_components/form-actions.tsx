@@ -1,6 +1,6 @@
 "use client";
 
-import { Save } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -19,7 +19,7 @@ export function FormActions({ isSubmitting, onCancel }: FormActionsProps) {
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? (
           <>
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
             Saving...
           </>
         ) : (

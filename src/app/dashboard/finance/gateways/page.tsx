@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -44,13 +45,13 @@ export default function FinanceGateways() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <Card className="animate-pulse">
+        <Card>
           <CardHeader className="pb-2">
-            <div className="h-4 bg-muted rounded w-32"></div>
+            <Skeleton className="h-4 w-32" />
           </CardHeader>
           <CardContent>
-            <div className="h-8 bg-muted rounded w-48 mb-2"></div>
-            <div className="h-3 bg-muted rounded w-64 max-w-full"></div>
+            <Skeleton className="h-8 w-48 mb-2" />
+            <Skeleton className="h-3 w-64 max-w-full" />
           </CardContent>
         </Card>
       </div>

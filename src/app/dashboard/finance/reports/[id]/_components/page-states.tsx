@@ -3,17 +3,18 @@ import { AlertTriangle, ArrowLeft, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function ReportLoadingState() {
   return (
     <div className="space-y-6">
-      <Card className="animate-pulse">
+      <Card>
         <CardHeader>
-          <div className="h-5 bg-muted rounded w-48 mb-2"></div>
-          <div className="h-3 bg-muted rounded w-96 max-w-full"></div>
+          <Skeleton className="h-5 w-48 mb-2" />
+          <Skeleton className="h-3 w-96 max-w-full" />
         </CardHeader>
         <CardContent>
-          <div className="h-40 bg-muted rounded"></div>
+          <Skeleton className="h-40" />
         </CardContent>
       </Card>
     </div>

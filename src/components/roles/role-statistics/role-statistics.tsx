@@ -8,6 +8,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle } from "lucide-react";
 import { CategoryBreakdownCard } from "./category-breakdown-card";
 import { OverviewCards } from "./overview-cards";
@@ -22,11 +23,11 @@ export function RoleStatistics({ data, loading = false }: RoleStatisticsProps) {
         {[...Array(4)].map((_, i) => (
           <Card key={i}>
             <CardHeader className="pb-2">
-              <div className="h-4 bg-muted rounded animate-pulse" />
+              <Skeleton className="h-4 rounded" />
             </CardHeader>
             <CardContent>
-              <div className="h-8 bg-muted rounded animate-pulse mb-2" />
-              <div className="h-3 bg-muted rounded animate-pulse w-3/4" />
+              <Skeleton className="h-8 rounded mb-2" />
+              <Skeleton className="h-3 rounded w-3/4" />
             </CardContent>
           </Card>
         ))}

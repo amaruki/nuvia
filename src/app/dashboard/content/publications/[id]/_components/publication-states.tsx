@@ -1,16 +1,17 @@
 import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function PublicationLoading() {
   return (
     <div className="space-y-6">
-      <div className="animate-pulse">
-        <div className="h-8 bg-muted rounded w-3/4 mb-4"></div>
-        <div className="h-4 bg-muted rounded w-1/2 mb-2"></div>
-        <div className="h-4 bg-muted rounded w-1/3 mb-6"></div>
-        <div className="h-32 bg-muted rounded mb-4"></div>
-        <div className="h-64 bg-muted rounded"></div>
+      <div>
+        <Skeleton className="h-8 w-3/4 mb-4" />
+        <Skeleton className="h-4 w-1/2 mb-2" />
+        <Skeleton className="h-4 w-1/3 mb-6" />
+        <Skeleton className="h-32 mb-4" />
+        <Skeleton className="h-64" />
       </div>
     </div>
   );

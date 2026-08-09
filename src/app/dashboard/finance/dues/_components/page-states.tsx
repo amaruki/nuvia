@@ -2,19 +2,20 @@ import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function DuesLoadingState() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
+          <Card key={i}>
             <CardHeader className="pb-2">
-              <div className="h-4 bg-muted rounded w-20"></div>
+              <Skeleton className="h-4 w-20" />
             </CardHeader>
             <CardContent>
-              <div className="h-8 bg-muted rounded w-32 mb-2"></div>
-              <div className="h-3 bg-muted rounded w-24"></div>
+              <Skeleton className="h-8 w-32 mb-2" />
+              <Skeleton className="h-3 w-24" />
             </CardContent>
           </Card>
         ))}

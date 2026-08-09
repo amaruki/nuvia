@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart3 } from "lucide-react";
 import type { MediaOverviewCardsProps } from "./types";
 import { StorageUsedCard, TotalDownloadsCard, TotalMediaCard, TotalViewsCard } from "./stat-cards";
@@ -16,14 +17,14 @@ export function MediaOverviewCards({ statistics, loading = false }: MediaOvervie
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
+          <Card key={i}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="h-4 w-20 bg-muted rounded"></div>
-              <div className="h-8 w-8 bg-muted rounded"></div>
+              <Skeleton className="h-4 w-20 rounded" />
+              <Skeleton className="h-8 w-8 rounded" />
             </CardHeader>
             <CardContent>
-              <div className="h-8 w-24 bg-muted rounded mb-2"></div>
-              <div className="h-3 w-16 bg-muted rounded"></div>
+              <Skeleton className="h-8 w-24 rounded mb-2" />
+              <Skeleton className="h-3 w-16 rounded" />
             </CardContent>
           </Card>
         ))}

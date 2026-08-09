@@ -35,7 +35,7 @@ export default function ListLoadingState({ className }: ListLoadingStateProps) {
       {/* Loading Grid */}
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: 8 }).map((_, index) => (
-          <Card key={index} className="animate-pulse border-l-4 border-l-muted">
+          <Card key={index} className="border-l-4 border-l-muted">
             <CardContent className="p-5">
               <div className="flex items-start gap-4 mb-5">
                 <LoadingSkeleton className="size-16 rounded-full" />

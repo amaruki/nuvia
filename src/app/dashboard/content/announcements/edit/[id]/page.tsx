@@ -6,6 +6,7 @@ import { useHeader } from "@/contexts/dashboard-context";
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
 import { logger } from "@/lib/logger";
 import { AddAnnouncementForm } from "@/components/content/add-announcement-form";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AnnouncementFormData } from "@/types/announcement";
 
 export default function EditAnnouncementPage() {
@@ -99,10 +100,10 @@ export default function EditAnnouncementPage() {
   if (loading) {
     return (
       <div className="container max-w-5xl py-6 mx-auto">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-1/3"></div>
-          <div className="h-4 bg-muted rounded w-1/2"></div>
-          <div className="h-64 bg-muted rounded"></div>
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-1/3" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-64" />
         </div>
       </div>
     );

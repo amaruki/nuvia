@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { FileText, Grid3X3, List } from "lucide-react";
 import { MediaGridCard } from "./media-grid-card";
 import { MediaGridTable } from "./media-grid-table";
@@ -31,9 +32,9 @@ export function MediaGrid({
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {[...Array(8)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
+          <Card key={i}>
             <CardContent className="p-0">
-              <div className="aspect-square bg-muted"></div>
+              <Skeleton className="aspect-square rounded-none" />
             </CardContent>
           </Card>
         ))}

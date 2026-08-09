@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Save } from "lucide-react";
 import PublicationPageForm from "@/components/content/add-publication-form";
 import { usePublications } from "@/lib/hooks/use-publications";
@@ -74,11 +75,11 @@ export default function EditPublicationPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-muted rounded w-3/4 mb-4"></div>
-          <div className="h-4 bg-muted rounded w-1/2 mb-2"></div>
-          <div className="h-4 bg-muted rounded w-1/3 mb-6"></div>
-          <div className="h-96 bg-muted rounded"></div>
+        <div>
+          <Skeleton className="h-8 w-3/4 mb-4" />
+          <Skeleton className="h-4 w-1/2 mb-2" />
+          <Skeleton className="h-4 w-1/3 mb-6" />
+          <Skeleton className="h-96" />
         </div>
       </div>
     );

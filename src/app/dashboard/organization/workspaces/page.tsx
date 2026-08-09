@@ -14,7 +14,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { AddWorkspaceForm } from "@/components/workspaces/add-workspace-form";
-import { WorkspacesFilters } from "@/components/workspaces/workspaces-filters";
 import { WorkspacesOverviewCards } from "@/components/workspaces/workspaces-overview-cards";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useWorkspaces } from "@/lib/hooks/use-workspaces";
@@ -28,7 +27,6 @@ import { WorkspacesTabs } from "./_components/workspaces-tabs";
 export default function OrganizationWorkspaces() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
-  const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingWorkspace, setEditingWorkspace] = useState<CommitteeWorkspace | null>(null);
   const [workspaceToDelete, setWorkspaceToDelete] = useState<CommitteeWorkspace | null>(null);
@@ -40,9 +38,6 @@ export default function OrganizationWorkspaces() {
     statistics,
     loading,
     error,
-    filters,
-    updateFilters,
-    clearFilters,
     refreshData,
     addWorkspace,
     updateWorkspace,
@@ -130,19 +125,9 @@ export default function OrganizationWorkspaces() {
       <WorkspacesActionBar
         totalWorkspaces={workspaces.length}
         statistics={statistics}
-        onToggleFilters={() => setShowFilters(!showFilters)}
         onRefresh={refreshData}
         onAdd={handleAdd}
       />
-
-      {/* Filters Panel */}
-      {showFilters && (
-        <WorkspacesFilters
-          filters={filters}
-          onFiltersChange={updateFilters}
-          onClearFilters={clearFilters}
-        />
-      )}
 
       {/* Main Content Tabs */}
       <WorkspacesTabs

@@ -33,7 +33,6 @@ export default function UserRoles() {
   const {
     loading,
     error,
-    users,
     roleStats,
     currentUserRole,
     loadData,
@@ -98,9 +97,6 @@ export default function UserRoles() {
         {/* User Roles Tab */}
         <TabsContent value="users" className="space-y-6">
           <RoleManagementTable
-            users={users}
-            loading={loading}
-            onRefresh={loadData}
             onRoleChange={handleRoleChange}
             onBulkRoleChange={handleBulkRoleChange}
             currentUserRole={currentUserRole}

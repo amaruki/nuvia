@@ -102,7 +102,9 @@ export function CommitteesOverviewTab({ committees, statistics }: CommitteesOver
                   <div className="text-right shrink-0">
                     <p
                       className={`text-lg font-bold ${
-                        committee.goalCompletionRate >= 80 ? "text-emerald-600" : "text-amber-600"
+                        committee.goalCompletionRate >= 80
+                          ? "text-emerald-700 dark:text-emerald-400"
+                          : "text-amber-700 dark:text-amber-400"
                       }`}
                     >
                       {committee.goalCompletionRate.toFixed(1)}%

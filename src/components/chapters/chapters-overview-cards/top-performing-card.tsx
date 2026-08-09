@@ -31,10 +31,7 @@ export function TopPerformingChaptersCard({ statistics }: ChapterStatisticsCardP
                     <span className="font-medium truncate max-w-[120px] sm:max-w-[200px]">
                       {chapter.chapterName}
                     </span>
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground"
-                    >
+                    <Badge variant="secondary" className="text-[11px] h-5 px-1.5 font-normal">
                       {chapter.location}
                     </Badge>
                   </div>
@@ -54,7 +51,9 @@ export function TopPerformingChaptersCard({ statistics }: ChapterStatisticsCardP
                     Growth:{" "}
                     <span
                       className={
-                        chapter.growthRate > 0 ? "text-emerald-600 font-medium" : "text-amber-600"
+                        chapter.growthRate > 0
+                          ? "text-emerald-700 dark:text-emerald-400 font-medium"
+                          : "text-amber-700 dark:text-amber-400"
                       }
                     >
                       {chapter.growthRate.toFixed(1)}%

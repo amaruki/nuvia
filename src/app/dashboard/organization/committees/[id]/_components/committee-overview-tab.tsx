@@ -113,7 +113,7 @@ export function CommitteeOverviewTab({ committee }: CommitteeOverviewTabProps) {
                     <Mail className="h-4 w-4 text-muted-foreground" />
                     <a
                       href={`mailto:${committee.contactInfo.email}`}
-                      className="text-blue-600 hover:underline"
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
                     >
                       {committee.contactInfo.email}
                     </a>
@@ -125,7 +125,7 @@ export function CommitteeOverviewTab({ committee }: CommitteeOverviewTabProps) {
                     <Phone className="h-4 w-4 text-muted-foreground" />
                     <a
                       href={`tel:${committee.contactInfo.phone}`}
-                      className="text-blue-600 hover:underline"
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
                     >
                       {committee.contactInfo.phone}
                     </a>
@@ -146,7 +146,7 @@ export function CommitteeOverviewTab({ committee }: CommitteeOverviewTabProps) {
                       href={committee.contactInfo.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
                     >
                       Visit Website
                     </a>

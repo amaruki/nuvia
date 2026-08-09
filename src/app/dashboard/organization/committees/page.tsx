@@ -14,7 +14,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { CommitteesOverviewCards } from "@/components/committees/committees-overview-cards";
-import { CommitteesFilters } from "@/components/committees/committees-filters";
 import { AddCommitteeForm } from "@/components/committees/add-committee-form";
 import { useCommittees } from "@/lib/hooks/use-committees";
 import { logger } from "@/lib/logger";
@@ -32,7 +31,6 @@ import { CommitteesError, CommitteesLoading } from "./_components/committees-sta
 export default function OrganizationCommittees() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
-  const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCommittee, setEditingCommittee] = useState<Committee | null>(null);
   const [committeeToDelete, setCommitteeToDelete] = useState<Committee | null>(null);
@@ -44,9 +42,6 @@ export default function OrganizationCommittees() {
     statistics,
     loading,
     error,
-    filters,
-    updateFilters,
-    clearFilters,
     refreshData,
     addCommittee,
     updateCommittee,
@@ -136,19 +131,9 @@ export default function OrganizationCommittees() {
       <CommitteesActionBar
         totalCount={committees.length}
         activeCount={statistics?.activeCommittees}
-        onToggleFilters={() => setShowFilters(!showFilters)}
         onRefresh={refreshData}
         onAdd={handleAdd}
       />
-
-      {/* Filters Panel */}
-      {showFilters && (
-        <CommitteesFilters
-          filters={filters}
-          onFiltersChange={updateFilters}
-          onClearFilters={clearFilters}
-        />
-      )}
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -169,7 +154,6 @@ export default function OrganizationCommittees() {
 
         <CommitteesOverviewTab committees={committees} statistics={statistics} />
         <CommitteesListTab
-          committees={committees}
           onViewDetails={handleViewDetails}
           onEdit={handleEdit}
           onDelete={handleDelete}

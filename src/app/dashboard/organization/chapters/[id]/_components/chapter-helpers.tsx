@@ -69,7 +69,7 @@ export const getGrowthIcon = (rate: number) => {
 };
 
 export const getGrowthColor = (rate: number) => {
-  return rate >= 0 ? "text-emerald-600" : "text-rose-600";
+  return rate >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400";
 };
 
 export const formatCurrency = (amount: number) => {

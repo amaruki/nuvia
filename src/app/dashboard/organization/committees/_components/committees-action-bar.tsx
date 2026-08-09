@@ -1,11 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Filter, Plus, RefreshCw } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 
 interface CommitteesActionBarProps {
   totalCount: number;
   activeCount?: number;
-  onToggleFilters: () => void;
   onRefresh: () => void;
   onAdd: () => void;
 }
@@ -13,7 +12,6 @@ interface CommitteesActionBarProps {
 export function CommitteesActionBar({
   totalCount,
   activeCount,
-  onToggleFilters,
   onRefresh,
   onAdd,
 }: CommitteesActionBarProps) {
@@ -30,15 +28,6 @@ export function CommitteesActionBar({
         )}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onToggleFilters}
-          className="flex-1 sm:flex-none"
-        >
-          <Filter className="mr-2 h-4 w-4" />
-          <span className="hidden sm:inline">Filters</span>
-        </Button>
         <Button variant="outline" size="sm" onClick={onRefresh} className="flex-1 sm:flex-none">
           <RefreshCw className="mr-2 h-4 w-4" />
           <span className="hidden sm:inline">Refresh</span>
@@ -47,10 +36,6 @@ export function CommitteesActionBar({
           <Plus className="mr-2 h-4 w-4" />
           <span className="hidden sm:inline">Add Committee</span>
           <span className="sm:hidden">Add</span>
-        </Button>
-        <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
-          <Download className="mr-2 h-4 w-4" />
-          <span className="hidden sm:inline">Export</span>
         </Button>
       </div>
     </div>

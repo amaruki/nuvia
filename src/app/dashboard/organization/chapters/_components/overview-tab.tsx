@@ -100,7 +100,9 @@ export function OverviewTab({ chapters, statistics }: OverviewTabProps) {
                   <div className="text-right shrink-0">
                     <p
                       className={`text-lg font-bold ${
-                        chapter.growthRate >= 0 ? "text-emerald-600" : "text-rose-600"
+                        chapter.growthRate >= 0
+                          ? "text-emerald-700 dark:text-emerald-400"
+                          : "text-rose-700 dark:text-rose-400"
                       }`}
                     >
                       {chapter.growthRate.toFixed(1)}%

@@ -1,8 +1,10 @@
 /**
  * Data hook for the User Roles Management Dashboard.
  *
- * Owns fetching of users, role statistics, and the current session role,
- * plus the mutation handlers for individual and bulk role updates.
+ * Owns role statistics and the current session role, plus the mutation
+ * handlers for individual and bulk role updates. The user list itself is
+ * fetched (server-paginated) by the RoleManagementTable via react-query, so
+ * no capped single-page user snapshot lives here anymore.
  */
 
 "use client";
@@ -11,28 +13,20 @@ import { useEffect, useState } from "react";
 
 import { RoleStatisticsData } from "@/components/roles/role-statistics";
 import { logger } from "@/lib/logger";
-import { Permission, Role, UserWithRoleInfo } from "@/types/role";
+import { Permission, Role } from "@/types/role";
 
 export function useRolesData() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [users, setUsers] = useState<UserWithRoleInfo[]>([]);
   const [roleStats, setRoleStats] = useState<RoleStatisticsData | undefined>(undefined);
   const [currentUserRole, setCurrentUserRole] = useState<Role>("admin");
 
-  // Load data
+  // Load role statistics and the current session role
   const loadData = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Load users with roles
-      const usersResponse = await fetch("/api/v1/admin/users?includeRoles=true&limit=100");
-      if (!usersResponse.ok) {
-        throw new Error("Failed to load users");
-      }
-      const usersData = await usersResponse.json();
-
       // Load role statistics
       const statsResponse = await fetch("/api/v1/admin/roles?includeStats=true");
       if (!statsResponse.ok) {
@@ -47,7 +41,6 @@ export function useRolesData() {
         setCurrentUserRole(sessionData.user?.role || "user");
       }
 
-      setUsers(usersData.data?.users || []);
       setRoleStats(
         statsData.data?.statistics || {
           totalUsers: 0,
@@ -81,7 +74,7 @@ export function useRolesData() {
         throw new Error(errorData.message || "Failed to update role");
       }
 
-      // Refresh data
+      // Refresh statistics (the table refreshes its own query)
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update role");
@@ -110,7 +103,7 @@ export function useRolesData() {
         throw new Error(errorData.message || "Failed to update roles");
       }
 
-      // Refresh data
+      // Refresh statistics (the table refreshes its own query)
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update roles");
@@ -132,7 +125,6 @@ export function useRolesData() {
   return {
     loading,
     error,
-    users,
     roleStats,
     currentUserRole,
     loadData,

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
@@ -15,7 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { AddChapterForm } from "@/components/chapters/add-chapter-form";
-import { ChaptersFilters } from "@/components/chapters/chapters-filters";
 import { ChaptersOverviewCards } from "@/components/chapters/chapters-overview-cards";
 import { useChapters } from "@/lib/hooks/use-chapters";
 import { logger } from "@/lib/logger";
@@ -30,12 +30,13 @@ import { ErrorState, LoadingState } from "./_components/page-states";
 
 export default function OrganizationChapters() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("overview");
-  const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
   const [chapterToDelete, setChapterToDelete] = useState<Chapter | null>(null);
   const [isDeletingChapter, setIsDeletingChapter] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
   const { setHeader, clearHeader } = useHeader();
 
   const {
@@ -43,15 +44,18 @@ export default function OrganizationChapters() {
     statistics,
     loading,
     error,
-    filters,
-    updateFilters,
-    clearFilters,
     refreshData,
     addChapter,
     updateChapter,
     deleteChapter,
     toggleChapterStatus,
   } = useChapters();
+
+  // The Chapters tab owns its own paginated query; write actions here only
+  // touch the hook's local cache, so the list query must be invalidated.
+  const invalidateChaptersList = () => {
+    void queryClient.invalidateQueries({ queryKey: ["chapters", "list"] });
+  };
 
   useEffect(() => {
     setHeader({
@@ -84,6 +88,7 @@ export default function OrganizationChapters() {
       }
       setShowAddForm(false);
       setEditingChapter(null);
+      invalidateChaptersList();
     } catch (error) {
       logger.error("Error saving chapter", error);
     }
@@ -99,6 +104,7 @@ export default function OrganizationChapters() {
       setIsDeletingChapter(true);
       await deleteChapter(chapterToDelete.id);
       setChapterToDelete(null);
+      invalidateChaptersList();
     } catch (error) {
       logger.error("Error deleting chapter", error);
     } finally {
@@ -108,10 +114,19 @@ export default function OrganizationChapters() {
 
   const handleToggleStatus = async (chapter: Chapter, status: "active" | "inactive") => {
     try {
+      setIsToggling(true);
       await toggleChapterStatus(chapter.id, status);
+      invalidateChaptersList();
     } catch (error) {
       logger.error("Error toggling chapter status", error);
+    } finally {
+      setIsToggling(false);
     }
+  };
+
+  const handleRefresh = () => {
+    void refreshData();
+    invalidateChaptersList();
   };
 
   if (loading) {
@@ -131,19 +146,9 @@ export default function OrganizationChapters() {
       <ActionBar
         totalChapters={chapters.length}
         statistics={statistics}
-        onToggleFilters={() => setShowFilters(!showFilters)}
-        onRefresh={refreshData}
+        onRefresh={handleRefresh}
         onAdd={handleAdd}
       />
-
-      {/* Filters Panel */}
-      {showFilters && (
-        <ChaptersFilters
-          filters={filters}
-          onFiltersChange={updateFilters}
-          onClearFilters={clearFilters}
-        />
-      )}
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -168,7 +173,7 @@ export default function OrganizationChapters() {
 
         <TabsContent value="chapters" className="space-y-6">
           <ChaptersTab
-            chapters={chapters}
+            isToggling={isToggling}
             onViewDetails={(chapter) =>
               router.push(`/dashboard/organization/chapters/${chapter.id}`)
             }

@@ -18,16 +18,16 @@ import type {
   ChapterOverallStatistics,
 } from "@/types/chapter.types";
 
-import { apiFetch } from "@/lib/api-client";
 import { logger } from "@/lib/logger";
 
 import { applyChapterFilters } from "./chapter-filters";
 import { computeChapterStatistics } from "./chapter-statistics";
-import { CHAPTERS_API_PATH, CHAPTERS_PAGE_LIMIT } from "./constants";
+import { CHAPTERS_API_PATH } from "./constants";
 import { toErrorMessage } from "./error-message";
 import { hydrateChapter } from "./hydrate-chapter";
 import type { WireChapter } from "./types";
 import { useChapterMutations } from "./use-chapter-mutations";
+import { fetchAllPages } from "../fetch-all-pages";
 
 export { hydrateChapter } from "./hydrate-chapter";
 export type { WireChapter } from "./types";
@@ -55,10 +55,10 @@ export function useChapters() {
   const refreshData = useCallback(async () => {
     try {
       setLoading(true);
-      const envelope = await apiFetch<WireChapter[]>(
-        `${CHAPTERS_API_PATH}?page=1&limit=${CHAPTERS_PAGE_LIMIT}`,
-      );
-      applyChapters((envelope.data ?? []).map(hydrateChapter));
+      // Drain every page (UI-09 C3): overview, leadership, analytics and
+      // the detail page all need the full chapter set, not a 100-row cap.
+      const wires = await fetchAllPages<WireChapter>(CHAPTERS_API_PATH);
+      applyChapters(wires.map(hydrateChapter));
       setError(null);
     } catch (err) {
       setError(toErrorMessage(err, "Failed to load chapter data"));

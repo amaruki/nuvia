@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type Dispatch,
+  type KeyboardEvent,
   type ReactNode,
   type SetStateAction,
 } from "react";
@@ -317,7 +318,25 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() ? "selected" : undefined}
+                  tabIndex={onRowClick ? 0 : undefined}
                   onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (event: KeyboardEvent<HTMLTableRowElement>) => {
+                          if (event.key !== "Enter" || event.defaultPrevented) {
+                            return;
+                          }
+                          // Enter belongs to controls inside the row (kebab,
+                          // checkbox, links) — only bare rows open on Enter.
+                          const target = event.target as HTMLElement;
+                          if (target.closest("button, a, input, select, textarea, label")) {
+                            return;
+                          }
+                          event.preventDefault();
+                          onRowClick(row.original);
+                        }
+                      : undefined
+                  }
                   className={cn(onRowClick && "cursor-pointer")}
                 >
                   {row.getVisibleCells().map((cell) => (

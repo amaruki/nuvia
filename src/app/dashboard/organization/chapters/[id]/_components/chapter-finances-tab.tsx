@@ -35,7 +35,7 @@ export function ChapterFinancesTab({ chapter }: ChapterFinancesTabProps) {
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Net Income</span>
               <span
-                className={`text-sm font-bold ${chapter.finances.netIncome >= 0 ? "text-emerald-600" : "text-rose-600"}`}
+                className={`text-sm font-bold ${chapter.finances.netIncome >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400"}`}
               >
                 {formatCurrency(chapter.finances.netIncome)}
               </span>

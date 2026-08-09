@@ -3,9 +3,10 @@
 /**
  * D2: committees dashboard hook backed by the real committees API.
  *
- * Data comes from GET /api/v1/committees (server-side filtering, paginated;
- * the dashboard pulls a full page of 100). Writes go through the same
- * resource: POST /api/v1/committees, PATCH/DELETE /api/v1/committees/:id.
+ * Data comes from GET /api/v1/committees (server-side filtering; the full
+ * dataset is drained page by page via fetchAllPages, UI-09 C3). Writes go
+ * through the same resource: POST /api/v1/committees, PATCH/DELETE
+ * /api/v1/committees/:id.
  *
  * The API serializes dates as ISO strings; `toCommitteeUi` converts them to
  * Date objects to satisfy the UI contract in src/types/committee/.

@@ -47,7 +47,9 @@ export function TotalMembersCard({ statistics }: ChapterStatisticsCardProps) {
               )}
               <span
                 className={`text-sm font-medium ${
-                  statistics.memberGrowthRate >= 0 ? "text-emerald-600" : "text-rose-600"
+                  statistics.memberGrowthRate >= 0
+                    ? "text-emerald-700 dark:text-emerald-400"
+                    : "text-rose-700 dark:text-rose-400"
                 }`}
               >
                 {statistics.memberGrowthRate.toFixed(1)}%

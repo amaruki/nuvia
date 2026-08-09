@@ -80,7 +80,7 @@ export function UserActions({
 
       resetDialogState();
       onClearSelection();
-      void queryClient.invalidateQueries({ queryKey: ["user-directory"] });
+      void queryClient.invalidateQueries({ queryKey: ["users", "directory"] });
     } catch {
       toast.error("Failed to update roles");
     }

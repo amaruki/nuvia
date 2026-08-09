@@ -3,18 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CommitteeOverallStatistics } from "@/types/committee";
-import {
-  Users,
-  Target,
-  Calendar,
-  CheckSquare,
-  TrendingUp,
-  Award,
-  Briefcase,
-  Star,
-  ArrowUpRight,
-  ArrowDownRight,
-} from "lucide-react";
+import { Users, Target, Calendar, CheckSquare, TrendingUp, Award, Briefcase } from "lucide-react";
 
 interface CommitteesOverviewCardsProps {
   statistics: CommitteeOverallStatistics;
@@ -23,18 +12,6 @@ interface CommitteesOverviewCardsProps {
 export function CommitteesOverviewCards({ statistics }: CommitteesOverviewCardsProps) {
   const formatPercentage = (value: number) => {
     return `${value.toFixed(1)}%`;
-  };
-
-  const getGrowthIcon = (rate: number) => {
-    return rate >= 0 ? (
-      <ArrowUpRight className="h-4 w-4 text-emerald-600" />
-    ) : (
-      <ArrowDownRight className="h-4 w-4 text-rose-600" />
-    );
-  };
-
-  const getGrowthColor = (rate: number) => {
-    return rate >= 0 ? "text-emerald-600" : "text-rose-600";
   };
 
   return (
@@ -197,7 +174,7 @@ export function CommitteesOverviewCards({ statistics }: CommitteesOverviewCardsP
           </CardHeader>
           <CardContent>
             <div className="space-y-5">
-              {statistics.topPerformingCommittees.slice(0, 4).map((committee, index) => {
+              {statistics.topPerformingCommittees.slice(0, 4).map((committee) => {
                 // Calculate percentage for the bar width (relative to max impact score in set for visual)
                 const maxScore = Math.max(
                   ...statistics.topPerformingCommittees.map((c) => c.impactScore),
@@ -211,10 +188,7 @@ export function CommitteesOverviewCards({ statistics }: CommitteesOverviewCardsP
                         <span className="font-medium truncate max-w-[120px] sm:max-w-[200px]">
                           {committee.committeeName}
                         </span>
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground"
-                        >
+                        <Badge variant="secondary" className="text-[11px] h-5 px-1.5 font-normal">
                           {committee.type}
                         </Badge>
                       </div>

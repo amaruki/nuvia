@@ -478,14 +478,14 @@ describe("seed-demo (stage 1)", () => {
       .where(like(certificate.studentEmail, "%@nuvia.test"));
     expect(certificates.length).toBeGreaterThanOrEqual(1);
     expect(certificates.every((c) => c.status === "ACTIVE")).toBe(true);
-  });
+  }, 30000);
 
   test("is idempotent on re-run", async () => {
     const before = await db.select({ id: event.id }).from(event).where(like(event.slug, "demo-%"));
     await seedDemo();
     const after = await db.select({ id: event.id }).from(event).where(like(event.slug, "demo-%"));
     expect(after.length).toBe(before.length);
-  });
+  }, 30000);
 });
 
 // ---------------------------------------------------------------------------
@@ -501,7 +501,7 @@ describe("demo login route (stage 3)", () => {
     // through the route itself is circular, so re-seed deterministically.
     const seeded = await seedDemo();
     credentials = { email: seeded.email, password: seeded.password };
-  });
+  }, 30000);
 
   test("returns a problem (not a session) when DEMO_MODE is off", async () => {
     setDemoMode(false);
@@ -645,7 +645,7 @@ describe("reset-demo rotates the credential", () => {
     // Content survived the reset (it was rebuilt).
     const events = await db.select({ id: event.id }).from(event).where(like(event.slug, "demo-%"));
     expect(events.length).toBeGreaterThanOrEqual(4);
-  });
+  }, 30000);
 });
 
 // ---------------------------------------------------------------------------

@@ -52,7 +52,7 @@ Routes map service errors in `src/app/api/v1/committees/_lib.ts`: `NotFoundError
 
 ## Dashboard UI
 
-Two pages under `src/app/dashboard/organization/committees/`, wired to the API through `src/lib/hooks/use-committees.ts` (react-query over `apiFetch`, backlog D2 — the `mock-committee-data.ts` file was deleted once its last importer moved):
+Two pages under `src/app/dashboard/organization/committees/`, wired to the API through `src/lib/hooks/use-committees/` (react-query over `apiFetch`, backlog D2 — the `mock-committee-data.ts` file was deleted once its last importer moved):
 
 | Page             | Path                                      |
 | ---------------- | ----------------------------------------- |

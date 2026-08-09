@@ -3,7 +3,7 @@
 /**
  * D3: learning certificates dashboard hooks backed by the real learning API.
  *
- * react-query over `apiFetch` (same arrangement as use-committees.ts):
+ * react-query over `apiFetch` (same arrangement as use-committees/):
  * the list query hydrates wire dates via `toCertificateUi`, and the revoke
  * mutation PATCHes the certificate status and invalidates the shared
  * `["learning", "certificates"]` key.

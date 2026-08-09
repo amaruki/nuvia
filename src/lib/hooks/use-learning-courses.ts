@@ -3,7 +3,7 @@
 /**
  * D3: learning courses dashboard hooks backed by the real learning API.
  *
- * react-query over `apiFetch` (same arrangement as use-committees.ts):
+ * react-query over `apiFetch` (same arrangement as use-committees/):
  * the list query hydrates wire dates via `toCourseUi`, statistics are
  * computed client-side from the fetched page (never invented), and
  * mutations invalidate the shared `["learning", "courses"]` key.

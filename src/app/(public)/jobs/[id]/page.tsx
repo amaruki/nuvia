@@ -221,7 +221,7 @@ export default async function PublicJobDetailPage({ params }: { params: Promise<
             </Card>
 
             <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <DollarSign className="h-6 w-6 mx-auto mb-2 text-green-600" />
+              <DollarSign className="h-6 w-6 mx-auto mb-2 text-success" />
               <p className="text-sm text-muted-foreground">
                 Competitive compensation and benefits package included
               </p>

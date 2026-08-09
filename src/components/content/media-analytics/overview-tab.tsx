@@ -20,7 +20,7 @@ export function OverviewTab({ stats, analytics }: OverviewTabProps) {
       change: 12.5,
       changeType: "increase",
       icon: <Eye className="h-5 w-5" />,
-      color: "text-blue-600",
+      color: "text-info",
     },
     {
       label: "Total Downloads",
@@ -28,7 +28,7 @@ export function OverviewTab({ stats, analytics }: OverviewTabProps) {
       change: 8.3,
       changeType: "increase",
       icon: <Download className="h-5 w-5" />,
-      color: "text-green-600",
+      color: "text-success",
     },
     {
       label: "Avg. View Duration",
@@ -38,7 +38,7 @@ export function OverviewTab({ stats, analytics }: OverviewTabProps) {
       change: -5.2,
       changeType: "decrease",
       icon: <Clock className="h-5 w-5" />,
-      color: "text-purple-600",
+      color: "text-accent-foreground",
     },
     {
       label: "Usage Count",
@@ -46,7 +46,7 @@ export function OverviewTab({ stats, analytics }: OverviewTabProps) {
       change: 15.7,
       changeType: "increase",
       icon: <Share2 className="h-5 w-5" />,
-      color: "text-orange-600",
+      color: "text-warning",
     },
   ];
 
@@ -59,7 +59,7 @@ export function OverviewTab({ stats, analytics }: OverviewTabProps) {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">{metric.label}</p>
+                  <p className="text-sm font-medium text-muted-foreground">{metric.label}</p>
                   <p className="text-2xl font-bold">{metric.value}</p>
                   {metric.change !== undefined && (
                     <div className="flex items-center gap-1 mt-1">
@@ -70,7 +70,7 @@ export function OverviewTab({ stats, analytics }: OverviewTabProps) {
                     </div>
                   )}
                 </div>
-                <div className={cn("text-blue-600", metric.color)}>{metric.icon}</div>
+                <div className={cn("text-foreground", metric.color)}>{metric.icon}</div>
               </div>
             </CardContent>
           </Card>
@@ -95,7 +95,7 @@ export function OverviewTab({ stats, analytics }: OverviewTabProps) {
                     <span className="capitalize">{type.type}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">{type.count} files</span>
+                    <span className="text-sm text-muted-foreground">{type.count} files</span>
                     <Badge variant="secondary">{type.percentage}%</Badge>
                   </div>
                 </div>

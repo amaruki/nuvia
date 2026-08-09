@@ -16,8 +16,8 @@ export function OverviewTab({ statistics }: OverviewTabProps) {
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50">
-                  <Eye className="h-4 w-4 text-blue-600" />
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                  <Eye className="h-4 w-4 text-primary" />
                 </div>
                 <span className="text-sm font-medium">Total Acknowledgments</span>
               </div>
@@ -29,8 +29,8 @@ export function OverviewTab({ statistics }: OverviewTabProps) {
             </div>
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-50">
-                  <BarChart3 className="h-4 w-4 text-green-600" />
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-success/10">
+                  <BarChart3 className="h-4 w-4 text-success" />
                 </div>
                 <span className="text-sm font-medium">Acknowledgment Rate</span>
               </div>
@@ -42,8 +42,8 @@ export function OverviewTab({ statistics }: OverviewTabProps) {
             </div>
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-red-50">
-                  <Zap className="h-4 w-4 text-red-600" />
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-destructive/10">
+                  <Zap className="h-4 w-4 text-destructive" />
                 </div>
                 <span className="text-sm font-medium">Urgent</span>
               </div>
@@ -53,8 +53,8 @@ export function OverviewTab({ statistics }: OverviewTabProps) {
             </div>
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-50">
-                  <Pin className="h-4 w-4 text-purple-600" />
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent">
+                  <Pin className="h-4 w-4 text-accent-foreground" />
                 </div>
                 <span className="text-sm font-medium">Pinned</span>
               </div>

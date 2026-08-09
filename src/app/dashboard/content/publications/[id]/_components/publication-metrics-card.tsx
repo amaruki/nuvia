@@ -20,8 +20,8 @@ export function PublicationMetricsCard({ metrics }: PublicationMetricsCardProps)
       <CardContent>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50">
-              <Eye className="h-5 w-5 text-blue-600" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
+              <Eye className="h-5 w-5 text-primary" />
             </div>
             <div>
               <p className="text-2xl font-bold">{formatNumber(metrics.views)}</p>
@@ -30,8 +30,8 @@ export function PublicationMetricsCard({ metrics }: PublicationMetricsCardProps)
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-50">
-              <Heart className="h-5 w-5 text-green-600" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-success/10">
+              <Heart className="h-5 w-5 text-success" />
             </div>
             <div>
               <p className="text-2xl font-bold">{formatNumber(metrics.likes)}</p>
@@ -40,8 +40,8 @@ export function PublicationMetricsCard({ metrics }: PublicationMetricsCardProps)
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-50">
-              <MessageCircle className="h-5 w-5 text-purple-600" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent">
+              <MessageCircle className="h-5 w-5 text-accent-foreground" />
             </div>
             <div>
               <p className="text-2xl font-bold">{formatNumber(metrics.comments)}</p>
@@ -50,8 +50,8 @@ export function PublicationMetricsCard({ metrics }: PublicationMetricsCardProps)
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-orange-50">
-              <Bookmark className="h-5 w-5 text-orange-600" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-warning/10">
+              <Bookmark className="h-5 w-5 text-warning" />
             </div>
             <div>
               <p className="text-2xl font-bold">{formatNumber(metrics.bookmarks)}</p>

@@ -26,7 +26,7 @@ export default async function PublicJobBoardPage({
       <div className="max-w-6xl mx-auto p-6">
         {/* Hero Section */}
         <div className="text-center py-12">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
             Join Our Team
           </h1>
           <p className="text-lg text-muted-foreground mb-8">
@@ -93,7 +93,7 @@ export default async function PublicJobBoardPage({
         )}
 
         {/* CTA Section */}
-        <div className="text-center mt-16 py-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl">
+        <div className="text-center mt-16 py-12 bg-gradient-to-r from-primary/10 to-accent/60 border border-border rounded-xl">
           <h2 className="text-2xl font-bold mb-4">Don&apos;t see what you&apos;re looking for?</h2>
           <p className="text-muted-foreground mb-6">
             Check back soon — we are always looking for talented people to join our partner

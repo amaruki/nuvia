@@ -259,7 +259,7 @@ export default async function PublicChapterDetailPage({
         </div>
 
         {/* Cross-link */}
-        <div className="text-center mt-16 py-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl">
+        <div className="text-center mt-16 py-12 bg-gradient-to-r from-primary/10 to-accent/60 border border-border rounded-xl">
           <h2 className="text-2xl font-bold mb-4">Want to see the working groups too?</h2>
           <p className="text-muted-foreground mb-6">
             Committees carry specific mandates between chapter meetings.

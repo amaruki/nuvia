@@ -23,8 +23,8 @@ export function CommitteesOverviewCards({ statistics }: CommitteesOverviewCardsP
           <CardContent className="p-6">
             <div className="flex items-center justify-between space-y-0 pb-2">
               <p className="text-sm font-medium text-muted-foreground">Total Committees</p>
-              <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center">
-                <Briefcase className="h-4 w-4 text-blue-600" />
+              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Briefcase className="h-4 w-4 text-primary" />
               </div>
             </div>
             <div className="flex flex-col mt-3">
@@ -41,8 +41,8 @@ export function CommitteesOverviewCards({ statistics }: CommitteesOverviewCardsP
           <CardContent className="p-6">
             <div className="flex items-center justify-between space-y-0 pb-2">
               <p className="text-sm font-medium text-muted-foreground">Total Members</p>
-              <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
-                <Users className="h-4 w-4 text-emerald-600" />
+              <div className="h-8 w-8 rounded-full bg-success/10 flex items-center justify-center">
+                <Users className="h-4 w-4 text-success" />
               </div>
             </div>
             <div className="flex flex-col mt-3">
@@ -59,8 +59,8 @@ export function CommitteesOverviewCards({ statistics }: CommitteesOverviewCardsP
           <CardContent className="p-6">
             <div className="flex items-center justify-between space-y-0 pb-2">
               <p className="text-sm font-medium text-muted-foreground">Total Meetings</p>
-              <div className="h-8 w-8 rounded-full bg-purple-50 flex items-center justify-center">
-                <Calendar className="h-4 w-4 text-purple-600" />
+              <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center">
+                <Calendar className="h-4 w-4 text-accent-foreground" />
               </div>
             </div>
             <div className="flex flex-col mt-3">
@@ -75,8 +75,8 @@ export function CommitteesOverviewCards({ statistics }: CommitteesOverviewCardsP
           <CardContent className="p-6">
             <div className="flex items-center justify-between space-y-0 pb-2">
               <p className="text-sm font-medium text-muted-foreground">Goal Completion</p>
-              <div className="h-8 w-8 rounded-full bg-indigo-50 flex items-center justify-center">
-                <Target className="h-4 w-4 text-indigo-600" />
+              <div className="h-8 w-8 rounded-full bg-chart-3/10 flex items-center justify-center">
+                <Target className="h-4 w-4 text-chart-3" />
               </div>
             </div>
             <div className="flex flex-col mt-3">
@@ -100,14 +100,14 @@ export function CommitteesOverviewCards({ statistics }: CommitteesOverviewCardsP
             {/* Status Item: Active */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                <div className="h-8 w-8 rounded-full bg-success/10 flex items-center justify-center text-success">
                   <CheckSquare className="h-4 w-4" />
                 </div>
                 <span className="text-sm font-medium">Active</span>
               </div>
               <Badge
                 variant="outline"
-                className="text-sm font-bold bg-emerald-50 text-emerald-700 border-emerald-200"
+                className="text-sm font-bold bg-success/10 text-success border-success/30"
               >
                 {statistics.activeCommittees}
               </Badge>
@@ -116,14 +116,14 @@ export function CommitteesOverviewCards({ statistics }: CommitteesOverviewCardsP
             {/* Status Item: Pending */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                <div className="h-8 w-8 rounded-full bg-warning/10 flex items-center justify-center text-warning">
                   <Calendar className="h-4 w-4" />
                 </div>
                 <span className="text-sm font-medium">Pending</span>
               </div>
               <Badge
                 variant="outline"
-                className="text-sm font-bold bg-amber-50 text-amber-700 border-amber-200"
+                className="text-sm font-bold bg-warning/10 text-warning border-warning/30"
               >
                 {statistics.pendingCommittees}
               </Badge>
@@ -132,14 +132,14 @@ export function CommitteesOverviewCards({ statistics }: CommitteesOverviewCardsP
             {/* Status Item: Inactive */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                   <Briefcase className="h-4 w-4" />
                 </div>
                 <span className="text-sm font-medium">Inactive</span>
               </div>
               <Badge
                 variant="outline"
-                className="text-sm font-bold bg-slate-50 text-slate-700 border-slate-200"
+                className="text-sm font-bold bg-muted text-muted-foreground border-border"
               >
                 {statistics.inactiveCommittees}
               </Badge>
@@ -148,14 +148,14 @@ export function CommitteesOverviewCards({ statistics }: CommitteesOverviewCardsP
             {/* Status Item: Suspended */}
             <div className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
+                <div className="h-8 w-8 rounded-full bg-destructive/10 flex items-center justify-center text-destructive">
                   <Target className="h-4 w-4" />
                 </div>
                 <span className="text-sm font-medium">Suspended</span>
               </div>
               <Badge
                 variant="outline"
-                className="text-sm font-bold bg-rose-50 text-rose-700 border-rose-200"
+                className="text-sm font-bold bg-destructive/10 text-destructive border-destructive/30"
               >
                 {statistics.suspendedCommittees}
               </Badge>

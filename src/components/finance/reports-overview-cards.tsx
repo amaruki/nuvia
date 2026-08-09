@@ -38,9 +38,9 @@ export function ReportsOverviewCards({ statistics }: ReportsOverviewCardsProps) 
   };
 
   const getCompletionRateColor = (rate: number) => {
-    if (rate >= 80) return "text-green-600";
-    if (rate >= 60) return "text-yellow-600";
-    return "text-red-600";
+    if (rate >= 80) return "text-success";
+    if (rate >= 60) return "text-warning";
+    return "text-destructive";
   };
 
   const getCompletionRateBadge = (rate: number) => {
@@ -125,7 +125,7 @@ export function ReportsOverviewCards({ statistics }: ReportsOverviewCardsProps) 
           <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
         </CardHeader>
         <CardContent>
-          <div className="text-xl sm:text-2xl font-bold text-yellow-600">
+          <div className="text-xl sm:text-2xl font-bold text-warning">
             {statistics.pendingReviewReports}
           </div>
           <p className="text-xs text-muted-foreground">{statistics.draftReports} drafts</p>
@@ -175,16 +175,14 @@ export function ReportsOverviewCards({ statistics }: ReportsOverviewCardsProps) 
                 <div className="flex items-center space-x-3">
                   <div className="p-1 rounded-full bg-muted">
                     {activity.action === "Published" && (
-                      <CheckCircle className="h-3 w-3 text-green-600" />
+                      <CheckCircle className="h-3 w-3 text-success" />
                     )}
-                    {activity.action === "Created" && (
-                      <FileText className="h-3 w-3 text-blue-600" />
-                    )}
+                    {activity.action === "Created" && <FileText className="h-3 w-3 text-info" />}
                     {activity.action === "Generated" && (
-                      <BarChart3 className="h-3 w-3 text-purple-600" />
+                      <BarChart3 className="h-3 w-3 text-accent-foreground" />
                     )}
                     {activity.action === "Downloaded" && (
-                      <Download className="h-3 w-3 text-gray-600" />
+                      <Download className="h-3 w-3 text-muted-foreground" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">

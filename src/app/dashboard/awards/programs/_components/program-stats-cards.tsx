@@ -12,8 +12,8 @@ export function ProgramStatsCards({ statistics }: { statistics: AwardProgramOver
         <CardContent className="p-6">
           <div className="flex items-center justify-between space-y-0 pb-2">
             <p className="text-sm font-medium text-muted-foreground">Programs (this page)</p>
-            <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center">
-              <Trophy className="h-4 w-4 text-blue-600" />
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Trophy className="h-4 w-4 text-primary" />
             </div>
           </div>
           <div className="flex flex-col mt-3">
@@ -29,8 +29,8 @@ export function ProgramStatsCards({ statistics }: { statistics: AwardProgramOver
         <CardContent className="p-6">
           <div className="flex items-center justify-between space-y-0 pb-2">
             <p className="text-sm font-medium text-muted-foreground">Open (this page)</p>
-            <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
-              <FolderOpen className="h-4 w-4 text-emerald-600" />
+            <div className="h-8 w-8 rounded-full bg-success/10 flex items-center justify-center">
+              <FolderOpen className="h-4 w-4 text-success" />
             </div>
           </div>
           <div className="flex flex-col mt-3">
@@ -46,8 +46,8 @@ export function ProgramStatsCards({ statistics }: { statistics: AwardProgramOver
         <CardContent className="p-6">
           <div className="flex items-center justify-between space-y-0 pb-2">
             <p className="text-sm font-medium text-muted-foreground">Nominations (this page)</p>
-            <div className="h-8 w-8 rounded-full bg-purple-50 flex items-center justify-center">
-              <Award className="h-4 w-4 text-purple-600" />
+            <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center">
+              <Award className="h-4 w-4 text-accent-foreground" />
             </div>
           </div>
           <div className="flex flex-col mt-3">
@@ -61,8 +61,8 @@ export function ProgramStatsCards({ statistics }: { statistics: AwardProgramOver
         <CardContent className="p-6">
           <div className="flex items-center justify-between space-y-0 pb-2">
             <p className="text-sm font-medium text-muted-foreground">Categories (this page)</p>
-            <div className="h-8 w-8 rounded-full bg-amber-50 flex items-center justify-center">
-              <Archive className="h-4 w-4 text-amber-600" />
+            <div className="h-8 w-8 rounded-full bg-warning/10 flex items-center justify-center">
+              <Archive className="h-4 w-4 text-warning" />
             </div>
           </div>
           <div className="flex flex-col mt-3">

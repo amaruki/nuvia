@@ -11,7 +11,7 @@ export function WorkspaceStats({ workspace }: WorkspaceStatsProps) {
     <div className="grid gap-4 md:grid-cols-4">
       <Card>
         <CardContent className="p-6 text-center">
-          <Users className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+          <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
           <div className="text-2xl font-bold">{workspace.members.length}</div>
           <p className="text-sm text-muted-foreground">Total Members</p>
         </CardContent>
@@ -19,7 +19,7 @@ export function WorkspaceStats({ workspace }: WorkspaceStatsProps) {
 
       <Card>
         <CardContent className="p-6 text-center">
-          <FileText className="h-8 w-8 mx-auto mb-2 text-emerald-500" />
+          <FileText className="h-8 w-8 mx-auto mb-2 text-success" />
           <div className="text-2xl font-bold">{workspace.documents.length}</div>
           <p className="text-sm text-muted-foreground">Documents</p>
         </CardContent>
@@ -27,7 +27,7 @@ export function WorkspaceStats({ workspace }: WorkspaceStatsProps) {
 
       <Card>
         <CardContent className="p-6 text-center">
-          <CheckSquare className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+          <CheckSquare className="h-8 w-8 mx-auto mb-2 text-accent-foreground" />
           <div className="text-2xl font-bold">{workspace.tasks.length}</div>
           <p className="text-sm text-muted-foreground">Tasks</p>
         </CardContent>
@@ -35,7 +35,7 @@ export function WorkspaceStats({ workspace }: WorkspaceStatsProps) {
 
       <Card>
         <CardContent className="p-6 text-center">
-          <MessageSquare className="h-8 w-8 mx-auto mb-2 text-orange-500" />
+          <MessageSquare className="h-8 w-8 mx-auto mb-2 text-warning" />
           <div className="text-2xl font-bold">{workspace.discussions.length}</div>
           <p className="text-sm text-muted-foreground">Discussions</p>
         </CardContent>

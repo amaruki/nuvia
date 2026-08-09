@@ -41,13 +41,13 @@ export const formatDuration = (seconds: number): string => {
 };
 
 export const getChangeIcon = (change: number) => {
-  if (change > 0) return <ArrowUpRight className="h-3 w-3 text-green-600" />;
-  if (change < 0) return <ArrowDownRight className="h-3 w-3 text-red-600" />;
+  if (change > 0) return <ArrowUpRight className="h-3 w-3 text-success" />;
+  if (change < 0) return <ArrowDownRight className="h-3 w-3 text-destructive" />;
   return null;
 };
 
 export const getChangeColor = (change: number) => {
-  if (change > 0) return "text-green-600";
-  if (change < 0) return "text-red-600";
-  return "text-gray-600";
+  if (change > 0) return "text-success";
+  if (change < 0) return "text-destructive";
+  return "text-muted-foreground";
 };

@@ -69,7 +69,7 @@ export default async function PublicForumsPage() {
       <div className="max-w-6xl mx-auto p-6">
         {/* Hero */}
         <div className="text-center py-12">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
             Community Forums
           </h1>
           <p className="text-lg text-muted-foreground mb-8">

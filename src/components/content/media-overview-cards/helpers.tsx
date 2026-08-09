@@ -15,11 +15,11 @@ export const formatNumber = (num: number): string => {
 export const getTrendIcon = (trend: "up" | "down" | "stable") => {
   switch (trend) {
     case "up":
-      return <TrendingUp className="h-4 w-4 text-green-600" />;
+      return <TrendingUp className="h-4 w-4 text-success" />;
     case "down":
-      return <TrendingUp className="h-4 w-4 text-red-600 rotate-180" />;
+      return <TrendingUp className="h-4 w-4 text-destructive rotate-180" />;
     default:
-      return <div className="h-4 w-4 bg-gray-400 rounded-full" />;
+      return <div className="h-4 w-4 bg-muted-foreground rounded-full" />;
   }
 };
 
@@ -44,17 +44,17 @@ export const getMediaTypeIcon = (mediaType: string) => {
 export const getLocationIcon = (location: string) => {
   switch (location) {
     case "s3":
-      return <div className="h-4 w-4 bg-orange-500 rounded" />;
+      return <div className="h-4 w-4 bg-warning rounded" />;
     case "local":
-      return <div className="h-4 w-4 bg-blue-500 rounded" />;
+      return <div className="h-4 w-4 bg-info rounded" />;
     case "cloudinary":
-      return <div className="h-4 w-4 bg-purple-500 rounded" />;
+      return <div className="h-4 w-4 bg-accent-foreground rounded" />;
     case "azure":
-      return <div className="h-4 w-4 bg-cyan-500 rounded" />;
+      return <div className="h-4 w-4 bg-chart-2 rounded" />;
     case "gcs":
-      return <div className="h-4 w-4 bg-red-500 rounded" />;
+      return <div className="h-4 w-4 bg-destructive rounded" />;
     default:
-      return <div className="h-4 w-4 bg-gray-500 rounded" />;
+      return <div className="h-4 w-4 bg-muted-foreground rounded" />;
   }
 };
 
@@ -78,14 +78,14 @@ export const getLocationName = (location: string): string => {
 export const getVisibilityIcon = (visibility: string) => {
   switch (visibility) {
     case "public":
-      return <Users className="h-4 w-4 text-blue-600" />;
+      return <Users className="h-4 w-4 text-info" />;
     case "private":
-      return <div className="h-4 w-4 bg-red-600 rounded-full" />;
+      return <div className="h-4 w-4 bg-destructive rounded-full" />;
     case "restricted":
-      return <Users className="h-4 w-4 text-amber-600" />;
+      return <Users className="h-4 w-4 text-warning" />;
     case "draft":
-      return <div className="h-4 w-4 bg-gray-600 rounded-full" />;
+      return <div className="h-4 w-4 bg-muted-foreground rounded-full" />;
     default:
-      return <div className="h-4 w-4 bg-gray-600 rounded-full" />;
+      return <div className="h-4 w-4 bg-muted-foreground rounded-full" />;
   }
 };

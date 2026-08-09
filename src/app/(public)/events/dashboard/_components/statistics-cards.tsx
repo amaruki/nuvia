@@ -47,8 +47,8 @@ export function StatisticsCards({ statistics }: StatisticsCardsProps) {
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg mr-4">
-              <Users className="h-6 w-6 text-purple-600" />
+            <div className="p-2 bg-accent rounded-lg mr-4">
+              <Users className="h-6 w-6 text-accent-foreground" />
             </div>
             <div>
               <p className="text-sm font-medium text-foreground/60">Registrations</p>

@@ -11,8 +11,8 @@ export function TotalWorkspacesCard({ statistics }: WorkspaceStatisticsCardProps
       <CardContent className="p-6">
         <div className="flex items-center justify-between space-y-0 pb-2">
           <p className="text-sm font-medium text-muted-foreground">Total Workspaces</p>
-          <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center">
-            <FolderOpen className="h-4 w-4 text-blue-600" />
+          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <FolderOpen className="h-4 w-4 text-primary" />
           </div>
         </div>
         <div className="flex flex-col mt-3">
@@ -32,8 +32,8 @@ export function TotalMembersCard({ statistics }: WorkspaceStatisticsCardProps) {
       <CardContent className="p-6">
         <div className="flex items-center justify-between space-y-0 pb-2">
           <p className="text-sm font-medium text-muted-foreground">Total Members</p>
-          <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
-            <Users className="h-4 w-4 text-emerald-600" />
+          <div className="h-8 w-8 rounded-full bg-success/10 flex items-center justify-center">
+            <Users className="h-4 w-4 text-success" />
           </div>
         </div>
         <div className="flex flex-col mt-3">
@@ -53,8 +53,8 @@ export function TotalDocumentsCard({ statistics }: WorkspaceStatisticsCardProps)
       <CardContent className="p-6">
         <div className="flex items-center justify-between space-y-0 pb-2">
           <p className="text-sm font-medium text-muted-foreground">Total Documents</p>
-          <div className="h-8 w-8 rounded-full bg-purple-50 flex items-center justify-center">
-            <FileText className="h-4 w-4 text-purple-600" />
+          <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center">
+            <FileText className="h-4 w-4 text-accent-foreground" />
           </div>
         </div>
         <div className="flex flex-col mt-3">
@@ -74,8 +74,8 @@ export function TaskCompletionCard({ statistics }: WorkspaceStatisticsCardProps)
       <CardContent className="p-6">
         <div className="flex items-center justify-between space-y-0 pb-2">
           <p className="text-sm font-medium text-muted-foreground">Task Completion</p>
-          <div className="h-8 w-8 rounded-full bg-indigo-50 flex items-center justify-center">
-            <CheckSquare className="h-4 w-4 text-indigo-600" />
+          <div className="h-8 w-8 rounded-full bg-chart-3/10 flex items-center justify-center">
+            <CheckSquare className="h-4 w-4 text-chart-3" />
           </div>
         </div>
         <div className="flex flex-col mt-3">

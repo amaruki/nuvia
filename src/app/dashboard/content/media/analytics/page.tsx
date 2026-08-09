@@ -45,15 +45,15 @@ export default function MediaAnalyticsPage() {
 
       {/* Error State */}
       {error && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-destructive/30 bg-destructive/10">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
-                <BarChart3 className="h-4 w-4 text-red-600" />
+              <div className="h-8 w-8 rounded-full bg-destructive/20 flex items-center justify-center">
+                <BarChart3 className="h-4 w-4 text-destructive" />
               </div>
               <div>
-                <h3 className="font-medium text-red-900">Failed to load analytics</h3>
-                <p className="text-sm text-red-700">{error}</p>
+                <h3 className="font-medium text-foreground">Failed to load analytics</h3>
+                <p className="text-sm text-destructive">{error}</p>
               </div>
             </div>
           </CardContent>
@@ -70,9 +70,9 @@ export default function MediaAnalyticsPage() {
 
       {/* Loading Overlay */}
       {loading && (
-        <div className="fixed inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="flex items-center gap-3 bg-white p-6 rounded-lg shadow-lg">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+        <div className="fixed inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="flex items-center gap-3 bg-card p-6 rounded-lg shadow-lg">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-info"></div>
             <span className="text-sm font-medium">Loading analytics data...</span>
           </div>
         </div>

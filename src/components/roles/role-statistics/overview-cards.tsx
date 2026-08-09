@@ -28,10 +28,10 @@ export function OverviewCards({ data }: RoleStatisticsSectionProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Administrators</CardTitle>
-          <Shield className="h-4 w-4 text-red-500" />
+          <Shield className="h-4 w-4 text-destructive" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-red-600">{adminUsers}</div>
+          <div className="text-2xl font-bold text-destructive">{adminUsers}</div>
           <p className="text-xs text-muted-foreground">
             {Math.round((adminUsers / totalUsers) * 100)}% of total users
           </p>
@@ -41,10 +41,10 @@ export function OverviewCards({ data }: RoleStatisticsSectionProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Leadership</CardTitle>
-          <Crown className="h-4 w-4 text-purple-500" />
+          <Crown className="h-4 w-4 text-accent-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-purple-600">{leadershipUsers}</div>
+          <div className="text-2xl font-bold text-accent-foreground">{leadershipUsers}</div>
           <p className="text-xs text-muted-foreground">Chapter and committee leaders</p>
         </CardContent>
       </Card>

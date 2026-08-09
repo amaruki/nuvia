@@ -4,12 +4,12 @@ const monthEventVariants = cva("size-2 rounded-full", {
   variants: {
     variant: {
       default: "bg-primary",
-      blue: "bg-blue-500",
-      green: "bg-green-500",
-      pink: "bg-pink-500",
-      purple: "bg-purple-500",
-      orange: "bg-orange-500",
-      red: "bg-red-500",
+      blue: "bg-info",
+      green: "bg-success",
+      pink: "bg-chart-5",
+      purple: "bg-accent-foreground",
+      orange: "bg-warning",
+      red: "bg-destructive",
     },
   },
   defaultVariants: {
@@ -23,12 +23,12 @@ const dayEventVariants = cva(
     variants: {
       variant: {
         default: "bg-muted/40 text-foreground border-muted-foreground/50 hover:bg-muted/60",
-        blue: "bg-blue-50 text-blue-700 border-blue-500 hover:bg-blue-100",
-        green: "bg-green-50 text-green-700 border-green-500 hover:bg-green-100",
-        pink: "bg-pink-50 text-pink-700 border-pink-500 hover:bg-pink-100",
-        purple: "bg-purple-50 text-purple-700 border-purple-500 hover:bg-purple-100",
-        orange: "bg-orange-50 text-orange-700 border-orange-500 hover:bg-orange-100",
-        red: "bg-red-50 text-red-700 border-red-500 hover:bg-red-100",
+        blue: "bg-info/10 text-foreground border-info hover:bg-info/20",
+        green: "bg-success/10 text-foreground border-success hover:bg-success/20",
+        pink: "bg-chart-5/10 text-foreground border-chart-5 hover:bg-chart-5/20",
+        purple: "bg-accent/60 text-accent-foreground border-accent-foreground/40 hover:bg-accent",
+        orange: "bg-warning/10 text-foreground border-warning hover:bg-warning/20",
+        red: "bg-destructive/10 text-foreground border-destructive hover:bg-destructive/20",
       },
     },
     defaultVariants: {

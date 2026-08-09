@@ -12,7 +12,7 @@ export function CommitteeQuickStats({ committee }: CommitteeQuickStatsProps) {
     <div className="grid gap-4 md:grid-cols-4">
       <Card>
         <CardContent className="p-6 text-center">
-          <Users className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+          <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
           <div className="text-2xl font-bold">{committee.metrics.memberCount}</div>
           <p className="text-sm text-muted-foreground">Total Members</p>
         </CardContent>
@@ -20,7 +20,7 @@ export function CommitteeQuickStats({ committee }: CommitteeQuickStatsProps) {
 
       <Card>
         <CardContent className="p-6 text-center">
-          <CheckSquare className="h-8 w-8 mx-auto mb-2 text-emerald-500" />
+          <CheckSquare className="h-8 w-8 mx-auto mb-2 text-success" />
           <div className="text-2xl font-bold">{committee.metrics.activeMembersCount}</div>
           <p className="text-sm text-muted-foreground">Active Members</p>
         </CardContent>
@@ -28,7 +28,7 @@ export function CommitteeQuickStats({ committee }: CommitteeQuickStatsProps) {
 
       <Card>
         <CardContent className="p-6 text-center">
-          <Calendar className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+          <Calendar className="h-8 w-8 mx-auto mb-2 text-accent-foreground" />
           <div className="text-2xl font-bold">
             {formatPercentage(committee.metrics.meetingAttendanceRate)}
           </div>
@@ -38,7 +38,7 @@ export function CommitteeQuickStats({ committee }: CommitteeQuickStatsProps) {
 
       <Card>
         <CardContent className="p-6 text-center">
-          <Target className="h-8 w-8 mx-auto mb-2 text-orange-500" />
+          <Target className="h-8 w-8 mx-auto mb-2 text-warning" />
           <div className="text-2xl font-bold">
             {formatPercentage(committee.metrics.goalCompletionRate)}
           </div>

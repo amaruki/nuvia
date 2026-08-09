@@ -20,7 +20,7 @@ export function ArticleMetricsCard({ metrics }: ArticleMetricsCardProps) {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Eye className="w-4 h-4 text-blue-600" />
+              <Eye className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium">Views</span>
             </div>
             <p className="text-2xl font-bold">{formatNumber(metrics.views)}</p>
@@ -28,7 +28,7 @@ export function ArticleMetricsCard({ metrics }: ArticleMetricsCardProps) {
 
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-green-600" />
+              <Clock className="w-4 h-4 text-success" />
               <span className="text-sm font-medium">Read Time</span>
             </div>
             <p className="text-2xl font-bold">{metrics.averageReadTime} min</p>
@@ -36,7 +36,7 @@ export function ArticleMetricsCard({ metrics }: ArticleMetricsCardProps) {
 
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-purple-600" />
+              <TrendingUp className="w-4 h-4 text-accent-foreground" />
               <span className="text-sm font-medium">Engagement</span>
             </div>
             <p className="text-2xl font-bold">{metrics.engagementScore}%</p>
@@ -44,7 +44,7 @@ export function ArticleMetricsCard({ metrics }: ArticleMetricsCardProps) {
 
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-orange-600" />
+              <MessageSquare className="w-4 h-4 text-warning" />
               <span className="text-sm font-medium">Comments</span>
             </div>
             <p className="text-2xl font-bold">{formatNumber(metrics.comments)}</p>

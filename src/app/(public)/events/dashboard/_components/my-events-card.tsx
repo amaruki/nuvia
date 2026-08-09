@@ -32,9 +32,9 @@ export function MyEventsCard({ events }: MyEventsCardProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {events.slice(0, 3).map((event) => (
             <div key={event.id} className="border rounded-lg overflow-hidden">
-              <div className="h-32 bg-gradient-to-r from-blue-500 to-indigo-600 relative">
+              <div className="h-32 bg-gradient-to-r from-primary to-chart-4 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Calendar className="h-12 w-12 text-white/30" />
+                  <Calendar className="h-12 w-12 text-primary-foreground/30" />
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
                   <h3 className="text-white font-medium truncate">{event.title}</h3>

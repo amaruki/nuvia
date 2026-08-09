@@ -36,7 +36,7 @@ export function EventCertificate({
   return (
     <div className={`max-w-4xl mx-auto ${className}`}>
       <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-primary to-indigo-700 text-white">
+        <CardHeader className="bg-gradient-to-r from-primary to-chart-4 text-primary-foreground">
           <CardTitle className="flex items-center text-xl">
             <Award className="h-6 w-6 mr-2" />
             Certificate of Completion
@@ -210,9 +210,9 @@ export function EventCertificateList({
           const event = getEventForCertificate(certificate);
           return (
             <Card key={certificate.id} className="overflow-hidden">
-              <div className="relative h-40 bg-gradient-to-r from-blue-600 to-indigo-700">
+              <div className="relative h-40 bg-gradient-to-r from-info to-chart-4">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Award className="h-16 w-16 text-white/30" />
+                  <Award className="h-16 w-16 text-primary-foreground/30" />
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
                   <h3 className="text-white font-medium truncate">

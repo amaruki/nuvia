@@ -61,7 +61,7 @@ export function OverviewTab({ workspace }: OverviewTabProps) {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-blue-500" />
+                <Users className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium">Guest Access</span>
               </div>
               <Badge variant={workspace.settings.allowGuestAccess ? "default" : "secondary"}>
@@ -71,7 +71,7 @@ export function OverviewTab({ workspace }: OverviewTabProps) {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <CheckSquare className="h-4 w-4 text-green-500" />
+                <CheckSquare className="h-4 w-4 text-success" />
                 <span className="text-sm font-medium">Approval Required</span>
               </div>
               <Badge variant={workspace.settings.requireApproval ? "default" : "secondary"}>
@@ -81,7 +81,7 @@ export function OverviewTab({ workspace }: OverviewTabProps) {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Activity className="h-4 w-4 text-purple-500" />
+                <Activity className="h-4 w-4 text-accent-foreground" />
                 <span className="text-sm font-medium">Notifications</span>
               </div>
               <Badge variant={workspace.settings.enableNotifications ? "default" : "secondary"}>
@@ -91,7 +91,7 @@ export function OverviewTab({ workspace }: OverviewTabProps) {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-orange-500" />
+                <Clock className="h-4 w-4 text-warning" />
                 <span className="text-sm font-medium">Auto Archive</span>
               </div>
               <span className="text-sm font-medium">{workspace.settings.autoArchiveDays} days</span>

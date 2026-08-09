@@ -46,6 +46,12 @@ export const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"
 export const PAGES = [
   { slug: "public-events", path: "/events", module: "public", auth: false },
   { slug: "public-jobs", path: "/jobs", module: "public", auth: false },
+  { slug: "public-news", path: "/news", module: "public", auth: false },
+  { slug: "public-forums", path: "/forums", module: "public", auth: false },
+  { slug: "public-members", path: "/members", module: "public", auth: false },
+  { slug: "public-membership", path: "/membership", module: "public", auth: false },
+  { slug: "public-chapters", path: "/chapters", module: "public", auth: false },
+  { slug: "public-committees", path: "/committees", module: "public", auth: false },
   {
     slug: "members-directory",
     path: "/dashboard/memberships/directory",
@@ -97,6 +103,25 @@ export const PAGES = [
     module: "workspaces",
     auth: true,
   },
+  {
+    slug: "learning-my-courses",
+    path: "/dashboard/learning/my-courses",
+    module: "learning",
+    auth: true,
+  },
+  {
+    slug: "memberships-applications",
+    path: "/dashboard/memberships/applications",
+    module: "memberships",
+    auth: true,
+  },
+  {
+    slug: "awards-nominate",
+    path: "/dashboard/awards/nominate",
+    module: "awards",
+    auth: true,
+  },
+  { slug: "member-profile", path: "/dashboard/profile", module: "users", auth: true },
 ] as const;
 
 export const SEVERITIES_FAILING: Record<string, true> = { critical: true, serious: true };

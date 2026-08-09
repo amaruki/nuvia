@@ -1,11 +1,19 @@
 /**
  * Directory pagination (UI-28) — plain links so paging works without
- * JavaScript and stays crawlable.
+ * JavaScript and stays crawlable. Built on the shared pagination primitive
+ * (UI-09); every control stays a server-rendered anchor.
  */
 
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface MemberPaginationProps {
   page: number;
@@ -25,30 +33,38 @@ export function MemberPagination({ page, totalPages, total, query }: MemberPagin
   if (total === 0) return null;
 
   return (
-    <nav aria-label="Member directory pagination" className="flex items-center justify-between">
-      {page > 1 ? (
-        <Button variant="outline" size="sm" asChild>
-          <Link href={hrefFor(page - 1, query)}>Previous</Link>
-        </Button>
-      ) : (
-        <Button variant="outline" size="sm" disabled>
-          Previous
-        </Button>
-      )}
+    <Pagination aria-label="Member directory pagination" className="justify-between">
+      <PaginationContent className="w-full justify-between">
+        <PaginationItem>
+          {page > 1 ? (
+            <PaginationPrevious variant="outline" size="sm" asChild>
+              <Link href={hrefFor(page - 1, query)}>Previous</Link>
+            </PaginationPrevious>
+          ) : (
+            <Button variant="outline" size="sm" disabled>
+              Previous
+            </Button>
+          )}
+        </PaginationItem>
 
-      <p className="text-sm text-muted-foreground">
-        Page {page} of {totalPages} · {total} {total === 1 ? "member" : "members"}
-      </p>
+        <PaginationItem>
+          <p className="text-muted-foreground text-sm">
+            Page {page} of {totalPages} · {total} {total === 1 ? "member" : "members"}
+          </p>
+        </PaginationItem>
 
-      {page < totalPages ? (
-        <Button variant="outline" size="sm" asChild>
-          <Link href={hrefFor(page + 1, query)}>Next</Link>
-        </Button>
-      ) : (
-        <Button variant="outline" size="sm" disabled>
-          Next
-        </Button>
-      )}
-    </nav>
+        <PaginationItem>
+          {page < totalPages ? (
+            <PaginationNext variant="outline" size="sm" asChild>
+              <Link href={hrefFor(page + 1, query)}>Next</Link>
+            </PaginationNext>
+          ) : (
+            <Button variant="outline" size="sm" disabled>
+              Next
+            </Button>
+          )}
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   );
 }

@@ -4,6 +4,12 @@ export { DataTable, type DataTableProps } from "./data-table";
 export { DataTableColumnHeader } from "./data-table-column-header";
 export { DataTableBulkBar } from "./data-table-bulk-bar";
 export {
+  DataTableDensityToggle,
+  TABLE_DENSITY_STORAGE_KEY,
+  type DataTableDensity,
+  type DataTableDensityToggleProps,
+} from "./data-table-density";
+export {
   DataTableFacetedFilter,
   type DataTableFacetedFilterOption,
 } from "./data-table-faceted-filter";

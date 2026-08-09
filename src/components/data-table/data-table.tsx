@@ -36,6 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { type DataTableDensity } from "./data-table-density";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { cn } from "@/lib/utils";
 
@@ -87,6 +88,11 @@ export interface DataTableProps<TData, TValue> {
   /** Pagination slot, usually <DataTablePagination />. */
   pagination?: ReactNode;
   skeletonRows?: number;
+  /**
+   * Row density (UI-09 convention 5). Defaults to "comfortable"; "compact"
+   * tightens cell padding for power users. Pair with DataTableDensityToggle.
+   */
+  density?: DataTableDensity;
   className?: string;
 }
 
@@ -127,6 +133,7 @@ export function DataTable<TData, TValue>({
   toolbar,
   pagination,
   skeletonRows = 5,
+  density = "comfortable",
   className,
 }: DataTableProps<TData, TValue>) {
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
@@ -216,7 +223,7 @@ export function DataTable<TData, TValue>({
   const showEmpty = !loading && !error && rows.length === 0;
 
   return (
-    <div className={cn("space-y-3", className)}>
+    <div data-density={density} className={cn("space-y-3", className)}>
       {toolbar && (
         <div className="flex flex-wrap items-center gap-2">
           {typeof toolbar === "function" ? toolbar(table) : toolbar}
@@ -225,7 +232,11 @@ export function DataTable<TData, TValue>({
       )}
 
       <div className="bg-card rounded-md border">
-        <Table>
+        <Table
+          className={
+            density === "compact" ? "[&_td]:py-1.5 [&_th]:py-1.5" : "[&_td]:py-3 [&_th]:py-3"
+          }
+        >
           {caption && <caption className="sr-only">{caption}</caption>}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

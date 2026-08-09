@@ -16,9 +16,11 @@ import { commandEnvironment, isServing, log } from "./helpers";
 async function findLockHoldingServer(logPath: string): Promise<string | null> {
   const logText = await Bun.file(logPath).text();
   if (!logText.includes("Another next dev server is already running")) return null;
-  const match = logText.match(/Another next dev server[\s\S]*?Local:\s+http:\/\/[^/\s:]+:(\d+)/);
+  const match = logText.match(/Another next dev server[\s\S]*?Local:\s+http:\/\/([^/\s:]+):(\d+)/);
   if (!match) return null;
-  const baseUrl = `http://127.0.0.1:${match[1]}`;
+  // Keep the lock holder's canonical hostname — dev-resource origin checks
+  // compare against it, so 127.0.0.1 and localhost are not interchangeable.
+  const baseUrl = `http://${match[1]}:${match[2]}`;
   if (!(await isServing(baseUrl))) return null;
   log(`Another next dev holds the project lock; reusing it at ${baseUrl} (left running on exit).`);
   return baseUrl;
@@ -39,7 +41,7 @@ export async function ensureDevServer(): Promise<{
   const logFd = openSync(logPath, "w");
   // detached: the child leads its own process group so cleanup can signal
   // the whole tree (bunx → next → bundler workers), not just the wrapper.
-  const server = spawn("bunx", ["next", "dev", "--port", String(PORT), "--hostname", "127.0.0.1"], {
+  const server = spawn("bunx", ["next", "dev", "--port", String(PORT), "--hostname", "localhost"], {
     cwd: REPO_ROOT,
     env: commandEnvironment as NodeJS.ProcessEnv,
     stdio: ["ignore", logFd, logFd],

@@ -3,10 +3,33 @@
  *
  * Loaded before every other module of the gate, so OUTPUT_DIR's timestamp
  * marks the start of the run exactly as the original single-file layout did.
+ *
+ * Theme passes (UI-10)
+ * --------------------
+ * The gate audits every page once per theme (see THEMES). Each pass runs in
+ * its own browser context whose addInitScript seeds next-themes' localStorage
+ * key (THEME_STORAGE_KEY) before any page script runs; next-themes' blocking
+ * inline <head> script (ThemeProvider in src/app/layout.tsx, attribute
+ * "data-theme", storageKey "theme") reads that key before first paint, so the
+ * pass's theme is active on server-rendered and client-rendered pages alike —
+ * no UI interaction needed. auditPage proves the theme actually applied
+ * (documentElement[data-theme] === the pass's theme) before axe runs, and
+ * fails the run loudly otherwise.
+ *
+ * The UI-10 detail pages resolve against the demo seed (scripts/seed-demo.ts);
+ * demo-content.ts re-seeds it when missing because other suites wipe this
+ * shared database (tests/demo-mode.test.ts calls seedDemo()/wipeDemo();
+ * scripts/run-integration-tests.ts drops the whole volume).
  */
 
 export const PORT = Number(process.env.A11Y_SMOKE_PORT ?? "3111");
-export const BASE_URL = `http://127.0.0.1:${PORT}`;
+// Must use the dev server's canonical hostname: Next blocks dev resources
+// (HMR ws, manifests) requested from any other origin, and without that
+// channel the app router client bootstrap silently never hydrates. Shared
+// `bun run dev` servers print `Local: http://localhost:<port>`, so browse
+// via localhost; DATABASE_URL/REDIS_URL below stay on 127.0.0.1 because
+// they are server-side connections, not browser origins.
+export const BASE_URL = `http://localhost:${PORT}`;
 export const ADMIN_EMAIL = "admin@nuvia.com";
 
 // This module lives in scripts/a11y-smoke/, one directory deeper than the
@@ -37,13 +60,40 @@ export const COMPOSE_COMMAND = [
 /** WCAG tags covering 2.0/2.1/2.2 levels A + AA. */
 export const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
+export type ThemeName = "light" | "dark";
+
+/** Passes the gate runs, in order — one full audit of every page per theme. */
+export const THEMES: readonly ThemeName[] = ["light", "dark"];
+
+/**
+ * localStorage key next-themes reads/writes (storageKey on the ThemeProvider
+ * in src/app/layout.tsx). Each pass's browser context seeds this key via
+ * addInitScript before navigation so the pass's theme wins over the
+ * headless browser's "system" preference.
+ */
+export const THEME_STORAGE_KEY = "theme";
+
+export interface PageTarget {
+  slug: string;
+  path: string;
+  module: string;
+  auth: boolean;
+  /**
+   * UI-10 detail/empty-list pages only: text the rendered page must contain.
+   * Proves the URL returned HTTP 200 and rendered its intended view (real
+   * seeded content) instead of a not-found fallback — which axe would
+   * happily pass, silently auditing the wrong page.
+   */
+  expectText?: string;
+}
+
 /**
  * One representative page per enabled module (config/features.ts module
  * flags) plus the two public listings. Finance — promoted in backlog C5 —
  * is audited on all six of its dashboard pages. See
  * docs/accessibility/wcag-2.2-aa-enabled-modules.md for the selection.
  */
-export const PAGES = [
+export const PAGES: readonly PageTarget[] = [
   { slug: "public-events", path: "/events", module: "public", auth: false },
   { slug: "public-jobs", path: "/jobs", module: "public", auth: false },
   { slug: "public-news", path: "/news", module: "public", auth: false },
@@ -152,6 +202,72 @@ export const PAGES = [
     module: "communications",
     auth: true,
   },
-] as const;
+  // Wave UI-10: detail pages + deliberately-empty lists. Paths resolve
+  // against the demo seed (scripts/seed-demo.ts), which demo-content.ts
+  // re-establishes when other suites wiped it; expectText proves each URL
+  // returned 200 and rendered its intended view before axe runs.
+  {
+    slug: "news-detail-article",
+    path: "/news/demo-welcome",
+    module: "content",
+    auth: false,
+    expectText: "Welcome to the Nuvia demo",
+  },
+  {
+    slug: "job-detail",
+    path: "/jobs/demo-program-manager",
+    module: "jobs",
+    auth: false,
+    expectText: "Demo Program Manager",
+  },
+  {
+    slug: "public-jobs-empty-search",
+    path: "/jobs?q=zzz-no-match",
+    module: "jobs",
+    auth: false,
+    expectText: "No jobs match your search",
+  },
+  {
+    // No dashboard list reads a ?q= search param from the URL; the member
+    // announcement inbox is the one dashboard list driven by URL query, so
+    // page=999 (an offset far past the seeded rows) is the deterministic
+    // zero-row variant of the requested "?q=zzz-no-match" shape.
+    slug: "dashboard-announcements-empty",
+    path: "/dashboard/announcements?page=999",
+    module: "communications",
+    auth: true,
+    expectText: "No announcements yet",
+  },
+];
 
 export const SEVERITIES_FAILING: Record<string, true> = { critical: true, serious: true };
+
+/**
+ * UI-10 detail pages whose paths contain seeded row ids (random UUIDs per
+ * seed run), so their paths are resolved from the database at run time by
+ * demo-content.ts instead of being hardcoded here.
+ */
+export type DynamicPageKind = "event-detail" | "forum-thread";
+
+export const DYNAMIC_PAGES: readonly {
+  kind: DynamicPageKind;
+  slug: string;
+  module: string;
+  auth: boolean;
+  expectText: string;
+}[] = [
+  {
+    kind: "event-detail",
+    slug: "event-detail",
+    module: "events",
+    auth: false,
+    expectText: "Demo Community Meetup",
+  },
+  {
+    kind: "forum-thread",
+    slug: "forum-thread",
+    module: "forums",
+    auth: false,
+    expectText: "Demo: a11y smoke thread",
+  },
+];

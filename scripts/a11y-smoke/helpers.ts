@@ -27,7 +27,10 @@ export async function run(command: readonly string[], env?: Record<string, strin
 
 export async function isServing(url: string): Promise<boolean> {
   try {
-    await fetch(url, { redirect: "manual", signal: AbortSignal.timeout(3_000) });
+    // Generous timeout: a dev server answers "any HTTP response" only after
+    // on-demand compilation, which can exceed tens of seconds on a cold or
+    // heavily loaded Turbopack instance.
+    await fetch(url, { redirect: "manual", signal: AbortSignal.timeout(30_000) });
     return true; // any HTTP response means something is listening
   } catch {
     return false;

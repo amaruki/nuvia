@@ -2,9 +2,10 @@
 
 import AxeBuilder from "@axe-core/playwright";
 import type { AxeResults, Result } from "axe-core";
-import type { BrowserContext } from "playwright";
+import type { BrowserContext, Page, Response as PlaywrightResponse } from "playwright";
 
-import { ADMIN_EMAIL, PAGES, SEVERITIES_FAILING, WCAG_TAGS } from "./config";
+import { ADMIN_EMAIL, SEVERITIES_FAILING, WCAG_TAGS } from "./config";
+import type { PageTarget, ThemeName } from "./config";
 import { log } from "./helpers";
 
 type PlaywrightCookie = Parameters<BrowserContext["addCookies"]>[0][number];
@@ -51,7 +52,7 @@ export async function signIn(
     const cookie: PlaywrightCookie = {
       name: nameValue.slice(0, separator),
       value: nameValue.slice(separator + 1),
-      domain: "127.0.0.1",
+      domain: "localhost",
       path: "/",
     };
     for (const attribute of attributes) {
@@ -82,6 +83,7 @@ export async function signIn(
 }
 
 export interface PageReport {
+  theme: ThemeName;
   slug: string;
   module: string;
   path: string;
@@ -93,16 +95,22 @@ export interface PageReport {
 
 export async function auditPage(
   context: BrowserContext,
-  target: (typeof PAGES)[number],
+  target: PageTarget,
   baseUrl: string,
+  theme: ThemeName,
 ): Promise<PageReport> {
   const url = `${baseUrl}${target.path}`;
   const page = await context.newPage();
   try {
-    await page.goto(url, { waitUntil: "load", timeout: 180_000 });
+    const response = await page.goto(url, { waitUntil: "load", timeout: 180_000 });
     // Dashboard pages hydrate + fetch data client-side; give them a moment,
     // but never fail the audit if the network just stays chatty.
     await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => undefined);
+
+    await assertThemeApplied(page, theme, url);
+    if (target.expectText !== undefined) {
+      await assertExpectedContent(page, response, target.expectText, url);
+    }
 
     const results: AxeResults = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
 
@@ -114,6 +122,7 @@ export async function auditPage(
     );
 
     return {
+      theme,
       slug: target.slug,
       module: target.module,
       path: target.path,
@@ -125,6 +134,54 @@ export async function auditPage(
   } finally {
     await page.close();
   }
+}
+
+/**
+ * UI-10: every pass must prove its theme is actually active before axe runs —
+ * an unapplied theme would silently audit the wrong palette. next-themes'
+ * blocking inline script sets documentElement[data-theme] before first paint,
+ * so by "load" the attribute already reflects the pass's seeded localStorage
+ * key.
+ */
+async function assertThemeApplied(page: Page, theme: ThemeName, url: string): Promise<void> {
+  const applied = await page.evaluate(() => document.documentElement.getAttribute("data-theme"));
+  if (applied !== theme) {
+    throw new Error(
+      `${theme} pass cannot be trusted on ${url}: expected <html data-theme="${theme}"> but found ` +
+        (applied === null ? "no data-theme attribute" : `data-theme="${applied}"`) +
+        " — aborting rather than auditing the wrong palette.",
+    );
+  }
+}
+
+/**
+ * UI-10: detail and empty-list pages must be proven to have returned HTTP
+ * 200 and rendered the intended view (real seeded content / the empty
+ * state) — axe would happily pass a not-found fallback and hide a dead URL.
+ */
+async function assertExpectedContent(
+  page: Page,
+  response: PlaywrightResponse | null,
+  expectText: string,
+  url: string,
+): Promise<void> {
+  if (response === null || response.status() !== 200) {
+    throw new Error(
+      `${url} did not return HTTP 200 (got ${
+        response === null ? "no response" : response.status()
+      }) — refusing to audit it.`,
+    );
+  }
+  const deadline = Date.now() + 20_000;
+  for (;;) {
+    const bodyText = await page.evaluate(() => document.body?.innerText ?? "");
+    if (bodyText.includes(expectText)) return;
+    if (Date.now() >= deadline) break;
+    await page.waitForTimeout(500);
+  }
+  throw new Error(
+    `${url} never rendered the expected content "${expectText}" — the URL no longer resolves to real seeded content, so the audit refuses to score a fallback state.`,
+  );
 }
 
 export function summarizeViolation(violation: Result): string {

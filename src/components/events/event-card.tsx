@@ -1,18 +1,16 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Users, Clock, ExternalLink, User } from "lucide-react";
-import { Event, EventStatus, EventType } from "@/types/event";
+import { Calendar, MapPin, Users, Clock, ExternalLink } from "lucide-react";
+import { Event, EventStatus } from "@/types/event";
 import {
   getEventTypeColor,
   getEventStatusColor,
   formatDate,
-  formatTime,
   isEventUpcoming,
   isEventToday,
   isEventTomorrow,
@@ -171,21 +169,12 @@ const EventCard = React.memo(function EventCard({
     <Card
       className={`py-0 overflow-hidden transition-all duration-200 hover:shadow-lg ${className}`}
     >
-      {/* Event Cover Image */}
+      {/* Cover placeholder — the events schema has no cover image column,
+          so the card always renders the calendar mark (UI-21). */}
       <div className="relative h-48 w-full sm:h-56 md:h-64 bg-primary/10">
-        {event.coverImage ? (
-          <Image
-            src={event.coverImage}
-            alt={event.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Calendar className="h-16 w-16 text-primary/60" />
-          </div>
-        )}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Calendar className="h-16 w-16 text-primary/60" />
+        </div>
         <div className="absolute inset-0" />
         <div className="absolute top-3 left-3 flex flex-wrap gap-2 max-w-[90%]">{badges}</div>
       </div>

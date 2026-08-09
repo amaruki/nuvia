@@ -188,8 +188,14 @@ export default function OAuthCallbackPage() {
       <div className="w-full max-w-md">
         {/* Logo and title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-foreground">
-            <Image src="/logo.png" alt="Nuvia Logo" width={60} height={60} className="rounded-md" />
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-foreground overflow-hidden">
+            <Image
+              src="/logo.png"
+              alt="Nuvia Logo"
+              width={60}
+              height={60}
+              className="rounded-md object-contain"
+            />
           </div>
           <h1 className="text-2xl font-semibold text-foreground">
             {status === "loading" && "Authentication in Progress"}

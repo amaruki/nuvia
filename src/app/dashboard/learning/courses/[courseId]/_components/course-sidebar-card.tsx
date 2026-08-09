@@ -11,6 +11,7 @@
  */
 
 import { useState } from "react";
+import Image from "next/image";
 import { BadgeCheck, BookOpen, CalendarDays, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -28,6 +29,28 @@ const DATE_FORMAT = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
   year: "numeric",
 });
+
+/**
+ * Hosts allowed by next.config.ts `images.remotePatterns`. Course thumbnails
+ * are admin-entered URLs (see the learning admin course form), so a URL whose
+ * host is not covered cannot go through next/image and gets an icon
+ * placeholder instead (UI-21).
+ */
+const REMOTE_PATTERN_HOSTS = new Set([
+  "images.unsplash.com",
+  "upload.wikimedia.org",
+  "picsum.photos",
+  "lh3.googleusercontent.com",
+]);
+
+function isNextImageSafe(src: string): boolean {
+  if (src.startsWith("/")) return true;
+  try {
+    return REMOTE_PATTERN_HOSTS.has(new URL(src).hostname);
+  } catch {
+    return false;
+  }
+}
 
 export function CourseSidebarCard({ course }: CourseSidebarCardProps) {
   const {
@@ -79,7 +102,19 @@ export function CourseSidebarCard({ course }: CourseSidebarCardProps) {
       <Card className="sticky top-6 overflow-hidden border-border/50 shadow-lg">
         <div className="relative">
           <AspectRatio ratio={16 / 9} className="bg-muted">
-            <img src={course.image} alt={course.title} className="object-cover w-full h-full" />
+            {isNextImageSafe(course.image) ? (
+              <Image
+                src={course.image}
+                alt={course.title}
+                fill
+                sizes="(max-width: 1024px) 100vw, 33vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex size-full items-center justify-center">
+                <BookOpen className="size-10 text-muted-foreground" aria-hidden="true" />
+              </div>
+            )}
             <div className={`absolute inset-0 bg-gradient-to-br ${course.color} opacity-40`} />
           </AspectRatio>
         </div>

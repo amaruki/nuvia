@@ -47,6 +47,10 @@ const nextConfig: NextConfig = {
       // Placeholder photography for the landing page until real brand
       // photography exists.
       { protocol: "https", hostname: "picsum.photos" },
+      // OAuth avatar hosts — keep in sync with socialProviders in
+      // src/lib/auth/core.ts. Google OAuth profile photos (only Google is
+      // configured today; add the GitHub/LinkedIn hosts when those land).
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ],
   },
   async headers() {

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { useSidebar } from "./use-sidebar";
 
@@ -57,13 +58,15 @@ export function SidebarUser({
 
   return (
     <div className={cn("flex items-center gap-3 p-3", className)} {...props}>
-      {user?.avatar ? (
-        <img src={user.avatar} alt={user.name} className="h-8 w-8 rounded-full" />
-      ) : (
-        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+      {/* The Avatar primitive handles the missing/failed-image fallback, so
+          the OAuth avatar URL (e.g. lh3.googleusercontent.com) never renders
+          as a broken raw image element. */}
+      <Avatar>
+        <AvatarImage src={user?.avatar} alt={user?.name ?? "User"} />
+        <AvatarFallback>
           <User className="h-4 w-4 text-muted-foreground" />
-        </div>
-      )}
+        </AvatarFallback>
+      </Avatar>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{user?.name || "Guest User"}</p>
         <p className="text-xs text-sidebar-foreground/50 truncate">

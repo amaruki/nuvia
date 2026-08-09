@@ -25,6 +25,31 @@ export const forumSection: readonly NavItemData[] = [
     ],
     subItems: [
       {
+        // Member-facing reading/participation surface (UI-27). Every role
+        // that sees the parent gets this entry; the admin entries below
+        // keep pointing at the moderation queue. The (public)/forums pages
+        // enforce their own audience gate server-side.
+        id: "forum-community",
+        title: "Community Forums",
+        path: "/forums",
+        roles: [
+          "user",
+          "member",
+          "member_student",
+          "member_professional",
+          "member_corporate",
+          "moderator",
+          "organizer",
+          "committee_chair",
+          "chapter_admin",
+          "chapter_president",
+          "staff",
+          "treasurer",
+          "admin",
+          "superadmin",
+        ],
+      },
+      {
         id: "forum-categories",
         title: "Forum Categories",
         path: "/dashboard/forums/categories",

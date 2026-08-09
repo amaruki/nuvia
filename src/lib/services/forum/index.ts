@@ -47,5 +47,24 @@ export { createComment, deleteComment } from "./comment-mutations";
 export { getModerationQueue, moderatePost } from "./moderation";
 export { listReports, createReport, resolveReport } from "./reports";
 
+// Public reading surface (UI-27): the (public)/forums pages call these
+// directly from server components; the module itself is the audience gate.
+export {
+  listPublicForumCategories,
+  getPublicForumCategory,
+  listPublicForumThreads,
+  getPublicForumThread,
+} from "./public-reads";
+export type {
+  ForumReader,
+  PublicForumAuthor,
+  PublicForumCategory,
+  PublicForumThreadSummary,
+  PublicForumThread,
+  PublicForumComment,
+  PublicForumThreadDetail,
+  PublicForumThreadPage,
+} from "./public-reads";
+
 // Re-export row types for callers/tests that want them.
 export type { ForumCategory, ForumPost, ForumComment, ForumReport } from "@/db/schema";

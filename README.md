@@ -6,7 +6,7 @@ Nuvia is an open-source Association Management System (AMS) for a professional a
 
 ## What actually works today
 
-Five modules connect to a real PostgreSQL database through Drizzle: **members, events, content, forums, jobs**. Authentication gates access to all five. Everything else in the dashboard (finance, awards, learning, chapters, committees, workspaces) is UI built against mock data. `src/proxy.ts` role-gates these pages the same way it gates other dashboard sections. `src/proxy.ts` checks the role list that `src/lib/navigation-data.ts` declares for each path. As a result, a plain member cannot reach `/dashboard/finance/reports`, for example.
+Five modules connect to a real PostgreSQL database through Drizzle: **members, events, content, forums, jobs**. Authentication gates access to all five. Everything else in the dashboard (finance, awards, learning, chapters, committees, workspaces) is UI built against mock data. `src/proxy.ts` role-gates these pages the same way it gates other dashboard sections. `src/proxy.ts` checks the role list that `src/lib/navigation-data/index.ts` declares for each path. As a result, a plain member cannot reach `/dashboard/finance/reports`, for example.
 
 **A module-level maturity flag does not yet exist**, independent of role. Today, an admin or treasurer who opens `/dashboard/finance/reports` sees a fully mock UI with no real schema behind it. The page gives no indication that this is not a working feature. `config/features.ts` ([ADR-0008](docs/adr/0008-module-maturity-gate.md)) is the planned fix. This file does not exist yet (`TODO.md` M3).
 

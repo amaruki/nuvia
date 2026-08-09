@@ -3,49 +3,34 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-import { Key, CheckCircle, AlertCircle, Eye, EyeOff, Loader2, Shield, Check } from "lucide-react";
+import { Key, CheckCircle, AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 
 import { changePassword } from "@/lib/client";
+import {
+  changePasswordSchema,
+  type ChangePasswordFormData,
+} from "@/lib/validation/auth.validation";
 
-// Simple password validation schema
-const passwordFormSchema = z
-  .object({
-    currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(100, "Password must be less than 100 characters")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number")
-      .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character"),
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  })
-  .refine((data) => data.currentPassword !== data.newPassword, {
-    message: "New password must be different from current password",
-    path: ["newPassword"],
-  });
+import { PasswordRequirementsCard } from "./password-requirements-card";
+import {
+  checkPasswordRequirements,
+  getProgressBarColor,
+  getStrengthColor,
+  getStrengthText,
+} from "./password-strength";
+import type { SecurityFormProps } from "./types";
 
-type PasswordFormData = z.infer<typeof passwordFormSchema>;
-
-interface SecurityFormProps {
-  user: any;
-}
-
-export function SecurityForm({ user }: SecurityFormProps) {
+// `_props`: the profile page passes the session user, but the password change
+// authenticates through the session cookie via changePassword() — see
+// SecurityFormProps.
+export function SecurityForm(_props: SecurityFormProps) {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -58,8 +43,8 @@ export function SecurityForm({ user }: SecurityFormProps) {
     handleSubmit,
     formState: { errors },
     watch,
-  } = useForm<PasswordFormData>({
-    resolver: zodResolver(passwordFormSchema),
+  } = useForm<ChangePasswordFormData>({
+    resolver: zodResolver(changePasswordSchema),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
@@ -69,52 +54,9 @@ export function SecurityForm({ user }: SecurityFormProps) {
 
   const newPassword = watch("newPassword");
 
-  // Password requirements checker
-  const checkPasswordRequirements = (password: string) => {
-    if (!password) {
-      return {
-        minLength: false,
-        hasUppercase: false,
-        hasLowercase: false,
-        hasNumber: false,
-        hasSpecialChar: false,
-        score: 0,
-      };
-    }
-
-    const requirements = {
-      minLength: password.length >= 8,
-      hasUppercase: /[A-Z]/.test(password),
-      hasLowercase: /[a-z]/.test(password),
-      hasNumber: /\d/.test(password),
-      hasSpecialChar: /[^a-zA-Z\d]/.test(password),
-    };
-
-    const score = Object.values(requirements).filter(Boolean).length;
-
-    return { ...requirements, score };
-  };
-
   const passwordRequirements = checkPasswordRequirements(newPassword || "");
 
-  const getStrengthText = (score: number) => {
-    const strengthLevels = ["Very Weak", "Weak", "Fair", "Good", "Strong"];
-    return strengthLevels[Math.min(score - 1, strengthLevels.length - 1)] || "Very Weak";
-  };
-
-  const getStrengthColor = (score: number) => {
-    if (score <= 2) return "text-red-500";
-    if (score === 3) return "text-yellow-500";
-    return "text-green-500";
-  };
-
-  const getProgressBarColor = (score: number) => {
-    if (score <= 2) return "bg-red-500";
-    if (score === 3) return "bg-yellow-500";
-    return "bg-green-500";
-  };
-
-  const onSubmit = async (data: PasswordFormData) => {
+  const onSubmit = async (data: ChangePasswordFormData) => {
     setIsSubmitting(true);
     setError(null);
 
@@ -133,8 +75,8 @@ export function SecurityForm({ user }: SecurityFormProps) {
       } else {
         setError(result.error?.message || "Failed to change password");
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : "An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -274,66 +216,7 @@ export function SecurityForm({ user }: SecurityFormProps) {
       </div>
 
       {/* Password Requirements */}
-      <Card className="bg-muted/30">
-        <CardContent className="p-4">
-          <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Password Requirements:
-          </h4>
-          <ul className="text-xs text-muted-foreground space-y-1">
-            <li
-              className={`flex items-center gap-2 ${passwordRequirements.minLength ? "text-green-600" : ""}`}
-            >
-              {passwordRequirements.minLength ? (
-                <Check className="h-3 w-3 text-green-600" />
-              ) : (
-                <span className="w-3 h-3 inline-block" />
-              )}
-              At least 8 characters long
-            </li>
-            <li
-              className={`flex items-center gap-2 ${passwordRequirements.hasUppercase ? "text-green-600" : ""}`}
-            >
-              {passwordRequirements.hasUppercase ? (
-                <Check className="h-3 w-3 text-green-600" />
-              ) : (
-                <span className="w-3 h-3 inline-block" />
-              )}
-              Contains uppercase letter
-            </li>
-            <li
-              className={`flex items-center gap-2 ${passwordRequirements.hasLowercase ? "text-green-600" : ""}`}
-            >
-              {passwordRequirements.hasLowercase ? (
-                <Check className="h-3 w-3 text-green-600" />
-              ) : (
-                <span className="w-3 h-3 inline-block" />
-              )}
-              Contains lowercase letter
-            </li>
-            <li
-              className={`flex items-center gap-2 ${passwordRequirements.hasNumber ? "text-green-600" : ""}`}
-            >
-              {passwordRequirements.hasNumber ? (
-                <Check className="h-3 w-3 text-green-600" />
-              ) : (
-                <span className="w-3 h-3 inline-block" />
-              )}
-              Contains number
-            </li>
-            <li
-              className={`flex items-center gap-2 ${passwordRequirements.hasSpecialChar ? "text-green-600" : ""}`}
-            >
-              {passwordRequirements.hasSpecialChar ? (
-                <Check className="h-3 w-3 text-green-600" />
-              ) : (
-                <span className="w-3 h-3 inline-block" />
-              )}
-              Contains special character
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
+      <PasswordRequirementsCard requirements={passwordRequirements} />
 
       {/* Submit Button */}
       <div className="flex justify-end pt-4">

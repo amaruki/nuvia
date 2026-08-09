@@ -34,6 +34,13 @@ export const user = pgTable(
     name: text("name").notNull(),
     image: text("image"),
     displayName: text("display_name"),
+    /**
+     * Public-profile opt-in (UI-28, decision D7). The member directory and
+     * /members/[id] only ever surface users with this flag on; default off
+     * keeps every account private until the member opts in from
+     * dashboard/profile.
+     */
+    profilePublic: boolean("profile_public").notNull().default(false),
   },
   (table) => [
     index("users_username_idx").on(table.username),

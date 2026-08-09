@@ -16,7 +16,12 @@ import {
   timestamp,
   unique,
 } from "drizzle-orm/pg-core";
-import { membershipStatusEnum, transactionStatusEnum, invoiceStatusEnum } from "./enums";
+import {
+  membershipStatusEnum,
+  transactionStatusEnum,
+  invoiceStatusEnum,
+  membershipApplicationStatusEnum,
+} from "./enums";
 import { user } from "./users";
 
 export const membershipTier = pgTable("membership_tiers", {
@@ -207,6 +212,43 @@ export const membershipWebhookEvent = pgTable(
   (table) => [unique("membership_webhook_events_provider_event").on(table.provider, table.eventId)],
 );
 
+/**
+ * Membership join funnel (UI-33, decision D10) — the manual track. A
+ * signed-in user applies for a tier; staff review the application in the
+ * backoffice. Approval records the decision only: the membership itself is
+ * activated through the subscription backoffice once the offline payment is
+ * recorded. Applications never self-activate, and a pending duplicate for the
+ * same applicant + tier is rejected by the service layer.
+ */
+export const membershipApplication = pgTable("membership_applications", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  /**
+   * The applicant's account. Applying requires sign-in, so this is set for
+   * every row created through the API; it stays nullable (set null on user
+   * deletion) so the review trail outlives account removal.
+   */
+  userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  organization: text("organization"),
+  tierId: text("tier_id")
+    .notNull()
+    .references(() => membershipTier.id),
+  /** Free-text note from the applicant (optional). */
+  message: text("message"),
+  status: membershipApplicationStatusEnum("status").notNull().default("PENDING"),
+  reviewedBy: text("reviewed_by").references(() => user.id, { onDelete: "set null" }),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  reviewNote: text("review_note"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
 export const membershipInvoiceRelations = relations(membershipInvoice, ({ one, many }) => ({
   user: one(user, { fields: [membershipInvoice.userId], references: [user.id] }),
   subscription: one(membershipSubscription, {
@@ -247,6 +289,7 @@ export const membershipPaymentRelations = relations(membershipPayment, ({ one })
 export const membershipTierRelations = relations(membershipTier, ({ many }) => ({
   subscriptions: many(membershipSubscription),
   transactions: many(membershipTransaction),
+  applications: many(membershipApplication),
 }));
 
 export const membershipSubscriptionRelations = relations(
@@ -273,6 +316,23 @@ export const membershipTransactionRelations = relations(membershipTransaction, (
   }),
 }));
 
+export const membershipApplicationRelations = relations(membershipApplication, ({ one }) => ({
+  applicant: one(user, {
+    fields: [membershipApplication.userId],
+    references: [user.id],
+    relationName: "membershipApplicationApplicant",
+  }),
+  tier: one(membershipTier, {
+    fields: [membershipApplication.tierId],
+    references: [membershipTier.id],
+  }),
+  reviewer: one(user, {
+    fields: [membershipApplication.reviewedBy],
+    references: [user.id],
+    relationName: "membershipApplicationReviewer",
+  }),
+}));
+
 export type MembershipTier = typeof membershipTier.$inferSelect;
 export type MembershipSubscription = typeof membershipSubscription.$inferSelect;
 export type MembershipTransaction = typeof membershipTransaction.$inferSelect;
@@ -280,3 +340,5 @@ export type MembershipInvoice = typeof membershipInvoice.$inferSelect;
 export type MembershipInvoiceItem = typeof membershipInvoiceItem.$inferSelect;
 export type MembershipPayment = typeof membershipPayment.$inferSelect;
 export type MembershipWebhookEvent = typeof membershipWebhookEvent.$inferSelect;
+export type MembershipApplication = typeof membershipApplication.$inferSelect;
+export type MembershipApplicationStatus = MembershipApplication["status"];

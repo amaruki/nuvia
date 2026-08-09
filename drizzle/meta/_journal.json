@@ -71,6 +71,20 @@
       "when": 1786197912915,
       "tag": "0009_slimy_mole_man",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1786256393549,
+      "tag": "0010_naive_selene",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1786260177099,
+      "tag": "0011_even_stranger",
+      "breakpoints": true
     }
   ]
 }

@@ -33,6 +33,15 @@ export const transactionStatusEnum = pgEnum("TransactionStatus", [
 // terminal — there is no path back to ISSUED.
 export const invoiceStatusEnum = pgEnum("InvoiceStatus", ["ISSUED", "PAID", "VOID"]);
 
+// Membership join funnel (UI-33): applicants apply for a tier and staff review
+// the application in the backoffice. Approval records the decision only — the
+// membership itself is activated through the subscription backoffice.
+export const membershipApplicationStatusEnum = pgEnum("MembershipApplicationStatus", [
+  "PENDING",
+  "APPROVED",
+  "REJECTED",
+]);
+
 // Events
 export const eventTypeEnum = pgEnum("EventType", [
   "CONFERENCE",

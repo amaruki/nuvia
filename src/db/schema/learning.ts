@@ -10,9 +10,11 @@
  * records: they denormalize the course name, instructor and badge image at
  * issue time so later course edits or deletion never rewrite issued history.
  *
- * Enrollments/progress stay off-schema for now — the course DTO renders a
- * neutral progress (0) until enrollment tracking lands in a later backlog
- * item, the same staging pattern chapters uses for metrics/events/finances.
+ * Enrollments are tracked in the additive `course_enrollments` table
+ * (backlog UI-35): one row per member per course with status, honest
+ * 0–100 progress and enrolled/completed timestamps. The catalog course DTO
+ * keeps a neutral progress (0); per-member progress lives on the
+ * enrollment DTO and is never invented.
  */
 
 import { relations } from "drizzle-orm";
@@ -25,13 +27,21 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
+import { user } from "./users";
 
 export const courseLevelEnum = pgEnum("course_level", ["BEGINNER", "INTERMEDIATE", "ADVANCED"]);
 
 export const certificateStatusEnum = pgEnum("certificate_status", ["ACTIVE", "REVOKED"]);
+
+export const courseEnrollmentStatusEnum = pgEnum("course_enrollment_status", [
+  "ENROLLED",
+  "COMPLETED",
+  "CANCELED",
+]);
 
 export const course = pgTable(
   "courses",
@@ -109,8 +119,48 @@ export const certificate = pgTable(
   ],
 );
 
+/**
+ * A member's enrollment in a course (backlog UI-35 — the additive Phase 2
+ * table). Unique per user+course; unenrolling cancels the row instead of
+ * deleting it so enrollment history stays honest. Both FKs cascade:
+ * deleting a user or a course removes its enrollments.
+ */
+export const courseEnrollment = pgTable(
+  "course_enrollments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references((): AnyPgColumn => user.id, { onDelete: "cascade" }),
+    courseId: uuid("course_id")
+      .notNull()
+      .references((): AnyPgColumn => course.id, { onDelete: "cascade" }),
+    status: courseEnrollmentStatusEnum("status").notNull().default("ENROLLED"),
+    /** Honest 0–100 progress; defaults to 0, never invented. */
+    progress: integer("progress").notNull().default(0),
+    enrolledAt: timestamp("enrolled_at", { withTimezone: true }).notNull().defaultNow(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    unique("course_enrollments_user_course_uniq").on(table.userId, table.courseId),
+    index("course_enrollments_user_idx").on(table.userId),
+    index("course_enrollments_course_idx").on(table.courseId),
+    index("course_enrollments_status_idx").on(table.status),
+  ],
+);
+
 export const courseRelations = relations(course, ({ many }) => ({
   certificates: many(certificate),
+  enrollments: many(courseEnrollment),
+}));
+
+export const courseEnrollmentRelations = relations(courseEnrollment, ({ one }) => ({
+  user: one(user, { fields: [courseEnrollment.userId], references: [user.id] }),
+  course: one(course, { fields: [courseEnrollment.courseId], references: [course.id] }),
 }));
 
 export const certificateRelations = relations(certificate, ({ one }) => ({

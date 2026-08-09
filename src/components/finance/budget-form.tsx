@@ -58,7 +58,10 @@ export function BudgetForm({
     description: editingCategory?.description || "",
     allocatedAmount: editingCategory?.allocatedAmount || 0,
     period: "",
-    color: editingCategory?.color || "hsl(var(--primary))",
+    // Concrete default: the light-theme --primary brand color,
+    // oklch(0.8012 0.1089 201.1736). The old hsl()-wrapped token fallback
+    // was invalid CSS once tokens moved to oklch(), so no color rendered.
+    color: editingCategory?.color || "#58d3db",
     subcategories:
       editingCategory?.subcategories?.map((sub) => ({
         name: sub.name,
@@ -208,6 +211,7 @@ export function BudgetForm({
                     style={{ backgroundColor: color.value }}
                     onClick={() => setFormData((prev) => ({ ...prev, color: color.value }))}
                     title={color.name}
+                    aria-label={color.name}
                   />
                 ))}
               </div>

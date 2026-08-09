@@ -38,14 +38,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const STATUS_BADGE_STYLES: Record<ApplicationStatus, string> = {
-  PENDING: "bg-blue-100 text-blue-800 hover:bg-blue-100 border-none",
-  REVIEWING: "bg-purple-100 text-purple-800 hover:bg-purple-100 border-none",
-  SHORTLISTED: "bg-indigo-100 text-indigo-800 hover:bg-indigo-100 border-none",
-  INTERVIEWING: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-none",
-  OFFERED: "bg-teal-100 text-teal-800 hover:bg-teal-100 border-none",
-  HIRED: "bg-green-100 text-green-800 hover:bg-green-100 border-none",
-  REJECTED: "bg-red-100 text-red-800 hover:bg-red-100 border-none",
-  WITHDRAWN: "bg-gray-100 text-gray-800 hover:bg-gray-100 border-none",
+  PENDING: "bg-info/15 text-info hover:bg-info/15 border-transparent",
+  REVIEWING: "bg-warning/15 text-warning hover:bg-warning/15 border-transparent",
+  SHORTLISTED: "bg-info/15 text-info hover:bg-info/15 border-transparent",
+  INTERVIEWING: "bg-warning/15 text-warning hover:bg-warning/15 border-transparent",
+  OFFERED: "bg-success/15 text-success hover:bg-success/15 border-transparent",
+  HIRED: "bg-success/15 text-success hover:bg-success/15 border-transparent",
+  REJECTED: "bg-destructive/15 text-destructive hover:bg-destructive/15 border-transparent",
+  WITHDRAWN: "bg-muted text-muted-foreground hover:bg-muted border-border",
 };
 
 export default function ApplicantDetailsPage() {

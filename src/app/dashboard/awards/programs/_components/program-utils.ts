@@ -17,12 +17,12 @@ export const STATUS_BADGE_VARIANTS: Record<
 };
 
 export const CATEGORY_BADGE_CLASSES: Record<AwardCategory, string> = {
-  achievement: "bg-purple-100 text-purple-800 border-purple-200",
-  service: "bg-green-100 text-green-800 border-green-200",
-  leadership: "bg-blue-100 text-blue-800 border-blue-200",
-  innovation: "bg-orange-100 text-orange-800 border-orange-200",
-  scholarship: "bg-indigo-100 text-indigo-800 border-indigo-200",
-  lifetime_achievement: "bg-amber-100 text-amber-800 border-amber-200",
+  achievement: "bg-muted text-muted-foreground border-border",
+  service: "bg-success/15 text-success border-success/25",
+  leadership: "bg-info/15 text-info border-info/25",
+  innovation: "bg-destructive/15 text-destructive border-destructive/25",
+  scholarship: "bg-info/15 text-info border-info/25",
+  lifetime_achievement: "bg-warning/15 text-warning border-warning/25",
 };
 
 export const STATUS_OPTIONS: { value: AwardProgramStatus; label: string }[] = [

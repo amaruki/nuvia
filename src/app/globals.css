@@ -8,9 +8,11 @@
   full token set: :root below is the default "light" theme and the
   [data-theme="dark"] block is the "dark" theme. To add a theme, register it
   in src/config/themes.ts and add a :root[data-theme="<id>"],
-  [data-theme="<id>"] block that overrides every token from :root. If the new
-  theme is dark, also append its selector to the @custom-variant line below so
-  dark: utilities resolve inside it.
+  [data-theme="<id>"] block that overrides every color and shadow token from
+  :root. Theme-independent constants (fonts, --radius, --spacing, and
+  --tracking-normal) stay inherited. If the new theme is dark, also append its
+  selector to the @custom-variant line below so dark: utilities resolve
+  inside it.
 */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
@@ -31,6 +33,12 @@
   --accent-foreground: oklch(0.3171 0 0);
   --destructive: oklch(0.505 0.213 27.518);
   --destructive-foreground: oklch(1 0 0);
+  /* Semantic status hues. Authored to clear WCAG AA (4.5:1) against --card
+     as text, including over their own /15-/20 soft tints used by badge
+     recipes (see Badge success/warning/info variants). */
+  --success: oklch(0.455 0.14 145);
+  --warning: oklch(0.475 0.135 72);
+  --info: oklch(0.475 0.12 255);
   --border: oklch(0.9317 0.0118 231.6594);
   --input: oklch(0.9809 0.0025 228.7836);
   --ring: oklch(0.8012 0.1089 201.1736);
@@ -97,6 +105,9 @@
   --accent-foreground: oklch(0.9328 0.0025 228.7857);
   --destructive: oklch(0.6188 0.2376 25.7658);
   --destructive-foreground: oklch(1 0 0);
+  --success: oklch(0.74 0.15 145);
+  --warning: oklch(0.79 0.14 78);
+  --info: oklch(0.75 0.11 245);
   --border: oklch(0.3184 0.0077 240.0771);
   --input: oklch(0.2086 0.0085 264.373);
   --ring: oklch(0.8012 0.1089 201.1736);
@@ -113,24 +124,20 @@
   --sidebar-accent-foreground: oklch(0.9328 0.0025 228.7857);
   --sidebar-border: oklch(0.3184 0.0077 240.0771);
   --sidebar-ring: oklch(0.8012 0.1089 201.1736);
-  --font-sans: Instrument Sans, ui-sans-serif, sans-serif, system-ui;
-  --font-serif: Libre Baskerville, ui-serif, serif;
-  --font-mono: IBM Plex Mono, ui-monospace, monospace;
-  --radius: 0.5rem;
   --shadow-x: 0px;
   --shadow-y: 4px;
   --shadow-blur: 0px;
   --shadow-spread: 0px;
-  --shadow-opacity: 0;
+  --shadow-opacity: 0.4;
   --shadow-color: rgba(0, 0, 0, 0.5);
-  --shadow-2xs: 0px 4px 0px 0px hsl(0 0% 0% / 0);
-  --shadow-xs: 0px 4px 0px 0px hsl(0 0% 0% / 0);
-  --shadow-sm: 0px 4px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
-  --shadow: 0px 4px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
-  --shadow-md: 0px 4px 0px 0px hsl(0 0% 0% / 0), 0px 2px 4px -1px hsl(0 0% 0% / 0);
-  --shadow-lg: 0px 4px 0px 0px hsl(0 0% 0% / 0), 0px 4px 6px -1px hsl(0 0% 0% / 0);
-  --shadow-xl: 0px 4px 0px 0px hsl(0 0% 0% / 0), 0px 8px 10px -1px hsl(0 0% 0% / 0);
-  --shadow-2xl: 0px 4px 0px 0px hsl(0 0% 0% / 0);
+  --shadow-2xs: 0px 4px 0px 0px hsl(0 0% 0% / 0.3);
+  --shadow-xs: 0px 4px 0px 0px hsl(0 0% 0% / 0.35);
+  --shadow-sm: 0px 4px 0px 0px hsl(0 0% 0% / 0.35), 0px 1px 2px -1px hsl(0 0% 0% / 0.5);
+  --shadow: 0px 4px 0px 0px hsl(0 0% 0% / 0.35), 0px 1px 2px -1px hsl(0 0% 0% / 0.5);
+  --shadow-md: 0px 4px 0px 0px hsl(0 0% 0% / 0.4), 0px 2px 4px -1px hsl(0 0% 0% / 0.55);
+  --shadow-lg: 0px 4px 0px 0px hsl(0 0% 0% / 0.4), 0px 4px 6px -1px hsl(0 0% 0% / 0.6);
+  --shadow-xl: 0px 4px 0px 0px hsl(0 0% 0% / 0.45), 0px 8px 10px -1px hsl(0 0% 0% / 0.65);
+  --shadow-2xl: 0px 4px 0px 0px hsl(0 0% 0% / 0.5);
 }
 
 @theme inline {
@@ -150,6 +157,9 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

@@ -16,17 +16,19 @@ export const getStatusBadge = (status: string) => {
 
 export const getTypeBadge = (type: string) => {
   const colors = {
-    general: "bg-blue-100 text-blue-800 border-blue-200",
-    project: "bg-purple-100 text-purple-800 border-purple-200",
-    document: "bg-green-100 text-green-800 border-green-200",
-    discussion: "bg-orange-100 text-orange-800 border-orange-200",
-    meeting: "bg-indigo-100 text-indigo-800 border-indigo-200",
+    general: "bg-muted text-muted-foreground border-border",
+    project: "bg-info/15 text-info border-info/25",
+    document: "bg-success/15 text-success border-success/25",
+    discussion: "bg-warning/15 text-warning border-warning/25",
+    meeting: "bg-info/15 text-info border-info/25",
   };
 
   return (
     <Badge
       variant="outline"
-      className={colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"}
+      className={
+        colors[type as keyof typeof colors] || "bg-muted text-muted-foreground border-border"
+      }
     >
       {type.charAt(0).toUpperCase() + type.slice(1)}
     </Badge>
@@ -51,17 +53,17 @@ export const getTaskStatusBadge = (status: string) => {
 
 export const getTaskPriorityBadge = (priority: string) => {
   const colors = {
-    low: "bg-gray-100 text-gray-800 border-gray-200",
-    medium: "bg-blue-100 text-blue-800 border-blue-200",
-    high: "bg-orange-100 text-orange-800 border-orange-200",
-    urgent: "bg-red-100 text-red-800 border-red-200",
+    low: "bg-muted text-muted-foreground border-border",
+    medium: "bg-info/15 text-info border-info/25",
+    high: "bg-warning/15 text-warning border-warning/25",
+    urgent: "bg-destructive/15 text-destructive border-destructive/25",
   };
 
   return (
     <Badge
       variant="outline"
       className={
-        colors[priority as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"
+        colors[priority as keyof typeof colors] || "bg-muted text-muted-foreground border-border"
       }
     >
       {priority.charAt(0).toUpperCase() + priority.slice(1)}

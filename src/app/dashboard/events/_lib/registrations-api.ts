@@ -106,12 +106,12 @@ export const REGISTRATION_STATUS_LABELS: Record<RegistrationStatusDb, string> = 
 };
 
 export const REGISTRATION_STATUS_BADGE_STYLES: Record<RegistrationStatusDb, string> = {
-  PENDING: "bg-blue-100 text-blue-800 hover:bg-blue-100 border-none",
-  CONFIRMED: "bg-green-100 text-green-800 hover:bg-green-100 border-none",
-  WAITLISTED: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-none",
-  CANCELED: "bg-gray-100 text-gray-800 hover:bg-gray-100 border-none",
-  ATTENDED: "bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none",
-  NO_SHOW: "bg-red-100 text-red-800 hover:bg-red-100 border-none",
+  PENDING: "bg-info/15 text-info hover:bg-info/15 border-transparent",
+  CONFIRMED: "bg-success/15 text-success hover:bg-success/15 border-transparent",
+  WAITLISTED: "bg-warning/15 text-warning hover:bg-warning/15 border-transparent",
+  CANCELED: "bg-destructive/15 text-destructive hover:bg-destructive/15 border-transparent",
+  ATTENDED: "bg-success/15 text-success hover:bg-success/15 border-transparent",
+  NO_SHOW: "bg-destructive/15 text-destructive hover:bg-destructive/15 border-transparent",
 };
 
 export async function fetchEventRegistrations(

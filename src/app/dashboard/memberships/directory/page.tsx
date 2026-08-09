@@ -45,14 +45,14 @@ export default function MembershipDirectory() {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <h2 className="text-red-800 font-semibold mb-2">Error Loading Members</h2>
-          <p className="text-red-600 mb-4">
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6">
+          <h2 className="text-destructive font-semibold mb-2">Error Loading Members</h2>
+          <p className="text-destructive/90 mb-4">
             {error.message || "Failed to load membership directory. Please try again later."}
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            className="px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors"
           >
             Try Again
           </button>

@@ -36,8 +36,8 @@ export function StatsOverview({ totalActiveMembers, activeTiers }: StatsOverview
         type="user-profile"
       >
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-            <Layers className="w-6 h-6 text-green-600 dark:text-green-400" />
+          <div className="p-3 bg-success/15 rounded-lg">
+            <Layers className="w-6 h-6 text-success" />
           </div>
           <div>
             <p className="text-2xl font-bold">{activeTiers}</p>

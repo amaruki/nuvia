@@ -1,4 +1,4 @@
-name: nuvia-test
+name: nuvia
 
 services:
   postgres:

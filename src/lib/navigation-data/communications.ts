@@ -24,12 +24,6 @@ export const communicationsSection: readonly NavItemData[] = [
         // so no count is shown instead of a fabricated one.
       },
       {
-        id: "announcement-management",
-        title: "Announcement Management",
-        path: "/dashboard/communications/announcements",
-        roles: ["admin", "superadmin", "staff", "chapter_admin", "committee_chair"],
-      },
-      {
         id: "calendar-integration",
         title: "Calendar Integration",
         path: "/dashboard/communications/calendar",

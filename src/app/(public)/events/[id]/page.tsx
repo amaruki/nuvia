@@ -1,6 +1,6 @@
 /**
  * Public event detail — server wrapper (plan item UI-03, organizer credit
- * UI-30).
+ * UI-30, announcement banner UI-32).
  *
  * Resolves the signed-in user's id server-side (null for anonymous visitors)
  * and hands it to the client body so the organizer gate compares real ids.
@@ -11,8 +11,10 @@
 import { getCurrentUser } from "@/lib/auth/utils/session";
 import { getEventDetail } from "@/lib/services/event-read.service";
 import { getOrganizerCredit } from "@/lib/services/member/public-profile";
+import { listEventAnnouncements } from "@/lib/services/content/member-announcements";
 
 import { EventDetailClient } from "./_components/event-detail-client";
+import { EventAnnouncementBanner } from "./_components/announcement-banner";
 
 export const dynamic = "force-dynamic";
 
@@ -29,5 +31,18 @@ export default async function EventDetailsPage({ params }: EventDetailsPageProps
   const detail = await getEventDetail(id, user?.id ?? undefined);
   const organizerCredit = detail ? await getOrganizerCredit(detail.event.organizerId) : null;
 
-  return <EventDetailClient currentUserId={user?.id ?? null} organizerCredit={organizerCredit} />;
+  // UI-32: announcements targeting this event, resolved server-side through
+  // the member-safe read path. Anonymous visitors only ever get PUBLIC rows.
+  // Resolved only when the event detail itself resolved, so a missing or
+  // audience-gated event cannot leak its banners.
+  const announcements = detail
+    ? await listEventAnnouncements(id, { authenticated: user !== null })
+    : [];
+
+  return (
+    <>
+      <EventAnnouncementBanner announcements={announcements} />
+      <EventDetailClient currentUserId={user?.id ?? null} organizerCredit={organizerCredit} />
+    </>
+  );
 }

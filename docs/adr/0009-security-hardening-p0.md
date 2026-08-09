@@ -8,7 +8,7 @@ A pre-launch security pass found several issues serious enough to block the clai
 
 ## Decision — fixed immediately
 
-- **`sameSite` CSRF gap.** `src/lib/auth.ts` set session cookies to `SameSite=None` in production. This fix changed the setting to always `SameSite=Lax`. This application is first-party and has no cross-site cookie requirement.
+- **`sameSite` CSRF gap.** `src/lib/auth/index.ts` set session cookies to `SameSite=None` in production. This fix changed the setting to always `SameSite=Lax`. This application is first-party and has no cross-site cookie requirement.
 - **Seed script shared password.** `prisma/seed.ts` (now `scripts/seed.ts`) hardcoded `Admin123!@#` into five privileged accounts, including superadmin, and committed it to git. `db:seed` now requires `SEED_ADMIN_PASSWORD` and refuses to run without it.
 - **No environment validation.** This fix added `src/lib/env.ts`. This module is zod-validated and loads at import time. It fails loudly. It does not fall back to a nonexistent SQLite database or an empty email configuration.
 - **Un-transacted audit trail.** The `changeUserRole` function in `rbac.ts` now writes the role update and its audit log entry in one `db.transaction`.

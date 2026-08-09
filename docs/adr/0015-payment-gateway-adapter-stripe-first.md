@@ -26,7 +26,7 @@ e-wallets, QRIS) but is not built now.
    mapping provider states onto the internal `membership_subscriptions` /
    `membership_transactions` states.
 
-2. **Stripe is the first concrete adapter** (`src/lib/payments/stripe.ts`),
+2. **Stripe is the first concrete adapter** (`src/lib/payments/stripe/index.ts`),
    added with an exactly pinned SDK version per the repo's dependency rule.
    Provider selection is deployment configuration (`PAYMENT_GATEWAY` env),
    not code branching at call sites.

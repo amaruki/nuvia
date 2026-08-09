@@ -8,7 +8,7 @@ Three implementations of API-route authorization exist in this codebase:
 
 | Helper                                                          | File                         | Routes using it |
 | --------------------------------------------------------------- | ---------------------------- | --------------- |
-| `requirePermission`                                             | `src/lib/rbac.ts`            | 5 of 23         |
+| `requirePermission`                                             | `src/lib/rbac/index.ts`      | 5 of 23         |
 | `withAuth` / `withRole` / `withResourceAuth` / `authMiddleware` | `src/lib/auth/middleware.ts` | 0               |
 | `authorizeApi`                                                  | `src/lib/security.ts`        | 0               |
 
@@ -16,7 +16,7 @@ Three implementations of API-route authorization exist in this codebase:
 
 ## Decision
 
-`requirePermission` (and `requireRole`, its role-level sibling) in `src/lib/rbac.ts` is the **only** authorization helper for API routes and server actions. It is the one already in real use. It works with the `` `${module}:${action}` `` permission model in `src/types/role.types.ts`. `docs/architecture/overview.md` documents its usage pattern — `requirePermission` → `AuthResponseFactory` → Drizzle — as the canonical route shape.
+`requirePermission` (and `requireRole`, its role-level sibling) in `src/lib/rbac/index.ts` is the **only** authorization helper for API routes and server actions. It is the one already in real use. It works with the `` `${module}:${action}` `` permission model in `src/types/role/index.ts`. `docs/architecture/overview.md` documents its usage pattern — `requirePermission` → `AuthResponseFactory` → Drizzle — as the canonical route shape.
 
 `withAuth`, `withRole`, `withResourceAuth`, `authMiddleware`, and `authorizeApi` are deleted. Nothing imports them (verified: zero references outside their own definition files).
 

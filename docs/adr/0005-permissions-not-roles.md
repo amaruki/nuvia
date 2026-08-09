@@ -6,8 +6,8 @@
 
 Two authorization vocabularies coexist:
 
-- The server: `` `${module}:${action}` `` permissions (`src/types/role.types.ts`, for example `'events:publish'`), resolved per role via `ROLE_PERMISSIONS` and checked with `requirePermission` (ADR-0001).
-- The UI nav: `roles?: UserRole[]` arrays (`src/lib/navigation-data.ts`, for example line 53: `roles: ["admin", "superadmin", "staff"]`).
+- The server: `` `${module}:${action}` `` permissions (`src/types/role/index.ts`, for example `'events:publish'`), resolved per role via `ROLE_PERMISSIONS` and checked with `requirePermission` (ADR-0001).
+- The UI nav: `roles?: UserRole[]` arrays (`src/lib/navigation-data/index.ts`, for example line 53: `roles: ["admin", "superadmin", "staff"]`).
 
 Neither derives from the other. A role gains a permission in `ROLE_PERMISSIONS`, and the nav does not reflect it. The reverse can also happen. This gap remains unless someone updates both, by hand, in two different files with two different shapes.
 

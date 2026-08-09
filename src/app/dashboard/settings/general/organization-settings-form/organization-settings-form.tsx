@@ -9,75 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
-export interface OrganizationFormValues {
-  name: string;
-  legalName: string | null;
-  logo: string | null;
-  website: string | null;
-  supportEmail: string | null;
-  locale: string;
-  currency: string;
-  timezone: string;
-}
-
-interface OrganizationSettingsFormProps {
-  organization: OrganizationFormValues;
-  canEdit: boolean;
-}
-
-const LOCALE_OPTIONS = [
-  "en",
-  "en-US",
-  "en-GB",
-  "id-ID",
-  "de-DE",
-  "es-ES",
-  "fr-FR",
-  "pt-BR",
-  "ja-JP",
-  "zh-CN",
-  "ar-SA",
-  "hi-IN",
-] as const;
-
-const CURRENCY_OPTIONS = [
-  "USD",
-  "EUR",
-  "GBP",
-  "IDR",
-  "SGD",
-  "MYR",
-  "AUD",
-  "CAD",
-  "JPY",
-  "CHF",
-  "INR",
-  "PHP",
-  "THB",
-  "VND",
-] as const;
-
-const TIMEZONE_SUGGESTIONS = [
-  "UTC",
-  "Asia/Jakarta",
-  "Asia/Singapore",
-  "Asia/Tokyo",
-  "Asia/Kolkata",
-  "Asia/Dubai",
-  "Australia/Sydney",
-  "Europe/London",
-  "Europe/Berlin",
-  "Europe/Paris",
-  "America/New_York",
-  "America/Chicago",
-  "America/Los_Angeles",
-  "America/Sao_Paulo",
-] as const;
-
-interface FieldError {
-  field: string;
-  message: string;
-}
+import { CURRENCY_OPTIONS, LOCALE_OPTIONS, TIMEZONE_SUGGESTIONS } from "./options";
+import type { FieldError, OrganizationSettingsFormProps } from "./types";
 
 export function OrganizationSettingsForm({ organization, canEdit }: OrganizationSettingsFormProps) {
   const router = useRouter();

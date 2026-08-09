@@ -130,19 +130,19 @@ export const REMOTE_EVENT_FORMATS: DbEventFormat[] = ["VIRTUAL", "RECORDED", "LI
 export function getEventTypeColor(eventType: EventType): string {
   switch (eventType) {
     case EventType.WORKSHOP:
-      return "bg-blue-100 text-blue-800";
+      return "bg-info/15 text-info";
     case EventType.MEETUP:
-      return "bg-green-100 text-green-800";
+      return "bg-success/15 text-success";
     case EventType.CONFERENCE:
-      return "bg-purple-100 text-purple-800";
+      return "bg-muted text-muted-foreground";
     case EventType.WEBINAR:
-      return "bg-indigo-100 text-indigo-800";
+      return "bg-info/15 text-info";
     case EventType.SOCIAL:
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-warning/15 text-warning";
     case EventType.TRAINING:
-      return "bg-red-100 text-red-800";
+      return "bg-destructive/15 text-destructive";
     default:
-      return "bg-gray-100 text-foreground/80";
+      return "bg-muted text-muted-foreground";
   }
 }
 
@@ -152,15 +152,15 @@ export function getEventTypeColor(eventType: EventType): string {
 export function getEventStatusColor(status: EventStatus): string {
   switch (status) {
     case EventStatus.DRAFT:
-      return "bg-gray-100 text-foreground/80";
+      return "bg-muted text-muted-foreground";
     case EventStatus.PUBLISHED:
-      return "bg-green-100 text-green-800";
+      return "bg-success/15 text-success";
     case EventStatus.CANCELLED:
-      return "bg-red-100 text-red-800";
+      return "bg-destructive/15 text-destructive";
     case EventStatus.COMPLETED:
-      return "bg-blue-100 text-blue-800";
+      return "bg-info/15 text-info";
     default:
-      return "bg-gray-100 text-foreground/80";
+      return "bg-muted text-muted-foreground";
   }
 }
 

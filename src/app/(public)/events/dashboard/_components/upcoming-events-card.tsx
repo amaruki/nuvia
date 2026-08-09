@@ -60,7 +60,7 @@ export function UpcomingEventsCard({ events }: UpcomingEventsCardProps) {
                     <Badge className="bg-info/20 text-info">Today</Badge>
                   )}
                   {isEventTomorrow(event.startDate) && (
-                    <Badge className="bg-purple-100 text-purple-800">Tomorrow</Badge>
+                    <Badge className="bg-accent text-accent-foreground">Tomorrow</Badge>
                   )}
                 </div>
               </div>

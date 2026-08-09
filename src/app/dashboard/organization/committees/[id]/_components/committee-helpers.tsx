@@ -17,17 +17,19 @@ export const getStatusBadge = (status: string) => {
 
 export const getTypeBadge = (type: string) => {
   const colors = {
-    executive: "bg-purple-100 text-purple-800 border-purple-200",
-    functional: "bg-blue-100 text-blue-800 border-blue-200",
-    special_interest: "bg-green-100 text-green-800 border-green-200",
-    ad_hoc: "bg-orange-100 text-orange-800 border-orange-200",
-    standing: "bg-indigo-100 text-indigo-800 border-indigo-200",
+    executive: "bg-info/15 text-info border-info/25",
+    functional: "bg-muted text-muted-foreground border-border",
+    special_interest: "bg-success/15 text-success border-success/25",
+    ad_hoc: "bg-warning/15 text-warning border-warning/25",
+    standing: "bg-info/15 text-info border-info/25",
   };
 
   return (
     <Badge
       variant="outline"
-      className={colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200"}
+      className={
+        colors[type as keyof typeof colors] || "bg-muted text-muted-foreground border-border"
+      }
     >
       {type.replace("_", " ").charAt(0).toUpperCase() + type.replace("_", " ").slice(1)}
     </Badge>

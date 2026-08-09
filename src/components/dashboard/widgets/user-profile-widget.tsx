@@ -35,7 +35,7 @@ const getTierColor = (tier: string) => {
     case "premium":
       return "bg-info/20 text-info";
     case "vip":
-      return "bg-purple-100 text-purple-800";
+      return "bg-chart-3/20 text-foreground";
     default:
       return "bg-muted text-muted-foreground";
   }

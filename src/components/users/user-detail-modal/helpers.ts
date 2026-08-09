@@ -3,15 +3,15 @@ import { AuthStatus, UserStatus } from "@/types/user-management.types";
 export function getStatusColor(status: UserStatus): string {
   switch (status) {
     case UserStatus.ACTIVE:
-      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 border-green-300 dark:border-green-700";
+      return "bg-success/15 text-success border-success/25";
     case UserStatus.INACTIVE:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700";
+      return "bg-muted text-muted-foreground border-border";
     case UserStatus.SUSPENDED:
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100 border-orange-300 dark:border-orange-700";
+      return "bg-warning/15 text-warning border-warning/25";
     case UserStatus.PENDING_VERIFICATION:
-      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100 border-yellow-300 dark:border-yellow-700";
+      return "bg-warning/15 text-warning border-warning/25";
     case UserStatus.BANNED:
-      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 border-red-300 dark:border-red-700";
+      return "bg-destructive/15 text-destructive border-destructive/25";
     default:
       return "bg-secondary text-secondary-foreground border-border";
   }
@@ -20,13 +20,13 @@ export function getStatusColor(status: UserStatus): string {
 export function getAuthStatusColor(authStatus: AuthStatus): string {
   switch (authStatus) {
     case AuthStatus.VERIFIED:
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 border-blue-300 dark:border-blue-700";
+      return "bg-info/15 text-info border-info/25";
     case AuthStatus.UNVERIFIED:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700";
+      return "bg-muted text-muted-foreground border-border";
     case AuthStatus.TWO_FACTOR_ENABLED:
-      return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100 border-purple-300 dark:border-purple-700";
+      return "bg-info/15 text-info border-info/25";
     case AuthStatus.TWO_FACTOR_DISABLED:
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100 border-orange-300 dark:border-orange-700";
+      return "bg-warning/15 text-warning border-warning/25";
     default:
       return "bg-secondary text-secondary-foreground border-border";
   }
@@ -35,11 +35,11 @@ export function getAuthStatusColor(authStatus: AuthStatus): string {
 export function getRoleColor(role: string): string {
   switch (role) {
     case "admin":
-      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 border-red-300 dark:border-red-700";
+      return "bg-destructive/15 text-destructive border-destructive/25";
     case "moderator":
-      return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100 border-indigo-300 dark:border-indigo-700";
+      return "bg-info/15 text-info border-info/25";
     case "member":
-      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 border-green-300 dark:border-green-700";
+      return "bg-success/15 text-success border-success/25";
     default:
       return "bg-secondary text-secondary-foreground border-border";
   }

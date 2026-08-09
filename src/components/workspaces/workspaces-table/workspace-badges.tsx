@@ -7,11 +7,11 @@ const STATUS_BADGE_VARIANTS = {
 } as const;
 
 const TYPE_BADGE_COLORS = {
-  general: "bg-blue-100 text-blue-800 border-blue-200",
-  project: "bg-purple-100 text-purple-800 border-purple-200",
-  document: "bg-green-100 text-green-800 border-green-200",
-  discussion: "bg-orange-100 text-orange-800 border-orange-200",
-  meeting: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  general: "bg-muted text-muted-foreground border-border",
+  project: "bg-info/15 text-info border-info/25",
+  document: "bg-success/15 text-success border-success/25",
+  discussion: "bg-warning/15 text-warning border-warning/25",
+  meeting: "bg-info/15 text-info border-info/25",
 };
 
 interface WorkspaceStatusBadgeProps {
@@ -32,7 +32,7 @@ interface WorkspaceTypeBadgeProps {
 export function WorkspaceTypeBadge({ type }: WorkspaceTypeBadgeProps) {
   const className =
     TYPE_BADGE_COLORS[type as keyof typeof TYPE_BADGE_COLORS] ||
-    "bg-gray-100 text-gray-800 border-gray-200";
+    "bg-muted text-muted-foreground border-border";
 
   return (
     <Badge variant="outline" className={className}>

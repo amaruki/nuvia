@@ -47,12 +47,12 @@ import {
 } from "@/types/jobs.types";
 
 const STATUS_BADGE_STYLES: Record<JobStatus, string> = {
-  DRAFT: "bg-amber-500/10 text-amber-800 dark:text-amber-400 border-amber-500/20",
-  PUBLISHED: "bg-green-500/10 text-green-800 dark:text-green-400 border-green-500/20",
-  ARCHIVED: "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20",
-  CLOSED: "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20",
-  FILLED: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
-  CANCELLED: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
+  DRAFT: "bg-warning/15 text-warning border-warning/25",
+  PUBLISHED: "bg-success/15 text-success border-success/25",
+  ARCHIVED: "bg-muted text-muted-foreground border-border",
+  CLOSED: "bg-muted text-muted-foreground border-border",
+  FILLED: "bg-info/15 text-info border-info/25",
+  CANCELLED: "bg-destructive/15 text-destructive border-destructive/25",
 };
 
 export default function JobsAdminPage() {
@@ -120,8 +120,8 @@ export default function JobsAdminPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Active Jobs</CardTitle>
-            <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center">
-              <Briefcase className="h-4 w-4 text-blue-600" />
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Briefcase className="h-4 w-4 text-primary" />
             </div>
           </CardHeader>
           <CardContent>
@@ -134,8 +134,8 @@ export default function JobsAdminPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Applicants
             </CardTitle>
-            <div className="h-8 w-8 rounded-full bg-green-50 flex items-center justify-center">
-              <Users className="h-4 w-4 text-green-600" />
+            <div className="h-8 w-8 rounded-full bg-success/10 flex items-center justify-center">
+              <Users className="h-4 w-4 text-success" />
             </div>
           </CardHeader>
           <CardContent>
@@ -148,8 +148,8 @@ export default function JobsAdminPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Postings
             </CardTitle>
-            <div className="h-8 w-8 rounded-full bg-purple-50 flex items-center justify-center">
-              <Briefcase className="h-4 w-4 text-purple-600" />
+            <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center">
+              <Briefcase className="h-4 w-4 text-accent-foreground" />
             </div>
           </CardHeader>
           <CardContent>

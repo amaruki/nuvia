@@ -14,12 +14,12 @@ export function CurrentSessionCard({ session }: CurrentSessionCardProps) {
   const { icon: DeviceIcon, name: deviceName } = getDeviceInfo(session.userAgent);
 
   return (
-    <Card className="border-green-200 bg-green-50">
+    <Card className="border-success/30 bg-success/10">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-green-800">
+        <CardTitle className="flex items-center gap-2 text-success">
           <Shield className="h-5 w-5" />
           Current Session
-          <Badge variant="default" className="bg-green-600">
+          <Badge variant="default" className="bg-success text-white">
             This Device
           </Badge>
         </CardTitle>
@@ -51,7 +51,7 @@ export function CurrentSessionCard({ session }: CurrentSessionCardProps) {
             </div>
           </div>
 
-          <Badge variant="secondary" className="bg-green-100 text-green-800">
+          <Badge variant="secondary" className="bg-success/15 text-success">
             Active
           </Badge>
         </div>

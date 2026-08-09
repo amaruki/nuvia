@@ -47,16 +47,16 @@ export const getPermissionIcon = (permission: string) => {
 export const getPermissionColor = (permission: string) => {
   switch (permission) {
     case "view":
-      return "bg-blue-100 text-blue-800";
+      return "bg-info/15 text-info";
     case "download":
-      return "bg-green-100 text-green-800";
+      return "bg-success/15 text-success";
     case "edit":
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-warning/15 text-warning";
     case "delete":
-      return "bg-red-100 text-red-800";
+      return "bg-destructive/15 text-destructive";
     case "share":
-      return "bg-purple-100 text-purple-800";
+      return "bg-primary/15 text-primary";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-muted text-muted-foreground";
   }
 };

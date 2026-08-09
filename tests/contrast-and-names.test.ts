@@ -15,10 +15,10 @@
  *      `text-muted-foreground` / sub-11px overrides on `bg-secondary` —
  *      those overrides must not come back.
  *   3. Page-level hardcoded palette fixes: content-media stats use
- *      `bg-card`, the jobs board status badges and growth/remote stats use
- *      >= 700 light tones with dark variants, the my-courses empty state
- *      uses `text-muted-foreground`, and the jobs board no longer paints
- *      Badges `bg-blue-600`.
+ *      `bg-card`, the jobs board status badges use semantic tone tokens
+ *      (no raw palette, no dark: pairs — semantic tokens adapt per
+ *      theme), the my-courses empty state uses `text-muted-foreground`,
+ *      and the jobs board no longer paints Badges `bg-blue-600`.
  *   4. Accessible names: the learning-courses difficulty Select trigger
  *      carries a non-empty aria-label.
  *   5. Standalone blue links (`text-blue-600 ... hover:underline`) must
@@ -200,16 +200,20 @@ describe("content-media stats cards", () => {
 });
 
 describe("jobs board status + role badges", () => {
-  test("status badge styles carry a dark-mode pair and >= 700 light tones", () => {
+  test("status badge styles use semantic tone tokens, no raw palette", () => {
     const source = src("src/app/dashboard/jobs/page.tsx");
     const stylesBlock = source.slice(source.indexOf("STATUS_BADGE_STYLES"));
     for (const status of ["DRAFT", "PUBLISHED", "ARCHIVED", "FILLED", "CLOSED", "CANCELLED"]) {
       const entry = stylesBlock.match(new RegExp(`${status}:\\s*"([^"]+)"`))?.[1];
       expect(entry, `${status} style`).toBeDefined();
-      expect(entry, `${status} dark tone`).toContain("dark:");
-      expect(entry, `${status} light tone`).toMatch(/text-(green|amber|gray|blue|red)-(700|800)/);
+      expect(entry, `${status} token text color`).toMatch(
+        /text-(warning|success|info|destructive|muted-foreground)\b/,
+      );
     }
     expect(stylesBlock).not.toContain("#00a63e");
+    expect(stylesBlock).not.toMatch(
+      /\b(slate|gray|zinc|red|orange|amber|yellow|green|blue|indigo)-\d{2,3}\b/,
+    );
   });
 
   test("job-card default badge is no longer painted bg-blue-600", () => {

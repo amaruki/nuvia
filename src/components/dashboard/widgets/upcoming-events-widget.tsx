@@ -152,7 +152,7 @@ export function UpcomingEventsWidget({
                       isEventToday(event.startDate)
                         ? "bg-info/10 border-info/30"
                         : isEventTomorrow(event.startDate)
-                          ? "bg-purple-100 text-purple-800"
+                          ? "bg-accent/60 border-accent-foreground/40"
                           : "bg-card border-border"
                     }`}
                   >
@@ -177,7 +177,7 @@ export function UpcomingEventsWidget({
                             </Badge>
                           )}
                           {isEventTomorrow(event.startDate) && (
-                            <Badge className="bg-purple-100 text-purple-800">Tomorrow</Badge>
+                            <Badge className="bg-accent text-accent-foreground">Tomorrow</Badge>
                           )}
                         </div>
 

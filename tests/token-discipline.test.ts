@@ -18,6 +18,11 @@
  *   (e) The dark block authors real shadows: no alpha-zero `/ 0)` entries,
  *       a non-zero --shadow-opacity, the 0px/4px offset scale intact, and no
  *       dead verbatim re-declarations of the :root font/radius tokens.
+ *   (f) Wave 2: the deferred centralized badge maps (jobs status, session
+ *       card chrome, committee/workspace type, user status/auth/role,
+ *       permission, event colors) carry zero raw palette classes and no
+ *       palette dark: overrides; the dead event-styles.ts is deleted; zero
+ *       `-100 text-*-800` pairs remain anywhere in src/.
  *
  * Run ONLY this file: `bun test tests/token-discipline.test.ts`.
  */
@@ -348,6 +353,142 @@ describe("dark block hygiene", () => {
   test("no duplicate --font-* / --radius re-declarations", () => {
     for (const name of ["font-sans", "font-serif", "font-mono", "radius"]) {
       expect(DARK_BLOCK).not.toContain(`--${name}:`);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// (f) Wave 2: centralized badge maps (deferred set)
+// ---------------------------------------------------------------------------
+
+const BADGE_MAP_FILES_WAVE2 = [
+  "src/app/dashboard/jobs/page.tsx",
+  "src/app/dashboard/profile/components/session-manager/session-card.tsx",
+  "src/app/dashboard/organization/committees/[id]/_components/committee-helpers.tsx",
+  "src/components/committees/committees-table/committee-badges.tsx",
+  "src/components/workspaces/workspaces-table/workspace-badges.tsx",
+  "src/components/users/user-detail-modal/helpers.ts",
+  "src/components/content/media-permissions-manager/helpers.tsx",
+  "src/lib/utils/event-utils.ts",
+];
+
+// Any raw Tailwind palette class with a numbered stop (bg-/text-/border-...).
+const RAW_PALETTE =
+  /\b(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}\b/;
+
+describe("wave-2 badge maps migrated off raw palette", () => {
+  for (const file of BADGE_MAP_FILES_WAVE2) {
+    const source = src(file);
+
+    test(`${file}: zero raw palette classes`, () => {
+      const offenders = source.match(RAW_PALETTE);
+      expect(offenders, `${file} palette classes`).toBeNull();
+    });
+
+    test(`${file}: zero -100 text-*-800 palette pairs`, () => {
+      expect(source).not.toMatch(/-100\s+text-[a-z]+-800/);
+    });
+
+    test(`${file}: no palette dark: overrides (tokens adapt per theme)`, () => {
+      expect(source).not.toMatch(/dark:(bg|text|border)-[a-z]+-\d{2,3}\b/);
+    });
+  }
+
+  test("dead event-styles.ts is deleted (it had zero importers)", () => {
+    expect(() => src("src/lib/styles/event-styles.ts")).toThrow();
+  });
+
+  test("no -100 text-*-800 badge pairs remain anywhere in src/", () => {
+    const offenders = walk(join(ROOT, "src")).filter((path) =>
+      /-100\s+text-[a-z]+-800/.test(readFileSync(path, "utf8")),
+    );
+    expect(offenders).toEqual([]);
+  });
+
+  test("jobs status map keeps every status on token classes", () => {
+    const source = src(BADGE_MAP_FILES_WAVE2[0]);
+    const start = source.indexOf("STATUS_BADGE_STYLES");
+    const map = source.slice(start, source.indexOf("};", start) + 2);
+    for (const status of ["DRAFT", "PUBLISHED", "ARCHIVED", "CLOSED", "FILLED", "CANCELLED"]) {
+      expect(map, `STATUS_BADGE_STYLES covers ${status}`).toMatch(new RegExp(`${status}:\\s*"`));
+    }
+    expect(map).toContain("text-warning");
+    expect(map).toContain("text-success");
+    expect(map).toContain("text-info");
+    expect(map).toContain("text-destructive");
+    expect(map).toContain("bg-muted");
+  });
+
+  test("session-card chrome and badges use success tokens", () => {
+    const source = src(BADGE_MAP_FILES_WAVE2[1]);
+    expect(source).toContain("border-success/30");
+    expect(source).toContain("bg-success/10");
+    expect(source).toContain("text-success");
+    expect(source).toContain("This Device");
+    expect(source).toContain("Active");
+  });
+
+  test("committee type maps keep all five types in both copies", () => {
+    for (const file of [BADGE_MAP_FILES_WAVE2[2], BADGE_MAP_FILES_WAVE2[3]]) {
+      const source = src(file);
+      for (const type of ["executive", "functional", "special_interest", "ad_hoc", "standing"]) {
+        expect(source, `${file} covers ${type}`).toMatch(new RegExp(`${type}:\\s*"`));
+      }
+    }
+  });
+
+  test("workspace type map keeps all five types", () => {
+    const source = src(BADGE_MAP_FILES_WAVE2[4]);
+    for (const type of ["general", "project", "document", "discussion", "meeting"]) {
+      expect(source).toMatch(new RegExp(`${type}:\\s*"`));
+    }
+  });
+
+  test("user-detail maps keep every status/auth/role key", () => {
+    const source = src(BADGE_MAP_FILES_WAVE2[5]);
+    for (const key of [
+      "UserStatus.ACTIVE",
+      "UserStatus.INACTIVE",
+      "UserStatus.SUSPENDED",
+      "UserStatus.PENDING_VERIFICATION",
+      "UserStatus.BANNED",
+      "AuthStatus.VERIFIED",
+      "AuthStatus.UNVERIFIED",
+      "AuthStatus.TWO_FACTOR_ENABLED",
+      "AuthStatus.TWO_FACTOR_DISABLED",
+      '"admin"',
+      '"moderator"',
+      '"member"',
+    ]) {
+      expect(source, `user-detail helpers cover ${key}`).toContain(key);
+    }
+  });
+
+  test("permission map keeps all five capabilities", () => {
+    const source = src(BADGE_MAP_FILES_WAVE2[6]);
+    for (const permission of ["view", "download", "edit", "delete", "share"]) {
+      expect(source).toMatch(new RegExp(`case "${permission}"`));
+    }
+    expect(source).toContain("getPermissionColor");
+  });
+
+  test("event-utils keeps both color getters with every key", () => {
+    const source = src(BADGE_MAP_FILES_WAVE2[7]);
+    expect(source).toContain("export function getEventTypeColor");
+    expect(source).toContain("export function getEventStatusColor");
+    for (const key of [
+      "EventType.WORKSHOP",
+      "EventType.MEETUP",
+      "EventType.CONFERENCE",
+      "EventType.WEBINAR",
+      "EventType.SOCIAL",
+      "EventType.TRAINING",
+      "EventStatus.DRAFT",
+      "EventStatus.PUBLISHED",
+      "EventStatus.CANCELLED",
+      "EventStatus.COMPLETED",
+    ]) {
+      expect(source, `event-utils covers ${key}`).toContain(key);
     }
   });
 });

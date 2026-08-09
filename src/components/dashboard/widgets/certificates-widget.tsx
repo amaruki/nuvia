@@ -48,10 +48,10 @@ const formatDate = (date: Date) => {
 const getCertificateColor = (index: number) => {
   const colors = [
     "bg-info/20 text-info",
-    "bg-purple-100 text-purple-800",
+    "bg-accent text-accent-foreground",
     "bg-chart-2/20 text-success",
     "bg-warning/20 text-warning",
-    "bg-pink-100 text-pink-800",
+    "bg-chart-5/20 text-foreground",
   ];
   return colors[index % colors.length];
 };

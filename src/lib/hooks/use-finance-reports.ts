@@ -20,7 +20,7 @@ import { apiFetch, ApiClientError } from "@/lib/api-client";
 import type { FinancialReport, ReportFilterOptions, ReportStatistics } from "@/types/finance";
 
 /** Wire shape of src/lib/services/finance-report.service.ts FinanceReportSummary. */
-interface FinanceReportSummary {
+export interface FinanceReportSummary {
   generatedAt: string;
   months: number;
   totals: {

@@ -1,12 +1,21 @@
 import { describe, expect, test } from "bun:test";
-import { existsSync } from "fs";
+import { existsSync, readdirSync } from "fs";
 import { join } from "path";
 import { navigationData, type NavItemData } from "@/lib/navigation-data";
 
 const APP_DIR = join(import.meta.dir, "..", "src", "app");
 
-function pagePath(navPath: string): string {
-  return join(APP_DIR, navPath, "page.tsx");
+// Route groups (e.g. "(public)") add URL-neutral segments, so a leaf path
+// like "/forums" may resolve under "src/app/(public)/forums/page.tsx".
+const ROUTE_GROUPS = readdirSync(APP_DIR, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && entry.name.startsWith("("))
+  .map((entry) => entry.name);
+
+function pageExists(navPath: string): boolean {
+  const segment = navPath.replace(/^\//, "");
+  return ["", ...ROUTE_GROUPS].some((group) =>
+    existsSync(join(APP_DIR, group, segment, "page.tsx")),
+  );
 }
 
 // A parent item with subItems renders as a collapsible trigger
@@ -34,7 +43,7 @@ describe("navigation-data.ts leaf links", () => {
 
   for (const path of leafPaths) {
     test(`${path} resolves to a real page.tsx`, () => {
-      expect(existsSync(pagePath(path))).toBe(true);
+      expect(pageExists(path)).toBe(true);
     });
   }
 });

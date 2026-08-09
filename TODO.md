@@ -179,6 +179,29 @@ As of the 2026-08-08 backlog completion, all eleven modules — members, events,
 
 ---
 
+## Frontend improvement pass — honest gaps logged while building real surfaces
+
+These are real, out-of-scope gaps found while replacing fake surfaces with real
+data (frontend improvement plan, Phase 2). Each was deliberately NOT papered
+over with a stub; the visible UI states the gap instead.
+
+- ☐ **Announcements have no event-targeting field.** The content schema has no
+  column targeting an announcement at an event, and the create-announcement API
+  zod-strips unknown keys. The member event banner (UI-32,
+  `(public)/events/[id]`) reads `metadata.ui.targetEventId` +
+  `metadata.ui.expiresAt`, so it renders nothing until the backoffice gains a
+  write path: one schema field (or a formal metadata slot) plus a form control.
+- ☐ **No donation store.** There is no donations table or API; the membership
+  schema tracks dues only. `/donate` and the member finance donations capability
+  (UI-34) report the gap honestly with alternatives (`DONATION_SCHEMA_GAP` in
+  `src/lib/services/finance/member-donations.ts`). Adding donations needs
+  schema + authorized API + tests, then the capability object flips.
+- ☐ **Stripe test keys absent in this environment.** `PAYMENT_GATEWAY` is unset
+  (`manual` track active). The UI-33 join/renew funnel and the UI-34 pay-now
+  flow are verified end to end on the manual track; the Stripe track is wired
+  through the gateway adapter but not exercised here. Smoke-test it with real
+  test-mode keys before relying on it.
+
 ## Good first issues
 
 - Remove any dead nav links, or point them at real pages, in `navigation-config.tsx`. Verify the current count first: `tests/nav-links.test.ts` only checks that leaf paths resolve to a real page, so a stale count here could be off if a parent-only nav item is involved.

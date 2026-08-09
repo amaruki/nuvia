@@ -120,7 +120,7 @@ export default function PrivacyPolicyPage() {
               Nuvia is open-source software; this policy is the baseline it ships with. Instance
               operators are expected to adapt it to their organization, add their contact details,
               and adjust it to the laws that apply to them. See also the{" "}
-              <Link href="/terms" className="text-primary hover:underline">
+              <Link href="/terms" className="underline underline-offset-4">
                 Terms of Service
               </Link>
               .

@@ -19,7 +19,7 @@ export default function TermsOfServicePage() {
         <div className="space-y-10 pb-24">
           <p className="text-muted-foreground leading-relaxed">
             This site is an instance of{" "}
-            <Link href="/" className="text-primary hover:underline">
+            <Link href="/" className="underline underline-offset-4">
               Nuvia
             </Link>
             , an open-source association management system. It is run by the organization that
@@ -108,7 +108,7 @@ export default function TermsOfServicePage() {
               document is the baseline it ships with; instance operators may adapt it to their
               organization. If you have questions about these terms, contact the organization that
               runs this site. See also the{" "}
-              <Link href="/privacy" className="text-primary hover:underline">
+              <Link href="/privacy" className="underline underline-offset-4">
                 Privacy Policy
               </Link>
               .

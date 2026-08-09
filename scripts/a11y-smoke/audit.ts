@@ -172,7 +172,11 @@ async function assertExpectedContent(
       }) — refusing to audit it.`,
     );
   }
-  const deadline = Date.now() + 20_000;
+  // Generous on purpose: on a cold Turbopack cache the detail page's client
+  // bundle and its API route both compile on first visit, which can take
+  // 30s+ after "load" before the seeded content hydrates in. The guard still
+  // requires the real content to appear before axe scores anything.
+  const deadline = Date.now() + 90_000;
   for (;;) {
     const bodyText = await page.evaluate(() => document.body?.innerText ?? "");
     if (bodyText.includes(expectText)) return;

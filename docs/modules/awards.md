@@ -44,7 +44,7 @@ All routes live under `src/app/api/v1/awards/**` and follow `docs/api/convention
 
 Role coverage: admin holds all `awards:*`; staff holds read/update/manage; corporate/professional/student members hold `awards:read`; plain members hold none.
 
-## Service layer
+## Services
 
 `src/lib/services/award/` (barrel `index.ts`; schemas in `schemas.ts`) — server-only, drizzle, RFC 9457:
 

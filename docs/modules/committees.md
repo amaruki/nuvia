@@ -14,7 +14,7 @@ Committees manages the association's committees and working groups: their charte
 
 - Registry: `MODULE_FLAGS.committees === true` in `config/features.ts` (:52, §13.3 shape). Promotion switched the module on by default; the flag-off "Preview — mock data" marking (`src/components/dashboard/module-preview-banner.tsx`, rendered by the committees layout) returns null on its own once the flag is on — no banner removal code was needed.
 - Path mapping: `/dashboard/organization/committees/**` resolves to the `committees` module via `MODULE_PATH_PREFIXES` in `config/features.ts` (:130).
-- Role gate (separate mechanism, `src/proxy.ts` + `src/lib/navigation-data.ts`): the Organization → Committees section is visible to roles carrying `committees:read`.
+- Role gate (separate mechanism, `src/proxy.ts` + `src/lib/navigation-data/index.ts`): the Organization → Committees section is visible to roles carrying `committees:read`.
 - API authorization is per-action and permission-based (below) — reaching a page through the role gate does not grant any API permission by itself.
 
 ## Schema
@@ -42,7 +42,7 @@ All routes live under `src/app/api/v1/committees/**` and follow `docs/api/conven
 
 GET list supports `page`, `limit` (≤100), `status`, `type`, `authorityLevel` (repeatable comma-separated enum lists; unknown values are dropped), `leadershipRole`, `search` (ilike over display name/purpose), and `memberCountMin`/`memberCountMax`, returning the success envelope with `page`/`limit`/`total`/`totalPages` meta. Charter dates are server-managed: create stamps `approvalDate`/`lastReviewed` and sets `nextReview` one year out; PATCH preserves `approvalDate` and refreshes the review dates. A committee cannot be its own parent (409), and a dangling `parentCommitteeId` is a 400 business-logic problem.
 
-Permission holders among predefined roles (`src/types/role.types.ts`): `superadmin` (all permissions), `admin` (`committees:create/read/update/delete/manage`, :298-302), `staff` (`committees:read/update/manage`, :348-350 — no create/delete), `committee_chair` (`committees:read/update/manage`, :443-445), `member_corporate`/`member_professional`/`member_student` (`committees:read` only, :476/:493/:509). The plain `member` role carries no `committees:*` permission; custom roles may.
+Permission holders among predefined roles (`src/types/role/index.ts`): `superadmin` (all permissions), `admin` (`committees:create/read/update/delete/manage`, :298-302), `staff` (`committees:read/update/manage`, :348-350 — no create/delete), `committee_chair` (`committees:read/update/manage`, :443-445), `member_corporate`/`member_professional`/`member_student` (`committees:read` only, :476/:493/:509). The plain `member` role carries no `committees:*` permission; custom roles may.
 
 ## Services
 
@@ -67,7 +67,7 @@ The hook fetches the list (filters → query params), computes statistics and th
 
 | File                                     | Tests | Covers                                                                                                                                                                                         |
 | ---------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/committees-api/crud.test.ts`      | 9     | RBAC matrix (admin/staff/member), create validation (422), unique-name conflict (409), charter date stamping/preservation, leadership vs member split from `committee_members`, PATCH behavior |
+| `tests/committees-api/`                  | 9     | RBAC matrix (admin/staff/member), create validation (422), unique-name conflict (409), charter date stamping/preservation, leadership vs member split from `committee_members`, PATCH behavior |
 | `tests/committees-api/hierarchy.test.ts` | 2     | Parent/child hierarchy incl. self-parent 409 and dangling parent 400                                                                                                                           |
 | `tests/committees-api/listing.test.ts`   | 2     | List filters with pagination meta                                                                                                                                                              |
 | `tests/committees-api/delete.test.ts`    | 1     | Delete permissions and idempotent 404s                                                                                                                                                         |

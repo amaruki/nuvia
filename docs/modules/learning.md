@@ -13,7 +13,7 @@ Learning & Development manages the association's course catalogue and the certif
 
 - Registry: `MODULE_FLAGS.learning` in `config/features.ts` (:51, §13.3 shape). The D3 commit delivers the schema/API/UI/tests but **does not flip the flag** — the orchestrator flips it post-commit, the same way D1/D2 handled chapters/committees. Until then `ModulePreviewBanner` keeps marking `/dashboard/learning` as preview (it returns null on its own once the flag is on — no banner removal code needed).
 - Path mapping: `/dashboard/learning/**` resolves to the `learning` module via `MODULE_PATH_PREFIXES` in `config/features.ts` (:129).
-- Role gate (separate mechanism, `src/proxy.ts` + `src/lib/navigation-data.ts`): the Learning section is visible to roles carrying `learning:read`.
+- Role gate (separate mechanism, `src/proxy.ts` + `src/lib/navigation-data/index.ts`): the Learning section is visible to roles carrying `learning:read`.
 - API authorization is per-action and permission-based (below) — reaching a page through the role gate does not grant any API permission by itself.
 
 ## Schema
@@ -45,7 +45,7 @@ All routes live under `src/app/api/v1/learning/**` and follow `docs/api/conventi
 
 GET course list supports `page`, `limit` (≤100), `search` (ilike over title/category), `category`, and `level`; GET certificate list supports `page`, `limit`, `search` (ilike over course name/student name/email/verification code), `status`, and `courseId`. Both return the success envelope with `page`/`limit`/`total`/`totalPages` meta. Issuing a certificate (`POST /certificates`) validates the course exists (400 business-logic problem otherwise) and generates a unique verification code shaped `SLUG-YEAR-NNNN` (course-title slug + issue year + random digits, retried on collision); PATCH on a certificate accepts `{ status: "active" | "revoked" }` only.
 
-Permission holders among predefined roles (`src/types/role.types.ts`): `superadmin` (all permissions), `admin` (`learning:create/read/update/delete/manage/approve`, :287-292), `staff` (`learning:read/update/manage`, :342-344 — no create/delete), `member_corporate`/`member_professional`/`member_student` (`learning:read` only, :474/:491/:507). The plain `member` role carries no `learning:*` permission; custom roles may.
+Permission holders among predefined roles (`src/types/role/index.ts`): `superadmin` (all permissions), `admin` (`learning:create/read/update/delete/manage/approve`, :287-292), `staff` (`learning:read/update/manage`, :342-344 — no create/delete), `member_corporate`/`member_professional`/`member_student` (`learning:read` only, :474/:491/:507). The plain `member` role carries no `learning:*` permission; custom roles may.
 
 ## Services
 

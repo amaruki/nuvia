@@ -14,7 +14,7 @@ Workspaces manages the association's committee workspaces — the collaboration 
 
 - Registry: `MODULE_FLAGS.workspaces === true` in `config/features.ts` (§13.3 shape). Promotion switched the module on by default; the flag-off "Preview — mock data" marking (`src/components/dashboard/module-preview-banner.tsx`) returns null on its own once the flag is on — no banner removal code was needed.
 - Path mapping: `/dashboard/organization/workspaces/**` resolves to the `workspaces` module via `MODULE_PATH_PREFIXES` in `config/features.ts`.
-- Role gate (separate mechanism, `src/proxy.ts` + `src/lib/navigation-data.ts`): the Organization → Workspaces section is visible to roles carrying `workspaces:read`.
+- Role gate (separate mechanism, `src/proxy.ts` + `src/lib/navigation-data/index.ts`): the Organization → Workspaces section is visible to roles carrying `workspaces:read`.
 - API authorization is per-action and permission-based (below) — reaching a page through the role gate does not grant any API permission by itself.
 
 ## Schema
@@ -45,7 +45,7 @@ GET list supports `page`, `limit` (≤100), `status`, `type`, `memberRole` (comm
 
 POST validates the full settings block (mirrors the add-workspace form: booleans, `autoArchiveDays` 1–1095, `maxFileSize` 1–1000, non-empty `allowedFileTypes`, at least one `memberPermissions` entry). A non-existent `committeeId` is a 422 validation problem; duplicate `name` is a 409 conflict. PATCH is partial; `committeeId: null` clears the committee link.
 
-Permission holders among predefined roles (`src/types/role.types.ts`): `superadmin` (all permissions), `admin` (`workspaces:create/read/update/delete/manage`), `staff` (`workspaces:read/update/manage` — no create/delete), `member_corporate`/`member_professional`/`member_student` (`workspaces:read` only). The plain `member` role carries no `workspaces:*` permission — not even read; custom roles may.
+Permission holders among predefined roles (`src/types/role/index.ts`): `superadmin` (all permissions), `admin` (`workspaces:create/read/update/delete/manage`), `staff` (`workspaces:read/update/manage` — no create/delete), `member_corporate`/`member_professional`/`member_student` (`workspaces:read` only). The plain `member` role carries no `workspaces:*` permission — not even read; custom roles may.
 
 ## Services
 
@@ -78,7 +78,7 @@ The hook fetches the list (filters → query params), hydrates wire dates per co
 | `tests/workspaces-api/delete.test.ts`      | 2     | Delete permissions and idempotent 404s                                                                     |
 | `tests/workspaces-api/service.test.ts`     | 2     | Service-layer round trip and unknown-id semantics                                                          |
 
-Run: `bun test tests/workspaces-api/` (needs the test Postgres/Redis stack, `compose.test.yml`). Each file is baseline-delta and self-cleaning: every row is `RUN_ID`-isolated and removed in `afterAll`.
+Run: `bun test tests/workspaces-api/` (needs the test Postgres/Redis stack, `compose.yml`). Each file is baseline-delta and self-cleaning: every row is `RUN_ID`-isolated and removed in `afterAll`.
 
 ## Accessibility
 

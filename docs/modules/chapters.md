@@ -39,9 +39,9 @@ All routes live under `src/app/api/v1/chapters/**` and follow `docs/api/conventi
 | `/api/v1/chapters/[id]` | PATCH  | `chapters:update` | Partial update; `parentChapterId: null` clears the parent; self-parenting rejected (422).                                                                                                          |
 | `/api/v1/chapters/[id]` | DELETE | `chapters:delete` | Cascades `chapter_members`; children get `parentChapterId = null`.                                                                                                                                 |
 
-Role coverage: admin holds all `chapters:*`; staff and chapter officers hold read/update/manage; plain members hold none. Validation mirrors `src/components/dashboard/chapters/add-chapter-form.tsx` so form-valid payloads are API-accepted.
+Role coverage: admin holds all `chapters:*`; staff and chapter officers hold read/update/manage; plain members hold none. Validation mirrors `src/components/chapters/add-chapter-form/index.tsx` so form-valid payloads are API-accepted.
 
-## Service layer
+## Services
 
 `src/lib/services/chapter/` — server-only, drizzle, RFC 9457:
 
@@ -52,7 +52,7 @@ Role coverage: admin holds all `chapters:*`; staff and chapter officers hold rea
 
 ## Dashboard UI
 
-Pages under `src/app/dashboard/chapters/` (list, add, `[id]` detail), wired through `src/lib/hooks/use-chapters.ts` — rewritten on `apiFetch` against `/api/v1/chapters`; `mock-chapter-data.ts` was deleted with zero remaining imports. The hook keeps its previous surface (`chapters`, `statistics`, `filters`, `addChapter`, `updateChapter`, `deleteChapter`, `toggleChapterStatus`, …); statistics are now derived from fetched rows. `ModulePreviewBanner` stays in place until the flag flips.
+Pages under `src/app/dashboard/chapters/` (list, add, `[id]` detail), wired through `src/lib/hooks/use-chapters/index.ts` — rewritten on `apiFetch` against `/api/v1/chapters`; `mock-chapter-data.ts` was deleted with zero remaining imports. The hook keeps its previous surface (`chapters`, `statistics`, `filters`, `addChapter`, `updateChapter`, `deleteChapter`, `toggleChapterStatus`, …); statistics are now derived from fetched rows. `ModulePreviewBanner` stays in place until the flag flips.
 
 ## Tests
 

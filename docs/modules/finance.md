@@ -14,7 +14,7 @@ Finance manages the association's dues billing: membership tiers, member subscri
 
 - Registry: `MODULE_FLAGS.finance === true` in `config/features.ts` (§13.3 shape). Promotion switched the module on by default; the flag-off "Preview — mock data" marking (`src/components/dashboard/module-preview-banner.tsx`) returns null on its own once the flag is on — no banner removal code was needed.
 - Path mapping: `/dashboard/finance/**` and `/dashboard/organization/budget` resolve to the `finance` module via `MODULE_PATH_PREFIXES` in `config/features.ts`.
-- Role gate (separate mechanism, `src/proxy.ts` + `src/lib/navigation-data.ts:194-238`): the Finance section is visible to `admin`, `superadmin`, `treasurer`, `staff`; the Reports and Gateways pages additionally exclude `staff`.
+- Role gate (separate mechanism, `src/proxy.ts` + `src/lib/navigation-data/index.ts:194-238`): the Finance section is visible to `admin`, `superadmin`, `treasurer`, `staff`; the Reports and Gateways pages additionally exclude `staff`.
 - API authorization is per-action and permission-based (below) — reaching a page through the role gate does not grant any API permission by itself.
 
 ## Schema
@@ -65,9 +65,9 @@ All routes live under `src/app/api/v1/finance/**` and follow `docs/api/conventio
 | `/api/v1/finance/reports/invoices`            | GET       | `finance:read`   |
 | `/api/v1/finance/gateways`                    | GET       | `finance:read`   |
 
-Permission holders among predefined roles (`src/types/role.types.ts`): `superadmin` (all permissions), `admin` (`finance:create/read/update/delete/manage/approve/export`, :215-221), `treasurer` (`finance:create/read/update/manage/approve/export`, :296-310 — no `finance:delete`). No other predefined role carries a `finance:*` permission; custom roles may.
+Permission holders among predefined roles (`src/types/role/index.ts`): `superadmin` (all permissions), `admin` (`finance:create/read/update/delete/manage/approve/export`, :215-221), `treasurer` (`finance:create/read/update/manage/approve/export`, :296-310 — no `finance:delete`). No other predefined role carries a `finance:*` permission; custom roles may.
 
-## Services and the gateway seam
+## Services
 
 - `src/lib/services/membership-tier.service.ts` — tier CRUD.
 - `src/lib/services/subscription/` — lifecycle engine: create → trialing → active → past_due → renew/pause/resume/cancel → expire, with grace handling and the UNPAID path.
@@ -104,7 +104,7 @@ Six pages under `src/app/dashboard/finance/`, wired to the services above throug
 | `tests/invoice-payment/`        | 39    | invoice issuance, manual payment recording, RFC 9457 error mapping, Stripe adapter (mocked SDK), verified-webhook processing end to end, validation schemas |
 | `tests/finance-dashboard-api/`  | 14    | report queries, dues ledger, invoice listing, gateway description, ledger consistency after void                                                            |
 
-Run: `bun test tests/subscription-lifecycle/ tests/invoice-payment/ tests/finance-dashboard-api/` (needs the test Postgres/Redis stack, `compose.test.yml`).
+Run: `bun test tests/subscription-lifecycle/ tests/invoice-payment/ tests/finance-dashboard-api/` (needs the test Postgres/Redis stack, `compose.yml`).
 
 ## Accessibility
 

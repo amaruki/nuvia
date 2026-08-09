@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { BookOpen, Clock, Filter, Search, Target, Trophy, Zap } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import {
 
 import { useLearningCertificates } from "@/lib/hooks/use-learning-certificates";
 import { useLearningCourses } from "@/lib/hooks/use-learning-courses";
+import { useMyEnrollments } from "@/lib/hooks/use-learning-enrollments";
 import type { UserStat } from "@/types/learning.types";
 import { CourseCard } from "./_components/course-card";
 import { CourseStats } from "./_components/course-stats";
@@ -29,6 +31,14 @@ export default function LearningPage() {
   const { setHeader, clearHeader } = useHeader();
   const { courses, loading, error } = useLearningCourses();
   const { certificates } = useLearningCertificates();
+  const { enrolledCourses, enroll, enrolling } = useMyEnrollments();
+  const [enrollingCourseId, setEnrollingCourseId] = useState<string | null>(null);
+
+  // My enrollment per course — Map for a dynamic runtime collection.
+  const enrollmentByCourseId = useMemo(
+    () => new Map(enrolledCourses.map((entry) => [entry.course.id, entry.enrollment])),
+    [enrolledCourses],
+  );
 
   useEffect(() => {
     setHeader({
@@ -41,14 +51,15 @@ export default function LearningPage() {
     };
   }, [setHeader, clearHeader]);
 
-  // Statistics computed from the fetched data — never invented. Progress is
-  // a neutral 0 until enrollment tracking exists (docs/modules/learning.md).
+  // Statistics computed from the fetched data — never invented. Enrollment
+  // counts come from the real enrollments endpoint (backlog UI-35); hours
+  // learned and streak have no backing data yet, so they stay honest zeros.
   const stats: UserStat[] = useMemo(
     () => [
       {
         label: "Courses in Progress",
         value: String(
-          courses.filter((course) => course.progress > 0 && course.progress < 100).length,
+          enrolledCourses.filter(({ enrollment }) => enrollment.status === "enrolled").length,
         ),
         icon: BookOpen,
       },
@@ -68,7 +79,7 @@ export default function LearningPage() {
         icon: Zap,
       },
     ],
-    [courses, certificates],
+    [enrolledCourses, certificates],
   );
 
   const filteredCourses = courses.filter((course) => {
@@ -77,22 +88,42 @@ export default function LearningPage() {
       course.category.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesDifficulty =
       difficultyFilter === "all" || course.level.toLowerCase() === difficultyFilter.toLowerCase();
+    const enrollment = enrollmentByCourseId.get(course.id);
 
     if (activeTab === "in-progress")
-      return matchesSearch && matchesDifficulty && course.progress > 0 && course.progress < 100;
+      return matchesSearch && matchesDifficulty && enrollment?.status === "enrolled";
     if (activeTab === "completed")
-      return matchesSearch && matchesDifficulty && course.progress === 100;
+      return matchesSearch && matchesDifficulty && enrollment?.status === "completed";
     if (activeTab === "saved") return matchesSearch && matchesDifficulty && false; // Mock saved property
     return matchesSearch && matchesDifficulty;
   });
+
+  const handleEnroll = async (courseId: string) => {
+    setEnrollingCourseId(courseId);
+    try {
+      await enroll(courseId);
+    } catch {
+      // The hook surfaces the error toast; nothing else to do here.
+    } finally {
+      setEnrollingCourseId(null);
+    }
+  };
 
   return (
     <div className="space-y-8 animate-fadeInUp">
       {/* Header Actions */}
       <div className="flex items-center justify-end gap-3">
-        <Button variant="outline" className="gap-2">
-          <Trophy className="h-4 w-4" />
-          My Certificates
+        <Button variant="outline" className="gap-2" asChild>
+          <Link href="/certificates">
+            <Trophy className="h-4 w-4" />
+            My Certificates
+          </Link>
+        </Button>
+        <Button variant="outline" className="gap-2" asChild>
+          <Link href="/dashboard/learning/my-courses">
+            <BookOpen className="h-4 w-4" />
+            My Courses
+          </Link>
         </Button>
         <Button className="gap-2">
           <Target className="h-4 w-4" />
@@ -160,7 +191,13 @@ export default function LearningPage() {
               <TabsContent value="all" className="mt-0 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredCourses.map((course) => (
-                    <CourseCard key={course.id} course={course} />
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      enrollment={enrollmentByCourseId.get(course.id)}
+                      enrolling={enrolling && enrollingCourseId === course.id}
+                      onEnroll={handleEnroll}
+                    />
                   ))}
                   {filteredCourses.length === 0 && (
                     <EmptyState
@@ -174,7 +211,13 @@ export default function LearningPage() {
               <TabsContent value="in-progress" className="mt-0 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredCourses.map((course) => (
-                    <CourseCard key={course.id} course={course} />
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      enrollment={enrollmentByCourseId.get(course.id)}
+                      enrolling={enrolling && enrollingCourseId === course.id}
+                      onEnroll={handleEnroll}
+                    />
                   ))}
                   {filteredCourses.length === 0 && (
                     <EmptyState
@@ -188,7 +231,13 @@ export default function LearningPage() {
               <TabsContent value="completed" className="mt-0 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredCourses.map((course) => (
-                    <CourseCard key={course.id} course={course} />
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      enrollment={enrollmentByCourseId.get(course.id)}
+                      enrolling={enrolling && enrollingCourseId === course.id}
+                      onEnroll={handleEnroll}
+                    />
                   ))}
                   {filteredCourses.length === 0 && (
                     <EmptyState
@@ -202,7 +251,13 @@ export default function LearningPage() {
               <TabsContent value="saved" className="mt-0 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredCourses.map((course) => (
-                    <CourseCard key={course.id} course={course} />
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      enrollment={enrollmentByCourseId.get(course.id)}
+                      enrolling={enrolling && enrollingCourseId === course.id}
+                      onEnroll={handleEnroll}
+                    />
                   ))}
                   {filteredCourses.length === 0 && (
                     <EmptyState

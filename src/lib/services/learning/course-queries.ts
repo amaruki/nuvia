@@ -2,8 +2,10 @@ import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 import { db } from "@/db/client";
 import { course } from "@/db/schema/learning";
 import type { Course, CourseLevel } from "@/types/learning.types";
+import { problems } from "@/lib/http";
 import { toUiCourse } from "./mappers";
 import { UI_TO_DB_LEVEL } from "./types";
+import { LearningServiceError } from "./errors";
 import { paginate, type CourseListFilters, type Paginated } from "./query-helpers";
 
 // ---------------------------------------------------------------------------
@@ -61,4 +63,16 @@ export async function listCourses(filters: CourseListFilters = {}): Promise<Pagi
 export async function getCourse(id: string): Promise<Course | null> {
   const rows = await db.select().from(course).where(eq(course.id, id)).limit(1);
   return rows.length > 0 ? toUiCourse(rows[0]) : null;
+}
+
+/** Throws a 404 LearningServiceError when the course row does not exist. */
+export async function assertCourseExists(courseId: string): Promise<void> {
+  const rows = await db
+    .select({ id: course.id })
+    .from(course)
+    .where(eq(course.id, courseId))
+    .limit(1);
+  if (rows.length === 0) {
+    throw new LearningServiceError(problems.notFound("Course not found"));
+  }
 }

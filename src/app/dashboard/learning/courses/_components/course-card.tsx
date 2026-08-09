@@ -1,16 +1,28 @@
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Clock, Star, Users } from "lucide-react";
-import type { Course } from "@/types/learning.types";
+import type { Course, Enrollment } from "@/types/learning.types";
 
 interface CourseCardProps {
   course: Course;
+  /**
+   * The caller's enrollment in this course, when one exists (backlog UI-35).
+   * Presence drives the progress overlay and the footer action: enrolled
+   * courses link into the lesson view instead of enrolling again.
+   */
+  enrollment?: Enrollment;
+  /** While an enroll mutation is in flight the button shows a pending label. */
+  enrolling?: boolean;
+  onEnroll?: (courseId: string) => void;
 }
 
-export function CourseCard({ course }: CourseCardProps) {
+export function CourseCard({ course, enrollment, enrolling, onEnroll }: CourseCardProps) {
+  const progress = enrollment?.progress ?? 0;
+
   return (
     <Card className="group overflow-hidden card-hover border-border/50 bg-card/50 backdrop-blur-sm flex flex-col h-full">
       <div className="relative">
@@ -42,15 +54,14 @@ export function CourseCard({ course }: CourseCardProps) {
           <div className="absolute inset-0 z-10 bg-gradient-to-t from-background/90 to-transparent opacity-80" />
 
           <div className="absolute bottom-3 left-3 right-3 z-20 flex justify-between items-end">
-            {course.progress > 0 && (
+            {enrollment && (
               <div className="w-full">
                 <div className="flex justify-between text-xs text-secondary-foreground mb-1.5 font-medium">
-                  <span>{course.progress}% Complete</span>
+                  <span>
+                    {enrollment.status === "completed" ? "Completed" : `${progress}% Complete`}
+                  </span>
                 </div>
-                <Progress
-                  value={course.progress}
-                  className="h-1.5 bg-background/30 [&>div]:bg-primary"
-                />
+                <Progress value={progress} className="h-1.5 bg-background/30 [&>div]:bg-primary" />
               </div>
             )}
           </div>
@@ -95,13 +106,23 @@ export function CourseCard({ course }: CourseCardProps) {
             {course.students}
           </div>
         </div>
-        <Button
-          size="sm"
-          variant={course.progress > 0 ? "default" : "outline"}
-          className="h-8 ml-auto"
-        >
-          {course.progress > 0 ? "Continue" : "Start"}
-        </Button>
+        {enrollment ? (
+          <Button size="sm" variant="default" className="h-8 ml-auto" asChild>
+            <Link href={`/dashboard/learning/courses/${course.id}`}>
+              {enrollment.status === "completed" ? "Review" : "Continue"}
+            </Link>
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 ml-auto"
+            disabled={enrolling || !onEnroll}
+            onClick={() => onEnroll?.(course.id)}
+          >
+            {enrolling ? "Enrolling…" : "Enroll"}
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

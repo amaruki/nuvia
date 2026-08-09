@@ -59,7 +59,7 @@ export interface Course {
   duration: string;
   students: number;
   rating: number;
-  /** Per-user progress (0–100). Stays 0 until enrollment tracking exists. */
+  /** Catalog-level progress (0–100). Neutral 0 on catalog DTOs; the real per-member value lives on {@link Enrollment.progress} (backlog UI-35). */
   progress: number;
   image: string;
   /** Tailwind gradient stops for the card overlay, e.g. "from-blue-500 to-indigo-600". */
@@ -99,4 +99,29 @@ export interface Certificate {
   studentName: string;
   studentEmail: string;
   status: CertificateStatus;
+}
+
+/** Enrollment lifecycle (mirrors the `course_enrollment_status` DB enum). */
+export type EnrollmentStatus = "enrolled" | "completed" | "canceled";
+
+/**
+ * A member's enrollment in a course (backlog UI-35). Ring-1: always the
+ * caller's own row — the service layer filters by the session user's id.
+ */
+export interface Enrollment {
+  id: string;
+  courseId: string;
+  status: EnrollmentStatus;
+  /** Honest 0–100 progress from the enrollment row; defaults to 0. */
+  progress: number;
+  /** ISO timestamp of the (most recent) enrollment. */
+  enrolledAt: string;
+  /** ISO timestamp when progress reached 100; null otherwise. */
+  completedAt: string | null;
+}
+
+/** An enrollment joined with its course — the my-courses listing shape. */
+export interface EnrolledCourse {
+  enrollment: Enrollment;
+  course: Course;
 }

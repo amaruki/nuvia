@@ -67,7 +67,8 @@ export function toUiCourse(row: CourseRow): Course {
     duration: row.duration,
     students: row.students,
     rating: row.rating,
-    // Neutral until enrollment tracking exists — never invented.
+    // Neutral on catalog DTOs — real per-member progress lives on the
+    // enrollment DTO (backlog UI-35). Never invented.
     progress: 0,
     image: row.image ?? "",
     color: ui.color ?? DEFAULT_COURSE_COLOR,

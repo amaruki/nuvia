@@ -40,6 +40,23 @@ export const learningSection: readonly NavItemData[] = [
         ],
       },
       {
+        // Member enrollment surface (backlog UI-35): my courses with real
+        // progress, lesson view, enroll/unenroll.
+        id: "my-courses",
+        title: "My Courses",
+        path: "/dashboard/learning/my-courses",
+        roles: [
+          "user",
+          "member",
+          "member_student",
+          "member_professional",
+          "member_corporate",
+          "admin",
+          "superadmin",
+          "staff",
+        ],
+      },
+      {
         id: "certifications",
         title: "Certifications",
         path: "/dashboard/learning/certifications",

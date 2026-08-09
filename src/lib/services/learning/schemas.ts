@@ -81,3 +81,13 @@ export const updateCertificateSchema = z
     message: "At least one certificate field must be provided",
   });
 export type UpdateCertificateInput = z.infer<typeof updateCertificateSchema>;
+
+export const createEnrollmentSchema = z.object({
+  courseId: z.string().uuid(),
+});
+export type CreateEnrollmentInput = z.infer<typeof createEnrollmentSchema>;
+
+export const updateEnrollmentProgressSchema = z.object({
+  progress: z.number().int().min(0).max(100),
+});
+export type UpdateEnrollmentProgressInput = z.infer<typeof updateEnrollmentProgressSchema>;

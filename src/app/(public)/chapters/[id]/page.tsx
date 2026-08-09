@@ -21,6 +21,10 @@ import { logger } from "@/lib/logger";
 import { getPublicChapter, type PublicChapter } from "@/lib/services/chapter";
 import { formatDate } from "@/lib/utils/date-utils";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export const dynamic = "force-dynamic";
 
 const FREQUENCY_LABELS: Record<PublicChapter["meeting"]["frequency"], string> = {

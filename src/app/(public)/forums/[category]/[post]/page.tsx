@@ -10,6 +10,10 @@ import { Separator } from "@/components/ui/separator";
 import { CommentForm } from "../../_components/comment-form";
 import { ReportButton } from "../../_components/report-button";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 /**
  * Thread detail view (UI-27): the PUBLISHED post, its PUBLISHED comments,
  * the comment form, and report controls. Any gate failure (unknown slug,

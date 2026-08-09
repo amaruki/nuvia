@@ -4,6 +4,10 @@ import { format } from "date-fns";
 import { getPublicNewsItem, type NewsType } from "@/lib/services/content/public-news";
 import { Badge } from "@/components/ui/badge";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const TYPE_LABELS: Record<NewsType, string> = {
   ARTICLE: "Article",
   ANNOUNCEMENT: "Announcement",

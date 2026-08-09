@@ -4,6 +4,10 @@ import { notFound } from "next/navigation";
 import { AUDIENCE_META, isDocAudience, listDocsForAudience } from "@/lib/docs";
 import { DocEntryCards } from "../_components/doc-entry-cards";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export const dynamic = "force-dynamic";
 
 interface AudienceParams {

@@ -73,3 +73,13 @@ Log the bug in `TODO.md` with a file:line reference. Do not fix it silently as p
 Check a claim in a doc, a commit message, or a code comment about what the system does or does not do. Verify it against the actual code before you write it. Do not assume the claim is true from an earlier finding.
 
 `TODO.md` has a corrected auth-gate finding. An earlier pass claimed that no server-side auth gate existed. In fact, `src/proxy.ts` (Next.js 16's renamed `middleware.ts`) does gate `/dashboard/**` for authentication. This correction is the concrete example of this mistake. It is also the standard for how to correct a mistake plainly, not quietly.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

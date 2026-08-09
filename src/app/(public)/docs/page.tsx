@@ -3,6 +3,10 @@ import Link from "next/link";
 import { AUDIENCES, AUDIENCE_META, listDocsForAudience } from "@/lib/docs";
 import { DocEntryCards } from "./_components/doc-entry-cards";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 // Rendered at request time from the docs/ tree — D14 keeps the tree the
 // single source of truth, so no build-time snapshot may go stale.
 export const dynamic = "force-dynamic";

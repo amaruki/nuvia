@@ -18,6 +18,10 @@ import { formatDate } from "@/lib/utils/date-utils";
 import { NominationForm } from "./_components/nomination-form";
 import { NominatePageHeader } from "./_components/page-header";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export const dynamic = "force-dynamic";
 
 const NOMINATION_STATUS_LABELS: Record<string, string> = {

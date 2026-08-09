@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { LogIn, Lock, MessageCircle } from "lucide-react";
 import { roleHasPermission } from "@/types/role";
 import { useSession } from "@/lib/client";
+import { useMounted } from "@/lib/hooks/use-mounted";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +37,7 @@ export function CommentForm({ postId, threadPath, isLocked }: CommentFormProps) 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [posted, setPosted] = useState(false);
+  const mounted = useMounted();
 
   if (isLocked) {
     return (
@@ -53,7 +55,7 @@ export function CommentForm({ postId, threadPath, isLocked }: CommentFormProps) 
     );
   }
 
-  if (isPending) {
+  if (!mounted || isPending) {
     return (
       <Card>
         <CardHeader>

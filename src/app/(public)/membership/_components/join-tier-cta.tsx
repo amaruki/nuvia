@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiClientError, apiFetch } from "@/lib/api-client";
 import { useSession } from "@/lib/client";
+import { useMounted } from "@/lib/hooks/use-mounted";
 import type { JoinTrack } from "@/lib/services/membership-join.service";
 import { ApplyDialog } from "./apply-dialog";
 
@@ -42,8 +43,9 @@ export function JoinTierCta({ tierId, tierName, track }: JoinTierCtaProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [applyOpen, setApplyOpen] = useState(false);
+  const mounted = useMounted();
 
-  if (isPending) {
+  if (!mounted || isPending) {
     return <Skeleton className="h-10 w-full" />;
   }
 

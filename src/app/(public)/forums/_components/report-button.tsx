@@ -12,6 +12,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Flag } from "lucide-react";
 import { useSession } from "@/lib/client";
+import { useMounted } from "@/lib/hooks/use-mounted";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -33,17 +34,18 @@ export function ReportButton({ targetType, targetId, targetLabel, threadPath }: 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reported, setReported] = useState(false);
+  const mounted = useMounted();
 
   if (reported) {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <CheckCircle2 className="h-4 w-4 text-green-600" />
-        Report submitted. Thank you — a moderator will review it.
+        <CheckCircle2 className="h-4 w-4 text-success" />
+        Report submitted. Thank you. A moderator will review it.
       </div>
     );
   }
 
-  if (isPending) return null;
+  if (!mounted || isPending) return null;
 
   if (!session?.user) {
     return (

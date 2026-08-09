@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useSession } from "@/lib/client";
+import { useMounted } from "@/lib/hooks/use-mounted";
 import { CheckCircle2, LogIn } from "lucide-react";
 
 interface ApplyFormProps {
@@ -36,8 +37,9 @@ export function ApplyForm({ jobId, slug, applicationDeadline }: ApplyFormProps) 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const mounted = useMounted();
 
-  if (isPending) {
+  if (!mounted || isPending) {
     return (
       <Card>
         <CardHeader>

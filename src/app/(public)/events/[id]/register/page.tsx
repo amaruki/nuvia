@@ -11,6 +11,7 @@ import { ArrowLeft, CheckCircle, AlertCircle, Clock, Hourglass, LogIn } from "lu
 import { Event, EventRegistration } from "@/types/event";
 import { getEventById, registerForEvent } from "@/lib/services/event";
 import { useSession } from "@/lib/client";
+import { useMounted } from "@/lib/hooks/use-mounted";
 import { EventLayout } from "@/components/events/event-layout";
 
 export default function EventRegistrationPage() {
@@ -18,6 +19,7 @@ export default function EventRegistrationPage() {
   const router = useRouter();
   const eventId = params.id as string;
   const { data: session, isPending } = useSession();
+  const mounted = useMounted();
 
   const [event, setEvent] = React.useState<Event | null>(null);
   const [existingRegistration, setExistingRegistration] = React.useState<EventRegistration | null>(
@@ -81,7 +83,7 @@ export default function EventRegistrationPage() {
   // Session gate (same pattern as the jobs apply form): registration writes a
   // NOT NULL user reference, so anonymous visitors are routed to login and
   // returned to this page via redirectTo.
-  if (isPending) {
+  if (!mounted || isPending) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">

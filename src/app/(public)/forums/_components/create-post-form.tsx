@@ -17,9 +17,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Info, LogIn, MessageSquarePlus } from "lucide-react";
+import { CheckCircle2, LogIn, MessageSquarePlus } from "lucide-react";
 import { roleHasPermission } from "@/types/role";
 import { useSession } from "@/lib/client";
+import { useMounted } from "@/lib/hooks/use-mounted";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,8 +50,9 @@ export function CreatePostForm({ categoryId, categorySlug }: CreatePostFormProps
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const mounted = useMounted();
 
-  if (isPending) {
+  if (!mounted || isPending) {
     return (
       <Card>
         <CardHeader>

@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, Eye, HardDrive } from "lucide-react";
 import type { MediaStatisticsCardProps } from "./types";

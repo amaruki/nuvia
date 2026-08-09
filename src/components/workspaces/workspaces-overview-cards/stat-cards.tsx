@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckSquare, FileText, FolderOpen, Users } from "lucide-react";
 import type { WorkspaceStatisticsCardProps } from "./types";

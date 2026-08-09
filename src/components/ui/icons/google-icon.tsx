@@ -1,5 +1,3 @@
-"use client";
-
 interface GoogleIconProps {
   className?: string;
   size?: number | string;

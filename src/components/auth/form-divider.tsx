@@ -1,5 +1,3 @@
-"use client";
-
 interface FormDividerProps {
   text: string;
   className?: string;

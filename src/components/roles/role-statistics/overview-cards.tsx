@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Crown, Shield, Users } from "lucide-react";
 import type { RoleStatisticsSectionProps } from "./types";

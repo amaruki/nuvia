@@ -5,8 +5,6 @@
  * total permissions, and overall access level for the role.
  */
 
-"use client";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface PermissionLegendProps {

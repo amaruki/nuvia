@@ -1,5 +1,3 @@
-"use client";
-
 import type { WorkspacesOverviewCardsProps } from "./types";
 import {
   TaskCompletionCard,

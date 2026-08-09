@@ -1,5 +1,3 @@
-"use client";
-
 interface FormMessageProps {
   type: "success" | "error";
   message: string;

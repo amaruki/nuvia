@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowDownRight, ArrowUpRight, Building2, Calendar, DollarSign, Users } from "lucide-react";
 import type { ChapterStatisticsCardProps } from "./types";

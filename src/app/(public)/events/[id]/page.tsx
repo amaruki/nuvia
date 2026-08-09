@@ -1,6 +1,12 @@
 /**
- * Public event detail — server wrapper (plan item UI-03, organizer credit
- * UI-30, announcement banner UI-32).
+ * Public event detail — server wrapper (plan item UI-03, UI-19 item 2,
+ * organizer credit UI-30, announcement banner UI-32).
+ *
+ * Server-first source of truth: resolves the event detail (with the viewer's
+ * registration state) here, once, and hands it to the client body, which
+ * renders exactly this and never re-fetches. A null result renders the
+ * not-found card through the client body — same content the client fetch
+ * used to show for a missing event.
  *
  * Resolves the signed-in user's id server-side (null for anonymous visitors)
  * and hands it to the client body so the organizer gate compares real ids.
@@ -26,8 +32,8 @@ export default async function EventDetailsPage({ params }: EventDetailsPageProps
   const { id } = await params;
   const user = await getCurrentUser();
 
-  // The credit is supplementary: if the server-side event lookup fails, the
-  // client still renders its own loading/error states through useEvent.
+  // The credit is supplementary: it is only resolved when the event detail
+  // itself resolved, same as the announcement banner below.
   const detail = await getEventDetail(id, user?.id ?? undefined);
   const organizerCredit = detail ? await getOrganizerCredit(detail.event.organizerId) : null;
 
@@ -42,7 +48,11 @@ export default async function EventDetailsPage({ params }: EventDetailsPageProps
   return (
     <>
       <EventAnnouncementBanner announcements={announcements} />
-      <EventDetailClient currentUserId={user?.id ?? null} organizerCredit={organizerCredit} />
+      <EventDetailClient
+        detail={detail}
+        currentUserId={user?.id ?? null}
+        organizerCredit={organizerCredit}
+      />
     </>
   );
 }

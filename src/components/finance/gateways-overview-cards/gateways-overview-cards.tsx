@@ -1,5 +1,3 @@
-"use client";
-
 import type { GatewaysOverviewCardsProps } from "./types";
 import { ActiveGatewaysCard, SuccessRateCard, TotalFeesCard, TotalVolumeCard } from "./stat-cards";
 import { GatewayHealthCard } from "./gateway-health-card";

@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, MessageSquare, Target } from "lucide-react";
 import type { WorkspaceStatisticsCardProps } from "./types";

@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Archive, CheckCircle, Folder, PauseCircle } from "lucide-react";
 import type { CategoryStatisticsCardProps } from "./types";

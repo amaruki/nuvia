@@ -1,5 +1,3 @@
-"use client";
-
 import type { ChaptersOverviewCardsProps } from "./types";
 import {
   TotalChaptersCard,

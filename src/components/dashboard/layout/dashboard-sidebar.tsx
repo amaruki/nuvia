@@ -2,7 +2,6 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { Sidebar, SidebarRail } from "@/components/ui/sidebar";
 import { UserRole } from "@/types/dashboard.types";
 import { useSession } from "@/hooks/use-session";
@@ -58,9 +57,22 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
   // Filter navigation items based on user role. navigation-data.ts names
   // every role a section is for — superadmin included — in each item's
   // role list, so no role needs a special case here; the server-side gate
-  // (src/lib/dashboard-access.ts) reads those same lists.
-  const filteredNavigationItems = navigationConfig.filter((item) => {
-    return !item.roles || item.roles.includes(user?.role as UserRole);
+  // (src/lib/dashboard-access.ts) reads those same lists. Sub-items get the
+  // same treatment (UI-39): without it a role that sees a parent would see
+  // every child link, including ones the proxy bounces it off — the demo
+  // role made this visible, but it was a latent bug for every role (e.g. an
+  // organizer seeing admin-only learning entries).
+  const userRole = user?.role as UserRole;
+  const filteredNavigationItems = navigationConfig.flatMap((item) => {
+    if (item.roles && !item.roles.includes(userRole)) return [];
+    if (!item.subItems) return [item];
+    const visibleSubItems = item.subItems.filter(
+      (subItem) => !subItem.roles || subItem.roles.includes(userRole),
+    );
+    // A parent whose children are all gated away has nothing to offer —
+    // hide the section instead of rendering an empty popover.
+    if (visibleSubItems.length === 0) return [];
+    return [{ ...item, subItems: visibleSubItems }];
   });
 
   // Group items by category

@@ -168,3 +168,12 @@ function loadEnv(): Env {
 }
 
 export const env = loadEnv();
+
+/**
+ * Demo-mode flag (UI-39). Read lazily — NOT part of the zod schema above —
+ * so tests and the daily reset job can toggle it per call, and a missing
+ * DEMO_MODE simply means "not a demo instance" instead of a boot failure.
+ */
+export function isDemoMode(): boolean {
+  return process.env.DEMO_MODE === "true";
+}

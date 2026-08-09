@@ -22,6 +22,7 @@ export const dashboardOverviewSection: readonly NavItemData[] = [
       "treasurer",
       "admin",
       "superadmin",
+      "demo",
     ],
   },
   // Member home hub (UI-31): own membership, registrations, applications,
@@ -46,6 +47,7 @@ export const dashboardOverviewSection: readonly NavItemData[] = [
       "treasurer",
       "admin",
       "superadmin",
+      "demo",
     ],
   },
 ] as const;

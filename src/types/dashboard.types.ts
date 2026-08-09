@@ -15,7 +15,8 @@ export type UserRole =
   | "member_student" // Student member tier
   | "member" // Basic member tier
   | "moderator" // Content moderation
-  | "user"; // Basic registered user
+  | "user" // Basic registered user
+  | "demo"; // Disposable demo-instance visitor (UI-39) — custom role, intentionally NOT in USER_ROLES
 
 // Export role constants for re-use
 export const USER_ROLES = [
@@ -37,7 +38,7 @@ export const USER_ROLES = [
 
 // Utility function to check if role is predefined
 export function isPredefinedRole(role: string): role is UserRole {
-  return USER_ROLES.includes(role as UserRole);
+  return (USER_ROLES as readonly string[]).includes(role);
 }
 
 // Role display information
@@ -147,6 +148,13 @@ export const ROLE_DISPLAY_INFO: Record<
     description: "Basic registered user access",
     color: "zinc",
     icon: "user",
+    category: "basic",
+  },
+  demo: {
+    name: "Demo Visitor",
+    description: "Read-only visitor on a demo instance (UI-39); data resets daily",
+    color: "teal",
+    icon: "play",
     category: "basic",
   },
 };

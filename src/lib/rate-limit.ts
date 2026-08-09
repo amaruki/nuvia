@@ -42,6 +42,11 @@ export const RATE_LIMITS = {
   // calls bypass better-auth's own HTTP-layer limiter (ADR-0003's reason
   // for this file existing), so it gets its own bucket like the rest.
   verifyEmail: { windowSeconds: 15 * 60, max: 10 },
+  // 5 / 15 minutes — the disposable demo account's login (UI-39). One
+  // shared credential for every visitor makes this endpoint a brute-force
+  // magnet, so it gets the same strict bucket as the real login instead of
+  // riding the generic /api/** backstop.
+  demoLogin: { windowSeconds: 15 * 60, max: 5 },
   // 100 / 15 minutes — the generic /api/** backstop proxy.ts applies to
   // everything else (matches the pre-migration API config).
   api: { windowSeconds: 15 * 60, max: 100 },

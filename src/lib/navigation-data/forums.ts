@@ -22,6 +22,7 @@ export const forumSection: readonly NavItemData[] = [
       "treasurer",
       "admin",
       "superadmin",
+      "demo",
     ],
     subItems: [
       {
@@ -47,6 +48,7 @@ export const forumSection: readonly NavItemData[] = [
           "treasurer",
           "admin",
           "superadmin",
+          "demo",
         ],
       },
       {

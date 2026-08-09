@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { GITHUB_URL, LIVE_MODULES, MEMBERS, REGISTRY_MODULE_COUNT, STACK } from "./landing-data";
+import { isDemoMode } from "@/lib/env";
 
 export function HeroSection() {
   return (
@@ -63,7 +64,18 @@ export function HeroSection() {
                 View source
               </Link>
             </Button>
+            {isDemoMode() && (
+              <Button size="lg" variant="secondary" asChild>
+                <Link href="/auth/login">Explore the demo</Link>
+              </Button>
+            )}
           </div>
+          {isDemoMode() && (
+            <p className="landing-rise mt-3 text-sm text-muted-foreground">
+              The demo is a shared instance seeded with sample data. It resets daily, so try
+              anything without worry.
+            </p>
+          )}
           <div
             className="landing-rise mt-10 flex flex-wrap gap-x-5 gap-y-2 border-t border-border/60 pt-5 font-mono text-xs text-muted-foreground"
             style={{ animationDelay: "240ms" }}

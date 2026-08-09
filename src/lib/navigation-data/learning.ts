@@ -22,6 +22,7 @@ export const learningSection: readonly NavItemData[] = [
       "treasurer",
       "admin",
       "superadmin",
+      "demo",
     ],
     subItems: [
       {
@@ -37,6 +38,7 @@ export const learningSection: readonly NavItemData[] = [
           "admin",
           "superadmin",
           "staff",
+          "demo",
         ],
       },
       {
@@ -54,6 +56,7 @@ export const learningSection: readonly NavItemData[] = [
           "admin",
           "superadmin",
           "staff",
+          "demo",
         ],
       },
       {
@@ -69,6 +72,7 @@ export const learningSection: readonly NavItemData[] = [
           "admin",
           "superadmin",
           "staff",
+          "demo",
         ],
       },
       {

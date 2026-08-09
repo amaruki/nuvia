@@ -16,6 +16,7 @@ export const awardsSection: readonly NavItemData[] = [
       "admin",
       "superadmin",
       "staff",
+      "demo",
     ],
     subItems: [
       {
@@ -46,6 +47,7 @@ export const awardsSection: readonly NavItemData[] = [
           "admin",
           "superadmin",
           "staff",
+          "demo",
         ],
       },
     ] as const,

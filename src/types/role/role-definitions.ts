@@ -31,7 +31,8 @@ export type UserRole =
   | "member_student" // Student member tier
   | "member" // Basic member tier
   | "moderator" // Content moderation
-  | "user"; // Basic registered user
+  | "user" // Basic registered user
+  | "demo"; // Disposable demo-instance visitor (UI-39); custom role, not in PREDEFINED_ROLES
 
 export type PredefinedRole = UserRole;
 export type Role = PredefinedRole | string; // Allow custom roles

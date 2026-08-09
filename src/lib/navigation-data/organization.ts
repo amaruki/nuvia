@@ -7,19 +7,19 @@ export const organizationSection: readonly NavItemData[] = [
     title: "Organization",
     path: "/dashboard/organization",
     category: "main",
-    roles: ["admin", "superadmin", "chapter_president", "chapter_admin", "committee_chair"],
+    roles: ["admin", "superadmin", "chapter_president", "chapter_admin", "committee_chair", "demo"],
     subItems: [
       {
         id: "chapters",
         title: "Chapters",
         path: "/dashboard/organization/chapters",
-        roles: ["admin", "superadmin", "chapter_president", "chapter_admin"],
+        roles: ["admin", "superadmin", "chapter_president", "chapter_admin", "demo"],
       },
       {
         id: "committees",
         title: "Committees",
         path: "/dashboard/organization/committees",
-        roles: ["admin", "superadmin", "chapter_president", "committee_chair"],
+        roles: ["admin", "superadmin", "chapter_president", "committee_chair", "demo"],
       },
       {
         id: "committee-workspaces",

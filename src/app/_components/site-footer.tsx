@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { FOOTER_LINK_CLASS, GITHUB_URL, LIVE_MODULES } from "./landing-data";
+import { isDemoMode } from "@/lib/env";
 
 export function SiteFooter() {
   return (
@@ -27,6 +28,11 @@ export function SiteFooter() {
               <span aria-hidden="true" className="size-1.5 rounded-full bg-primary" />
               MIT licensed · Pre-1.0
             </p>
+            {isDemoMode() && (
+              <p className="mt-4 max-w-xs rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
+                Demo instance. All data here is sample content and resets daily.
+              </p>
+            )}
           </div>
 
           <nav aria-label="Explore">

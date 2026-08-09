@@ -7,7 +7,7 @@ export const contentSection: readonly NavItemData[] = [
     title: "Content Management",
     path: "/dashboard/content",
     category: "main",
-    roles: ["admin", "superadmin", "staff", "moderator"],
+    roles: ["admin", "superadmin", "staff", "moderator", "demo"],
     subItems: [
       {
         id: "publications",
@@ -19,13 +19,13 @@ export const contentSection: readonly NavItemData[] = [
         id: "articles-news",
         title: "Articles & News",
         path: "/dashboard/content/articles",
-        roles: ["admin", "superadmin", "staff", "moderator"],
+        roles: ["admin", "superadmin", "staff", "moderator", "demo"],
       },
       {
         id: "announcements",
         title: "Announcements",
         path: "/dashboard/content/announcements",
-        roles: ["admin", "superadmin", "staff", "chapter_admin", "committee_chair"],
+        roles: ["admin", "superadmin", "staff", "chapter_admin", "committee_chair", "demo"],
       },
       {
         id: "categories-tags",

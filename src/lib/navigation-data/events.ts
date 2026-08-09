@@ -12,6 +12,7 @@ export const eventSection: readonly NavItemData[] = [
     roles: [
       "admin",
       "superadmin",
+      "demo",
       "staff",
       "organizer",
       "committee_chair",
@@ -38,6 +39,7 @@ export const eventSection: readonly NavItemData[] = [
           "treasurer",
           "admin",
           "superadmin",
+          "demo",
         ],
       },
       {

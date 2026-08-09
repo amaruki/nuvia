@@ -16,6 +16,7 @@ export const jobBoardSection: readonly NavItemData[] = [
       "admin",
       "superadmin",
       "staff",
+      "demo",
     ],
   },
 ] as const;

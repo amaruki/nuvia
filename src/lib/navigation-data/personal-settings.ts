@@ -22,6 +22,7 @@ export const personalSettingsSection: readonly NavItemData[] = [
       "treasurer",
       "admin",
       "superadmin",
+      "demo",
     ],
     subItems: [
       {
@@ -43,6 +44,7 @@ export const personalSettingsSection: readonly NavItemData[] = [
           "treasurer",
           "admin",
           "superadmin",
+          "demo",
         ],
       },
       {
@@ -64,6 +66,7 @@ export const personalSettingsSection: readonly NavItemData[] = [
           "treasurer",
           "admin",
           "superadmin",
+          "demo",
         ],
       },
     ] as const,

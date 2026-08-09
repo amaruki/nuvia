@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import LoadingSkeleton from "@/components/ui/loading-skeleton";
+import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 

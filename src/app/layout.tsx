@@ -6,10 +6,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { THEME_IDS } from "@/config/themes";
 import "./globals.css";
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
-
 const fontSans = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-sans",

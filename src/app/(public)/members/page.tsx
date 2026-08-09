@@ -18,10 +18,6 @@ import { MemberCard } from "./_components/member-card";
 import { MemberPagination } from "./_components/member-pagination";
 import { MemberSearch } from "./_components/member-search";
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
-
 export const metadata: Metadata = {
   title: "Member Directory",
   description: "Members who chose to appear in the public directory.",

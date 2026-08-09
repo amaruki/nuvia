@@ -36,10 +36,6 @@ import { FinanceHeader } from "./_components/finance-header";
 import { PayNowButton } from "./_components/pay-now-button";
 import { formatDate, formatMoney } from "./_components/format";
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
-
 export const dynamic = "force-dynamic";
 
 const STATUS_META: Record<

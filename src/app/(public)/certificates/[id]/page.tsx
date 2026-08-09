@@ -16,10 +16,6 @@ import { getCurrentUser } from "@/lib/auth/utils/session";
 import { getCertificateForStudent } from "@/lib/services/learning/certificate-queries";
 import { formatDate } from "@/lib/utils/date-utils";
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
-
 export const dynamic = "force-dynamic";
 
 interface CertificateDetailPageProps {

@@ -10,8 +10,9 @@
  *
  * To add a theme:
  * 1. Add an entry below. The id becomes the data-theme attribute value.
- * 2. Add a palette block in src/app/globals.css that overrides every token
- *    from the :root block:
+ * 2. Add a palette block in src/app/globals.css that overrides
+ *    every color and shadow token from the :root block. Theme-independent
+ *    constants (--font-*, --radius, --spacing, --tracking-normal) stay inherited:
  *      :root[data-theme="ocean"], [data-theme="ocean"] { --background: ...; }
  * 3. If the theme is a dark palette, also append its selector to the
  *    @custom-variant dark line at the top of globals.css so dark: utilities

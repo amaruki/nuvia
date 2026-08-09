@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
+
+import { APP_THEMES } from "@/config/themes";
 import {
   HelpCircle,
   Layout,
@@ -55,14 +57,16 @@ export function QuickSettingsMenu() {
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
-              <DropdownMenuRadioItem value="light">
-                <Sun className="mr-2 h-4 w-4" />
-                Light
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="dark">
-                <Moon className="mr-2 h-4 w-4" />
-                Dark
-              </DropdownMenuRadioItem>
+              {APP_THEMES.map((option) => (
+                <DropdownMenuRadioItem key={option.id} value={option.id}>
+                  {option.dark ? (
+                    <Moon className="mr-2 h-4 w-4" />
+                  ) : (
+                    <Sun className="mr-2 h-4 w-4" />
+                  )}
+                  {option.label}
+                </DropdownMenuRadioItem>
+              ))}
               <DropdownMenuRadioItem value="system">
                 <Monitor className="mr-2 h-4 w-4" />
                 System

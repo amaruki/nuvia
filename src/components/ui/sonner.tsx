@@ -10,12 +10,18 @@ import {
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
+import { isDarkTheme } from "@/config/themes";
+
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme();
+  // sonner only understands light, dark, and system. Map registered theme ids
+  // through the registry; keep system passthrough.
+  const toasterTheme: ToasterProps["theme"] =
+    theme === "system" ? "system" : isDarkTheme(theme) ? "dark" : "light";
 
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+      theme={toasterTheme}
       className="toaster group"
       icons={{
         success: <CircleCheckIcon className="size-4" />,

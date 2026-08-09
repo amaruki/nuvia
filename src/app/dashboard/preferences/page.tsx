@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useTheme } from "next-themes";
+
+import { APP_THEMES } from "@/config/themes";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -30,18 +32,12 @@ export default function PreferencesPage() {
   }
 
   const themeOptions = [
-    {
-      id: "light",
-      label: "Light",
-      icon: Sun,
-      description: "Clean and bright interface",
-    },
-    {
-      id: "dark",
-      label: "Dark",
-      icon: Moon,
-      description: "Easy on the eyes in low light",
-    },
+    ...APP_THEMES.map((option) => ({
+      id: option.id,
+      label: option.label,
+      icon: option.dark ? Moon : Sun,
+      description: option.description ?? "",
+    })),
     {
       id: "system",
       label: "System",

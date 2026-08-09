@@ -4,8 +4,10 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
+import { PRIMARY_DARK_THEME_ID, PRIMARY_LIGHT_THEME_ID, isDarkTheme } from "@/config/themes";
+
 export function DarkModeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -25,8 +27,8 @@ export function DarkModeToggle() {
     );
   }
 
-  const isDark = theme === "dark";
-  const toggleTheme = () => setTheme(isDark ? "light" : "dark");
+  const isDark = isDarkTheme(resolvedTheme);
+  const toggleTheme = () => setTheme(isDark ? PRIMARY_LIGHT_THEME_ID : PRIMARY_DARK_THEME_ID);
 
   return (
     <button

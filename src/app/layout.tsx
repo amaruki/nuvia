@@ -1,18 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Instrument_Sans, Libre_Baskerville, IBM_Plex_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { THEME_IDS } from "@/config/themes";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fontSans = Instrument_Sans({
   subsets: ["latin"],
+  variable: "--font-sans",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const fontSerif = Libre_Baskerville({
   subsets: ["latin"],
+  variable: "--font-serif",
+});
+
+const fontMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -31,7 +38,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}
+      >
         <QueryProvider>
           <ThemeProvider
             enableSystem={true}
@@ -39,6 +48,7 @@ export default function RootLayout({
             attribute="data-theme"
             storageKey="theme"
             disableTransitionOnChange
+            themes={THEME_IDS}
           >
             {children}
             <Toaster position="top-center" closeButton duration={5000} />

@@ -46,7 +46,10 @@ export const membershipSection: readonly NavItemData[] = [
         roles: ["admin", "superadmin", "staff"],
       },
       {
-        id: "member-analytics",
+        // UI-22: id was "member-analytics", colliding with analytics.ts;
+        // navigation-config keyed icons and group dedupe by id, so the
+        // memberships copy gets its own id. Path stays stable.
+        id: "membership-analytics",
         title: "Member Analytics",
         path: "/dashboard/memberships/analytics",
         roles: ["admin", "superadmin", "staff", "chapter_admin", "chapter_president"],

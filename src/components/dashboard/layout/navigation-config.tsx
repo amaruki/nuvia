@@ -72,6 +72,8 @@ const icons: Record<string, React.ReactNode> = {
   "membership-applications": <UserPlusIcon className="h-4 w-4" />,
   "membership-renewals": <RefreshCw className="h-4 w-4" />,
   "member-analytics": <BarChart3 className="h-4 w-4" />,
+  // UI-22: renamed from "member-analytics" in memberships.ts to dedupe the id.
+  "membership-analytics": <BarChart3 className="h-4 w-4" />,
   events: <Calendar className="h-4 w-4" />,
   "event-calendar": <CalendarCheck className="h-4 w-4" />,
   "event-registrations": <Users className="h-4 w-4" />,

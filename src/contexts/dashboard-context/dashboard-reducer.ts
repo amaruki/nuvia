@@ -28,18 +28,6 @@ export function dashboardReducer(state: DashboardState, action: DashboardAction)
         notifications: state.notifications.map((notif) => ({ ...notif, read: true })),
       };
 
-    case "TOGGLE_SIDEBAR":
-      return {
-        ...state,
-        sidebarCollapsed: !state.sidebarCollapsed,
-      };
-
-    case "SET_THEME":
-      return {
-        ...state,
-        theme: action.payload,
-      };
-
     case "SET_HEADER":
       return {
         ...state,
@@ -59,7 +47,5 @@ export function dashboardReducer(state: DashboardState, action: DashboardAction)
 
 export const initialState: DashboardState = {
   notifications: [],
-  sidebarCollapsed: false,
-  theme: "system",
   header: {},
 };

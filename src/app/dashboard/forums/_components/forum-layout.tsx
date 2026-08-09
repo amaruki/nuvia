@@ -36,7 +36,7 @@ export function ForumLayout({
   total,
   showTabs = true,
 }: ForumLayoutProps) {
-  const { setHeader } = useHeader();
+  const { setHeader, clearHeader } = useHeader();
   const pathname = usePathname();
 
   React.useEffect(() => {
@@ -44,7 +44,12 @@ export function ForumLayout({
       title,
       description,
     });
-  }, [setHeader, title, description]);
+    // UI-22: clear on unmount so the forums title never leaks onto pages
+    // that don't set their own header (pattern from users/directory/page.tsx).
+    return () => {
+      clearHeader();
+    };
+  }, [setHeader, clearHeader, title, description]);
 
   // Tab counts come from the real forum API (react-query dedupes the
   // queries across pages). Undefined while loading — the badge hides.

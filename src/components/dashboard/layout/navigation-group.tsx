@@ -2,14 +2,13 @@
 
 import React from "react";
 import {
-  Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
 } from "@/components/ui/sidebar";
-import { NavigationItem } from "./navigation-config";
+import { navigationCategories, NavigationItem } from "./navigation-config";
 import { NavigationItemComponent } from "./navigation-item";
 import { cn } from "@/lib/utils";
 
@@ -49,20 +48,33 @@ interface NavigationRendererProps {
   isActive: (path: string) => boolean;
 }
 
+/**
+ * Render order for known categories. Everything present in the data
+ * renders: this list used to hardcode `main` and `admin`, which silently
+ * discarded the whole `personal` category (profile, preferences) from the
+ * sidebar (UI-22). Unknown keys still render after the known ones so new
+ * categories in navigation-data land in the nav instead of vanishing.
+ */
+const CATEGORY_ORDER: readonly string[] = ["main", "personal", "admin"];
+
 export function NavigationRenderer({ navigationGroups, isActive }: NavigationRendererProps) {
-  const categories = [
-    { key: "main", title: "Main Navigation" },
-    { key: "admin", title: "Administration" },
-  ] as const;
+  const categoryKeys = [
+    ...CATEGORY_ORDER.filter((key) => navigationGroups[key]),
+    ...Object.keys(navigationGroups)
+      .filter((key) => !CATEGORY_ORDER.includes(key))
+      .sort(),
+  ];
 
   return (
     <SidebarContent>
-      {categories.map(({ key, title }) => (
+      {categoryKeys.map((categoryKey) => (
         <NavigationGroup
-          key={key}
-          category={key}
-          title={title}
-          items={navigationGroups[key] || []}
+          key={categoryKey}
+          category={categoryKey}
+          title={
+            navigationCategories[categoryKey as keyof typeof navigationCategories] ?? categoryKey
+          }
+          items={navigationGroups[categoryKey] ?? []}
           isActive={isActive}
         />
       ))}

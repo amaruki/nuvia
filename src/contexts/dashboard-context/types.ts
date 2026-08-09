@@ -17,10 +17,6 @@ export interface DashboardState {
   // Real-time data
   notifications: DashboardNotification[];
 
-  // UI State
-  sidebarCollapsed: boolean;
-  theme: "light" | "dark" | "system";
-
   // Header state
   header: {
     title?: string;
@@ -34,7 +30,5 @@ export type DashboardAction =
   | { type: "ADD_NOTIFICATION"; payload: DashboardNotification }
   | { type: "MARK_NOTIFICATION_READ"; payload: string }
   | { type: "MARK_ALL_NOTIFICATIONS_READ" }
-  | { type: "TOGGLE_SIDEBAR" }
-  | { type: "SET_THEME"; payload: DashboardState["theme"] }
   | { type: "SET_HEADER"; payload: DashboardState["header"] }
   | { type: "CLEAR_HEADER" };

@@ -2,8 +2,20 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Sidebar, SidebarRail } from "@/components/ui/sidebar";
-import { UserRole } from "@/types/dashboard.types";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuSkeleton,
+  SidebarRail,
+} from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 import { useSession } from "@/hooks/use-session";
 
 // Modular components
@@ -16,9 +28,93 @@ interface DashboardSidebarProps {
   readonly className?: string;
 }
 
+/**
+ * Role filter that answers the same question the server gate answers.
+ * dashboard-access.ts flattens every nav level and matches longest path
+ * first, so it decides reachability per URL, not per top-level section.
+ * Filtering only the top level used to hide whole sections whose children
+ * a role could still reach: a member can load /dashboard/events/calendar
+ * (the calendar child names member roles) even though /dashboard/events
+ * itself is staff-only, yet the Events section never rendered for them.
+ * Instead of re-deriving that logic, ask the gate's own predicate for
+ * every item: a section stays visible when the role can reach its own URL
+ * or any descendant URL, and children the role cannot reach are dropped.
+ * A parent kept only for its children's sake renders as a collapsible
+ * trigger (never a link — see navigation-item.tsx), so showing it does
+ * not advertise the parent URL the gate denies.
+ */
+export function filterNavigationByRole(
+  items: readonly NavigationItem[],
+  role: string | null | undefined,
+): NavigationItem[] {
+  return items.flatMap((item) => {
+    const visibleChildren = item.subItems ? filterNavigationByRole(item.subItems, role) : undefined;
+    const selfReachable = isRoleAllowedForPath(item.path, role);
+    if (!selfReachable && (!visibleChildren || visibleChildren.length === 0)) {
+      return [];
+    }
+    return [
+      {
+        ...item,
+        // An empty child list collapses back to a plain row: the parent
+        // URL itself is reachable, so the link form is the honest one.
+        subItems: visibleChildren && visibleChildren.length > 0 ? visibleChildren : undefined,
+      },
+    ];
+  });
+}
+
+/** Row count of the pending-session placeholder; cosmetic only. */
+const SKELETON_ROW_COUNT = 8;
+
+/**
+ * Placeholder shell while the session is still resolving. Rendering the
+ * real nav with an unknown role filtered every role-gated item out (the
+ * old `user?.role as UserRole` cast), flashing an empty sidebar for a
+ * moment before the session landed. Skeleton rows hold the space instead
+ * (UI-22).
+ */
+export function DashboardSidebarSkeleton({ className }: DashboardSidebarProps) {
+  return (
+    <Sidebar collapsible="icon" className={className}>
+      <SidebarHeaderComponent />
+      <SidebarContent role="status" aria-label="Loading navigation">
+        <SidebarGroup>
+          <SidebarGroupLabel>
+            <Skeleton className="h-3 w-24" />
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {Array.from({ length: SKELETON_ROW_COUNT }).map((_, index) => (
+                <SidebarMenuItem key={index}>
+                  <SidebarMenuSkeleton showIcon />
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarRail />
+      <SidebarFooter className="p-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuSkeleton showIcon className="h-12" />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
+
 export function DashboardSidebar({ className }: DashboardSidebarProps) {
   const pathname = usePathname();
   const { user } = useSession();
+
+  // Session still resolving (or no user yet): render the skeleton instead
+  // of role-filtering against an unknown role (UI-22).
+  if (!user) {
+    return <DashboardSidebarSkeleton className={className} />;
+  }
 
   // Active path detection
   const isPathActive = (path: string): boolean => {
@@ -54,26 +150,8 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     return false;
   };
 
-  // Filter navigation items based on user role. navigation-data.ts names
-  // every role a section is for — superadmin included — in each item's
-  // role list, so no role needs a special case here; the server-side gate
-  // (src/lib/dashboard-access.ts) reads those same lists. Sub-items get the
-  // same treatment (UI-39): without it a role that sees a parent would see
-  // every child link, including ones the proxy bounces it off — the demo
-  // role made this visible, but it was a latent bug for every role (e.g. an
-  // organizer seeing admin-only learning entries).
-  const userRole = user?.role as UserRole;
-  const filteredNavigationItems = navigationConfig.flatMap((item) => {
-    if (item.roles && !item.roles.includes(userRole)) return [];
-    if (!item.subItems) return [item];
-    const visibleSubItems = item.subItems.filter(
-      (subItem) => !subItem.roles || subItem.roles.includes(userRole),
-    );
-    // A parent whose children are all gated away has nothing to offer —
-    // hide the section instead of rendering an empty popover.
-    if (visibleSubItems.length === 0) return [];
-    return [{ ...item, subItems: visibleSubItems }];
-  });
+  // Role filter mirroring the server gate; see filterNavigationByRole.
+  const filteredNavigationItems = filterNavigationByRole(navigationConfig, user.role);
 
   // Group items by category
   const navigationGroups = filteredNavigationItems.reduce(

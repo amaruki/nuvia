@@ -68,6 +68,18 @@ export const updateAwardNominationSchema = z
     message: "At least one field must be provided",
   });
 
+/**
+ * Member-facing nomination (backlog UI-36): only the program and the
+ * nominee. Nominator identity and review status are forced server-side.
+ */
+export const submitMemberNominationSchema = z.object({
+  programId: z.uuid(),
+  nomineeName: z.string().min(2).max(120),
+  nomineeEmail: z.string().email(),
+  statement: z.string().max(5000).optional(),
+});
+export type SubmitMemberNominationInput = z.infer<typeof submitMemberNominationSchema>;
+
 export type CreateAwardProgramInput = z.infer<typeof createAwardProgramSchema>;
 export type UpdateAwardProgramInput = z.infer<typeof updateAwardProgramSchema>;
 export type CreateAwardNominationInput = z.infer<typeof createAwardNominationSchema>;

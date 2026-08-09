@@ -12,12 +12,14 @@ export {
   createAwardNominationSchema,
   createAwardProgramSchema,
   updateAwardNominationSchema,
+  submitMemberNominationSchema,
   updateAwardProgramSchema,
 } from "./schemas";
 export type {
   CreateAwardNominationInput,
   CreateAwardProgramInput,
   UpdateAwardNominationInput,
+  SubmitMemberNominationInput,
   UpdateAwardProgramInput,
 } from "./schemas";
 export type {
@@ -33,3 +35,9 @@ export {
   deleteAwardNomination,
   updateAwardNomination,
 } from "./nomination-mutations";
+export {
+  listOpenAwardPrograms,
+  listOwnNominations,
+  submitMemberNomination,
+} from "./member-nominations";
+export type { OpenAwardProgram } from "./member-nominations";

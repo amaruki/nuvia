@@ -25,9 +25,18 @@ export const awardsSection: readonly NavItemData[] = [
         roles: ["admin", "superadmin", "staff", "committee_chair"],
       },
       {
+        // Admin review queue — gating fix (backlog UI-36): members used to
+        // see this child, but the page behind it requires awards:read and
+        // bounced them. Members get the nomination surface below instead.
         id: "award-nominations",
-        title: "Nominations",
+        title: "Review Nominations",
         path: "/dashboard/awards/nominations",
+        roles: ["admin", "superadmin", "staff", "committee_chair"],
+      },
+      {
+        id: "award-nominate",
+        title: "Nominate",
+        path: "/dashboard/awards/nominate",
         roles: [
           "user",
           "member",

@@ -125,6 +125,13 @@ export const changePasswordSchema = z
     path: ["newPassword"],
   });
 
+// Delete account confirmation schema — the password proves intent to
+// DELETE /api/v1/auth/delete-account (better-auth accepts a fresh session
+// in lieu of a password, but the UI always asks for one).
+export const deleteAccountSchema = z.object({
+  password: z.string().min(1, "Enter your password to confirm deletion"),
+});
+
 // Device info validation schema
 export const deviceInfoSchema = z.object({
   deviceId: z.string().min(1, "Device ID is required"),
@@ -166,6 +173,7 @@ export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
 export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+export type DeleteAccountFormData = z.infer<typeof deleteAccountSchema>;
 export type DeviceInfoFormData = z.infer<typeof deviceInfoSchema>;
 export type LoginActivityInfoFormData = z.infer<typeof loginActivityInfoSchema>;
 export type OAuthProfileFormData = z.infer<typeof oAuthProfileSchema>;

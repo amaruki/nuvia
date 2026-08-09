@@ -5,9 +5,9 @@ interface SettingsLayoutProps {
 }
 
 /**
- * Settings section shell. Deliberately reads nothing from the database so
- * the non-general settings stubs stay statically prerenderable; pages that
- * need the organization row read it themselves (and opt into force-dynamic).
+ * Settings section shell. Deliberately reads nothing from the database;
+ * each sub-page reads its own data (session, organization, invoices) and
+ * opts into force-dynamic itself, so the shell stays statically prerenderable.
  */
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   return (

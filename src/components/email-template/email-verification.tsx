@@ -11,6 +11,7 @@ import {
 } from "@react-email/components";
 import { Tailwind } from "@react-email/tailwind";
 import { EmailFooter } from "./shared-footer";
+import { EMAIL_TAILWIND_CONFIG } from "./email-theme";
 
 interface EmailVerificationProps {
   verificationUrl: string;
@@ -28,18 +29,18 @@ export function EmailVerificationEmail({
   return (
     <Html>
       <Preview>Verify your email address</Preview>
-      <Tailwind>
+      <Tailwind config={EMAIL_TAILWIND_CONFIG}>
         {/* Head must sit inside Tailwind so media-query/hover classes can
             be emitted into a <style> tag; outside, rendering throws. */}
         <Head />
-        <Body className="bg-gray-50 font-sans">
-          <Container className="max-w-lg mx-auto bg-white rounded-lg shadow-lg">
+        <Body className="bg-muted font-sans">
+          <Container className="max-w-lg mx-auto bg-card rounded-lg shadow-lg">
             {/* Logo/Header */}
-            <Section className="bg-green-600 text-white p-6 rounded-t-lg">
+            <Section className="bg-success text-white p-6 rounded-t-lg">
               <div className="text-center">
                 <div className="w-12 h-12 bg-white rounded-full mx-auto mb-4 flex items-center justify-center">
                   <svg
-                    className="w-6 h-6 text-green-600"
+                    className="w-6 h-6 text-success"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -53,13 +54,13 @@ export function EmailVerificationEmail({
                   </svg>
                 </div>
                 <h1 className="text-2xl font-bold mb-2">Verify Your Email</h1>
-                <p className="text-green-100">{userName ? `Welcome ${userName}!` : "Welcome!"}</p>
+                <p className="text-white">{userName ? `Welcome ${userName}!` : "Welcome!"}</p>
               </div>
             </Section>
 
             {/* Main Content */}
             <Section className="p-8">
-              <Text className="text-gray-700 leading-6 mb-6">
+              <Text className="text-foreground leading-6 mb-6">
                 Please click the button below to verify your email address and complete your
                 registration:
               </Text>
@@ -67,16 +68,16 @@ export function EmailVerificationEmail({
               <div className="text-center my-6">
                 <Button
                   href={verificationUrl}
-                  className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700"
+                  className="bg-success text-white px-6 py-3 rounded-lg font-medium"
                 >
                   Verify Email
                 </Button>
               </div>
 
               {/* Instructions */}
-              <Section className="bg-green-50 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">Getting Started</h3>
-                <Text className="text-sm text-gray-600 leading-5">
+              <Section className="bg-muted rounded-lg p-4">
+                <h3 className="text-sm font-semibold text-foreground mb-2">Getting Started</h3>
+                <Text className="text-sm text-muted-foreground leading-5">
                   • Click the verification button above to activate your account
                   <br />• You'll be redirected to our platform once verified
                   <br />• If you didn't create this account, you can safely ignore this email

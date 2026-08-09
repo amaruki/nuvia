@@ -12,6 +12,7 @@ import {
 } from "@react-email/components";
 import { Tailwind } from "@react-email/tailwind";
 import { EmailFooter } from "./shared-footer";
+import { EMAIL_TAILWIND_CONFIG } from "./email-theme";
 
 interface WelcomeEmailProps {
   userName?: string;
@@ -29,18 +30,18 @@ export function WelcomeEmail({
   return (
     <Html>
       <Preview>Welcome to {organizationName}!</Preview>
-      <Tailwind>
+      <Tailwind config={EMAIL_TAILWIND_CONFIG}>
         {/* Head must sit inside Tailwind so media-query/hover classes can
             be emitted into a <style> tag; outside, rendering throws. */}
         <Head />
-        <Body className="bg-gray-50 font-sans">
-          <Container className="max-w-lg mx-auto bg-white rounded-lg shadow-lg">
+        <Body className="bg-muted font-sans">
+          <Container className="max-w-lg mx-auto bg-card rounded-lg shadow-lg">
             {/* Logo/Header */}
-            <Section className="bg-purple-600 text-white p-6 rounded-t-lg">
+            <Section className="bg-primary text-primary-foreground p-6 rounded-t-lg">
               <div className="text-center">
                 <div className="w-12 h-12 bg-white rounded-full mx-auto mb-4 flex items-center justify-center">
                   <svg
-                    className="w-6 h-6 text-purple-600"
+                    className="w-6 h-6 text-primary"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -53,14 +54,16 @@ export function WelcomeEmail({
                     ></path>
                   </svg>
                 </div>
-                <h1 className="text-2xl font-bold mb-2">Welcome Aboard! 🎉</h1>
-                <p className="text-purple-100">{userName ? `Hi ${userName},` : "Hello,"}</p>
+                {/* No glyph: the gift-box SVG chip above carries the celebration;
+                    lucide SVGs are not safe across email clients (UI-13). */}
+                <h1 className="text-2xl font-bold mb-2">Welcome Aboard!</h1>
+                <p className="text-primary-foreground">{userName ? `Hi ${userName},` : "Hello,"}</p>
               </div>
             </Section>
 
             {/* Main Content */}
             <Section className="p-8">
-              <Text className="text-gray-700 leading-6 mb-6">
+              <Text className="text-foreground leading-6 mb-6">
                 Thank you for joining {organizationName}! Your account has been successfully created
                 and we're excited to have you with us.
               </Text>
@@ -68,19 +71,19 @@ export function WelcomeEmail({
               <div className="text-center my-6">
                 <Button
                   href={dashboardUrl}
-                  className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700"
+                  className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium"
                 >
                   Get Started
                 </Button>
               </div>
 
               {/* Features */}
-              <Section className="bg-purple-50 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-gray-900 mb-4">What's Next?</h3>
+              <Section className="bg-muted rounded-lg p-4">
+                <h3 className="text-sm font-semibold text-foreground mb-4">What's Next?</h3>
                 <div className="space-y-3">
                   <div className="flex items-start">
                     <svg
-                      className="w-5 h-5 text-purple-600 mr-3 mt-0.5 flex-shrink-0"
+                      className="w-5 h-5 text-primary mr-3 mt-0.5 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -92,13 +95,13 @@ export function WelcomeEmail({
                         d="M5 13l4 4L19 7"
                       ></path>
                     </svg>
-                    <Text className="text-sm text-gray-600">
+                    <Text className="text-sm text-muted-foreground">
                       Complete your profile to get personalized recommendations
                     </Text>
                   </div>
                   <div className="flex items-start">
                     <svg
-                      className="w-5 h-5 text-purple-600 mr-3 mt-0.5 flex-shrink-0"
+                      className="w-5 h-5 text-primary mr-3 mt-0.5 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -110,13 +113,13 @@ export function WelcomeEmail({
                         d="M5 13l4 4L19 7"
                       ></path>
                     </svg>
-                    <Text className="text-sm text-gray-600">
+                    <Text className="text-sm text-muted-foreground">
                       Explore our features and discover what you can do
                     </Text>
                   </div>
                   <div className="flex items-start">
                     <svg
-                      className="w-5 h-5 text-purple-600 mr-3 mt-0.5 flex-shrink-0"
+                      className="w-5 h-5 text-primary mr-3 mt-0.5 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -128,7 +131,7 @@ export function WelcomeEmail({
                         d="M5 13l4 4L19 7"
                       ></path>
                     </svg>
-                    <Text className="text-sm text-gray-600">
+                    <Text className="text-sm text-muted-foreground">
                       Connect with our community and get support
                     </Text>
                   </div>
@@ -137,11 +140,11 @@ export function WelcomeEmail({
 
               {/* Support */}
               <div className="text-center mt-6">
-                <Text className="text-sm text-gray-600">
+                <Text className="text-sm text-muted-foreground">
                   Need help?{" "}
                   <Link
                     href={supportEmail ? `mailto:${supportEmail}` : "/support"}
-                    className="text-purple-600 font-medium"
+                    className="text-primary font-medium"
                   >
                     Contact our support team
                   </Link>

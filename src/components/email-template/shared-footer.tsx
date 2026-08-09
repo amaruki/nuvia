@@ -13,14 +13,14 @@ interface EmailFooterProps {
  */
 export function EmailFooter({ organizationName, supportEmail }: EmailFooterProps) {
   return (
-    <Section className="bg-gray-50 p-6 rounded-b-lg border-t">
-      <Text className="text-xs text-gray-500 text-center">
+    <Section className="bg-muted p-6 rounded-b-lg border-t border-border">
+      <Text className="text-xs text-muted-foreground text-center">
         This is an automated message from {organizationName}. Please do not reply to this email.
       </Text>
       {supportEmail && (
-        <Text className="text-xs text-gray-500 text-center">
+        <Text className="text-xs text-muted-foreground text-center">
           Need help? Contact{" "}
-          <Link href={`mailto:${supportEmail}`} className="text-gray-600 underline">
+          <Link href={`mailto:${supportEmail}`} className="text-muted-foreground underline">
             {supportEmail}
           </Link>
         </Text>

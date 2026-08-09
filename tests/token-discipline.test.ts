@@ -23,6 +23,11 @@
  *       permission, event colors) carry zero raw palette classes and no
  *       palette dark: overrides; the dead event-styles.ts is deleted; zero
  *       `-100 text-*-800` pairs remain anywhere in src/.
+ *   (g) Wave 3: the membership tier/status map (member-card) and the
+ *       transactional email templates carry zero raw palette classes and no
+ *       palette dark: overrides; the emails resolve their colors through the
+ *       shared email-theme tailwind config (email clients never load
+ *       globals.css); the shared footer rides the same theme.
  *
  * Run ONLY this file: `bun test tests/token-discipline.test.ts`.
  */
@@ -490,5 +495,64 @@ describe("wave-2 badge maps migrated off raw palette", () => {
     ]) {
       expect(source, `event-utils covers ${key}`).toContain(key);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// (g) Wave 3: membership tier map + transactional email templates
+// ---------------------------------------------------------------------------
+
+const BADGE_MAP_FILES_WAVE3 = [
+  "src/components/memberships/member-card.tsx",
+  "src/components/email-template/welcome.tsx",
+  "src/components/email-template/email-verification.tsx",
+  "src/components/email-template/password-reset.tsx",
+];
+
+describe("wave-3 tier map and email templates migrated off raw palette", () => {
+  for (const file of BADGE_MAP_FILES_WAVE3) {
+    const source = src(file);
+
+    test(`${file}: zero raw palette classes`, () => {
+      const offenders = source.match(RAW_PALETTE);
+      expect(offenders, `${file} palette classes`).toBeNull();
+    });
+
+    test(`${file}: zero -100 text-*-800 palette pairs`, () => {
+      expect(source).not.toMatch(/-100\s+text-[a-z]+-800/);
+    });
+
+    test(`${file}: no palette dark: overrides (tokens adapt per theme)`, () => {
+      expect(source).not.toMatch(/dark:(bg|text|border)-[a-z]+-\d{2,3}\b/);
+    });
+  }
+
+  test("member-card keeps every tier/status/accent key on token classes", () => {
+    const source = src(BADGE_MAP_FILES_WAVE3[0]);
+    for (const tier of ["BASIC", "STUDENT", "PROFESSIONAL", "CORPORATE", "PREMIUM", "VIP"]) {
+      expect(source, `member-card tier ${tier}`).toMatch(new RegExp(`MembershipTier\\.${tier}:`));
+    }
+    for (const status of ["ACTIVE", "EXPIRED", "PENDING", "SUSPENDED", "CANCELLED"]) {
+      expect(source, `member-card status ${status}`).toMatch(
+        new RegExp(`MembershipStatus\\.${status}:`),
+      );
+    }
+    expect(source).toContain("getTierAccent");
+    expect(source).toContain("bg-success");
+    expect(source).toContain("text-info");
+    expect(source).toContain("bg-warning/15");
+  });
+
+  test("email templates wire the shared email theme into <Tailwind>", () => {
+    for (const file of BADGE_MAP_FILES_WAVE3.slice(1)) {
+      const source = src(file);
+      expect(source, `${file} imports the email theme`).toContain('from "./email-theme"');
+      expect(source, `${file} passes the config`).toMatch(/<Tailwind\s+config=\{/);
+    }
+  });
+
+  test("shared email footer stays on the email theme", () => {
+    const source = src("src/components/email-template/shared-footer.tsx");
+    expect(source.match(RAW_PALETTE), "shared-footer palette classes").toBeNull();
   });
 });

@@ -28,15 +28,15 @@ function getTierColor(tier: MembershipTier): string {
     case MembershipTier.BASIC:
       return "bg-secondary text-secondary-foreground border-border";
     case MembershipTier.STUDENT:
-      return "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 border-blue-300 dark:border-blue-700";
+      return "bg-info/15 text-info border-info/25";
     case MembershipTier.PROFESSIONAL:
-      return "bg-indigo-100 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100 border-indigo-300 dark:border-indigo-700";
+      return "bg-info/15 text-info border-info/25";
     case MembershipTier.CORPORATE:
-      return "bg-purple-100 dark:bg-purple-900 text-purple-900 dark:text-purple-100 border-purple-300 dark:border-purple-700";
+      return "bg-muted text-muted-foreground border-border";
     case MembershipTier.PREMIUM:
-      return "bg-amber-100 dark:bg-amber-900 text-amber-900 dark:text-amber-100 border-amber-300 dark:border-amber-700";
+      return "bg-warning/15 text-warning border-warning/25";
     case MembershipTier.VIP:
-      return "bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900 dark:to-yellow-900 text-amber-900 dark:text-amber-100 border-amber-400 dark:border-amber-600";
+      return "bg-warning/15 text-warning border-warning/25";
     default:
       return "bg-secondary text-secondary-foreground border-border";
   }
@@ -45,13 +45,13 @@ function getTierColor(tier: MembershipTier): string {
 function getStatusColor(status: MembershipStatus): string {
   switch (status) {
     case MembershipStatus.ACTIVE:
-      return "bg-green-100 dark:bg-green-900 text-green-900 dark:text-green-100 border-green-300 dark:border-green-700";
+      return "bg-success/15 text-success border-success/25";
     case MembershipStatus.EXPIRED:
       return "bg-destructive/10 text-destructive border-destructive/30";
     case MembershipStatus.PENDING:
-      return "bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 border-yellow-300 dark:border-yellow-700";
+      return "bg-warning/15 text-warning border-warning/25";
     case MembershipStatus.SUSPENDED:
-      return "bg-orange-100 dark:bg-orange-900 text-orange-900 dark:text-orange-100 border-orange-300 dark:border-orange-700";
+      return "bg-destructive/15 text-destructive border-destructive/25";
     case MembershipStatus.CANCELLED:
       return "bg-muted text-muted-foreground border-border";
     default:
@@ -64,15 +64,15 @@ function getTierAccent(tier: MembershipTier): string {
     case MembershipTier.BASIC:
       return "border-l-muted";
     case MembershipTier.STUDENT:
-      return "border-l-blue-500";
+      return "border-l-info";
     case MembershipTier.PROFESSIONAL:
-      return "border-l-indigo-500";
+      return "border-l-info";
     case MembershipTier.CORPORATE:
-      return "border-l-purple-500";
+      return "border-l-muted";
     case MembershipTier.PREMIUM:
-      return "border-l-amber-500";
+      return "border-l-warning";
     case MembershipTier.VIP:
-      return "border-l-amber-500";
+      return "border-l-warning";
     default:
       return "border-l-muted";
   }
@@ -110,7 +110,7 @@ export function MemberCard({ member, className }: MemberCardProps) {
         className={cn(
           "absolute top-4 right-4 size-2.5 rounded-full",
           member.membershipStatus === MembershipStatus.ACTIVE
-            ? "bg-green-500 animate-pulse"
+            ? "bg-success animate-pulse"
             : "bg-muted",
         )}
       />
@@ -245,7 +245,7 @@ export function MemberCard({ member, className }: MemberCardProps) {
                 href={member.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center size-8 rounded-full bg-muted/50 text-muted-foreground hover:bg-blue-500 hover:text-white transition-all duration-200 hover:scale-110"
+                className="flex items-center justify-center size-8 rounded-full bg-muted/50 text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-200 hover:scale-110"
                 onClick={(e) => e.stopPropagation()}
               >
                 <Linkedin className="size-4" />

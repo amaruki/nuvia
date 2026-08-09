@@ -16,13 +16,18 @@ import { ArrowLeft, Ban, Edit, Share2, QrCode } from "lucide-react";
 import { RegistrationStatus } from "@/types/event";
 import { useEvent } from "@/lib/hooks/use-events";
 import { cancelEventRegistration } from "@/lib/services/event";
+import type { OrganizerCredit } from "@/lib/services/member/public-profile";
+
+import { OrganizerCreditCard } from "./organizer-credit";
 
 interface EventDetailClientProps {
   /** Signed-in user's id, or null for anonymous visitors. */
   currentUserId: string | null;
+  /** UI-30: organizer credit resolved server-side; null when unknown. */
+  organizerCredit: OrganizerCredit | null;
 }
 
-export function EventDetailClient({ currentUserId }: EventDetailClientProps) {
+export function EventDetailClient({ currentUserId, organizerCredit }: EventDetailClientProps) {
   const params = useParams();
   const router = useRouter();
   const eventId = params.id as string;
@@ -118,23 +123,10 @@ export function EventDetailClient({ currentUserId }: EventDetailClientProps) {
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold text-lg mb-4">Organized by</h3>
-                <div className="flex items-center">
-                  <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mr-4">
-                    <span className="text-foreground/70 font-medium">
-                      {(event.organizer?.displayName || event.organizer?.username || "O")
-                        .charAt(0)
-                        .toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-medium">
-                      {event.organizer?.displayName ||
-                        event.organizer?.username ||
-                        "Event Organizer"}
-                    </p>
-                    <p className="text-sm text-foreground/60">Event Organizer</p>
-                  </div>
-                </div>
+                <OrganizerCreditCard
+                  credit={organizerCredit}
+                  fallbackName={event.organizer?.displayName ?? "Event Organizer"}
+                />
               </CardContent>
             </Card>
 

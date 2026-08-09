@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, Clock, DollarSign, MapPin, Briefcase, Calendar } from "lucide-react";
 import { getPublicJobPostingBySlug } from "@/lib/services/job";
 import { ApplyForm } from "./_components/apply-form";
+import { CompanyNameLink } from "./_components/company-link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -48,7 +49,9 @@ export default async function PublicJobDetailPage({ params }: { params: Promise<
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-2">{job.title}</h1>
-              <p className="text-xl text-muted-foreground mb-4">{job.companyName}</p>
+              <p className="text-xl text-muted-foreground mb-4">
+                <CompanyNameLink companyId={job.companyId} name={job.companyName} />
+              </p>
               <div className="flex items-center gap-4 text-muted-foreground">
                 <span className="flex items-center">
                   <MapPin className="h-4 w-4 mr-1" />

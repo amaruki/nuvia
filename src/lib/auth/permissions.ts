@@ -32,6 +32,17 @@ export const userOptions = {
       type: "json",
       required: false,
     },
+    /**
+     * Public-profile opt-in (UI-28, decision D7). Declared here so the
+     * existing profile-update path (`auth.api.updateUser`) can persist the
+     * dashboard visibility toggle. No `input: false` — unlike `role`, this
+     * one is the member's own choice. Default off = private by default.
+     */
+    profilePublic: {
+      type: "boolean",
+      required: false,
+      defaultValue: false,
+    },
     role: {
       type: "string",
       required: false,

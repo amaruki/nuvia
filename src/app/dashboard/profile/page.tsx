@@ -9,27 +9,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 
 import {
   User,
   Shield,
   Link,
-  Settings,
   Camera,
+  Eye,
   Key,
   Smartphone,
   Trash2,
-  CheckCircle,
   AlertCircle,
 } from "lucide-react";
 
 import { ProfileForm } from "./components/profile-form";
 import { SecurityForm } from "./components/security-form";
 import { SocialLinksForm } from "./components/social-links-form";
+import { PublicProfileVisibility } from "./components/public-profile-visibility";
 import { ProfilePhotoUpload } from "./components/profile-photo-upload";
 import { SessionManager } from "./components/session-manager";
 
@@ -180,6 +177,21 @@ export default function ProfileSettingsPage() {
               </CardContent>
             </Card>
           </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                Public Profile
+              </CardTitle>
+              <CardDescription>
+                Choose whether you appear in the public member directory
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PublicProfileVisibility />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Security Tab */}

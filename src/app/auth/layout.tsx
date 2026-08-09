@@ -1,31 +1,6 @@
 "use client";
 
-import { animate } from "animejs";
-import { useState, useEffect, useRef } from "react";
-
-export default function ForgotPasswordLayout({ children }: { children: React.ReactNode }) {
-  const backgroundRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Animate background shapes with subtle, random movements
-    if (backgroundRef.current) {
-      const shapes = backgroundRef.current.querySelectorAll(".shape");
-
-      shapes.forEach((shape, index) => {
-        animate(shape, {
-          translateX: () => Math.random() * 30 - 15,
-          translateY: () => Math.random() * 30 - 15,
-          rotate: () => Math.random() * 8 - 4,
-          duration: () => 8000 + Math.random() * 4000, // 8-12 seconds per animation
-          delay: index * 500, // Stagger the start of each shape
-          direction: "alternate",
-          loop: true,
-          easing: "easeInOutQuad",
-        });
-      });
-    }
-  }, []);
-
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
       <div
@@ -44,9 +19,3 @@ export default function ForgotPasswordLayout({ children }: { children: React.Rea
     </div>
   );
 }
-
-<div className="min-h-screen w-full bg-[#f8fafc] relative">
-  {/* Circuit Board Background */}
-
-  {/* Your Content/Components */}
-</div>;

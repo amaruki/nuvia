@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { animate } from "animejs";
 import { useSession } from "@/hooks/use-session";
 import { useOAuthLogin } from "@/hooks/use-oauth-login";
 import { extractOAuthError, cleanOAuthUrlParams } from "@/lib/utils/oauth-utils";
@@ -79,7 +78,7 @@ function LoginForm() {
     }
   }, [user, isPending, searchParams]);
 
-  // Handle OAuth callback errors and animations
+  // Handle OAuth callback errors
   useEffect(() => {
     // Only check for OAuth errors if user is NOT authenticated
     if (!user && !isPending) {
@@ -88,16 +87,6 @@ function LoginForm() {
         toast.error(oauthError.message || "OAuth sign-in failed");
         cleanOAuthUrlParams();
       }
-    }
-
-    // Animate login card entrance only if user is not authenticated
-    if (!user && !isPending) {
-      animate(".login-card", {
-        translateY: [50, 0],
-        opacity: [0, 1],
-        duration: 1000,
-        easing: "easeOutExpo",
-      });
     }
   }, [searchParams, user, isPending]);
 
@@ -163,7 +152,7 @@ function LoginForm() {
         href: "/auth/signup",
       }}
     >
-      <div className="login-card">
+      <div className="login-card landing-rise">
         {/* Social Login */}
         <div className="space-y-3">
           <OAuthButton

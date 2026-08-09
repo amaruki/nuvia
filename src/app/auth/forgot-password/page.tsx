@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { animate } from "animejs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,16 +70,6 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  useEffect(() => {
-    // Animate forgot password card entrance
-    animate(".forgot-password-card", {
-      translateY: [50, 0],
-      opacity: [0, 1],
-      duration: 1000,
-      easing: "easeOutExpo",
-    });
-  }, []);
-
   const getErrorMessage = (field: string) => {
     return validationErrors[field]?.[0];
   };
@@ -118,7 +107,7 @@ export default function ForgotPasswordPage() {
           {success && <FormMessage type="success" message={success} />}
 
           {/* Forgot password form */}
-          <div className="forgot-password-card rounded-2xl border p-8 shadow-sm bg-card border-border">
+          <div className="forgot-password-card landing-rise rounded-2xl border p-8 shadow-sm bg-card border-border">
             {!success ? (
               <>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">

@@ -85,6 +85,15 @@
   --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+
+  /* Motion tokens. Theme-independent constants: easing curves and duration
+     budgets shared by every theme. Used via var() in the landing contract,
+     sheet drawers, and hover transitions below. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-drawer: 300ms;
 }
 
 :root[data-theme="dark"],
@@ -268,9 +277,12 @@ body {
    container in the app rendered full-bleed as a result. Layout width is now
    owned by Tailwind's `container` + explicit `max-w-*` per usage. */
 
-/* Smooth scrolling for the entire document */
-html {
-  scroll-behavior: smooth;
+/* Smooth scrolling for the entire document. Gated so visitors who prefer
+   reduced motion get instant anchor jumps instead of a glide. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* ============================================================================
@@ -314,68 +326,19 @@ html {
   }
 }
 
-@keyframes slideInRight {
-  0% {
-    opacity: 0;
-    transform: translateX(30px);
+/* Custom animation utilities. fadeInUp is page-entrance motion, so it only
+   runs when the visitor has not asked for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out;
   }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInLeft {
-  0% {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-
-/* Custom animation utilities */
-.animate-fadeInUp {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.animate-slideInRight {
-  animation: slideInRight 0.4s ease-out;
-}
-
-.animate-slideInLeft {
-  animation: slideInLeft 0.4s ease-out;
-}
-
-.animate-shimmer {
-  animation: shimmer 2s ease-out infinite;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  background-size: 200px 100%;
-}
-
-/* Modal animations */
-.modal-content {
-  animation: fadeInUp 0.3s ease-out;
-}
-
-.modal-overlay {
-  animation: fadeIn 0.2s ease-out;
 }
 
 /* Card hover effects */
 .card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform var(--duration-drawer) var(--ease-out),
+    box-shadow var(--duration-drawer) var(--ease-out);
 }
 
 .card-hover:hover {
@@ -383,78 +346,6 @@ html {
   box-shadow:
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* Button animations */
-.button-scale {
-  transition: transform 0.2s ease-in-out;
-}
-
-.button-scale:hover {
-  transform: scale(1.05);
-}
-
-.button-scale:active {
-  transform: scale(0.98);
-}
-
-/* Loading skeleton animation */
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--muted) 0%,
-    var(--muted-foreground) 50%,
-    var(--muted) 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-  border-radius: var(--radius);
-}
-
-/* Modal transitions */
-.modal-enter {
-  opacity: 0;
-  transform: scale(0.95);
-}
-
-.modal-enter-active {
-  opacity: 1;
-  transform: scale(1);
-  transition:
-    opacity 0.2s ease-out,
-    transform 0.2s ease-out;
-}
-
-.modal-exit {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.modal-exit-active {
-  opacity: 0;
-  transform: scale(0.95);
-  transition:
-    opacity 0.2s ease-out,
-    transform 0.2s ease-out;
-}
-
-/* Staggered animations for lists */
-.stagger-item {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.stagger-item-animate {
-  opacity: 1;
-  transform: translateY(0);
-  transition:
-    opacity 0.3s ease-out,
-    transform 0.3s ease-out;
-}
-
-/* Badge animations */
-.badge-glow {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Premium gradient animations */
@@ -472,15 +363,6 @@ html {
   }
   100% {
     background-position: 0% 50%;
-  }
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
   }
 }
 

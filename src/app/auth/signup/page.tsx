@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { animate } from "animejs";
 import { useSession } from "@/hooks/use-session";
 import { useOAuthLogin } from "@/hooks/use-oauth-login";
 import { Button } from "@/components/ui/button";
@@ -87,18 +86,6 @@ function SignupPage() {
     }
   }, [user, isPending]);
 
-  // Animate signup card entrance only if user is not authenticated
-  useEffect(() => {
-    if (!user && !isPending) {
-      animate(".signup-card", {
-        translateY: [50, 0],
-        opacity: [0, 1],
-        duration: 1000,
-        easing: "easeOutExpo",
-      });
-    }
-  }, [user, isPending]);
-
   // Show loading state only while checking authentication (not for authenticated users)
   if (isPending || user) {
     return (
@@ -155,7 +142,7 @@ function SignupPage() {
         href: "/auth/login",
       }}
     >
-      <div className="signup-card">
+      <div className="signup-card landing-rise">
         {/* Social Signup */}
         <div className="space-y-3">
           <OAuthButton

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { animate } from "animejs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -89,16 +88,6 @@ function ResetPasswordForm() {
     }
   };
 
-  useEffect(() => {
-    // Animate reset password card entrance
-    animate(".reset-password-card", {
-      translateY: [50, 0],
-      opacity: [0, 1],
-      duration: 1000,
-      easing: "easeOutExpo",
-    });
-  }, []);
-
   const getErrorMessage = (field: string) => {
     return validationErrors[field]?.[0];
   };
@@ -143,7 +132,7 @@ function ResetPasswordForm() {
             />
 
             {/* Reset password form */}
-            <div className="rounded-2xl border p-8 shadow-sm bg-card border-border space-y-4">
+            <div className="landing-rise rounded-2xl border p-8 shadow-sm bg-card border-border space-y-4">
               <div className="text-center">
                 <Button asChild className="w-full h-10">
                   <Link href="/auth/forgot-password">Request New Reset Link</Link>

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { animate } from "animejs";
 import { authClient } from "@/lib/client";
 import { logger } from "@/lib/logger";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
@@ -60,13 +59,6 @@ export default function OAuthCallbackPage() {
           setStatus("success");
           setMessage("Authentication successful! Redirecting to dashboard...");
 
-          // Animate success state
-          animate(".callback-card", {
-            scale: [1, 1.05, 1],
-            duration: 500,
-            easing: "easeInOutQuad",
-          });
-
           // Redirect to dashboard after a short delay
           setTimeout(() => {
             window.location.assign("/dashboard");
@@ -109,13 +101,6 @@ export default function OAuthCallbackPage() {
                 setStatus("success");
                 setMessage("Authentication successful! Redirecting to dashboard...");
 
-                // Animate success state
-                animate(".callback-card", {
-                  scale: [1, 1.05, 1],
-                  duration: 500,
-                  easing: "easeInOutQuad",
-                });
-
                 // Redirect to dashboard after a short delay
                 setTimeout(() => {
                   window.location.assign("/dashboard");
@@ -157,14 +142,6 @@ export default function OAuthCallbackPage() {
     };
 
     handleOAuthCallback();
-
-    // Animate card entrance
-    animate(".callback-card", {
-      translateY: [50, 0],
-      opacity: [0, 1],
-      duration: 1000,
-      easing: "easeOutExpo",
-    });
   }, [router]);
 
   const getStatusIcon = () => {
@@ -224,7 +201,7 @@ export default function OAuthCallbackPage() {
 
         {/* Status card */}
         <div
-          className="callback-card rounded-2xl border p-8 shadow-sm bg-card border-border"
+          className="callback-card landing-rise rounded-2xl border p-8 shadow-sm bg-card border-border"
           aria-live="polite"
           aria-busy={status === "loading"}
         >

@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Calendar, Download, User } from "lucide-react";
 import type { FinancialReport } from "@/types/finance";
@@ -27,11 +28,10 @@ export default function ReportRow({
   return (
     <TableRow className="hover:bg-muted/50">
       <TableCell>
-        <input
-          type="checkbox"
-          className="rounded border-gray-300"
+        <Checkbox
           checked={selected}
-          onChange={(e) => onSelect(report.id, e.target.checked)}
+          onCheckedChange={(checked) => onSelect(report.id, checked === true)}
+          aria-label="Select row"
         />
       </TableCell>
       <TableCell className="min-w-[200px]">

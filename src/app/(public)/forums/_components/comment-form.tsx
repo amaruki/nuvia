@@ -3,23 +3,28 @@
 /**
  * Comment form for the public forum thread view (UI-27).
  *
- * Same session-gate pattern as the create-post form. Comments are stored
+ * Same session-gate pattern as the create-post form, validated with RHF +
+ * zod through forumCommentSchema (UI-16 form standard). Comments are stored
  * PUBLISHED immediately by the service, so a `router.refresh()` after a
  * successful POST shows the new comment right away. The response body is
  * `{}` (double-wrapped by the route handler), so only the status code is
  * consulted.
  */
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { LogIn, Lock, MessageCircle } from "lucide-react";
 import { roleHasPermission } from "@/types/role";
 import { useSession } from "@/lib/client";
 import { useMounted } from "@/lib/hooks/use-mounted";
+import { forumCommentSchema, type ForumCommentFormValues } from "@/lib/validation/forum.validation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -33,11 +38,15 @@ interface CommentFormProps {
 export function CommentForm({ postId, threadPath, isLocked }: CommentFormProps) {
   const router = useRouter();
   const { data: session, isPending } = useSession();
-  const [content, setContent] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [posted, setPosted] = useState(false);
   const mounted = useMounted();
+
+  const form = useForm<ForumCommentFormValues>({
+    resolver: zodResolver(forumCommentSchema),
+    defaultValues: { content: "" },
+  });
+  const { isSubmitting } = form.formState;
 
   if (isLocked) {
     return (
@@ -104,9 +113,7 @@ export function CommentForm({ postId, threadPath, isLocked }: CommentFormProps) 
     );
   }
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setSubmitting(true);
+  const onValid = async (data: ForumCommentFormValues) => {
     setError(null);
 
     try {
@@ -114,7 +121,7 @@ export function CommentForm({ postId, threadPath, isLocked }: CommentFormProps) 
         method: "POST",
         credentials: "include",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ postId, content: content.trim() }),
+        body: JSON.stringify({ postId, content: data.content }),
       });
 
       if (!res.ok) {
@@ -126,13 +133,11 @@ export function CommentForm({ postId, threadPath, isLocked }: CommentFormProps) 
         return;
       }
 
-      setContent("");
+      form.reset();
       setPosted(true);
       router.refresh();
     } catch {
       setError("Something went wrong while posting your comment. Please try again.");
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -148,30 +153,41 @@ export function CommentForm({ postId, threadPath, isLocked }: CommentFormProps) 
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Textarea
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            placeholder="Share your thoughts..."
-            rows={4}
-            maxLength={50000}
-            aria-label="Comment"
-            required
-          />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Share your thoughts..."
+                      rows={4}
+                      maxLength={20000}
+                      aria-label="Comment"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-          <div className="flex items-center gap-3">
-            <Button type="submit" disabled={submitting}>
-              {submitting ? "Posting..." : "Post comment"}
-            </Button>
-            {posted && !error && <span className="text-sm text-green-600">Comment posted.</span>}
-          </div>
-        </form>
+            <div className="flex items-center gap-3">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Posting..." : "Post comment"}
+              </Button>
+              {posted && !error && <span className="text-sm text-green-600">Comment posted.</span>}
+            </div>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

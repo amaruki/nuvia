@@ -5,6 +5,7 @@
  */
 
 import type { ChangeEvent } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { EventFormData } from "./types";
@@ -20,6 +21,11 @@ export function LocationSection({
   onInputChange,
   onCheckboxChange,
 }: LocationSectionProps) {
+  /** Adapts Radix's boolean callback to the page's event-shaped checkbox handler. */
+  const handleCheckedChange = (name: "isInPerson" | "isVirtual", checked: boolean) => {
+    onCheckboxChange({ target: { name, checked } } as ChangeEvent<HTMLInputElement>);
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium text-foreground/90">Location</h3>
@@ -38,13 +44,10 @@ export function LocationSection({
 
       <div className="flex items-center space-x-6">
         <div className="flex items-center">
-          <input
+          <Checkbox
             id="isInPerson"
-            name="isInPerson"
-            type="checkbox"
             checked={formData.isInPerson}
-            onChange={onCheckboxChange}
-            className="h-4 w-4 text-primary focus:ring-ring border-input rounded"
+            onCheckedChange={(checked) => handleCheckedChange("isInPerson", checked === true)}
           />
           <Label htmlFor="isInPerson" className="ml-2">
             In-Person Event
@@ -52,13 +55,10 @@ export function LocationSection({
         </div>
 
         <div className="flex items-center">
-          <input
+          <Checkbox
             id="isVirtual"
-            name="isVirtual"
-            type="checkbox"
             checked={formData.isVirtual}
-            onChange={onCheckboxChange}
-            className="h-4 w-4 text-primary focus:ring-ring border-input rounded"
+            onCheckedChange={(checked) => handleCheckedChange("isVirtual", checked === true)}
           />
           <Label htmlFor="isVirtual" className="ml-2">
             Virtual Event

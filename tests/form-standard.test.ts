@@ -100,3 +100,107 @@ describe("job application schema exists", () => {
     expect(schema).toMatch(/export const jobApplicationSchema\s*=/);
   });
 });
+
+describe("job posting form adopts the form standard", () => {
+  const jobFormIndex = "src/app/dashboard/jobs/_components/job-form/index.tsx";
+
+  test("job.validation.ts exports a posting schema", async () => {
+    const schema = await read("src/lib/validation/job.validation.ts");
+    expect(schema).toMatch(/export const jobPostingSchema\s*=/);
+  });
+
+  test("the form provider wraps sections in FormField wiring", async () => {
+    const src = await read(jobFormIndex);
+    expect(src).toContain("useForm");
+    expect(src).toContain("zodResolver");
+    expect(src).toContain("jobPostingSchema");
+    expect(src).not.toMatch(/useState<JobFormState>/);
+  });
+
+  test("sections render through the shared Form provider", async () => {
+    const sections = [
+      "basic-info-section.tsx",
+      "classification-section.tsx",
+      "description-section.tsx",
+      "salary-section.tsx",
+      "settings-section.tsx",
+      "status-section.tsx",
+    ];
+    for (const section of sections) {
+      const src = await read(`src/app/dashboard/jobs/_components/job-form/${section}`);
+      expect(src).toContain("FormField");
+      expect(src).toContain("FormMessage");
+      expect(src).not.toContain("<select");
+    }
+  });
+});
+
+describe("forum forms adopt the form standard", () => {
+  test("forum.validation.ts exports post, comment and report schemas", async () => {
+    const schema = await read("src/lib/validation/forum.validation.ts");
+    expect(schema).toMatch(/export const forumPostSchema\s*=/);
+    expect(schema).toMatch(/export const forumCommentSchema\s*=/);
+    expect(schema).toMatch(/export const forumReportSchema\s*=/);
+  });
+
+  test.each(["create-post-form.tsx", "comment-form.tsx", "report-button.tsx"])(
+    "%s submits through RHF + zod + FormMessage",
+    async (file) => {
+      const src = await read(`src/app/(public)/forums/_components/${file}`);
+      expect(src).toContain("useForm");
+      expect(src).toContain("zodResolver");
+      expect(src).toContain("FormMessage");
+      expect(src).not.toContain("<select");
+      expect(src).not.toMatch(/text-destructive">\{/);
+    },
+  );
+});
+
+describe("membership application dialog adopts the form standard", () => {
+  test("organization validation exports the application schema", async () => {
+    const schema = await read("src/lib/validation/organization.validation.ts");
+    expect(schema).toMatch(/export const membershipApplicationSchema\s*=/);
+  });
+
+  test("the dialog submits through RHF + zod + FormMessage", async () => {
+    const src = await read("src/app/(public)/membership/_components/apply-dialog.tsx");
+    expect(src).toContain("useForm");
+    expect(src).toContain("zodResolver");
+    expect(src).toContain("FormMessage");
+    expect(src).not.toMatch(/text-destructive">\{/);
+  });
+});
+
+describe("learning settings form adopts the form standard", () => {
+  test("learning.validation.ts exports the settings schema", async () => {
+    const schema = await read("src/lib/validation/learning.validation.ts");
+    expect(schema).toMatch(/export const learningSettingsSchema\s*=/);
+  });
+
+  test("the page submits through RHF + zod + FormMessage", async () => {
+    const src = await read("src/app/dashboard/learning/settings/page.tsx");
+    expect(src).toContain("useForm");
+    expect(src).toContain("zodResolver");
+    expect(src).toContain("FormMessage");
+  });
+});
+
+describe("native select and checkbox controls are gone", () => {
+  const files = [
+    "src/app/dashboard/memberships/tiers/_components/tier-edit-dialog.tsx",
+    "src/app/dashboard/profile/components/social-links-form/add-link-form.tsx",
+    "src/components/content/media-upload/media-upload.tsx",
+    "src/app/dashboard/content/media/_components/media-grid.tsx",
+    "src/components/content/category-card.tsx",
+    "src/components/finance/reports-table/index.tsx",
+    "src/components/finance/reports-table/report-row.tsx",
+    "src/app/(public)/events/[id]/edit/_components/location-section.tsx",
+    "src/app/dashboard/events/[id]/edit/_components/location-section.tsx",
+  ];
+
+  test.each(files)("%s uses shadcn controls", async (file) => {
+    const src = await read(file);
+    expect(src).not.toContain("<select");
+    expect(src).not.toContain('type="checkbox"');
+  });
+});

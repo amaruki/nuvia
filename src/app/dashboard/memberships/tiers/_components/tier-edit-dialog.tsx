@@ -15,6 +15,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -250,16 +257,19 @@ export function TierEditDialog({
             </div>
             <div>
               <Label htmlFor="tier-billingCycle">Billing Cycle</Label>
-              <select
-                id="tier-billingCycle"
+              <Select
                 value={form.billingCycle}
-                onChange={(e) => setField("billingCycle", e.target.value as BillingCycle)}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-input focus:outline-none focus:ring-ring focus:border-primary sm:text-sm rounded-md"
+                onValueChange={(value) => setField("billingCycle", value as BillingCycle)}
               >
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-                <option value="lifetime">Lifetime</option>
-              </select>
+                <SelectTrigger id="tier-billingCycle" className="mt-1 w-full">
+                  <SelectValue placeholder="Select billing cycle" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="yearly">Yearly</SelectItem>
+                  <SelectItem value="lifetime">Lifetime</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

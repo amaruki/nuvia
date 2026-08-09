@@ -3,19 +3,30 @@
 /**
  * Report content control for the public forums (UI-27).
  *
- * Wires the existing POST /api/v1/forums/reports endpoint (reason is
- * required server-side). Rendering is session-gated; permission failures
+ * Wires the existing POST /api/v1/forums/reports endpoint, validated with
+ * RHF + zod through forumReportSchema (UI-16 form standard); reason is
+ * required server-side. Rendering is session-gated; permission failures
  * (the endpoint requires forum:create) surface the API's own message.
  */
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Flag } from "lucide-react";
 import { useSession } from "@/lib/client";
 import { useMounted } from "@/lib/hooks/use-mounted";
+import { forumReportSchema, type ForumReportFormValues } from "@/lib/validation/forum.validation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 
 interface ReportButtonProps {
@@ -30,11 +41,20 @@ interface ReportButtonProps {
 export function ReportButton({ targetType, targetId, targetLabel, threadPath }: ReportButtonProps) {
   const { data: session, isPending } = useSession();
   const [open, setOpen] = useState(false);
-  const [reason, setReason] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reported, setReported] = useState(false);
   const mounted = useMounted();
+
+  const form = useForm<ForumReportFormValues>({
+    resolver: zodResolver(forumReportSchema),
+    defaultValues: {
+      targetType,
+      postId: targetType === "POST" ? targetId : undefined,
+      commentId: targetType === "COMMENT" ? targetId : undefined,
+      reason: "",
+    },
+  });
+  const { isSubmitting } = form.formState;
 
   if (reported) {
     return (
@@ -58,9 +78,7 @@ export function ReportButton({ targetType, targetId, targetLabel, threadPath }: 
     );
   }
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setSubmitting(true);
+  const onValid = async (data: ForumReportFormValues) => {
     setError(null);
 
     try {
@@ -69,9 +87,9 @@ export function ReportButton({ targetType, targetId, targetLabel, threadPath }: 
         credentials: "include",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(
-          targetType === "POST"
-            ? { targetType, postId: targetId, reason: reason.trim() }
-            : { targetType, commentId: targetId, reason: reason.trim() },
+          data.targetType === "POST"
+            ? { targetType: data.targetType, postId: data.postId, reason: data.reason }
+            : { targetType: data.targetType, commentId: data.commentId, reason: data.reason },
         ),
       });
 
@@ -88,8 +106,6 @@ export function ReportButton({ targetType, targetId, targetLabel, threadPath }: 
       setOpen(false);
     } catch {
       setError("Something went wrong while submitting your report. Please try again.");
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -109,42 +125,51 @@ export function ReportButton({ targetType, targetId, targetLabel, threadPath }: 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 rounded-lg border p-4">
-      <div className="space-y-2">
-        <Label htmlFor={`report-reason-${targetId}`}>Report this {targetLabel}</Label>
-        <Textarea
-          id={`report-reason-${targetId}`}
-          value={reason}
-          onChange={(event) => setReason(event.target.value)}
-          placeholder="Tell the moderators what is wrong with this content (required)"
-          rows={3}
-          maxLength={1000}
-          required
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onValid)} className="space-y-3 rounded-lg border p-4">
+        <FormField
+          control={form.control}
+          name="reason"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Report this {targetLabel}</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Tell the moderators what is wrong with this content (required)"
+                  rows={3}
+                  maxLength={1000}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      <div className="flex items-center gap-2">
-        <Button type="submit" size="sm" disabled={submitting}>
-          {submitting ? "Submitting..." : "Submit report"}
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            setOpen(false);
-            setError(null);
-          }}
-        >
-          Cancel
-        </Button>
-      </div>
-    </form>
+        <div className="flex items-center gap-2">
+          <Button type="submit" size="sm" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit report"}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setOpen(false);
+              setError(null);
+              form.clearErrors();
+            }}
+          >
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Upload, X, Save } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -13,9 +15,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { toast } from "sonner";
-import { Upload, X, Save } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useHeader } from "@/contexts/dashboard-context";
+import {
+  learningSettingsSchema,
+  type LearningSettingsFormInput,
+  type LearningSettingsFormValues,
+} from "@/lib/validation/learning.validation";
+
+// The Public Profile form has no settings endpoint yet — the save below is
+// still the mock toast it has always been. These are the placeholder values
+// the page has always rendered with, standing in for the settings a real GET
+// would return; form.reset is already wired for that fetch when it lands.
+const LOADED_SETTINGS: LearningSettingsFormValues = {
+  title: "Senior Frontend Engineer",
+  bio: "Sarah is a Core Team member of Vue.js and a Staff Writer at CSS-Tricks. She loves teaching and building tools for developers.",
+};
 
 export default function InstructorSettingsPage() {
   const { setHeader, clearHeader } = useHeader();
@@ -30,10 +54,22 @@ export default function InstructorSettingsPage() {
       clearHeader();
     };
   }, [setHeader, clearHeader]);
+
   const [signature, setSignature] = useState<string | null>(
     "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Signature_sample.svg/1200px-Signature_sample.svg.png",
   );
   const [isUploading, setIsUploading] = useState(false);
+
+  const form = useForm<LearningSettingsFormInput, unknown, LearningSettingsFormValues>({
+    resolver: zodResolver(learningSettingsSchema),
+    defaultValues: { title: "", bio: "" },
+  });
+  const { isSubmitting } = form.formState;
+
+  // Prefill the form once the settings have loaded.
+  useEffect(() => {
+    form.reset(LOADED_SETTINGS);
+  }, [form]);
 
   // Mock upload handlers
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,8 +92,8 @@ export default function InstructorSettingsPage() {
     toast.info("Signature removed");
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onValid = async (_data: LearningSettingsFormValues) => {
+    // Mock save, as before: there is no settings endpoint yet.
     toast.success("Profile settings saved successfully");
   };
 
@@ -137,23 +173,44 @@ export default function InstructorSettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form id="profile-form" onSubmit={handleSaveProfile} className="space-y-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="title">Professional Title</Label>
-                  <Input id="title" defaultValue="Senior Frontend Engineer" />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  <textarea
-                    className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    id="bio"
-                    defaultValue="Sarah is a Core Team member of Vue.js and a Staff Writer at CSS-Tricks. She loves teaching and building tools for developers."
+              <Form {...form}>
+                <form
+                  id="profile-form"
+                  onSubmit={form.handleSubmit(onValid)}
+                  noValidate
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Professional Title</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-              </form>
+                  <FormField
+                    control={form.control}
+                    name="bio"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bio</FormLabel>
+                        <FormControl>
+                          <Textarea className="min-h-[120px]" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </form>
+              </Form>
             </CardContent>
             <CardFooter className="border-t px-6 py-4">
-              <Button type="submit" form="profile-form">
+              <Button type="submit" form="profile-form" disabled={isSubmitting}>
                 <Save className="mr-2 h-4 w-4" /> Save Changes
               </Button>
             </CardFooter>

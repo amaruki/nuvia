@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Download, FileText, Trash2 } from "lucide-react";
@@ -106,11 +107,10 @@ export function ReportsTable({
             <TableHeader>
               <TableRow>
                 <TableHead className="w-12">
-                  <input
-                    type="checkbox"
-                    className="rounded border-gray-300"
+                  <Checkbox
                     checked={selectedReports.length === reports.length}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    onCheckedChange={(checked) => handleSelectAll(checked === true)}
+                    aria-label="Select all rows"
                   />
                 </TableHead>
                 <TableHead className="min-w-[200px]">Report</TableHead>

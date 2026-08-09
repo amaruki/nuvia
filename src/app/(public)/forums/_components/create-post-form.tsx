@@ -4,7 +4,8 @@
  * New-thread form for the public forums (UI-27).
  *
  * Posting always requires an account (D8). The form mirrors the jobs
- * apply-form pattern: session-gated card, inline problem+json error
+ * apply-form pattern: session-gated card, RHF + zod validation through
+ * forumPostSchema (UI-16 form standard), inline problem+json error
  * parsing, and honest success copy. Forum API success bodies are
  * double-wrapped to `{}` by the route handlers, so we rely on the status
  * code and `router.refresh()` instead of reading the response payload.
@@ -14,26 +15,47 @@
  * permission map the API enforces.
  */
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, LogIn, MessageSquarePlus } from "lucide-react";
 import { roleHasPermission } from "@/types/role";
 import { useSession } from "@/lib/client";
 import { useMounted } from "@/lib/hooks/use-mounted";
+import {
+  forumPostSchema,
+  FORUM_THREAD_TYPES,
+  type ForumPostFormValues,
+} from "@/lib/validation/forum.validation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 
-const THREAD_TYPES = [
-  { value: "DISCUSSION", label: "Discussion" },
-  { value: "QUESTION", label: "Question" },
-  { value: "RESOURCE", label: "Resource" },
-] as const;
+const THREAD_TYPE_LABELS: Record<(typeof FORUM_THREAD_TYPES)[number], string> = {
+  DISCUSSION: "Discussion",
+  QUESTION: "Question",
+  RESOURCE: "Resource",
+};
 
 interface CreatePostFormProps {
   categoryId: string;
@@ -44,13 +66,20 @@ interface CreatePostFormProps {
 export function CreatePostForm({ categoryId, categorySlug }: CreatePostFormProps) {
   const router = useRouter();
   const { data: session, isPending } = useSession();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [type, setType] = useState<string>("DISCUSSION");
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const mounted = useMounted();
+
+  const form = useForm<ForumPostFormValues>({
+    resolver: zodResolver(forumPostSchema),
+    defaultValues: {
+      categoryId,
+      title: "",
+      content: "",
+      type: "DISCUSSION",
+    },
+  });
+  const { isSubmitting } = form.formState;
 
   if (!mounted || isPending) {
     return (
@@ -118,9 +147,7 @@ export function CreatePostForm({ categoryId, categorySlug }: CreatePostFormProps
     );
   }
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setSubmitting(true);
+  const onValid = async (data: ForumPostFormValues) => {
     setError(null);
 
     try {
@@ -129,10 +156,10 @@ export function CreatePostForm({ categoryId, categorySlug }: CreatePostFormProps
         credentials: "include",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          categoryId,
-          title: title.trim(),
-          content: content.trim(),
-          type,
+          categoryId: data.categoryId,
+          title: data.title,
+          content: data.content,
+          type: data.type,
         }),
       });
 
@@ -156,8 +183,6 @@ export function CreatePostForm({ categoryId, categorySlug }: CreatePostFormProps
       router.refresh();
     } catch {
       setError("Something went wrong while creating your thread. Please try again.");
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -175,58 +200,83 @@ export function CreatePostForm({ categoryId, categorySlug }: CreatePostFormProps
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="thread-title">Title</Label>
-            <Input
-              id="thread-title"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="A short, descriptive title"
-              maxLength={300}
-              required
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onValid)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="A short, descriptive title" maxLength={300} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="thread-type">Type</Label>
-            <select
-              id="thread-type"
-              value={type}
-              onChange={(event) => setType(event.target.value)}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              {THREAD_TYPES.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="thread-content">Content</Label>
-            <Textarea
-              id="thread-content"
-              value={content}
-              onChange={(event) => setContent(event.target.value)}
-              placeholder="What would you like to discuss?"
-              rows={6}
-              maxLength={50000}
-              required
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Type</FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      const next = FORUM_THREAD_TYPES.find((option) => option === value);
+                      if (next) form.setValue("type", next);
+                    }}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a thread type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {FORUM_THREAD_TYPES.map((value) => (
+                        <SelectItem key={value} value={value}>
+                          {THREAD_TYPE_LABELS[value]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+            <FormField
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Content</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="What would you like to discuss?"
+                      rows={6}
+                      maxLength={50000}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Button type="submit" disabled={submitting}>
-            {submitting ? "Submitting..." : "Post thread"}
-          </Button>
-        </form>
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Post thread"}
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

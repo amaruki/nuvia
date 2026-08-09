@@ -5,6 +5,7 @@ import { Copy, Edit, Eye, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Media } from "@/types/media";
 import { getMediaIcon, getStatusColor, getVisibilityIcon } from "./media-helpers";
 
@@ -46,15 +47,14 @@ export function MediaGrid({
             }
           }}
         >
-          {/* Checkbox */}
+          {/* Checkbox (visual indicator; the card itself is the toggle control) */}
           <div className="absolute top-2 left-2 z-10">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={selectedMedia.includes(item.id)}
-              onChange={() => toggleMediaSelection(item.id)}
-              className="h-4 w-4 rounded border-primary"
+              onCheckedChange={() => toggleMediaSelection(item.id)}
               aria-hidden="true"
               tabIndex={-1}
+              className="pointer-events-none"
             />
           </div>
 

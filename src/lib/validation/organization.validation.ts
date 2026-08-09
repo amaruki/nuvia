@@ -103,3 +103,39 @@ export const organizationUpdateSchema = z.object({
 });
 
 export type OrganizationUpdateInput = z.infer<typeof organizationUpdateSchema>;
+
+/**
+ * Membership application dialog (UI-33). Mirrors the request schema of
+ * POST /api/v1/membership-applications: name is required (≤200), email must
+ * be a valid address (≤320), organization and message are optional notes
+ * (≤200 / ≤2000). tierId is supplied by the dialog, never typed by the
+ * applicant, so it stays out of the form schema. The dialog maps blank
+ * optional fields to null when it builds the payload, as it always has.
+ */
+export const membershipApplicationSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "Full name is required")
+    .max(200, "Full name must be at most 200 characters"),
+
+  // Trim before the format check: applicants paste addresses with stray
+  // whitespace, and the dialog has always submitted the trimmed value.
+  email: z
+    .string()
+    .trim()
+    .min(1, "Contact email is required")
+    .pipe(
+      z
+        .email("Contact email must be a valid email address")
+        .max(320, "Contact email must be at most 320 characters"),
+    ),
+
+  organization: z.string().trim().max(200, "Organization must be at most 200 characters"),
+
+  message: z.string().trim().max(2000, "Message must be at most 2000 characters"),
+});
+
+export type MembershipApplicationFormValues = z.infer<typeof membershipApplicationSchema>;
+
+export type MembershipApplicationFormInput = z.input<typeof membershipApplicationSchema>;

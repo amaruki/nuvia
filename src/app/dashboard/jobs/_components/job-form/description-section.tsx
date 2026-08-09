@@ -1,59 +1,76 @@
-import { Label } from "@/components/ui/label";
+import { useFormContext } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
-import type { JobFormState, SetJobFormField } from "./types";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import type { JobPostingFormValues } from "@/lib/validation/job.validation";
 
-interface DescriptionSectionProps {
-  formData: JobFormState;
-  setField: SetJobFormField;
-}
+export function DescriptionSection() {
+  const { control } = useFormContext<JobPostingFormValues>();
 
-export function DescriptionSection({ formData, setField }: DescriptionSectionProps) {
   return (
     <>
-      <div className="space-y-2">
-        <Label htmlFor="description">Job Description</Label>
-        <Textarea
-          id="description"
-          placeholder="Describe the role..."
-          className="min-h-[160px]"
-          value={formData.description}
-          onChange={(e) => setField("description", e.target.value)}
-          required
-        />
-      </div>
+      <FormField
+        control={control}
+        name="description"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Job Description</FormLabel>
+            <FormControl>
+              <Textarea placeholder="Describe the role..." className="min-h-[160px]" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="requirements">Requirements</Label>
-        <Textarea
-          id="requirements"
-          placeholder="What candidates should bring..."
-          className="min-h-[120px]"
-          value={formData.requirements}
-          onChange={(e) => setField("requirements", e.target.value)}
-        />
-      </div>
+      <FormField
+        control={control}
+        name="requirements"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Requirements</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="What candidates should bring..."
+                className="min-h-[120px]"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="responsibilities">Responsibilities</Label>
-        <Textarea
-          id="responsibilities"
-          placeholder="What the role will own..."
-          className="min-h-[120px]"
-          value={formData.responsibilities}
-          onChange={(e) => setField("responsibilities", e.target.value)}
-        />
-      </div>
+      <FormField
+        control={control}
+        name="responsibilities"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Responsibilities</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="What the role will own..."
+                className="min-h-[120px]"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="benefits">Benefits</Label>
-        <Textarea
-          id="benefits"
-          placeholder="Perks and benefits..."
-          className="min-h-[120px]"
-          value={formData.benefits}
-          onChange={(e) => setField("benefits", e.target.value)}
-        />
-      </div>
+      <FormField
+        control={control}
+        name="benefits"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Benefits</FormLabel>
+            <FormControl>
+              <Textarea placeholder="Perks and benefits..." className="min-h-[120px]" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   );
 }

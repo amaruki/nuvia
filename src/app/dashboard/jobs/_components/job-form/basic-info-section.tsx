@@ -1,5 +1,6 @@
+import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -8,101 +9,131 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { JobBoardMeta } from "@/types/jobs.types";
-import type { JobFormState, SetJobFormField } from "./types";
+import type { JobPostingFormValues } from "@/lib/validation/job.validation";
 
 interface BasicInfoSectionProps {
-  formData: JobFormState;
-  setField: SetJobFormField;
   meta: JobBoardMeta;
 }
 
-export function BasicInfoSection({ formData, setField, meta }: BasicInfoSectionProps) {
+export function BasicInfoSection({ meta }: BasicInfoSectionProps) {
+  const { control, setValue } = useFormContext<JobPostingFormValues>();
+
   return (
     <>
-      <div className="space-y-2">
-        <Label htmlFor="title">Job Title</Label>
-        <Input
-          id="title"
-          placeholder="e.g. Senior Frontend Developer"
-          value={formData.title}
-          onChange={(e) => setField("title", e.target.value)}
-          required
+      <FormField
+        control={control}
+        name="title"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Job Title</FormLabel>
+            <FormControl>
+              <Input placeholder="e.g. Senior Frontend Developer" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={control}
+          name="companyId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Company</FormLabel>
+              <Select value={field.value} onValueChange={(value) => setValue("companyId", value)}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select company" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {meta.companies.map((company) => (
+                    <SelectItem key={company.id} value={company.id}>
+                      {company.displayName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="locationId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <Select value={field.value} onValueChange={(value) => setValue("locationId", value)}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {meta.locations.map((location) => (
+                    <SelectItem key={location.id} value={location.id}>
+                      {location.displayName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="company">Company</Label>
-          <Select
-            value={formData.companyId}
-            onValueChange={(value) => setField("companyId", value)}
-          >
-            <SelectTrigger id="company">
-              <SelectValue placeholder="Select company" />
-            </SelectTrigger>
-            <SelectContent>
-              {meta.companies.map((company) => (
-                <SelectItem key={company.id} value={company.id}>
-                  {company.displayName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="location">Location</Label>
-          <Select
-            value={formData.locationId}
-            onValueChange={(value) => setField("locationId", value)}
-          >
-            <SelectTrigger id="location">
-              <SelectValue placeholder="Select location" />
-            </SelectTrigger>
-            <SelectContent>
-              {meta.locations.map((location) => (
-                <SelectItem key={location.id} value={location.id}>
-                  {location.displayName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="category">Job Category</Label>
-          <Select
-            value={formData.categoryId}
-            onValueChange={(value) => setField("categoryId", value)}
-          >
-            <SelectTrigger id="category">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              {meta.categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.displayName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="type">Job Type</Label>
-          <Select value={formData.typeId} onValueChange={(value) => setField("typeId", value)}>
-            <SelectTrigger id="type">
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              {meta.types.map((type) => (
-                <SelectItem key={type.id} value={type.id}>
-                  {type.displayName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <FormField
+          control={control}
+          name="categoryId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Job Category</FormLabel>
+              <Select value={field.value} onValueChange={(value) => setValue("categoryId", value)}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {meta.categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.displayName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="typeId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Job Type</FormLabel>
+              <Select value={field.value} onValueChange={(value) => setValue("typeId", value)}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {meta.types.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.displayName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
     </>
   );

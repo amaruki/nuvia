@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,9 +14,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Form } from "@/components/ui/form";
+import { jobPostingSchema, type JobPostingFormValues } from "@/lib/validation/job.validation";
 import { createJobPosting, updateJobPosting } from "../../_lib/jobs-api";
 import { buildPayload, toFormState } from "./helpers";
-import type { JobFormProps, JobFormState } from "./types";
+import type { JobFormProps } from "./types";
 import { BasicInfoSection } from "./basic-info-section";
 import { ClassificationSection } from "./classification-section";
 import { SalarySection } from "./salary-section";
@@ -24,21 +28,19 @@ import { DescriptionSection } from "./description-section";
 
 export function JobForm({ initialData, meta, mode }: JobFormProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<JobFormState>(() => toFormState(initialData));
 
-  const setField = <K extends keyof JobFormState>(field: K, value: JobFormState[K]) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+  const form = useForm<JobPostingFormValues>({
+    resolver: zodResolver(jobPostingSchema),
+    defaultValues: toFormState(initialData),
+  });
+  const { isSubmitting } = form.formState;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const onSubmit = async (values: JobPostingFormValues) => {
     setError(null);
 
     try {
-      const payload = buildPayload(formData);
+      const payload = buildPayload(values);
       if (mode === "create") {
         await createJobPosting(payload);
       } else if (initialData) {
@@ -48,7 +50,6 @@ export function JobForm({ initialData, meta, mode }: JobFormProps) {
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save the job posting");
-      setLoading(false);
     }
   };
 
@@ -63,35 +64,37 @@ export function JobForm({ initialData, meta, mode }: JobFormProps) {
               : "Update the job details below."}
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-6">
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+        <Form {...form}>
+          <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
+            <CardContent className="space-y-6">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
 
-            <BasicInfoSection formData={formData} setField={setField} meta={meta} />
-            <ClassificationSection formData={formData} setField={setField} />
-            <SalarySection formData={formData} setField={setField} />
-            <StatusSection formData={formData} setField={setField} />
-            <SettingsSection formData={formData} setField={setField} />
-            <DescriptionSection formData={formData} setField={setField} />
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.back()}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : mode === "create" ? "Create Job" : "Update Job"}
-            </Button>
-          </CardFooter>
-        </form>
+              <BasicInfoSection meta={meta} />
+              <ClassificationSection />
+              <SalarySection />
+              <StatusSection />
+              <SettingsSection />
+              <DescriptionSection />
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : mode === "create" ? "Create Job" : "Update Job"}
+              </Button>
+            </CardFooter>
+          </form>
+        </Form>
       </Card>
     </div>
   );

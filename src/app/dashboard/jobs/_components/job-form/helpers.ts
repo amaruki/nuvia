@@ -1,7 +1,7 @@
 import type { JobPostingDto } from "@/types/jobs.types";
-import type { JobFormState } from "./types";
+import type { JobPostingFormValues } from "@/lib/validation/job.validation";
 
-export function toFormState(initialData?: JobPostingDto): JobFormState {
+export function toFormState(initialData?: JobPostingDto): JobPostingFormValues {
   if (!initialData) {
     return {
       title: "",
@@ -51,7 +51,7 @@ export function toFormState(initialData?: JobPostingDto): JobFormState {
   };
 }
 
-export function buildPayload(formData: JobFormState): Record<string, unknown> {
+export function buildPayload(formData: JobPostingFormValues): Record<string, unknown> {
   const payload: Record<string, unknown> = {
     title: formData.title,
     description: formData.description,

@@ -1,48 +1,70 @@
+import { useFormContext } from "react-hook-form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import type { JobFormState, SetJobFormField } from "./types";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import type { JobPostingFormValues } from "@/lib/validation/job.validation";
 
-interface SettingsSectionProps {
-  formData: JobFormState;
-  setField: SetJobFormField;
-}
+export function SettingsSection() {
+  const { control, setValue } = useFormContext<JobPostingFormValues>();
 
-export function SettingsSection({ formData, setField }: SettingsSectionProps) {
   return (
     <>
       <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="isRemote"
-            checked={formData.isRemote}
-            onCheckedChange={(checked) => setField("isRemote", checked === true)}
-          />
-          <Label htmlFor="isRemote" className="font-normal">
-            Remote friendly
-          </Label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="isFeatured"
-            checked={formData.isFeatured}
-            onCheckedChange={(checked) => setField("isFeatured", checked === true)}
-          />
-          <Label htmlFor="isFeatured" className="font-normal">
-            Feature on the public job board
-          </Label>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="tags">Tags (comma separated)</Label>
-        <Input
-          id="tags"
-          placeholder="e.g. react, typescript, remote"
-          value={formData.tags}
-          onChange={(e) => setField("tags", e.target.value)}
+        <FormField
+          control={control}
+          name="isRemote"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center gap-2">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => setValue("isRemote", checked === true)}
+                />
+              </FormControl>
+              <FormLabel className="font-normal">Remote friendly</FormLabel>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="isFeatured"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center gap-2">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => setValue("isFeatured", checked === true)}
+                />
+              </FormControl>
+              <FormLabel className="font-normal">Feature on the public job board</FormLabel>
+              <FormMessage />
+            </FormItem>
+          )}
         />
       </div>
+
+      <FormField
+        control={control}
+        name="tags"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Tags</FormLabel>
+            <FormControl>
+              <Input placeholder="e.g. react, typescript, remote" {...field} />
+            </FormControl>
+            <FormDescription>Separate tags with commas.</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   );
 }

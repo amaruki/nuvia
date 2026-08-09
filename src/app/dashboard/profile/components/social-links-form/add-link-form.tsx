@@ -1,6 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Plus } from "lucide-react";
 
 import { socialPlatforms, type SocialLink, type SocialPlatform } from "./platforms";
@@ -20,23 +27,26 @@ export function AddLinkForm({ newLink, onNewLinkChange, onAdd, onCancel }: AddLi
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="platform">Platform</Label>
-          <select
-            id="platform"
+          <Select
             value={newLink.platform}
-            onChange={(e) =>
+            onValueChange={(value) =>
               onNewLinkChange({
                 ...newLink,
-                platform: e.target.value as SocialPlatform,
+                platform: value as SocialPlatform,
               })
             }
-            className="w-full p-2 border rounded-md text-sm"
           >
-            {Object.entries(socialPlatforms).map(([key, platform]) => (
-              <option key={key} value={key}>
-                {platform.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id="platform" className="w-full">
+              <SelectValue placeholder="Select platform" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(socialPlatforms).map(([key, platform]) => (
+                <SelectItem key={key} value={key}>
+                  {platform.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">

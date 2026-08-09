@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -156,11 +157,11 @@ export function CategoryCard({
           {/* Actions */}
           <div className="flex items-center gap-1">
             {onSelect && (
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={selected}
-                onChange={(e) => onSelect(category, e.target.checked)}
-                className="rounded border-gray-300 mr-2"
+                onCheckedChange={(checked) => onSelect(category, checked === true)}
+                aria-label={`Select ${category.name} category`}
+                className="mr-2"
               />
             )}
 

@@ -3,9 +3,18 @@
 import { useCallback, useState } from "react";
 import { Loader2, Trash2, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
-import type { MediaUploadOptions } from "@/types/media";
+import type { MediaUploadOptions, MediaVisibility } from "@/types/media";
 import FilePreviewList from "./file-preview-list";
 import { formatFileSize } from "./helpers";
 import type { MediaUploadProps, UploadFile } from "./types";
@@ -115,67 +124,82 @@ export function MediaUpload({ onUpload, onClose, className }: MediaUploadProps) 
         <div className="p-6 border-b space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label htmlFor="media-upload-visibility" className="block text-sm font-medium mb-2">
+              <Label htmlFor="media-upload-visibility" className="block text-sm font-medium mb-2">
                 Visibility
-                <select
-                  value={uploadOptions.visibility}
-                  onChange={(e) =>
-                    setUploadOptions((prev) => ({ ...prev, visibility: e.target.value as any }))
-                  }
-                  id="media-upload-visibility"
-                  className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  disabled={isUploading}
-                >
-                  <option value="public">Public</option>
-                  <option value="private">Private</option>
-                  <option value="restricted">Restricted</option>
-                  <option value="draft">Draft</option>
-                </select>
-              </label>
+              </Label>
+              <Select
+                value={uploadOptions.visibility}
+                onValueChange={(value) =>
+                  setUploadOptions((prev) => ({ ...prev, visibility: value as MediaVisibility }))
+                }
+                disabled={isUploading}
+              >
+                <SelectTrigger id="media-upload-visibility" className="mt-1 w-full">
+                  <SelectValue placeholder="Select visibility" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="public">Public</SelectItem>
+                  <SelectItem value="private">Private</SelectItem>
+                  <SelectItem value="restricted">Restricted</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <fieldset>
               <legend className="text-sm font-medium mb-2">Options</legend>
 
               <div className="mt-2 space-y-2">
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="media-upload-generate-thumbnail"
                     checked={uploadOptions.generateThumbnail}
-                    onChange={(e) =>
-                      setUploadOptions((prev) => ({ ...prev, generateThumbnail: e.target.checked }))
+                    onCheckedChange={(checked) =>
+                      setUploadOptions((prev) => ({
+                        ...prev,
+                        generateThumbnail: checked === true,
+                      }))
                     }
                     disabled={isUploading}
-                    className="rounded border-primary"
                   />
-                  <span>Generate thumbnail</span>
-                </label>
+                  <Label htmlFor="media-upload-generate-thumbnail" className="text-sm font-normal">
+                    Generate thumbnail
+                  </Label>
+                </div>
 
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="media-upload-generate-preview"
                     checked={uploadOptions.generatePreview}
-                    onChange={(e) =>
-                      setUploadOptions((prev) => ({ ...prev, generatePreview: e.target.checked }))
+                    onCheckedChange={(checked) =>
+                      setUploadOptions((prev) => ({
+                        ...prev,
+                        generatePreview: checked === true,
+                      }))
                     }
                     disabled={isUploading}
-                    className="rounded border-primary"
                   />
-                  <span>Generate preview</span>
-                </label>
+                  <Label htmlFor="media-upload-generate-preview" className="text-sm font-normal">
+                    Generate preview
+                  </Label>
+                </div>
 
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="media-upload-extract-metadata"
                     checked={uploadOptions.extractMetadata}
-                    onChange={(e) =>
-                      setUploadOptions((prev) => ({ ...prev, extractMetadata: e.target.checked }))
+                    onCheckedChange={(checked) =>
+                      setUploadOptions((prev) => ({
+                        ...prev,
+                        extractMetadata: checked === true,
+                      }))
                     }
                     disabled={isUploading}
-                    className="rounded border-primary"
                   />
-                  <span>Extract metadata</span>
-                </label>
+                  <Label htmlFor="media-upload-extract-metadata" className="text-sm font-normal">
+                    Extract metadata
+                  </Label>
+                </div>
               </div>
             </fieldset>
           </div>

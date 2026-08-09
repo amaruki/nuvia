@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file gives guidance to AI coding agents that work in this repository. It states the canonical choice for every contested decision and links to the ADR that explains the reason. This file does not repeat that reasoning, so it stays short enough for readers to actually use it. If you are an agent and this file conflicts with something you inferred from the surrounding code, this file wins. The surrounding code may predate the decision. Do not overcommenting in codebase, Clean code comments should explain why the code exists or why a non-obvious decision was made, not restate what the code already clearly shows.
+This file gives guidance to AI coding agents that work in this repository. It states the canonical choice for every contested decision and links to the ADR that explains the reason. This file does not repeat that reasoning, so it stays short enough for readers to actually use it. If you are an agent and this file conflicts with something you inferred from the surrounding code, this file wins. The surrounding code may predate the decision. Do not overcomment the codebase: comments should explain why code exists or why a non-obvious decision was made, not restate what the code already clearly shows.
 
 ## Why this file exists
 
@@ -11,6 +11,20 @@ This file gives guidance to AI coding agents that work in this repository. It st
 1. Check `docs/adr/README.md` for whether this decision is already made. If a canonical helper, pattern, or dependency exists, use it. Do not introduce an alternative because it seems cleaner in isolation.
 2. Check `TODO.md` for whether the thing you are about to build is already scoped there, with known constraints.
 3. If you are about to import something that oxlint's `no-restricted-imports` blocks, that block has a message that names the replacement. Use the replacement. Do not work around the lint rule.
+
+## Commands
+
+```bash
+bun run dev              # dev server
+bun run typecheck        # tsc --noEmit
+bun run lint             # oxlint        (bun run lint:fix to autofix)
+bun run format:check     # oxfmt --check (bun run format to apply)
+bun test                 # unit + integration suites (all files run in one process)
+bun run guard:light      # lint + format:check + typecheck — the fast pre-commit loop
+bun run guard:heavy      # guard:light + integration tests + drizzle-kit check + build
+```
+
+Integration tests (`bun run test:integration`, `bun run test:a11y`) need the docker stack up: Postgres on `127.0.0.1:15433` and Redis on `127.0.0.1:16380`.
 
 ## Canonical choices (see the linked ADR for why)
 
@@ -32,7 +46,11 @@ Every entry in `package.json` is an exact version — no `^`, no `~`. Add a depe
 
 ## New modules are off by default
 
-A new domain module is finance, chapters, or anything not in the current enabled set (members, events, content, forums, jobs). Its feature flag stays `false` until the module has a real Drizzle schema, an authorized API, tests, and docs — all four, not some (`docs/adr/0008-module-maturity-gate.md`). You may build UI against mock data as a starting point. Do not ship that UI enabled by default.
+A new domain module — anything not yet in `MODULE_FLAGS` in `config/features.ts`, where every current module (members through workspaces) is promoted — starts with its feature flag `false`. The flag stays `false` until the module has a real Drizzle schema, an authorized API, tests, and docs — all four, not some (`docs/adr/0008-module-maturity-gate.md`). You may build UI against mock data as a starting point. Do not ship that UI enabled by default.
+
+## Files stay under 300 lines
+
+oxlint's `max-lines` warns at 300 (skipping blanks/comments). Keep files ≤300 raw lines. Split by moving the monolith into a same-named folder with a barrel `index.ts` that re-exports the public surface; page sub-parts go in a `_components/` folder under the page.
 
 ## Commits
 
@@ -40,6 +58,11 @@ A new domain module is finance, chapters, or anything not in the current enabled
 - **No `Co-Authored-By:` trailer, ever** — enforced by a commit-msg hook, not a request.
 - Separate concerns into separate commits. A dependency migration, the fallout fixes it causes, and an unrelated formatting pass are three commits, not one. See the commit history from the Drizzle migration for the pattern.
 - `lefthook`'s pre-commit hook runs oxlint and oxfmt on staged files. This hook will block a commit that fails either. Do not bypass it with `--no-verify`. If a check is wrong, fix the check in a separate commit. Do not route around it.
+
+## Testing gotchas
+
+- Never run `bun run db:seed` or `db:reset` against the shared test database mid-task: suites that assert global superadmin counts (`tests/role-assignment.test.ts`, `tests/delete-account.test.ts`) fail on seeded admins.
+- Components/services/hooks live in same-named folders with a barrel; tests are sibling concern-based files with per-file factory fixtures. Style details: `CODING_STANDARD.md`.
 
 ## When you find a bug outside your task's scope
 

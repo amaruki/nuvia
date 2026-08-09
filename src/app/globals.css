@@ -225,6 +225,10 @@ body {
   letter-spacing: var(--tracking-normal);
 }
 
+/* Fallback focus indicator for content elements that carry no ring classes of
+   their own (plain links, the skip link). Interactive primitives own the
+   focus-visible ring recipe (ui/button.tsx is the reference) and set
+   outline-none, so the two layers never double up on one element. */
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
@@ -507,26 +511,6 @@ html {
   }
   100% {
     opacity: 1;
-  }
-}
-
-/* Focus ring animations */
-.focus-ring {
-  transition: box-shadow 0.2s ease-out;
-}
-
-.focus-ring:focus {
-  box-shadow:
-    0 0 0 3px var(--ring),
-    0 0 0 1px var(--background);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }
 

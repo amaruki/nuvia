@@ -4,7 +4,7 @@
  * resolving.
  *
  * Owns payment recording (mutations.ts) and provider-webhook processing
- * (webhook.ts); the invoice aggregate lives in invoice.service.ts (scope
+ * (webhook/); the invoice aggregate lives in invoice.service.ts (scope
  * split documented there).
  *
  * Money rule (ADR-0015 §5): string-mode numeric(10,2) in and out; integer

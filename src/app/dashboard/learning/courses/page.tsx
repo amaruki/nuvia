@@ -172,7 +172,7 @@ export default function LearningPage() {
                     />
                   </div>
                   <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="w-[140px]" aria-label="Filter courses by difficulty">
                       <div className="flex items-center gap-2">
                         <Filter className="h-3.5 w-3.5" />
                         <SelectValue placeholder="Difficulty" />

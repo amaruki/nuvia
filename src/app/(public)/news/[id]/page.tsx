@@ -26,7 +26,7 @@ export default async function PublicNewsDetailPage({
           <p className="text-muted-foreground mb-6">
             The post you&apos;re looking for doesn&apos;t exist or is no longer published.
           </p>
-          <Link href="/news" className="text-blue-600 hover:underline">
+          <Link href="/news" className="text-blue-600 dark:text-blue-400 hover:underline">
             Back to News
           </Link>
         </div>

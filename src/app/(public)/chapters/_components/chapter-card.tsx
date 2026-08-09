@@ -34,7 +34,7 @@ export function ChapterCard({ chapter }: { chapter: PublicChapterSummary }) {
 
         <Link
           href={`/chapters/${chapter.id}`}
-          className="mt-4 inline-flex items-center text-blue-600 hover:underline text-sm font-medium"
+          className="mt-4 inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
         >
           View chapter
           <ArrowRight className="h-4 w-4 ml-1" />

@@ -114,7 +114,7 @@ export default async function ForumCategoryPage({
           <p className="text-muted-foreground mb-6">
             This category doesn&apos;t exist, is not active, or isn&apos;t open to your account.
           </p>
-          <Link href="/forums" className="text-blue-600 hover:underline">
+          <Link href="/forums" className="text-blue-600 dark:text-blue-400 hover:underline">
             Back to Community Forums
           </Link>
         </div>
@@ -130,7 +130,7 @@ export default async function ForumCategoryPage({
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Forum category not available</h1>
-          <Link href="/forums" className="text-blue-600 hover:underline">
+          <Link href="/forums" className="text-blue-600 dark:text-blue-400 hover:underline">
             Back to Community Forums
           </Link>
         </div>
@@ -189,7 +189,10 @@ export default async function ForumCategoryPage({
         {threads.totalPages > 1 && (
           <div className="mt-8 flex items-center justify-center gap-4 text-sm">
             {threads.page > 1 ? (
-              <Link href={pageHref(threads.page - 1)} className="text-blue-600 hover:underline">
+              <Link
+                href={pageHref(threads.page - 1)}
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+              >
                 ← Newer
               </Link>
             ) : (
@@ -199,7 +202,10 @@ export default async function ForumCategoryPage({
               Page {threads.page} of {threads.totalPages}
             </span>
             {threads.page < threads.totalPages ? (
-              <Link href={pageHref(threads.page + 1)} className="text-blue-600 hover:underline">
+              <Link
+                href={pageHref(threads.page + 1)}
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+              >
                 Older →
               </Link>
             ) : (

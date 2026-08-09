@@ -95,7 +95,10 @@ export default async function PublicNewsPage({
                 : "When articles, announcements, or publications are published, they will appear here."}
             </p>
             {type && (
-              <Link href="/news" className="inline-block mt-4 text-blue-600 hover:underline">
+              <Link
+                href="/news"
+                className="inline-block mt-4 text-blue-600 dark:text-blue-400 hover:underline"
+              >
                 Show all posts
               </Link>
             )}
@@ -132,7 +135,7 @@ export default async function PublicNewsPage({
             {page > 1 ? (
               <Link
                 href={pageHref(page - 1, type)}
-                className="text-sm font-medium text-blue-600 hover:underline"
+                className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
               >
                 ← Previous
               </Link>
@@ -147,7 +150,7 @@ export default async function PublicNewsPage({
             {page < totalPages ? (
               <Link
                 href={pageHref(page + 1, type)}
-                className="text-sm font-medium text-blue-600 hover:underline"
+                className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
               >
                 Next →
               </Link>

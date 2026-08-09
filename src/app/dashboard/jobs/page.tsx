@@ -47,12 +47,12 @@ import {
 } from "@/types/jobs.types";
 
 const STATUS_BADGE_STYLES: Record<JobStatus, string> = {
-  DRAFT: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  PUBLISHED: "bg-green-500/10 text-green-600 border-green-500/20",
-  ARCHIVED: "bg-gray-500/10 text-gray-600 border-gray-500/20",
-  CLOSED: "bg-gray-500/10 text-gray-600 border-gray-500/20",
-  FILLED: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  CANCELLED: "bg-red-500/10 text-red-600 border-red-500/20",
+  DRAFT: "bg-amber-500/10 text-amber-800 dark:text-amber-400 border-amber-500/20",
+  PUBLISHED: "bg-green-500/10 text-green-800 dark:text-green-400 border-green-500/20",
+  ARCHIVED: "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20",
+  CLOSED: "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20",
+  FILLED: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
+  CANCELLED: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
 };
 
 export default function JobsAdminPage() {

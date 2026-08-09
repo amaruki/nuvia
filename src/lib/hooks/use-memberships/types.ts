@@ -9,15 +9,17 @@ export interface UseMembershipsOptions {
 export interface UseMembershipsReturn {
   members: MembershipProfile[];
   isLoading: boolean;
+  isFetching: boolean;
   error: Error | null;
   total: number;
-  hasMore: boolean;
+  totalPages: number;
+  page: number;
+  pageSize: number;
   filters: MembershipFilter;
   sort: MembershipSort;
-  page: number;
   updateFilters: (filters: MembershipFilter) => void;
   updateSort: (sort: MembershipSort) => void;
-  loadMore: () => void;
+  setPage: (page: number) => void;
   refresh: () => void;
   reset: () => void;
 }

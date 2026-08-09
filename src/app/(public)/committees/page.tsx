@@ -40,7 +40,7 @@ export default async function PublicCommitteesPage() {
             Looking for a local chapter instead?{" "}
             <Link
               href="/chapters"
-              className="text-blue-600 hover:underline inline-flex items-center"
+              className="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center"
             >
               Browse chapters
               <ArrowRight className="h-3 w-3 ml-1" />

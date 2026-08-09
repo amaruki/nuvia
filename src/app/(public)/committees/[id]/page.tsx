@@ -41,7 +41,7 @@ export default async function PublicCommitteeDetailPage({
           <p className="text-muted-foreground mb-6">
             We couldn&apos;t load this committee. Please try again in a few minutes.
           </p>
-          <Link href="/committees" className="text-blue-600 hover:underline">
+          <Link href="/committees" className="text-blue-600 dark:text-blue-400 hover:underline">
             Back to committees
           </Link>
         </div>
@@ -57,7 +57,7 @@ export default async function PublicCommitteeDetailPage({
           <p className="text-muted-foreground mb-6">
             This committee doesn&apos;t exist or isn&apos;t currently active.
           </p>
-          <Link href="/committees" className="text-blue-600 hover:underline">
+          <Link href="/committees" className="text-blue-600 dark:text-blue-400 hover:underline">
             Back to committees
           </Link>
         </div>
@@ -145,7 +145,7 @@ export default async function PublicCommitteeDetailPage({
                 {contact.email && (
                   <a
                     href={`mailto:${contact.email}`}
-                    className="flex items-center text-blue-600 hover:underline"
+                    className="flex items-center text-blue-600 dark:text-blue-400 hover:underline"
                   >
                     <Mail className="h-4 w-4 mr-2 shrink-0" />
                     {contact.email}
@@ -154,7 +154,7 @@ export default async function PublicCommitteeDetailPage({
                 {contact.phone && (
                   <a
                     href={`tel:${contact.phone.replace(/[^+\d]/g, "")}`}
-                    className="flex items-center text-blue-600 hover:underline"
+                    className="flex items-center text-blue-600 dark:text-blue-400 hover:underline"
                   >
                     <Phone className="h-4 w-4 mr-2 shrink-0" />
                     {contact.phone}
@@ -165,7 +165,7 @@ export default async function PublicCommitteeDetailPage({
                     href={contact.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center text-blue-600 hover:underline"
+                    className="flex items-center text-blue-600 dark:text-blue-400 hover:underline"
                   >
                     <Globe className="h-4 w-4 mr-2 shrink-0" />
                     {contact.website.replace(/^https?:\/\//, "")}
@@ -191,7 +191,7 @@ export default async function PublicCommitteeDetailPage({
                       href={contact.virtualMeetingLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center text-blue-600 hover:underline"
+                      className="flex items-center text-blue-600 dark:text-blue-400 hover:underline"
                     >
                       <Video className="h-4 w-4 mr-2 shrink-0" />
                       Join virtual meeting
@@ -211,7 +211,7 @@ export default async function PublicCommitteeDetailPage({
           </p>
           <Link
             href="/chapters"
-            className="inline-flex items-center text-blue-600 hover:underline font-medium"
+            className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline font-medium"
           >
             Browse chapters
             <ArrowRight className="h-4 w-4 ml-1" />

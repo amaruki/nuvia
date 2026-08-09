@@ -25,7 +25,7 @@ export function JobCard({ job }: JobCardProps) {
             <p className="text-sm text-muted-foreground mt-1">{job.companyName}</p>
           </div>
           {job.employmentType === "FULL_TIME" ? (
-            <Badge variant="default" className="bg-blue-600 shrink-0">
+            <Badge variant="default" className="shrink-0">
               {EMPLOYMENT_TYPE_LABELS[job.employmentType]}
             </Badge>
           ) : (
@@ -50,7 +50,7 @@ export function JobCard({ job }: JobCardProps) {
             {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
           </div>
         </div>
-        <p className="text-sm text-gray-600 line-clamp-3">{job.description}</p>
+        <p className="text-sm text-muted-foreground line-clamp-3">{job.description}</p>
       </CardContent>
       <CardFooter>
         <Button asChild className="w-full">

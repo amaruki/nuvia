@@ -38,7 +38,7 @@ export default async function PublicChaptersPage() {
             Looking for a working group instead?{" "}
             <Link
               href="/committees"
-              className="text-blue-600 hover:underline inline-flex items-center"
+              className="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center"
             >
               Browse committees
               <ArrowRight className="h-3 w-3 ml-1" />

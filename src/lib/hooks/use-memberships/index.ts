@@ -1,21 +1,22 @@
 "use client";
 
 /**
- * Membership directory hook — backlog B1 (Members on real data).
+ * Membership directory hook — backlog B1 (Members on real data), UI-09 Tier A.
  *
- * Backed by the members API (`GET /api/v1/members`) instead of generated mock
- * data. The directory vocabulary is mapped onto real data:
+ * Backed by the members API (`GET /api/v1/members`) with TRUE server-side
+ * pagination: one page per query (`page`/`limit` params), no infinite
+ * load-more accumulation. The directory vocabulary is mapped onto real data:
  * - `MembershipStatus` (UI) <- derived member status per ADR-0014 (API),
  * - `MembershipTier`  (UI) <- subscription tier name / member role suffix.
  *
  * Fields with no backing column yet (location, company, committees, skills,
  * phone) stay empty. Filters for criteria the API does not support are
- * applied client-side, so they filter against those empty values until the
- * schema grows the columns.
+ * applied client-side to the loaded page, so they filter against those
+ * empty values until the schema grows the columns.
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import type { MembershipFilter, MembershipSort } from "@/types/membership.types";
 
@@ -35,6 +36,7 @@ export function useMemberships({
 }: UseMembershipsOptions = {}): UseMembershipsReturn {
   const [filters, setFilters] = useState<MembershipFilter>(initialFilters);
   const [sort, setSort] = useState<MembershipSort>(initialSort);
+  const [page, setPage] = useState(1);
 
   // Debounce the search box so typing does not fire a request per keystroke.
   const [debouncedSearch, setDebouncedSearch] = useState(filters.search ?? "");
@@ -52,7 +54,7 @@ export function useMemberships({
     [filters.statuses],
   );
 
-  const query = useInfiniteQuery({
+  const query = useQuery({
     queryKey: [
       "members-directory",
       debouncedSearch,
@@ -60,10 +62,11 @@ export function useMemberships({
       sort.field,
       sort.direction,
       pageSize,
+      page,
     ],
-    queryFn: ({ pageParam }) => {
+    queryFn: () => {
       const params = new URLSearchParams();
-      params.set("page", String(pageParam));
+      params.set("page", String(page));
       params.set("limit", String(pageSize));
       if (debouncedSearch) params.set("search", debouncedSearch);
       for (const status of memberStatusParams) params.append("memberStatus", status);
@@ -71,17 +74,16 @@ export function useMemberships({
       params.set("sortOrder", sort.direction);
       return fetchMembersPage(params);
     },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.meta.page < lastPage.meta.totalPages ? lastPage.meta.page + 1 : undefined,
+    placeholderData: keepPreviousData,
   });
 
   const fetchedMembers = useMemo(
-    () => (query.data?.pages ?? []).flatMap((page) => page.data.members).map(toMembershipProfile),
+    () => (query.data?.data.members ?? []).map(toMembershipProfile),
     [query.data],
   );
 
-  // Client-side filters for criteria the members API does not support yet.
+  // Client-side filters for criteria the members API does not support yet
+  // (they apply to the loaded page, mirroring the previous behavior).
   const members = useMemo(() => {
     // Loop-invariant: lowercased location filters change with `filters`, not per member.
     const locationsLower = filters.locations?.map((location) => location.toLowerCase());
@@ -109,19 +111,20 @@ export function useMemberships({
     });
   }, [fetchedMembers, filters]);
 
+  // Filter/sort changes always restart at page one; paging keeps the query.
   const updateFilters = useCallback((newFilters: MembershipFilter) => {
     setFilters(newFilters);
+    setPage(1);
   }, []);
 
   const updateSort = useCallback((newSort: MembershipSort) => {
     setSort(newSort);
+    setPage(1);
   }, []);
 
-  const loadMore = useCallback(() => {
-    if (query.hasNextPage && !query.isFetchingNextPage) {
-      void query.fetchNextPage();
-    }
-  }, [query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
+  const changePage = useCallback((nextPage: number) => {
+    if (nextPage >= 1) setPage(nextPage);
+  }, []);
 
   const refresh = useCallback(() => {
     void query.refetch();
@@ -130,20 +133,25 @@ export function useMemberships({
   const reset = useCallback(() => {
     setFilters(initialFilters);
     setSort(initialSort);
+    setPage(1);
   }, [initialFilters, initialSort]);
+
+  const meta = query.data?.meta;
 
   return {
     members,
     isLoading: query.isLoading,
+    isFetching: query.isFetching,
     error: query.error,
-    total: query.data?.pages[0]?.meta.total ?? 0,
-    hasMore: query.hasNextPage,
+    total: meta?.total ?? 0,
+    totalPages: meta?.totalPages ?? 1,
+    page: meta?.page ?? page,
+    pageSize,
     filters,
     sort,
-    page: query.data?.pages.length ?? 1,
     updateFilters,
     updateSort,
-    loadMore,
+    setPage: changePage,
     refresh,
     reset,
   };

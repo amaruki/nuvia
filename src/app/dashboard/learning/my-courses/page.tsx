@@ -77,7 +77,7 @@ export default function MyCoursesPage() {
         <div className="text-center py-16 border rounded-lg bg-card">
           <BookOpen className="h-12 w-12 mx-auto mb-3 text-foreground/30" />
           <h3 className="font-medium text-foreground/80 mb-1">No enrollments yet</h3>
-          <p className="text-sm text-foreground/50 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             You haven&apos;t enrolled in any courses. Browse the catalog to find your first one.
           </p>
           <Button asChild>
@@ -92,15 +92,15 @@ export default function MyCoursesPage() {
             <Card key={enrollment.id} className="flex flex-col">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="secondary" className="text-[10px] px-2 py-0.5 h-auto">
+                  <Badge variant="secondary" className="text-[11px] px-2 py-0.5 h-auto">
                     {course.category}
                   </Badge>
-                  <Badge variant="outline" className="text-[10px] px-2 py-0.5 h-auto">
+                  <Badge variant="outline" className="text-[11px] px-2 py-0.5 h-auto">
                     {course.level}
                   </Badge>
                   <Badge
                     variant={enrollment.status === "completed" ? "default" : "secondary"}
-                    className="text-[10px] px-2 py-0.5 h-auto ml-auto"
+                    className="text-[11px] px-2 py-0.5 h-auto ml-auto"
                   >
                     {ENROLLMENT_STATUS_LABELS[enrollment.status] ?? enrollment.status}
                   </Badge>

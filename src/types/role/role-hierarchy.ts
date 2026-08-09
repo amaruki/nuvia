@@ -16,6 +16,10 @@ export const ROLE_HIERARCHY: Record<PredefinedRole, number> = {
   member_student: 30,
   member: 25,
   user: 10,
+  // UI-39: demo is a custom role (isPredefinedRole("demo") is false), so this
+  // entry is never read at runtime; it exists only to satisfy the exhaustive
+  // Record<PredefinedRole, number>. Level 0 matches the custom-role default.
+  demo: 0,
 };
 
 // Role display information is now in dashboard.types.ts

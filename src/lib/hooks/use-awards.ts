@@ -4,10 +4,12 @@
  * D4: awards dashboard hooks backed by the real awards API.
  *
  * Data comes from GET /api/v1/awards/programs and GET
- * /api/v1/awards/nominations (server-side filtering, paginated; the
- * dashboard pulls a full page of 100). The dashboard list pages are
- * read-only, so no mutations are exposed — writes stay on the API surface
- * until an award form lands.
+ * /api/v1/awards/nominations (server-side filtering and pagination). The
+ * caller owns page/pageSize (via useDataTableState) and passes derived
+ * filters; both hooks return the envelope meta (total, totalPages) so the
+ * DataTable pagination footer reflects the server totals. The dashboard
+ * list pages are read-only, so no mutations are exposed — writes stay on
+ * the API surface until an award form lands.
  *
  * The API serializes dates as ISO strings; `toAwardProgramUi` /
  * `toAwardNominationUi` convert them to Date objects to satisfy the UI
@@ -15,8 +17,8 @@
  * from the fetched rows — nothing is invented.
  */
 
-import { useMemo, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch, ApiClientError } from "@/lib/api-client";
 import type {
   AwardCategory,
@@ -126,8 +128,14 @@ function computeNominationStatistics(
 // Hooks
 // ---------------------------------------------------------------------------
 
-function awardProgramsQueryPath(filters: AwardProgramFilterOptions): string {
-  const params = new URLSearchParams({ limit: "100" });
+function awardProgramsQueryPath(
+  filters: AwardProgramFilterOptions,
+  page: number,
+  limit: number,
+): string {
+  const params = new URLSearchParams();
+  params.set("page", String(page));
+  params.set("limit", String(limit));
   if (filters.status && filters.status.length > 0) params.set("status", filters.status.join(","));
   if (filters.category && filters.category.length > 0) {
     params.set("category", filters.category.join(","));
@@ -136,80 +144,115 @@ function awardProgramsQueryPath(filters: AwardProgramFilterOptions): string {
   return `/api/v1/awards/programs?${params.toString()}`;
 }
 
-export function useAwardPrograms() {
+export interface UseAwardProgramsResult {
+  programs: AwardProgram[];
+  statistics: AwardProgramOverallStatistics;
+  total: number;
+  totalPages: number;
+  loading: boolean;
+  isFetching: boolean;
+  error: string | null;
+  refreshData: () => void;
+}
+
+export function useAwardPrograms(
+  filters: AwardProgramFilterOptions,
+  page: number,
+  pageSize: number,
+): UseAwardProgramsResult {
   const queryClient = useQueryClient();
-  const [filters, setFilters] = useState<AwardProgramFilterOptions>({});
 
   const listQuery = useQuery({
-    queryKey: ["awards", "programs", filters],
-    queryFn: async () => {
-      const { data } = await apiFetch<WireAwardProgram[]>(awardProgramsQueryPath(filters));
-      return data.map(toAwardProgramUi);
-    },
+    queryKey: ["awards", "programs", filters, page, pageSize],
+    queryFn: () => apiFetch<WireAwardProgram[]>(awardProgramsQueryPath(filters, page, pageSize)),
+    placeholderData: keepPreviousData,
   });
 
   const invalidatePrograms = () => queryClient.invalidateQueries({ queryKey: ["awards"] });
 
-  const programs = useMemo(() => listQuery.data ?? [], [listQuery.data]);
+  const programs = useMemo(
+    () => (listQuery.data?.data ?? []).map(toAwardProgramUi),
+    [listQuery.data],
+  );
   const statistics = useMemo(() => computeProgramStatistics(programs), [programs]);
+  const meta = listQuery.data?.meta;
 
   return {
     programs,
     statistics,
+    total: meta?.total ?? 0,
+    totalPages: Math.max(1, meta?.totalPages ?? 1),
     loading: listQuery.isPending,
+    isFetching: listQuery.isFetching,
     error: listQuery.error
       ? listQuery.error instanceof ApiClientError
         ? listQuery.error.message
         : "Failed to fetch award programs. Please try again."
       : null,
-    filters,
-    updateFilters: (newFilters: Partial<AwardProgramFilterOptions>) => {
-      setFilters((prev) => ({ ...prev, ...newFilters }));
-    },
-    clearFilters: () => setFilters({}),
     refreshData: invalidatePrograms,
   };
 }
 
-function awardNominationsQueryPath(filters: AwardNominationFilterOptions): string {
-  const params = new URLSearchParams({ limit: "100" });
+function awardNominationsQueryPath(
+  filters: AwardNominationFilterOptions,
+  page: number,
+  limit: number,
+): string {
+  const params = new URLSearchParams();
+  params.set("page", String(page));
+  params.set("limit", String(limit));
   if (filters.status && filters.status.length > 0) params.set("status", filters.status.join(","));
   if (filters.programId) params.set("programId", filters.programId);
   if (filters.search?.trim()) params.set("search", filters.search.trim());
   return `/api/v1/awards/nominations?${params.toString()}`;
 }
 
-export function useAwardNominations() {
+export interface UseAwardNominationsResult {
+  nominations: AwardNomination[];
+  statistics: AwardNominationOverallStatistics;
+  total: number;
+  totalPages: number;
+  loading: boolean;
+  isFetching: boolean;
+  error: string | null;
+  refreshData: () => void;
+}
+
+export function useAwardNominations(
+  filters: AwardNominationFilterOptions,
+  page: number,
+  pageSize: number,
+): UseAwardNominationsResult {
   const queryClient = useQueryClient();
-  const [filters, setFilters] = useState<AwardNominationFilterOptions>({});
 
   const listQuery = useQuery({
-    queryKey: ["awards", "nominations", filters],
-    queryFn: async () => {
-      const { data } = await apiFetch<WireAwardNomination[]>(awardNominationsQueryPath(filters));
-      return data.map(toAwardNominationUi);
-    },
+    queryKey: ["awards", "nominations", filters, page, pageSize],
+    queryFn: () =>
+      apiFetch<WireAwardNomination[]>(awardNominationsQueryPath(filters, page, pageSize)),
+    placeholderData: keepPreviousData,
   });
 
   const invalidateNominations = () => queryClient.invalidateQueries({ queryKey: ["awards"] });
 
-  const nominations = useMemo(() => listQuery.data ?? [], [listQuery.data]);
+  const nominations = useMemo(
+    () => (listQuery.data?.data ?? []).map(toAwardNominationUi),
+    [listQuery.data],
+  );
   const statistics = useMemo(() => computeNominationStatistics(nominations), [nominations]);
+  const meta = listQuery.data?.meta;
 
   return {
     nominations,
     statistics,
+    total: meta?.total ?? 0,
+    totalPages: Math.max(1, meta?.totalPages ?? 1),
     loading: listQuery.isPending,
+    isFetching: listQuery.isFetching,
     error: listQuery.error
       ? listQuery.error instanceof ApiClientError
         ? listQuery.error.message
         : "Failed to fetch nominations. Please try again."
       : null,
-    filters,
-    updateFilters: (newFilters: Partial<AwardNominationFilterOptions>) => {
-      setFilters((prev) => ({ ...prev, ...newFilters }));
-    },
-    clearFilters: () => setFilters({}),
     refreshData: invalidateNominations,
   };
 }

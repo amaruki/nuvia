@@ -78,7 +78,7 @@ export function CourseCard({ course, enrollment, enrolling, onEnroll }: CourseCa
                   ? "default"
                   : "secondary"
             }
-            className="text-[10px] px-2 py-0.5 h-auto"
+            className="text-[11px] px-2 py-0.5 h-auto"
           >
             {course.level}
           </Badge>

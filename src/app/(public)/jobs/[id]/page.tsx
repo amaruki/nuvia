@@ -24,7 +24,7 @@ export default async function PublicJobDetailPage({ params }: { params: Promise<
           <p className="text-muted-foreground mb-6">
             The job you&apos;re looking for doesn&apos;t exist or has been removed.
           </p>
-          <Link href="/jobs" className="text-blue-600 hover:underline">
+          <Link href="/jobs" className="text-blue-600 dark:text-blue-400 hover:underline">
             Back to Job Board
           </Link>
         </div>
@@ -194,7 +194,9 @@ export default async function PublicJobDetailPage({ params }: { params: Promise<
                 {job.isRemote && (
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Remote</span>
-                    <span className="font-medium text-green-600">Remote friendly</span>
+                    <span className="font-medium text-green-700 dark:text-green-400">
+                      Remote friendly
+                    </span>
                   </div>
                 )}
               </CardContent>

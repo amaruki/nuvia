@@ -79,7 +79,7 @@ export default async function MemberAnnouncementsPage({
               {item.excerpt && <p className="text-sm text-muted-foreground">{item.excerpt}</p>}
               {item.content && (
                 <details>
-                  <summary className="cursor-pointer text-sm text-blue-600 hover:underline">
+                  <summary className="cursor-pointer text-sm text-blue-600 dark:text-blue-400 hover:underline">
                     Read the full announcement
                   </summary>
                   <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
@@ -97,7 +97,7 @@ export default async function MemberAnnouncementsPage({
           {page > 1 ? (
             <Link
               href={pageHref(page - 1)}
-              className="text-sm font-medium text-blue-600 hover:underline"
+              className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
             >
               ← Previous
             </Link>
@@ -112,7 +112,7 @@ export default async function MemberAnnouncementsPage({
           {page < totalPages ? (
             <Link
               href={pageHref(page + 1)}
-              className="text-sm font-medium text-blue-600 hover:underline"
+              className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
             >
               Next →
             </Link>

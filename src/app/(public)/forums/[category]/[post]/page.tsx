@@ -50,7 +50,10 @@ export default async function ForumThreadPage({
             This thread doesn&apos;t exist, hasn&apos;t been published, or isn&apos;t open to your
             account.
           </p>
-          <Link href={`/forums/${categorySlug}`} className="text-blue-600 hover:underline">
+          <Link
+            href={`/forums/${categorySlug}`}
+            className="text-blue-600 dark:text-blue-400 hover:underline"
+          >
             Back to threads
           </Link>
         </div>

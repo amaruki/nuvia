@@ -89,7 +89,7 @@ export default async function PublicForumsPage() {
             {!reader && (
               <Link
                 href="/auth/login?redirectTo=/forums"
-                className="inline-block mt-4 text-blue-600 hover:underline"
+                className="inline-block mt-4 text-blue-600 dark:text-blue-400 hover:underline"
               >
                 Sign in
               </Link>

@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Invoice } from "@/types/finance";
-import { formatCurrency, getBalanceAmount } from "./helpers";
+import { formatCurrency, getBalanceAmount, validatePaymentAmount } from "./helpers";
 
 interface PaymentDialogProps {
   open: boolean;
@@ -40,6 +40,11 @@ export default function PaymentDialog({
   onMethodChange,
   onSubmit,
 }: PaymentDialogProps) {
+  const balance = invoice ? getBalanceAmount(invoice) : null;
+  // Only surface errors once the user has typed something; an empty field is
+  // handled by the disabled submit button.
+  const amountError = amount ? validatePaymentAmount(amount, balance) : null;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -60,7 +65,14 @@ export default function PaymentDialog({
                 placeholder="0.00"
                 min="0"
                 step="0.01"
+                aria-invalid={amountError ? true : undefined}
+                aria-describedby={amountError ? "amount-error" : undefined}
               />
+              {amountError && (
+                <p id="amount-error" role="alert" className="text-sm text-destructive">
+                  {amountError}
+                </p>
+              )}
               {invoice && (
                 <p className="text-sm text-muted-foreground">
                   Outstanding: {formatCurrency(getBalanceAmount(invoice))}
@@ -90,7 +102,7 @@ export default function PaymentDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={onSubmit} disabled={!amount || !method}>
+          <Button onClick={onSubmit} disabled={!amount || !method || amountError !== null}>
             Record Payment
           </Button>
         </DialogFooter>

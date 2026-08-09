@@ -201,6 +201,19 @@ over with a stub; the visible UI states the gap instead.
   flow are verified end to end on the manual track; the Stripe track is wired
   through the gateway adapter but not exercised here. Smoke-test it with real
   test-mode keys before relying on it.
+- ☐ **Finance tables: server-side filtering.** The invoices and dues tables moved
+  to the shared DataTable layer with server pagination (`?page=&limit=`), but the
+  old client-side filter panels (status, date range, tier) were removed rather
+  than re-implemented. `GET /api/v1/finance/reports/invoices` and
+  `/reports/dues` already accept page/limit; they need server-side `q`/status/
+  date params before the toolbar search and faceted filters can drive the query
+  instead of filtering one loaded page.
+- ☐ **Gateways/budget/donations DataTable components are unwired by design.**
+  `src/components/finance/gateways-table.tsx`, `budget-transaction-table.tsx`
+  and `donations-table.tsx` are DataTable-based and reusable, but the
+  gateways page is a read-only deployment-config view (one gateway, no CRUD)
+  and the budget/donations pages are honest empty states — there are no budget
+  or donation tables in the schema. Wire these components when the stores land.
 
 ## Good first issues
 

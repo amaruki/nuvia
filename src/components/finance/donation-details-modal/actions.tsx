@@ -1,4 +1,4 @@
-import { CheckCircle, CreditCard, Download, Mail } from "lucide-react";
+import { CheckCircle, CreditCard, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Donation } from "@/types/finance";
 
@@ -48,10 +48,6 @@ export default function DonationActions({
           Send Receipt
         </Button>
       )}
-      <Button variant="outline" className="w-full sm:w-auto">
-        <Download className="h-4 w-4 mr-2" />
-        Download Receipt
-      </Button>
       <Button
         variant="outline"
         className="w-full sm:w-auto sm:ml-auto"

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Invoice } from "@/types/finance";
-import { getBalanceAmount } from "./helpers";
+import { getBalanceAmount, validatePaymentAmount } from "./helpers";
 
 interface UseInvoicesTableStateOptions {
   onRecordPayment: (invoiceId: string, amount: number, paymentMethod: string) => void;
@@ -27,13 +27,14 @@ export function useInvoicesTableState({ onRecordPayment }: UseInvoicesTableState
   };
 
   const handlePaymentSubmit = () => {
-    if (selectedInvoice && paymentAmount && paymentMethod) {
-      onRecordPayment(selectedInvoice.id, parseFloat(paymentAmount), paymentMethod);
-      setPaymentDialogOpen(false);
-      setSelectedInvoice(null);
-      setPaymentAmount("");
-      setPaymentMethod("");
-    }
+    if (!selectedInvoice || !paymentMethod) return;
+    const error = validatePaymentAmount(paymentAmount, getBalanceAmount(selectedInvoice));
+    if (error) return;
+    onRecordPayment(selectedInvoice.id, parseFloat(paymentAmount), paymentMethod);
+    setPaymentDialogOpen(false);
+    setSelectedInvoice(null);
+    setPaymentAmount("");
+    setPaymentMethod("");
   };
 
   return {

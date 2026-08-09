@@ -3,8 +3,12 @@
 /**
  * C4: invoices dashboard hook backed by the real finance services.
  *
- * Listing comes from GET /api/v1/finance/reports/invoices (invoices joined to
- * member, tier and line items). Actions go through the landed C3 endpoints:
+ * The table list comes from GET /api/v1/finance/reports/invoices with real
+ * page/limit params (URL-synced pagination). Statistics, overview cards and
+ * the recent/upcoming lists use a bounded window of the newest
+ * STATISTICS_WINDOW_LIMIT rows — the endpoint caps `limit` at 100 — so the
+ * cap is stated instead of silent. Actions go through the landed C3
+ * endpoints:
  *   POST /api/v1/finance/payments            — record a payment
  *   POST /api/v1/finance/invoices/:id/void   — void (cancel) an invoice
  *
@@ -14,25 +18,31 @@
  * honestly instead of pretending.
  */
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { ApiClientError } from "@/lib/api-client";
-import type { Invoice, InvoiceFilterOptions } from "@/types/finance";
+import type { Invoice } from "@/types/finance";
 
 import { FINANCE_QUERY_KEY } from "./constants";
-import { applyInvoiceFilters } from "./invoice-filters";
 import { buildInvoiceStatistics } from "./invoice-statistics";
-import type { UseFinanceInvoicesReturn } from "./types";
+import type { UseFinanceInvoicesOptions, UseFinanceInvoicesReturn } from "./types";
 import { useInvoiceMutations } from "./use-invoice-mutations";
-import { useInvoicesQuery, usePaymentsQuery } from "./use-invoice-queries";
+import { useInvoicesQuery, useInvoicesWindowQuery, usePaymentsQuery } from "./use-invoice-queries";
 
-export function useFinanceInvoices(): UseFinanceInvoicesReturn {
+function errorMessage(error: unknown): string {
+  return error instanceof ApiClientError ? error.message : "Failed to load invoices";
+}
+
+export function useFinanceInvoices({
+  page,
+  pageSize,
+}: UseFinanceInvoicesOptions): UseFinanceInvoicesReturn {
   const queryClient = useQueryClient();
-  const [filters, setFilters] = useState<InvoiceFilterOptions>({});
 
-  const invoicesQuery = useInvoicesQuery();
+  const invoicesQuery = useInvoicesQuery({ page, pageSize });
+  const windowQuery = useInvoicesWindowQuery();
   const paymentsQuery = usePaymentsQuery();
 
   const invalidateFinance = () => queryClient.invalidateQueries({ queryKey: FINANCE_QUERY_KEY });
@@ -41,14 +51,14 @@ export function useFinanceInvoices(): UseFinanceInvoicesReturn {
     invalidate: invalidateFinance,
   });
 
-  const invoices = useMemo(
-    () => applyInvoiceFilters(invoicesQuery.data ?? [], filters),
-    [invoicesQuery.data, filters],
-  );
+  const invoices = useMemo(() => invoicesQuery.data?.invoices ?? [], [invoicesQuery.data]);
+  const total = invoicesQuery.data?.meta.total ?? 0;
+  const totalPages = invoicesQuery.data?.meta.totalPages ?? 0;
+
+  const statisticsRows = useMemo(() => windowQuery.data ?? [], [windowQuery.data]);
+  const statistics = useMemo(() => buildInvoiceStatistics(statisticsRows), [statisticsRows]);
 
   const payments = useMemo(() => paymentsQuery.data ?? [], [paymentsQuery.data]);
-
-  const statistics = useMemo(() => buildInvoiceStatistics(invoices), [invoices]);
 
   const recordPayment = (invoiceId: string, amount: number, paymentMethod: string) => {
     if (amount <= 0) {
@@ -59,7 +69,9 @@ export function useFinanceInvoices(): UseFinanceInvoicesReturn {
   };
 
   const updateInvoiceStatus = (invoiceId: string, status: Invoice["status"]) => {
-    const invoice = invoices.find((candidate) => candidate.id === invoiceId);
+    const invoice =
+      invoices.find((candidate) => candidate.id === invoiceId) ??
+      statisticsRows.find((candidate) => candidate.id === invoiceId);
     if (!invoice) return;
 
     if (status === "paid") {
@@ -96,33 +108,26 @@ export function useFinanceInvoices(): UseFinanceInvoicesReturn {
     invalidateFinance();
   };
 
-  const updateFilters = (next: Partial<InvoiceFilterOptions>) => {
-    setFilters((current) => ({ ...current, ...next }));
-  };
-
-  const clearFilters = () => setFilters({});
-
   return {
     invoices,
-    payments,
-    statistics,
-    loading: invoicesQuery.isPending || paymentsQuery.isPending,
+    total,
+    totalPages,
+    loading: invoicesQuery.isPending || windowQuery.isPending || paymentsQuery.isPending,
+    fetching: invoicesQuery.isFetching,
     error: invoicesQuery.error
-      ? invoicesQuery.error instanceof ApiClientError
-        ? invoicesQuery.error.message
-        : "Failed to load invoices"
-      : paymentsQuery.error
-        ? paymentsQuery.error instanceof ApiClientError
-          ? paymentsQuery.error.message
-          : "Failed to load invoices"
-        : null,
-    filters,
+      ? errorMessage(invoicesQuery.error)
+      : windowQuery.error
+        ? errorMessage(windowQuery.error)
+        : paymentsQuery.error
+          ? errorMessage(paymentsQuery.error)
+          : null,
+    statisticsRows,
+    statistics,
+    payments,
     recordPayment,
     updateInvoiceStatus,
     sendReminder,
     sendInvoice,
     refreshData,
-    updateFilters,
-    clearFilters,
   };
 }

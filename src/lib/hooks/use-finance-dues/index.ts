@@ -3,9 +3,13 @@
 /**
  * C4: dues dashboard hook backed by the real finance services.
  *
- * Data comes from GET /api/v1/finance/reports/dues (the dues ledger computed
- * from membership invoices) and GET /api/v1/finance/payments (C3 payment
- * records). Writing goes through the landed C3 endpoints:
+ * The table ledger comes from GET /api/v1/finance/reports/dues with real
+ * page/limit params (URL-synced pagination). Statistics, overview cards and
+ * the recent/upcoming lists use a bounded window of the newest
+ * STATISTICS_WINDOW_LIMIT rows — the endpoint caps `limit` at 100 — so the
+ * cap is stated instead of silent. Payments come from GET
+ * /api/v1/finance/payments (C3 payment records). Writing goes through the
+ * landed C3 endpoints:
  *   POST /api/v1/finance/payments            — record a payment
  *   POST /api/v1/finance/invoices/:id/void   — void (cancel) an invoice
  *
@@ -13,25 +17,28 @@
  * and sendReminder reports that honestly instead of faking a send.
  */
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { ApiClientError } from "@/lib/api-client";
-import type { DueFilterOptions, MemberDue } from "@/types/finance";
+import type { MemberDue } from "@/types/finance";
 
 import { FINANCE_QUERY_KEY } from "./constants";
-import { applyDueFilters } from "./due-filters";
 import { buildDueStatistics } from "./due-statistics";
-import type { UseFinanceDuesReturn } from "./types";
+import type { UseFinanceDuesOptions, UseFinanceDuesReturn } from "./types";
 import { useDueMutations } from "./use-due-mutations";
-import { useDuesLedgerQuery, usePaymentsQuery } from "./use-due-queries";
+import { useDuesLedgerQuery, useDuesWindowQuery, usePaymentsQuery } from "./use-due-queries";
 
-export function useFinanceDues(): UseFinanceDuesReturn {
+function errorMessage(error: unknown): string {
+  return error instanceof ApiClientError ? error.message : "Failed to load member dues";
+}
+
+export function useFinanceDues({ page, pageSize }: UseFinanceDuesOptions): UseFinanceDuesReturn {
   const queryClient = useQueryClient();
-  const [filters, setFilters] = useState<DueFilterOptions>({});
 
-  const ledgerQuery = useDuesLedgerQuery();
+  const ledgerQuery = useDuesLedgerQuery({ page, pageSize });
+  const windowQuery = useDuesWindowQuery();
   const paymentsQuery = usePaymentsQuery();
 
   const invalidateFinance = () => queryClient.invalidateQueries({ queryKey: FINANCE_QUERY_KEY });
@@ -40,14 +47,14 @@ export function useFinanceDues(): UseFinanceDuesReturn {
     invalidate: invalidateFinance,
   });
 
-  const dues = useMemo(
-    () => applyDueFilters(ledgerQuery.data ?? [], filters),
-    [ledgerQuery.data, filters],
-  );
+  const dues = useMemo(() => ledgerQuery.data?.dues ?? [], [ledgerQuery.data]);
+  const total = ledgerQuery.data?.meta.total ?? 0;
+  const totalPages = ledgerQuery.data?.meta.totalPages ?? 0;
+
+  const statisticsRows = useMemo(() => windowQuery.data ?? [], [windowQuery.data]);
+  const statistics = useMemo(() => buildDueStatistics(statisticsRows), [statisticsRows]);
 
   const payments = useMemo(() => paymentsQuery.data ?? [], [paymentsQuery.data]);
-
-  const statistics = useMemo(() => buildDueStatistics(dues), [dues]);
 
   const recordPayment = (dueId: string, amount: number, paymentMethod: string) => {
     if (amount <= 0) {
@@ -58,7 +65,7 @@ export function useFinanceDues(): UseFinanceDuesReturn {
   };
 
   const updateDueStatus = (dueId: string, status: MemberDue["status"]) => {
-    const due = dues.find((d) => d.id === dueId);
+    const due = dues.find((d) => d.id === dueId) ?? statisticsRows.find((d) => d.id === dueId);
     if (!due) return;
 
     if (status === "paid") {
@@ -92,34 +99,27 @@ export function useFinanceDues(): UseFinanceDuesReturn {
     invalidateFinance();
   };
 
-  const updateFilters = (next: Partial<DueFilterOptions>) => {
-    setFilters((current) => ({ ...current, ...next }));
-  };
-
-  const clearFilters = () => setFilters({});
-
   return {
     dues,
+    total,
+    totalPages,
+    loading: ledgerQuery.isPending || windowQuery.isPending || paymentsQuery.isPending,
+    fetching: ledgerQuery.isFetching,
+    error: ledgerQuery.error
+      ? errorMessage(ledgerQuery.error)
+      : windowQuery.error
+        ? errorMessage(windowQuery.error)
+        : paymentsQuery.error
+          ? errorMessage(paymentsQuery.error)
+          : null,
+    statisticsRows,
+    statistics,
     payments,
     /** No reminders table exists in the schema; the dashboard shows none. */
     reminders: [] as never[],
-    statistics,
-    loading: ledgerQuery.isPending || paymentsQuery.isPending,
-    error: ledgerQuery.error
-      ? ledgerQuery.error instanceof ApiClientError
-        ? ledgerQuery.error.message
-        : "Failed to load member dues"
-      : paymentsQuery.error
-        ? paymentsQuery.error instanceof ApiClientError
-          ? paymentsQuery.error.message
-          : "Failed to load member dues"
-        : null,
-    filters,
     updateDueStatus,
     recordPayment,
     sendReminder,
     refreshData,
-    updateFilters,
-    clearFilters,
   };
 }

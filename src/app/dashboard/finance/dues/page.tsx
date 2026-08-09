@@ -5,8 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { DuesOverviewCards } from "@/components/finance/dues-overview-cards";
 import { DuesTable } from "@/components/finance/dues-table";
-import { DuesFilters } from "@/components/finance/dues-filters";
 import { useFinanceDues } from "@/lib/hooks/use-finance-dues";
+import { useDataTableState } from "@/hooks/use-data-table-state";
 import { useHeader } from "@/contexts/dashboard-context";
 import { CollectionTrendCard } from "./_components/collection-trend-card";
 import { DuesActionBar } from "./_components/dues-action-bar";
@@ -18,23 +18,29 @@ import { UpcomingDuesCard } from "./_components/upcoming-dues-card";
 
 export default function FinanceDues() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [showFilters, setShowFilters] = useState(false);
   const { setHeader, clearHeader } = useHeader();
+
+  // URL-synced table state (sort/search/page) shared with the table.
+  const tableState = useDataTableState({ defaultPageSize: 20 });
 
   const {
     dues,
+    total,
+    totalPages,
+    statisticsRows,
     payments,
     statistics,
     loading,
+    fetching,
     error,
-    filters,
     updateDueStatus,
     recordPayment,
     sendReminder,
     refreshData,
-    updateFilters,
-    clearFilters,
-  } = useFinanceDues();
+  } = useFinanceDues({
+    page: tableState.state.page,
+    pageSize: tableState.state.pageSize,
+  });
 
   useEffect(() => {
     setHeader({
@@ -46,6 +52,13 @@ export default function FinanceDues() {
       clearHeader();
     };
   }, [setHeader, clearHeader]);
+
+  // Clamp a stale ?page= param after the ledger shrinks.
+  useEffect(() => {
+    if (totalPages > 0 && tableState.state.page > totalPages) {
+      tableState.setPage(totalPages);
+    }
+  }, [totalPages, tableState.state.page, tableState]);
 
   if (loading) {
     return <DuesLoadingState />;
@@ -62,20 +75,10 @@ export default function FinanceDues() {
 
       {/* Action Bar */}
       <DuesActionBar
-        totalDues={dues.length}
+        totalDues={total}
         overdueCount={statistics?.overdueCount}
-        onToggleFilters={() => setShowFilters(!showFilters)}
         onRefresh={refreshData}
       />
-
-      {/* Filters Panel */}
-      {showFilters && (
-        <DuesFilters
-          filters={filters}
-          onFiltersChange={updateFilters}
-          onClearFilters={clearFilters}
-        />
-      )}
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -89,10 +92,10 @@ export default function FinanceDues() {
         <TabsContent value="overview" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             {/* Recent Dues */}
-            <RecentDuesCard dues={dues} />
+            <RecentDuesCard dues={statisticsRows} />
 
             {/* Upcoming Dues */}
-            <UpcomingDuesCard dues={dues} />
+            <UpcomingDuesCard dues={statisticsRows} />
           </div>
 
           {/* Collection Trend */}
@@ -102,10 +105,15 @@ export default function FinanceDues() {
         <TabsContent value="dues" className="space-y-6">
           <DuesTable
             dues={dues}
+            total={total}
+            totalPages={totalPages}
             payments={payments}
+            loading={fetching}
             onRecordPayment={recordPayment}
             onSendReminder={sendReminder}
             onUpdateStatus={updateDueStatus}
+            onRefresh={refreshData}
+            tableState={tableState}
           />
         </TabsContent>
 

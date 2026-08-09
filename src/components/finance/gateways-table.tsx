@@ -1,14 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Power,
+  PowerOff,
+  Star,
+  TestTube,
+  Trash2,
+  XCircle,
+} from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
+import { format, formatDistanceToNow } from "date-fns";
+
+import {
+  DataTable,
+  DataTableColumnHeader,
+  DataTablePagination,
+  DataTableSearch,
+  DataTableViewOptions,
+} from "@/components/data-table";
+import { useDataTableState } from "@/hooks/use-data-table-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,24 +36,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
-import {
-  MoreHorizontal,
-  Eye,
-  Edit,
-  Trash2,
-  TestTube,
-  Power,
-  PowerOff,
-  Star,
-  StarOff,
-  ExternalLink,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Clock,
-} from "lucide-react";
 import { PaymentGateway } from "@/types/finance";
-import { formatDistanceToNow } from "date-fns";
 
 interface GatewaysTableProps {
   gateways: PaymentGateway[];
@@ -44,9 +44,32 @@ interface GatewaysTableProps {
   onEdit: (gateway: PaymentGateway) => void;
   onDelete: (gateway: PaymentGateway) => void;
   onToggleStatus: (gateway: PaymentGateway, enabled: boolean) => void;
-  onTest: (gateway: PaymentGateway) => void;
+  onTest: (gateway: PaymentGateway) => Promise<void> | void;
   onSetDefault: (gateway: PaymentGateway) => void;
 }
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+
+const STATUS_ICONS: Record<string, typeof CheckCircle> = {
+  active: CheckCircle,
+  inactive: XCircle,
+  testing: Clock,
+  error: AlertTriangle,
+};
+
+const STATUS_VARIANTS: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
+  active: "default",
+  inactive: "secondary",
+  testing: "outline",
+  error: "destructive",
+};
 
 export function GatewaysTable({
   gateways,
@@ -58,216 +81,322 @@ export function GatewaysTable({
   onSetDefault,
 }: GatewaysTableProps) {
   const [testingGateway, setTestingGateway] = useState<string | null>(null);
+  const tableState = useDataTableState({ defaultPageSize: 20 });
+  const { page, pageSize, globalFilter, sorting } = tableState.state;
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "active":
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "inactive":
-        return <XCircle className="h-4 w-4 text-red-500" />;
-      case "testing":
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      case "error":
-        return <AlertTriangle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
-    }
-  };
+  const handleTest = useCallback(
+    async (gateway: PaymentGateway) => {
+      setTestingGateway(gateway.id);
+      try {
+        await onTest(gateway);
+      } finally {
+        setTestingGateway(null);
+      }
+    },
+    [onTest],
+  );
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      active: "default" as const,
-      inactive: "secondary" as const,
-      testing: "outline" as const,
-      error: "destructive" as const,
-    };
+  // Client-mode table: filter and sort in memory, then slice the page.
+  const filtered = useMemo(() => {
+    const query = globalFilter.trim().toLowerCase();
+    const searched = query
+      ? gateways.filter(
+          (gateway) =>
+            gateway.displayName.toLowerCase().includes(query) ||
+            gateway.provider.toLowerCase().includes(query),
+        )
+      : gateways;
 
-    return (
-      <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
-    );
-  };
+    const [{ id, desc } = { id: "displayName", desc: false }] = sorting;
+    const sorted = [...searched].sort((a, b) => {
+      const valueOf = (gateway: PaymentGateway): number | string => {
+        switch (id) {
+          case "provider":
+            return gateway.provider.toLowerCase();
+          case "status":
+            return gateway.status;
+          case "totalTransactions":
+            return gateway.statistics.totalTransactions;
+          case "totalVolume":
+            return gateway.statistics.totalVolume;
+          case "successRate":
+            return gateway.statistics.successRate;
+          default:
+            return gateway.displayName.toLowerCase();
+        }
+      };
+      const left = valueOf(a);
+      const right = valueOf(b);
+      const compared = left < right ? -1 : left > right ? 1 : 0;
+      return desc ? -compared : compared;
+    });
 
-  const getEnvironmentBadge = (environment: string) => {
-    return (
-      <Badge variant={environment === "production" ? "default" : "outline"}>
-        {environment === "production" ? "Prod" : "Sandbox"}
-      </Badge>
-    );
-  };
+    return sorted;
+  }, [gateways, globalFilter, sorting]);
 
-  const handleTest = async (gateway: PaymentGateway) => {
-    setTestingGateway(gateway.id);
-    try {
-      await onTest(gateway);
-    } finally {
-      setTestingGateway(null);
-    }
-  };
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const clampedPage = Math.min(page, pageCount);
+  const pageRows = useMemo(
+    () => filtered.slice((clampedPage - 1) * pageSize, clampedPage * pageSize),
+    [filtered, clampedPage, pageSize],
+  );
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const columns = useMemo<ColumnDef<PaymentGateway>[]>(
+    () => [
+      {
+        id: "displayName",
+        accessorKey: "displayName",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Gateway" className="justify-start" />
+        ),
+        cell: ({ row }) => {
+          const StatusIcon = STATUS_ICONS[row.original.status] ?? Clock;
+          return (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                <StatusIcon className="h-4 w-4" aria-hidden="true" />
+              </div>
+              <div className="min-w-0">
+                <div className="font-medium">{row.original.displayName}</div>
+                <div className="text-sm text-muted-foreground">
+                  {row.original.currencies.join(", ")}
+                </div>
+              </div>
+              {row.original.isDefault && (
+                <Star className="h-4 w-4 text-yellow-500" aria-label="Default gateway" />
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        id: "provider",
+        accessorKey: "provider",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Provider" />,
+        cell: ({ row }) => (
+          <Badge variant="outline" className="capitalize">
+            {row.original.provider}
+          </Badge>
+        ),
+      },
+      {
+        id: "status",
+        accessorKey: "status",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2">
+            <Badge variant={STATUS_VARIANTS[row.original.status] ?? "secondary"}>
+              {row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1)}
+            </Badge>
+            {row.original.lastTestedAt && (
+              <span
+                className="text-xs text-muted-foreground"
+                title={format(new Date(row.original.lastTestedAt), "MMM d, yyyy HH:mm")}
+              >
+                Tested{" "}
+                {formatDistanceToNow(new Date(row.original.lastTestedAt), { addSuffix: true })}
+              </span>
+            )}
+          </div>
+        ),
+      },
+      {
+        id: "environment",
+        accessorKey: "environment",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Environment" />,
+        cell: ({ row }) => (
+          <Badge variant={row.original.environment === "production" ? "default" : "outline"}>
+            {row.original.environment === "production" ? "Prod" : "Sandbox"}
+          </Badge>
+        ),
+      },
+      {
+        id: "totalTransactions",
+        accessorFn: (row) => row.statistics.totalTransactions,
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Transactions" className="justify-end" />
+        ),
+        cell: ({ row }) => (
+          <div className="text-right">
+            <div className="font-medium tabular-nums">
+              {row.original.statistics.totalTransactions.toLocaleString()}
+            </div>
+            <div className="text-sm text-muted-foreground tabular-nums">
+              {row.original.statistics.monthlyTransactions[0]?.count || 0} this month
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "totalVolume",
+        accessorFn: (row) => row.statistics.totalVolume,
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Volume" className="justify-end" />
+        ),
+        cell: ({ row }) => (
+          <div className="text-right">
+            <div className="font-medium tabular-nums">
+              {formatCurrency(row.original.statistics.totalVolume)}
+            </div>
+            <div className="text-sm text-muted-foreground tabular-nums">
+              {formatCurrency(row.original.statistics.monthlyTransactions[0]?.volume || 0)} this
+              month
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "successRate",
+        accessorFn: (row) => row.statistics.successRate,
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Success Rate" className="justify-end" />
+        ),
+        cell: ({ row }) => (
+          <div className="flex items-center justify-end gap-2">
+            <span
+              className={`font-medium tabular-nums ${
+                row.original.statistics.successRate >= 95
+                  ? "text-green-600"
+                  : row.original.statistics.successRate >= 90
+                    ? "text-yellow-600"
+                    : "text-red-600"
+              }`}
+            >
+              {row.original.statistics.successRate.toFixed(1)}%
+            </span>
+            {row.original.statistics.errorRates.length > 0 && (
+              <AlertTriangle className="h-4 w-4 text-yellow-500" aria-hidden="true" />
+            )}
+          </div>
+        ),
+      },
+      {
+        id: "enabled",
+        enableSorting: false,
+        accessorFn: (row) => (row.isEnabled ? "enabled" : "disabled"),
+        header: "Enabled",
+        cell: ({ row }) => (
+          <Switch
+            checked={row.original.isEnabled}
+            onCheckedChange={(checked) => onToggleStatus(row.original, checked)}
+            disabled={row.original.status === "testing"}
+            aria-label={`Toggle ${row.original.displayName}`}
+          />
+        ),
+      },
+      {
+        id: "actions",
+        enableSorting: false,
+        enableHiding: false,
+        cell: ({ row }) => (
+          <div className="flex justify-end">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="h-8 w-8 p-0"
+                  aria-label={`Actions for ${row.original.displayName} gateway`}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onViewDetails(row.original)}>
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Details
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onEdit(row.original)}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleTest(row.original)}
+                  disabled={testingGateway === row.original.id}
+                >
+                  <TestTube className="mr-2 h-4 w-4" />
+                  {testingGateway === row.original.id ? "Testing..." : "Test Connection"}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {!row.original.isDefault && (
+                  <DropdownMenuItem onClick={() => onSetDefault(row.original)}>
+                    <Star className="mr-2 h-4 w-4" />
+                    Set as Default
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  onClick={() => onToggleStatus(row.original, !row.original.isEnabled)}
+                >
+                  {row.original.isEnabled ? (
+                    <>
+                      <PowerOff className="mr-2 h-4 w-4" />
+                      Disable
+                    </>
+                  ) : (
+                    <>
+                      <Power className="mr-2 h-4 w-4" />
+                      Enable
+                    </>
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => onDelete(row.original)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ),
+      },
+    ],
+    [onViewDetails, onEdit, onDelete, onToggleStatus, onSetDefault, testingGateway, handleTest],
+  );
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Gateway</TableHead>
-            <TableHead>Provider</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Environment</TableHead>
-            <TableHead>Transactions</TableHead>
-            <TableHead>Volume</TableHead>
-            <TableHead>Success Rate</TableHead>
-            <TableHead>Enabled</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {gateways.map((gateway) => (
-            <TableRow key={gateway.id} className="hover:bg-muted/50">
-              <TableCell>
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                    {getStatusIcon(gateway.status)}
-                  </div>
-                  <div>
-                    <div className="font-medium">{gateway.displayName}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {gateway.currencies.join(", ")}
-                    </div>
-                  </div>
-                  {gateway.isDefault && <Star className="h-4 w-4 text-yellow-500" />}
-                </div>
-              </TableCell>
-              <TableCell>
-                <Badge variant="outline" className="capitalize">
-                  {gateway.provider}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center space-x-2">
-                  {getStatusBadge(gateway.status)}
-                  {gateway.lastTestedAt && (
-                    <span className="text-xs text-muted-foreground">
-                      Tested {formatDistanceToNow(gateway.lastTestedAt, { addSuffix: true })}
-                    </span>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>{getEnvironmentBadge(gateway.environment)}</TableCell>
-              <TableCell>
-                <div>
-                  <div className="font-medium">
-                    {gateway.statistics.totalTransactions.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {gateway.statistics.monthlyTransactions[0]?.count || 0} this month
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div>
-                  <div className="font-medium">
-                    {formatCurrency(gateway.statistics.totalVolume)}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {formatCurrency(gateway.statistics.monthlyTransactions[0]?.volume || 0)} this
-                    month
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center space-x-2">
-                  <span
-                    className={`font-medium ${
-                      gateway.statistics.successRate >= 95
-                        ? "text-green-600"
-                        : gateway.statistics.successRate >= 90
-                          ? "text-yellow-600"
-                          : "text-red-600"
-                    }`}
-                  >
-                    {gateway.statistics.successRate.toFixed(1)}%
-                  </span>
-                  {gateway.statistics.errorRates.length > 0 && (
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>
-                <Switch
-                  checked={gateway.isEnabled}
-                  onCheckedChange={(checked) => onToggleStatus(gateway, checked)}
-                  disabled={gateway.status === "testing"}
-                />
-              </TableCell>
-              <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onViewDetails(gateway)}>
-                      <Eye className="mr-2 h-4 w-4" />
-                      View Details
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onEdit(gateway)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleTest(gateway)}
-                      disabled={testingGateway === gateway.id}
-                    >
-                      <TestTube className="mr-2 h-4 w-4" />
-                      {testingGateway === gateway.id ? "Testing..." : "Test Connection"}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    {!gateway.isDefault && (
-                      <DropdownMenuItem onClick={() => onSetDefault(gateway)}>
-                        <Star className="mr-2 h-4 w-4" />
-                        Set as Default
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem onClick={() => onToggleStatus(gateway, !gateway.isEnabled)}>
-                      {gateway.isEnabled ? (
-                        <>
-                          <PowerOff className="mr-2 h-4 w-4" />
-                          Disable
-                        </>
-                      ) : (
-                        <>
-                          <Power className="mr-2 h-4 w-4" />
-                          Enable
-                        </>
-                      )}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => onDelete(gateway)}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <DataTable
+      columns={columns}
+      data={pageRows}
+      getRowId={(row) => row.id}
+      manualSorting
+      sorting={tableState.state.sorting}
+      onSortingChange={(updater) =>
+        tableState.setSorting(
+          typeof updater === "function" ? updater(tableState.state.sorting) : updater,
+        )
+      }
+      manualFiltering
+      globalFilter={tableState.state.globalFilter}
+      onGlobalFilterChange={(updater) =>
+        tableState.setGlobalFilter(
+          typeof updater === "function" ? updater(tableState.state.globalFilter) : updater,
+        )
+      }
+      caption="Payment gateways"
+      emptyTitle="No gateways configured"
+      emptyDescription="Add a payment gateway to start accepting payments."
+      toolbar={(table) => (
+        <>
+          <DataTableSearch
+            value={tableState.state.globalFilter}
+            onValueChange={tableState.setGlobalFilter}
+            placeholder="Search gateways…"
+          />
+          <DataTableViewOptions table={table} />
+        </>
+      )}
+      pagination={
+        <DataTablePagination
+          page={clampedPage}
+          pageCount={pageCount}
+          total={filtered.length}
+          pageSize={pageSize}
+          onPageChange={tableState.setPage}
+          onPageSizeChange={tableState.setPageSize}
+        />
+      }
+    />
   );
 }

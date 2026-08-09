@@ -1,9 +1,4 @@
-import type {
-  Invoice,
-  InvoiceFilterOptions,
-  InvoicePayment,
-  InvoiceStatistics,
-} from "@/types/finance";
+import type { Invoice, InvoicePayment, InvoiceStatistics } from "@/types/finance";
 
 // ---------------------------------------------------------------------------
 // Wire shapes (ISO dates, decimal strings) returned by the finance API
@@ -53,23 +48,35 @@ export interface RecordPaymentInput {
 // Hook contract
 // ---------------------------------------------------------------------------
 
+export interface UseFinanceInvoicesOptions {
+  /** 1-based page of the invoices table. */
+  page: number;
+  /** Rows per page requested from the report endpoint. */
+  pageSize: number;
+}
+
 export interface UseFinanceInvoicesReturn {
-  // Data
+  // Table data (one server-paginated page)
   invoices: Invoice[];
-  payments: InvoicePayment[];
-  statistics: InvoiceStatistics;
+  total: number;
+  totalPages: number;
+  /** Initial load gate for the whole page. */
   loading: boolean;
+  /** True while a table page/refetch is in flight (skeleton rows). */
+  fetching: boolean;
   error: string | null;
-  filters: InvoiceFilterOptions;
+
+  // Aggregate window (newest STATISTICS_WINDOW_LIMIT rows, documented cap)
+  statisticsRows: Invoice[];
+  statistics: InvoiceStatistics;
+
+  // Payments window (most recent records, documented cap)
+  payments: InvoicePayment[];
 
   // Actions
   recordPayment: (invoiceId: string, amount: number, paymentMethod: string) => void;
   updateInvoiceStatus: (invoiceId: string, status: Invoice["status"]) => void;
   sendReminder: (invoiceId: string, type: "email" | "sms" | "in_app") => void;
   sendInvoice: (invoiceId: string) => void;
-
-  // Filter and refresh operations
   refreshData: () => void;
-  updateFilters: (next: Partial<InvoiceFilterOptions>) => void;
-  clearFilters: () => void;
 }

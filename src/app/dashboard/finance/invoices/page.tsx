@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useFinanceInvoices } from "@/lib/hooks/use-finance-invoices";
+import { useDataTableState } from "@/hooks/use-data-table-state";
 import { useHeader } from "@/contexts/dashboard-context";
-import { InvoicesFilters } from "@/components/finance/invoices-filters";
 import { InvoicesOverviewCards } from "@/components/finance/invoices-overview-cards";
 import { InvoicesTable } from "@/components/finance/invoices-table";
 import { ActionBar } from "./_components/action-bar";
@@ -16,24 +16,29 @@ import { PaymentsTab } from "./_components/payments-tab";
 
 export default function FinanceInvoices() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [showFilters, setShowFilters] = useState(false);
   const { setHeader, clearHeader } = useHeader();
+
+  // URL-synced table state (sort/search/page) shared with the table.
+  const tableState = useDataTableState({ defaultPageSize: 20 });
 
   const {
     invoices,
+    total,
+    totalPages,
+    statisticsRows,
     payments,
     statistics,
     loading,
+    fetching,
     error,
-    filters,
-    updateInvoiceStatus,
     recordPayment,
     sendInvoice,
     sendReminder,
     refreshData,
-    updateFilters,
-    clearFilters,
-  } = useFinanceInvoices();
+  } = useFinanceInvoices({
+    page: tableState.state.page,
+    pageSize: tableState.state.pageSize,
+  });
 
   useEffect(() => {
     setHeader({
@@ -45,6 +50,13 @@ export default function FinanceInvoices() {
       clearHeader();
     };
   }, [setHeader, clearHeader]);
+
+  // Clamp a stale ?page= param after the list shrinks.
+  useEffect(() => {
+    if (totalPages > 0 && tableState.state.page > totalPages) {
+      tableState.setPage(totalPages);
+    }
+  }, [totalPages, tableState.state.page, tableState]);
 
   if (loading) {
     return <LoadingState />;
@@ -60,21 +72,7 @@ export default function FinanceInvoices() {
       {statistics && <InvoicesOverviewCards statistics={statistics} />}
 
       {/* Action Bar */}
-      <ActionBar
-        totalItems={invoices.length}
-        statistics={statistics}
-        onToggleFilters={() => setShowFilters(!showFilters)}
-        onRefresh={refreshData}
-      />
-
-      {/* Filters Panel */}
-      {showFilters && (
-        <InvoicesFilters
-          filters={filters}
-          onFiltersChange={updateFilters}
-          onClearFilters={clearFilters}
-        />
-      )}
+      <ActionBar totalItems={total} statistics={statistics} onRefresh={refreshData} />
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -94,17 +92,21 @@ export default function FinanceInvoices() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <OverviewTab invoices={invoices} statistics={statistics} />
+          <OverviewTab invoices={statisticsRows} statistics={statistics} />
         </TabsContent>
 
         <TabsContent value="invoices" className="space-y-6">
           <InvoicesTable
             invoices={invoices}
+            total={total}
+            totalPages={totalPages}
             payments={payments}
+            loading={fetching}
             onRecordPayment={recordPayment}
-            onSendReminder={sendReminder}
-            onUpdateStatus={updateInvoiceStatus}
             onSendInvoice={sendInvoice}
+            onSendReminder={sendReminder}
+            onRefresh={refreshData}
+            tableState={tableState}
           />
         </TabsContent>
 
@@ -113,7 +115,7 @@ export default function FinanceInvoices() {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
-          <AnalyticsTab invoices={invoices} statistics={statistics} />
+          <AnalyticsTab invoices={statisticsRows} statistics={statistics} />
         </TabsContent>
       </Tabs>
     </div>

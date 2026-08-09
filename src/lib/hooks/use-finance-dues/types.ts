@@ -1,4 +1,4 @@
-import type { DueFilterOptions, DuePayment, DueStatistics, MemberDue } from "@/types/finance";
+import type { DuePayment, DueStatistics, MemberDue } from "@/types/finance";
 
 // ---------------------------------------------------------------------------
 // Wire shapes (ISO dates, decimal strings) returned by the finance API
@@ -47,24 +47,36 @@ export interface RecordPaymentInput {
 // Hook contract
 // ---------------------------------------------------------------------------
 
+export interface UseFinanceDuesOptions {
+  /** 1-based page of the dues table. */
+  page: number;
+  /** Rows per page requested from the report endpoint. */
+  pageSize: number;
+}
+
 export interface UseFinanceDuesReturn {
-  // Data
+  // Table data (one server-paginated page)
   dues: MemberDue[];
+  total: number;
+  totalPages: number;
+  /** Initial load gate for the whole page. */
+  loading: boolean;
+  /** True while a table page/refetch is in flight (skeleton rows). */
+  fetching: boolean;
+  error: string | null;
+
+  // Aggregate window (newest STATISTICS_WINDOW_LIMIT rows, documented cap)
+  statisticsRows: MemberDue[];
+  statistics: DueStatistics;
+
+  // Payments window (most recent records, documented cap)
   payments: DuePayment[];
   /** No reminders table exists in the schema; the dashboard shows none. */
   reminders: never[];
-  statistics: DueStatistics;
-  loading: boolean;
-  error: string | null;
-  filters: DueFilterOptions;
 
   // Actions
   updateDueStatus: (dueId: string, status: MemberDue["status"]) => void;
   recordPayment: (dueId: string, amount: number, paymentMethod: string) => void;
   sendReminder: (dueId: string, type: "email" | "sms" | "in_app") => void;
-
-  // Filter and refresh operations
   refreshData: () => void;
-  updateFilters: (next: Partial<DueFilterOptions>) => void;
-  clearFilters: () => void;
 }

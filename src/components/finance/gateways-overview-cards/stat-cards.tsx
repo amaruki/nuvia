@@ -112,11 +112,11 @@ export function ActiveGatewaysCard({ statistics }: GatewayStatisticsCardProps) {
           </span>
           <span className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
             {statistics.inactiveGateways > 0 ? (
-              <span className="text-rose-500 flex items-center gap-1">
+              <span className="text-rose-700 dark:text-rose-400 flex items-center gap-1">
                 <AlertTriangle className="h-3 w-3" /> {statistics.inactiveGateways} Inactive
               </span>
             ) : (
-              <span className="text-emerald-600 flex items-center gap-1">
+              <span className="text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
                 <CheckCircle2 className="h-3 w-3" /> All systems operational
               </span>
             )}

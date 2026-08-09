@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { MemberDue } from "@/types/finance";
-import { formatCurrency } from "./helpers";
+import { formatCurrency, validatePaymentAmount } from "./helpers";
 
 interface PaymentDialogProps {
   open: boolean;
@@ -40,6 +40,8 @@ export function PaymentDialog({
   onMethodChange,
   onSubmit,
 }: PaymentDialogProps) {
+  const amountError = amount ? validatePaymentAmount(amount, due ? due.balanceAmount : null) : null;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -60,7 +62,14 @@ export function PaymentDialog({
                 placeholder="0.00"
                 min="0"
                 step="0.01"
+                aria-invalid={amountError ? true : undefined}
+                aria-describedby={amountError ? "amount-error" : undefined}
               />
+              {amountError && (
+                <p id="amount-error" role="alert" className="text-sm text-destructive">
+                  {amountError}
+                </p>
+              )}
               {due && (
                 <p className="text-sm text-muted-foreground">
                   Outstanding: {formatCurrency(due.balanceAmount)}
@@ -90,7 +99,7 @@ export function PaymentDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={onSubmit} disabled={!amount || !method}>
+          <Button onClick={onSubmit} disabled={!amount || !method || amountError !== null}>
             Record Payment
           </Button>
         </DialogFooter>

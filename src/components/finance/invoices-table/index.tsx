@@ -1,20 +1,40 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { InvoiceDetailsModal } from "../invoice-details-modal";
-import InvoiceCard from "./invoice-card";
-import InvoiceRow from "./invoice-row";
+import { useMemo } from "react";
+import { FileText } from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
+import { format, formatDistanceToNow } from "date-fns";
+
+import {
+  DataTable,
+  DataTableColumnHeader,
+  DataTablePagination,
+  DataTableSearch,
+  DataTableViewOptions,
+} from "@/components/data-table";
+import { InvoiceDetailsModal } from "@/components/finance/invoice-details-modal";
+import type { Invoice } from "@/types/finance";
+
+import { formatCurrencyExact, getBalanceAmount, getPaidAmount } from "./helpers";
+import { InvoiceActionsMenu } from "./invoice-actions-menu";
 import PaymentDialog from "./payment-dialog";
+import InvoiceStatusBadge from "./status-badge";
 import type { InvoicesTableProps } from "./types";
 import { useInvoicesTableState } from "./use-invoices-table-state";
 
 export function InvoicesTable({
   invoices,
+  total,
+  totalPages,
   payments,
+  loading,
+  error,
+  onViewDetails,
   onRecordPayment,
-  onSendReminder,
   onSendInvoice,
+  onSendReminder,
+  onRefresh,
+  tableState,
 }: InvoicesTableProps) {
   const {
     selectedInvoice,
@@ -29,63 +49,186 @@ export function InvoicesTable({
     handleViewDetails,
     handleRecordPayment,
     handlePaymentSubmit,
-  } = useInvoicesTableState({ onRecordPayment });
+  } = useInvoicesTableState({
+    onRecordPayment: (invoiceId, amount, paymentMethod) => {
+      onRecordPayment?.(invoiceId, amount, paymentMethod);
+    },
+  });
+
+  const columns = useMemo<ColumnDef<Invoice>[]>(
+    () => [
+      {
+        id: "invoiceNumber",
+        accessorKey: "invoiceNumber",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Invoice" className="justify-start" />
+        ),
+        cell: ({ row }) => (
+          <div className="space-y-0.5">
+            <span className="font-medium tabular-nums">{row.original.invoiceNumber}</span>
+            <span className="block text-xs text-muted-foreground">
+              Issued {format(row.original.createdAt, "MMM d, yyyy")}
+            </span>
+          </div>
+        ),
+      },
+      {
+        id: "clientName",
+        accessorKey: "clientName",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Client" />,
+        cell: ({ row }) => <span>{row.original.clientName}</span>,
+      },
+      {
+        id: "amount",
+        accessorFn: (row) => row.totalAmount,
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Amount" className="justify-end" />
+        ),
+        cell: ({ row }) => (
+          <span className="block text-right font-medium tabular-nums">
+            {formatCurrencyExact(row.original.totalAmount)}
+          </span>
+        ),
+      },
+      {
+        id: "paidAmount",
+        accessorFn: (row) => getPaidAmount(row),
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Paid" className="justify-end" />
+        ),
+        cell: ({ row }) => (
+          <span className="block text-right tabular-nums">
+            {formatCurrencyExact(getPaidAmount(row.original))}
+          </span>
+        ),
+      },
+      {
+        id: "balance",
+        accessorFn: (row) => getBalanceAmount(row),
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Balance" className="justify-end" />
+        ),
+        cell: ({ row }) => (
+          <span className="block text-right tabular-nums">
+            {formatCurrencyExact(getBalanceAmount(row.original))}
+          </span>
+        ),
+      },
+      {
+        id: "dueDate",
+        accessorFn: (row) => row.dueDate?.getTime() ?? 0,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Due Date" />,
+        cell: ({ row }) =>
+          row.original.dueDate ? (
+            <div
+              className="space-y-0.5"
+              title={`Due ${formatDistanceToNow(row.original.dueDate, { addSuffix: true })}`}
+            >
+              <span className="tabular-nums">{format(row.original.dueDate, "MMM d, yyyy")}</span>
+              <span className="block text-xs text-muted-foreground">
+                {formatDistanceToNow(row.original.dueDate, { addSuffix: true })}
+              </span>
+            </div>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
+      },
+      {
+        id: "status",
+        accessorKey: "status",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        cell: ({ row }) => <InvoiceStatusBadge invoice={row.original} />,
+      },
+      {
+        id: "actions",
+        enableSorting: false,
+        enableHiding: false,
+        cell: ({ row }) => (
+          <div className="flex justify-end">
+            <InvoiceActionsMenu
+              invoice={row.original}
+              onViewDetails={(invoice) => {
+                handleViewDetails(invoice);
+                onViewDetails?.(invoice);
+              }}
+              onRecordPayment={(invoice) => handleRecordPayment(invoice)}
+              onSendInvoice={(invoice) => onSendInvoice?.(invoice.id)}
+              onSendReminder={(invoice, type) => onSendReminder?.(invoice.id, type)}
+            />
+          </div>
+        ),
+      },
+    ],
+    [handleViewDetails, handleRecordPayment, onViewDetails, onSendInvoice, onSendReminder],
+  );
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Invoices</CardTitle>
-          <CardDescription>Manage client invoices and billing</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {/* Desktop Table View */}
-          <div className="hidden md:block">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Invoice #</TableHead>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Paid</TableHead>
-                  <TableHead>Balance</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {invoices.map((invoice) => (
-                  <InvoiceRow
-                    key={invoice.id}
-                    invoice={invoice}
-                    onViewDetails={handleViewDetails}
-                    onRecordPayment={handleRecordPayment}
-                    onSendInvoice={onSendInvoice}
-                    onSendReminder={onSendReminder}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+      <DataTable
+        columns={columns}
+        data={invoices}
+        loading={loading}
+        error={error}
+        onRetry={onRefresh}
+        getRowId={(row) => row.id}
+        manualSorting
+        sorting={tableState.state.sorting}
+        onSortingChange={(updater) =>
+          tableState.setSorting(
+            typeof updater === "function" ? updater(tableState.state.sorting) : updater,
+          )
+        }
+        manualFiltering
+        globalFilter={tableState.state.globalFilter}
+        onGlobalFilterChange={(updater) =>
+          tableState.setGlobalFilter(
+            typeof updater === "function" ? updater(tableState.state.globalFilter) : updater,
+          )
+        }
+        columnFilters={tableState.state.columnFilters}
+        onColumnFiltersChange={(updater) =>
+          tableState.setColumnFilters(
+            typeof updater === "function" ? updater(tableState.state.columnFilters) : updater,
+          )
+        }
+        caption="Membership invoices"
+        emptyTitle="No invoices found"
+        emptyDescription="Adjust the search or record the first invoice of the period."
+        emptyIcon={<FileText className="h-8 w-8" />}
+        toolbar={(table) => (
+          <>
+            <DataTableSearch
+              value={tableState.state.globalFilter}
+              onValueChange={tableState.setGlobalFilter}
+              placeholder="Search invoices…"
+            />
+            <DataTableViewOptions table={table} />
+          </>
+        )}
+        pagination={
+          <DataTablePagination
+            page={tableState.state.page}
+            pageCount={totalPages}
+            total={total}
+            pageSize={tableState.state.pageSize}
+            loading={loading}
+            onPageChange={tableState.setPage}
+            onPageSizeChange={tableState.setPageSize}
+          />
+        }
+      />
 
-          {/* Mobile Card View */}
-          <div className="md:hidden space-y-4">
-            {invoices.map((invoice) => (
-              <InvoiceCard
-                key={invoice.id}
-                invoice={invoice}
-                onViewDetails={handleViewDetails}
-                onRecordPayment={handleRecordPayment}
-                onSendInvoice={onSendInvoice}
-                onSendReminder={onSendReminder}
-              />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <InvoiceDetailsModal
+        open={detailsModalOpen}
+        onOpenChange={setDetailsModalOpen}
+        invoice={selectedInvoice}
+        payments={payments}
+        onRecordPayment={(invoiceId, amount, paymentMethod) =>
+          onRecordPayment?.(invoiceId, amount, paymentMethod)
+        }
+        onSendReminder={(invoiceId, type) => onSendReminder?.(invoiceId, type)}
+      />
 
-      {/* Payment Dialog */}
       <PaymentDialog
         open={paymentDialogOpen}
         onOpenChange={setPaymentDialogOpen}
@@ -96,16 +239,8 @@ export function InvoicesTable({
         onMethodChange={setPaymentMethod}
         onSubmit={handlePaymentSubmit}
       />
-
-      {/* Invoice Details Modal */}
-      <InvoiceDetailsModal
-        invoice={selectedInvoice}
-        payments={payments}
-        open={detailsModalOpen}
-        onOpenChange={setDetailsModalOpen}
-        onRecordPayment={onRecordPayment}
-        onSendReminder={onSendReminder}
-      />
     </>
   );
 }
+
+export default InvoicesTable;

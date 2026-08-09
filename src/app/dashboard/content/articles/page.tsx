@@ -2,6 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { ArticlesOverviewCards } from "@/components/content/articles-overview-cards";
@@ -23,6 +33,7 @@ export default function ContentArticles() {
   const [activeTab, setActiveTab] = useState("overview");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedArticles, setSelectedArticles] = useState<string[]>([]);
+  const [deleteTarget, setDeleteTarget] = useState<Article | null>(null);
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
 
@@ -66,15 +77,17 @@ export default function ContentArticles() {
     router.push(`/dashboard/content/articles/edit/${article.id}`);
   };
 
-  const handleDelete = async (article: Article) => {
-    if (
-      confirm(`Are you sure you want to delete "${article.title}"? This action cannot be undone.`)
-    ) {
-      try {
-        await deleteArticle(article.id);
-      } catch (error) {
-        logger.error("Error deleting article", error);
-      }
+  const handleDelete = (article: Article) => {
+    setDeleteTarget(article);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteTarget(null);
+    try {
+      await deleteArticle(deleteTarget.id);
+    } catch (error) {
+      logger.error("Error deleting article", error);
     }
   };
 
@@ -203,6 +216,31 @@ export default function ContentArticles() {
 
       {/* Import/Export Section */}
       <ImportExportBar exportArticles={exportArticles} importArticles={importArticles} />
+
+      {/* Delete confirmation dialog (UI-06: replaces native confirm()). */}
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete article?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget
+                ? `Are you sure you want to delete "${deleteTarget.title}"? This action cannot be undone.`
+                : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

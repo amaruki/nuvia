@@ -4,6 +4,16 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { usePublications } from "@/lib/hooks/use-publications";
 import { useHeader } from "@/contexts/dashboard-context";
 import { PublicationContentSection } from "./_components/publication-content-section";
@@ -19,6 +29,7 @@ export default function PublicationDetailsPage() {
   const { setHeader, clearHeader } = useHeader();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { getPublication, deletePublication, publishPublication, archivePublication } =
     usePublications();
@@ -70,18 +81,17 @@ export default function PublicationDetailsPage() {
 
   const handleDelete = async () => {
     if (!publication) return;
+    setDeleteDialogOpen(true);
+  };
 
-    if (
-      confirm(
-        `Are you sure you want to delete "${publication.title}"? This action cannot be undone.`,
-      )
-    ) {
-      try {
-        await deletePublication(publication.id);
-        router.push("/dashboard/content/publications");
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to delete publication");
-      }
+  const handleConfirmDelete = async () => {
+    if (!publication) return;
+    setDeleteDialogOpen(false);
+    try {
+      await deletePublication(publication.id);
+      router.push("/dashboard/content/publications");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete publication");
     }
   };
 
@@ -147,6 +157,29 @@ export default function PublicationDetailsPage() {
 
       {/* SEO Information */}
       <PublicationSeoCard publication={publication} />
+
+      {/* Delete confirmation dialog (UI-06: replaces native confirm()). */}
+      <AlertDialog
+        open={deleteDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) setDeleteDialogOpen(false);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete publication?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {`Are you sure you want to delete "${publication.title}"? This action cannot be undone.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

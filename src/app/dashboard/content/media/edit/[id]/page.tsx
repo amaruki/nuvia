@@ -3,6 +3,16 @@
 import { useParams } from "next/navigation";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 import { ActionsCard } from "./_components/actions-card";
 import { BasicInfoCard } from "./_components/basic-info-card";
@@ -29,6 +39,9 @@ export default function EditMediaPage() {
     handleRemoveTag,
     handleSave,
     handleDelete,
+    isDeleteDialogOpen,
+    handleConfirmDelete,
+    handleCloseDeleteDialog,
     handlePreview,
     handleGoBack,
   } = useEditMediaForm(mediaId);
@@ -79,6 +92,29 @@ export default function EditMediaPage() {
           />
         </div>
       </div>
+
+      {/* Delete confirmation dialog (UI-06: replaces native confirm()). */}
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) handleCloseDeleteDialog();
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete media?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {`Are you sure you want to delete "${currentMedia.title}"? This action cannot be undone.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -2,6 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useMedia } from "@/lib/hooks/use-media";
@@ -30,6 +40,7 @@ export default function ContentMedia() {
   const [showUpload, setShowUpload] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Media | null>(null);
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
 
@@ -44,11 +55,9 @@ export default function ContentMedia() {
     totalPages,
     totalItems,
     uploadMedia,
-    updateMedia,
     deleteMedia,
     duplicateMedia,
     bulkDelete,
-    bulkUpdate,
     bulkMove,
     exportMedia,
     importMedia,
@@ -79,15 +88,17 @@ export default function ContentMedia() {
     router.push(`/dashboard/content/media/edit/${mediaItem.id}`);
   };
 
-  const handleDelete = async (mediaItem: Media) => {
-    if (
-      confirm(`Are you sure you want to delete "${mediaItem.title}"? This action cannot be undone.`)
-    ) {
-      try {
-        await deleteMedia(mediaItem.id);
-      } catch (error) {
-        logger.error("Error deleting media", error);
-      }
+  const handleDelete = (mediaItem: Media) => {
+    setDeleteTarget(mediaItem);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteTarget(null);
+    try {
+      await deleteMedia(deleteTarget.id);
+    } catch (error) {
+      logger.error("Error deleting media", error);
     }
   };
 
@@ -230,6 +241,31 @@ export default function ContentMedia() {
 
       {/* Upload Modal */}
       {showUpload && <MediaUpload onUpload={handleUpload} onClose={() => setShowUpload(false)} />}
+
+      {/* Delete confirmation dialog (UI-06: replaces native confirm()). */}
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete media?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget
+                ? `Are you sure you want to delete "${deleteTarget.title}"? This action cannot be undone.`
+                : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

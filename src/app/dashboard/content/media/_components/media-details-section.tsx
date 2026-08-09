@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "sonner";
+
 import { MediaDetailsModal } from "@/components/content/media-details-modal";
 import type { Media } from "@/types/media";
 
@@ -22,12 +24,16 @@ export function MediaDetailsSection({
       isOpen={!!viewingMedia}
       onClose={onClose}
       onEdit={onEdit}
-      onDelete={(mediaId) => onDelete(viewingMedia!)}
+      onDelete={(_mediaId) => onDelete(viewingMedia!)}
       onDownload={(media) => window.open(media.url, "_blank")}
-      onShare={(media) => {
+      onShare={async (media) => {
         // Simple share implementation - copy URL to clipboard
-        navigator.clipboard.writeText(media.url);
-        alert("Media URL copied to clipboard!");
+        try {
+          await navigator.clipboard.writeText(media.url);
+          toast.success("Media URL copied to clipboard!");
+        } catch {
+          toast.error("Failed to copy media URL");
+        }
       }}
     />
   );

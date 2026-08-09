@@ -25,6 +25,7 @@ export function useEditMediaForm(mediaId: string) {
   const [tagInput, setTagInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     const mediaItem = media.find((m) => m.id === mediaId);
@@ -87,21 +88,24 @@ export function useEditMediaForm(mediaId: string) {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!currentMedia) return;
+    setIsDeleteDialogOpen(true);
+  };
 
-    if (
-      confirm(
-        `Are you sure you want to delete "${currentMedia.title}"? This action cannot be undone.`,
-      )
-    ) {
-      try {
-        await deleteMedia(mediaId);
-        router.push(MEDIA_LIBRARY_PATH);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to delete media");
-      }
+  const handleConfirmDelete = async () => {
+    if (!currentMedia) return;
+    setIsDeleteDialogOpen(false);
+    try {
+      await deleteMedia(mediaId);
+      router.push(MEDIA_LIBRARY_PATH);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete media");
     }
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
   };
 
   const handlePreview = () => {
@@ -127,6 +131,9 @@ export function useEditMediaForm(mediaId: string) {
     handleRemoveTag,
     handleSave,
     handleDelete,
+    isDeleteDialogOpen,
+    handleConfirmDelete,
+    handleCloseDeleteDialog,
     handlePreview,
     handleGoBack,
   };

@@ -2,6 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
@@ -25,6 +35,7 @@ export default function ContentAnnouncements() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedAnnouncements, setSelectedAnnouncements] = useState<string[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Announcement | null>(null);
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
 
@@ -70,17 +81,17 @@ export default function ContentAnnouncements() {
     router.push(`/dashboard/content/announcements/edit/${announcement.id}`);
   };
 
-  const handleDelete = async (announcement: Announcement) => {
-    if (
-      confirm(
-        `Are you sure you want to delete "${announcement.title}"? This action cannot be undone.`,
-      )
-    ) {
-      try {
-        await deleteAnnouncement(announcement.id);
-      } catch (error) {
-        logger.error("Error deleting announcement", error);
-      }
+  const handleDelete = (announcement: Announcement) => {
+    setDeleteTarget(announcement);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteTarget(null);
+    try {
+      await deleteAnnouncement(deleteTarget.id);
+    } catch (error) {
+      logger.error("Error deleting announcement", error);
     }
   };
 
@@ -212,6 +223,31 @@ export default function ContentAnnouncements() {
         importAnnouncements={importAnnouncements}
         exportAnnouncements={exportAnnouncements}
       />
+
+      {/* Delete confirmation dialog (UI-06: replaces native confirm()). */}
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete announcement?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget
+                ? `Are you sure you want to delete "${deleteTarget.title}"? This action cannot be undone.`
+                : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

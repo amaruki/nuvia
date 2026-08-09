@@ -1,7 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { Folder, Trash2 } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { logger } from "@/lib/logger";
 
@@ -18,20 +28,20 @@ export function BulkActions({
   bulkMove,
   clearSelection,
 }: BulkActionsProps) {
-  const handleBulkDelete = async () => {
-    if (selectedMedia.length === 0) return;
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-    if (
-      confirm(
-        `Are you sure you want to delete ${selectedMedia.length} selected items? This action cannot be undone.`,
-      )
-    ) {
-      try {
-        await bulkDelete(selectedMedia);
-        clearSelection();
-      } catch (error) {
-        logger.error("Error bulk deleting", error);
-      }
+  const handleBulkDelete = () => {
+    if (selectedMedia.length === 0) return;
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmBulkDelete = async () => {
+    setDeleteDialogOpen(false);
+    try {
+      await bulkDelete(selectedMedia);
+      clearSelection();
+    } catch (error) {
+      logger.error("Error bulk deleting", error);
     }
   };
 
@@ -61,6 +71,29 @@ export function BulkActions({
         <Trash2 className="mr-2 h-4 w-4" />
         Delete ({selectedMedia.length})
       </Button>
+
+      {/* Bulk delete confirmation (UI-06: replaces native confirm()). */}
+      <AlertDialog
+        open={deleteDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) setDeleteDialogOpen(false);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete selected items?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {`Are you sure you want to delete ${selectedMedia.length} selected items? This action cannot be undone.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button variant="destructive" onClick={handleConfirmBulkDelete}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

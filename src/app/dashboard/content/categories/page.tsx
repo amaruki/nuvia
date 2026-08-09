@@ -1,6 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { CategoriesFilters } from "@/components/content/categories-filters";
@@ -19,12 +30,40 @@ import { CategoriesOverviewTab } from "./_components/categories-overview-tab";
 import { CategoriesSettingsTab } from "./_components/categories-settings-tab";
 import { CategoriesError, CategoriesLoading } from "./_components/categories-states";
 
+type BulkActionKind = "activate" | "archive" | "delete";
+
+const BULK_ACTION_COPY = {
+  activate: {
+    title: "Activate selected categories?",
+    confirmLabel: "Activate",
+    logMessage: "Error bulk activating categories",
+    description: (count: number) =>
+      `Are you sure you want to activate ${count} selected categories?`,
+  },
+  archive: {
+    title: "Archive selected categories?",
+    confirmLabel: "Archive",
+    logMessage: "Error bulk archiving categories",
+    description: (count: number) =>
+      `Are you sure you want to archive ${count} selected categories?`,
+  },
+  delete: {
+    title: "Delete selected categories?",
+    confirmLabel: "Delete",
+    logMessage: "Error bulk deleting categories",
+    description: (count: number) =>
+      `Are you sure you want to delete ${count} selected categories? This action cannot be undone.`,
+  },
+};
+
 export default function ContentCategories() {
   const [activeTab, setActiveTab] = useState("overview");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
+  const [pendingBulkAction, setPendingBulkAction] = useState<BulkActionKind | null>(null);
   const { setHeader, clearHeader } = useHeader();
 
   const {
@@ -79,15 +118,17 @@ export default function ContentCategories() {
     }
   };
 
-  const handleDelete = async (category: Category) => {
-    if (
-      confirm(`Are you sure you want to delete "${category.name}"? This action cannot be undone.`)
-    ) {
-      try {
-        await deleteCategory(category.id);
-      } catch (error) {
-        logger.error("Error deleting category", error);
-      }
+  const handleDelete = (category: Category) => {
+    setDeleteTarget(category);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteTarget(null);
+    try {
+      await deleteCategory(deleteTarget.id);
+    } catch (error) {
+      logger.error("Error deleting category", error);
     }
   };
 
@@ -130,46 +171,25 @@ export default function ContentCategories() {
     }
   };
 
-  const handleBulkPublish = async () => {
-    if (
-      confirm(`Are you sure you want to activate ${selectedCategories.length} selected categories?`)
-    ) {
-      try {
+  const runPendingBulkAction = async () => {
+    if (!pendingBulkAction || selectedCategories.length === 0) return;
+    const action = pendingBulkAction;
+    setPendingBulkAction(null);
+    try {
+      if (action === "activate") {
         await bulkUpdateStatus(selectedCategories, "active");
-        setSelectedCategories([]);
-      } catch (error) {
-        logger.error("Error bulk activating categories", error);
-      }
-    }
-  };
-
-  const handleBulkArchive = async () => {
-    if (
-      confirm(`Are you sure you want to archive ${selectedCategories.length} selected categories?`)
-    ) {
-      try {
+      } else if (action === "archive") {
         await bulkUpdateStatus(selectedCategories, "archived");
-        setSelectedCategories([]);
-      } catch (error) {
-        logger.error("Error bulk archiving categories", error);
+      } else {
+        await bulkDelete(selectedCategories);
       }
+      setSelectedCategories([]);
+    } catch (error) {
+      logger.error(BULK_ACTION_COPY[action].logMessage, error);
     }
   };
 
-  const handleBulkDelete = async () => {
-    if (
-      confirm(
-        `Are you sure you want to delete ${selectedCategories.length} selected categories? This action cannot be undone.`,
-      )
-    ) {
-      try {
-        await bulkDelete(selectedCategories);
-        setSelectedCategories([]);
-      } catch (error) {
-        logger.error("Error bulk deleting categories", error);
-      }
-    }
-  };
+  const bulkCopy = pendingBulkAction ? BULK_ACTION_COPY[pendingBulkAction] : null;
 
   if (loading) return <CategoriesLoading />;
 
@@ -211,9 +231,9 @@ export default function ContentCategories() {
       {selectedCategories.length > 0 && (
         <CategoriesBulkActions
           selectedCount={selectedCategories.length}
-          onActivate={handleBulkPublish}
-          onArchive={handleBulkArchive}
-          onDelete={handleBulkDelete}
+          onActivate={() => setPendingBulkAction("activate")}
+          onArchive={() => setPendingBulkAction("archive")}
+          onDelete={() => setPendingBulkAction("delete")}
         />
       )}
 
@@ -251,6 +271,60 @@ export default function ContentCategories() {
 
       {/* Import/Export Section */}
       <CategoriesImportExportBar onExport={exportCategories} />
+
+      {/* Delete confirmation dialog (UI-06: replaces native confirm()). */}
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete category?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget
+                ? `Are you sure you want to delete "${deleteTarget.name}"? This action cannot be undone.`
+                : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk action confirmation (UI-06: replaces native confirm()). */}
+      <AlertDialog
+        open={pendingBulkAction !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingBulkAction(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{bulkCopy?.title ?? ""}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {bulkCopy ? bulkCopy.description(selectedCategories.length) : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            {pendingBulkAction === "activate" ? (
+              <AlertDialogAction onClick={runPendingBulkAction}>
+                {bulkCopy?.confirmLabel ?? "Activate"}
+              </AlertDialogAction>
+            ) : (
+              <Button variant="destructive" onClick={runPendingBulkAction}>
+                {bulkCopy?.confirmLabel ?? "Confirm"}
+              </Button>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

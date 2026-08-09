@@ -52,6 +52,7 @@ export const PAGES = [
   { slug: "public-membership", path: "/membership", module: "public", auth: false },
   { slug: "public-chapters", path: "/chapters", module: "public", auth: false },
   { slug: "public-committees", path: "/committees", module: "public", auth: false },
+  { slug: "public-donate", path: "/donate", module: "public", auth: false },
   {
     slug: "members-directory",
     path: "/dashboard/memberships/directory",
@@ -122,6 +123,20 @@ export const PAGES = [
     auth: true,
   },
   { slug: "member-profile", path: "/dashboard/profile", module: "users", auth: true },
+  // Wave B2 member surfaces (UI-31, UI-32, UI-34)
+  { slug: "member-home", path: "/dashboard/my", module: "memberships", auth: true },
+  {
+    slug: "member-finance",
+    path: "/dashboard/my/finance",
+    module: "finance",
+    auth: true,
+  },
+  {
+    slug: "member-announcements",
+    path: "/dashboard/announcements",
+    module: "communications",
+    auth: true,
+  },
 ] as const;
 
 export const SEVERITIES_FAILING: Record<string, true> = { critical: true, serious: true };

@@ -59,6 +59,11 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
+                <Link href="/docs" className={FOOTER_LINK_CLASS}>
+                  Documentation
+                </Link>
+              </li>
+              <li>
                 <Link href="/auth/login" className={FOOTER_LINK_CLASS}>
                   Sign in
                 </Link>

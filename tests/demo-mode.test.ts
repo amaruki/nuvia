@@ -280,7 +280,9 @@ describe("landing demo surfaces (stage 2)", () => {
     const text = collectText(SiteFooter());
     expect(text.toLowerCase()).toContain("demo instance");
     expect(text.toLowerCase()).toContain("resets daily");
-    expect(collectHrefs(SiteFooter()).filter((href) => href.includes("/docs"))).toEqual([]);
+    // The docs portal (UI-40) is public regardless of demo mode; the
+    // orchestrator wires its footer link centrally.
+    expect(collectHrefs(SiteFooter())).toContain("/docs");
   });
 });
 

@@ -53,6 +53,21 @@ export const PAGES = [
   { slug: "public-chapters", path: "/chapters", module: "public", auth: false },
   { slug: "public-committees", path: "/committees", module: "public", auth: false },
   { slug: "public-donate", path: "/donate", module: "public", auth: false },
+  // Wave B3 docs portal (UI-40)
+  { slug: "public-docs", path: "/docs", module: "public", auth: false },
+  { slug: "docs-users-awards", path: "/docs/users/awards", module: "public", auth: false },
+  {
+    slug: "docs-developers-architecture",
+    path: "/docs/developers/architecture-overview",
+    module: "public",
+    auth: false,
+  },
+  {
+    slug: "docs-operators-deployment",
+    path: "/docs/operators/deployment-plan",
+    module: "public",
+    auth: false,
+  },
   {
     slug: "members-directory",
     path: "/dashboard/memberships/directory",

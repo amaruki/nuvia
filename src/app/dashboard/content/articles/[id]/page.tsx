@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronLeft, Edit, Share2 } from "lucide-react";
+import { ChevronLeft, Edit, ExternalLink, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useArticles } from "@/lib/hooks/use-articles";
@@ -107,6 +107,15 @@ export default function ArticleDetailsPage() {
             <Share2 className="w-4 h-4 mr-2" />
             Share
           </Button>
+          {article.status === "published" && article.visibility === "public" && (
+            <Button
+              variant="outline"
+              onClick={() => window.open(`/news/${article.id}`, "_blank", "noopener,noreferrer")}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              View public page
+            </Button>
+          )}
           <Button onClick={handleEdit}>
             <Edit className="w-4 h-4 mr-2" />
             Edit

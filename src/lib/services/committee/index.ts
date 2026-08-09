@@ -27,3 +27,12 @@ export type { CreateCommitteeInput, UpdateCommitteeInput } from "./schemas";
 export { getCommittee, listCommittees } from "./queries";
 export type { CommitteeListFilters, CommitteeListResult } from "./queries";
 export { createCommittee, deleteCommittee, updateCommittee } from "./mutations";
+
+// Public reads (ring 0, plan UI-29) — never wired to /api/v1.
+export { getPublicCommittee, listPublicCommittees } from "./public";
+export type {
+  PublicCommittee,
+  PublicCommitteeContact,
+  PublicCommitteeLeader,
+  PublicCommitteeSummary,
+} from "./public";

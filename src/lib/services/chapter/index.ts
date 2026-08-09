@@ -20,3 +20,13 @@ export type { CreateChapterInput, UpdateChapterInput } from "./schemas";
 export type { ChapterListFilters, Paginated } from "./types";
 export { listChapters, getChapter } from "./queries";
 export { createChapter, updateChapter, deleteChapter } from "./mutations";
+
+// Public reads (ring 0, plan UI-29) — never wired to /api/v1.
+export { getPublicChapter, listPublicChapters } from "./public";
+export type {
+  PublicChapter,
+  PublicChapterContact,
+  PublicChapterLeader,
+  PublicChapterMeeting,
+  PublicChapterSummary,
+} from "./public";

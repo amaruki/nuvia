@@ -1,20 +1,15 @@
 /**
- * B6 — Jobs API integration tests: applying to postings, listing applications, and detail access.
- *
- * Runs against the shared test database (DATABASE_URL from .env). Every row
- * this file creates is id-isolated by RUN_ID and removed in afterAll, so the
- * suite is self-cleaning and safe to run alongside other test files.
+ * Jobs API — application creation: apply guards (auth, draft/unknown
+ * postings, payload validation, expired deadline), the created envelope,
+ * duplicate rejection, and the posting's applicationCount counter. Route
+ * handlers are called directly; shared fixtures and RUN_ID isolation live
+ * in ./helpers.
  */
 
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { POST as createPosting } from "@/app/api/v1/jobs/route";
 import { GET as getPosting } from "@/app/api/v1/jobs/[id]/route";
-import { GET as listAllApplications } from "@/app/api/v1/jobs/applications/route";
-import {
-  GET as listJobApplications,
-  POST as applyToJob,
-} from "@/app/api/v1/jobs/[id]/applications/route";
-import { GET as getApplication } from "@/app/api/v1/jobs/[id]/applications/[applicationId]/route";
+import { POST as applyToJob } from "@/app/api/v1/jobs/[id]/applications/route";
 import { createJobsApiFixtures } from "./helpers";
 
 const {
@@ -33,20 +28,19 @@ const {
 const state: Record<string, string> = {};
 
 let admin = { userId: "", cookie: "" };
-let staff = { userId: "", cookie: "" };
 let member = { userId: "", cookie: "" };
 let applicant = { userId: "", cookie: "" };
 let applicant2 = { userId: "", cookie: "" };
 
 beforeAll(async () => {
-  ({ admin, staff, member, applicant, applicant2 } = await setup());
+  ({ admin, member, applicant, applicant2 } = await setup());
 });
 
 afterAll(async () => {
   await teardown();
 });
 
-describe("job applications", () => {
+describe("job application creation", () => {
   test("setup: one published and one draft posting", async () => {
     const published = await createPosting(
       buildRequest(API, {
@@ -198,104 +192,5 @@ describe("job applications", () => {
       ctx({ id: expiredId }),
     );
     expect(res.status).toBe(400);
-  });
-
-  test("listing applications for a posting requires jobs:read", async () => {
-    const asStaff = await listJobApplications(
-      buildRequest(`${API}/${state.publishedPostingId}/applications`, { cookie: staff.cookie }),
-      ctx({ id: state.publishedPostingId }),
-    );
-    expect(asStaff.status).toBe(200);
-    const body = await parseEnvelope(asStaff);
-    expect(body.meta.total).toBe(2);
-    const item = body.data.find((a: any) => a.id === state.applicantApplicationId);
-    expect(item.applicantName).toBeTruthy();
-    expect(item.applicantEmail).toContain("@");
-
-    const asMember = await listJobApplications(
-      buildRequest(`${API}/${state.publishedPostingId}/applications`, { cookie: member.cookie }),
-      ctx({ id: state.publishedPostingId }),
-    );
-    expect(asMember.status).toBe(403);
-
-    const asOwnerWithoutPermission = await listJobApplications(
-      buildRequest(`${API}/${state.publishedPostingId}/applications`, { cookie: applicant.cookie }),
-      ctx({ id: state.publishedPostingId }),
-    );
-    expect(asOwnerWithoutPermission.status).toBe(403);
-  });
-
-  test("global applications list filters by jobId and status", async () => {
-    const byJob = await listAllApplications(
-      buildRequest(`${API}/applications?jobId=${state.publishedPostingId}`, {
-        cookie: admin.cookie,
-      }),
-    );
-    expect(byJob.status).toBe(200);
-    const ids = (await parseEnvelope(byJob)).data.map((a: any) => a.id);
-    expect(ids).toContain(state.applicantApplicationId);
-    expect(ids).toContain(state.memberApplicationId);
-
-    const pending = await listAllApplications(
-      buildRequest(`${API}/applications?jobId=${state.publishedPostingId}&status=PENDING`, {
-        cookie: admin.cookie,
-      }),
-    );
-    expect(pending.status).toBe(200);
-    const pendingBody = await parseEnvelope(pending);
-    expect(pendingBody.data.length).toBeGreaterThanOrEqual(2);
-    expect(pendingBody.data.every((a: any) => a.status === "PENDING")).toBe(true);
-  });
-
-  test("application detail: admin and owner can read, others cannot", async () => {
-    const applicationParams = {
-      id: state.publishedPostingId,
-      applicationId: state.applicantApplicationId,
-    };
-
-    const asAdmin = await getApplication(
-      buildRequest(
-        `${API}/${applicationParams.id}/applications/${applicationParams.applicationId}`,
-        { cookie: admin.cookie },
-      ),
-      ctx(applicationParams),
-    );
-    expect(asAdmin.status).toBe(200);
-
-    const asOwner = await getApplication(
-      buildRequest(
-        `${API}/${applicationParams.id}/applications/${applicationParams.applicationId}`,
-        { cookie: applicant.cookie },
-      ),
-      ctx(applicationParams),
-    );
-    expect(asOwner.status).toBe(200);
-    expect((await parseEnvelope(asOwner)).data.coverLetter).toContain("write tests");
-
-    const asStranger = await getApplication(
-      buildRequest(
-        `${API}/${applicationParams.id}/applications/${applicationParams.applicationId}`,
-        { cookie: applicant2.cookie },
-      ),
-      ctx(applicationParams),
-    );
-    expect(asStranger.status).toBe(403);
-
-    const anonymous = await getApplication(
-      buildRequest(
-        `${API}/${applicationParams.id}/applications/${applicationParams.applicationId}`,
-      ),
-      ctx(applicationParams),
-    );
-    expect(anonymous.status).toBe(401);
-
-    const unknownParams = { id: state.publishedPostingId, applicationId: crypto.randomUUID() };
-    const unknown = await getApplication(
-      buildRequest(`${API}/${unknownParams.id}/applications/${unknownParams.applicationId}`, {
-        cookie: admin.cookie,
-      }),
-      ctx(unknownParams),
-    );
-    expect(unknown.status).toBe(404);
   });
 });

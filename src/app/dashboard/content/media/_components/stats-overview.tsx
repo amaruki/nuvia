@@ -10,7 +10,7 @@ interface StatsOverviewProps {
 export function StatsOverview({ statistics }: StatsOverviewProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <div className="bg-white rounded-lg border p-6">
+      <div className="bg-card rounded-lg border p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Total Media</p>
@@ -22,7 +22,7 @@ export function StatsOverview({ statistics }: StatsOverviewProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border p-6">
+      <div className="bg-card rounded-lg border p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Storage Used</p>
@@ -34,7 +34,7 @@ export function StatsOverview({ statistics }: StatsOverviewProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border p-6">
+      <div className="bg-card rounded-lg border p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Total Views</p>
@@ -46,7 +46,7 @@ export function StatsOverview({ statistics }: StatsOverviewProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border p-6">
+      <div className="bg-card rounded-lg border p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Downloads</p>

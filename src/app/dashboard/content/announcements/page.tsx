@@ -19,12 +19,10 @@ import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import type { Announcement, AnnouncementFormData } from "@/types/announcement";
 import type { ArticleStatus } from "@/types/article";
-import { AnnouncementsFilters } from "@/components/content/announcements-filters";
 import { ActionBar } from "./_components/action-bar";
 import { AcknowledgmentsTab } from "./_components/acknowledgments-tab";
 import { AddAnnouncementView } from "./_components/add-announcement-view";
 import { AnnouncementsTab } from "./_components/announcements-tab";
-import { BulkActions } from "./_components/bulk-actions";
 import { DraftsTab } from "./_components/drafts-tab";
 import { ImportExportBar } from "./_components/import-export-bar";
 import { OverviewTab } from "./_components/overview-tab";
@@ -32,7 +30,7 @@ import { ErrorState, LoadingState } from "./_components/page-states";
 
 export default function ContentAnnouncements() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [showFilters, setShowFilters] = useState(false);
+  const [tableVersion, setTableVersion] = useState(0);
   const [selectedAnnouncements, setSelectedAnnouncements] = useState<string[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Announcement | null>(null);
@@ -44,9 +42,6 @@ export default function ContentAnnouncements() {
     statistics,
     loading,
     error,
-    filters,
-    updateFilters,
-    clearFilters,
     refreshData,
     addAnnouncement,
     updateAnnouncement,
@@ -60,6 +55,8 @@ export default function ContentAnnouncements() {
     importAnnouncements,
     totalItems,
   } = useAnnouncements();
+
+  const bumpTable = () => setTableVersion((value) => value + 1);
 
   useEffect(() => {
     setHeader({
@@ -90,6 +87,7 @@ export default function ContentAnnouncements() {
     setDeleteTarget(null);
     try {
       await deleteAnnouncement(deleteTarget.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error deleting announcement", error);
     }
@@ -98,6 +96,7 @@ export default function ContentAnnouncements() {
   const handleStatusChange = async (announcement: Announcement, status: ArticleStatus) => {
     try {
       await updateAnnouncement(announcement.id, { status });
+      bumpTable();
     } catch (error) {
       logger.error("Error changing announcement status", error);
     }
@@ -106,6 +105,7 @@ export default function ContentAnnouncements() {
   const handlePublish = async (announcement: Announcement) => {
     try {
       await publishAnnouncement(announcement.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error publishing announcement", error);
     }
@@ -114,6 +114,7 @@ export default function ContentAnnouncements() {
   const handleDuplicate = async (announcement: Announcement) => {
     try {
       await duplicateAnnouncement(announcement.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error duplicating announcement", error);
     }
@@ -122,6 +123,7 @@ export default function ContentAnnouncements() {
   const handleAddAnnouncement = async (data: AnnouncementFormData) => {
     try {
       await addAnnouncement(data);
+      bumpTable();
       setShowAddForm(false);
     } catch (error) {
       logger.error("Error adding announcement", error);
@@ -152,30 +154,9 @@ export default function ContentAnnouncements() {
         totalItems={totalItems}
         statistics={statistics}
         selectedCount={selectedAnnouncements.length}
-        onToggleFilters={() => setShowFilters(!showFilters)}
         onRefresh={refreshData}
         onAdd={() => setShowAddForm(true)}
       />
-
-      {/* Filters Panel */}
-      {showFilters && (
-        <AnnouncementsFilters
-          filters={filters}
-          onFiltersChange={updateFilters}
-          onReset={clearFilters}
-        />
-      )}
-
-      {/* Bulk Actions */}
-      {selectedAnnouncements.length > 0 && (
-        <BulkActions
-          selectedAnnouncements={selectedAnnouncements}
-          bulkPublish={bulkPublish}
-          bulkArchive={bulkArchive}
-          bulkDelete={bulkDelete}
-          clearSelection={() => setSelectedAnnouncements([])}
-        />
-      )}
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -200,12 +181,16 @@ export default function ContentAnnouncements() {
 
         <TabsContent value="announcements" className="space-y-6">
           <AnnouncementsTab
-            announcements={announcements}
             onView={handleViewDetails}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onDuplicate={handleDuplicate}
             onStatusChange={handleStatusChange}
+            bulkPublish={bulkPublish}
+            bulkArchive={bulkArchive}
+            bulkDelete={bulkDelete}
+            onSelectionChange={setSelectedAnnouncements}
+            version={tableVersion}
           />
         </TabsContent>
 

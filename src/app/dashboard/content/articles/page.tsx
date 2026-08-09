@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { ArticlesOverviewCards } from "@/components/content/articles-overview-cards";
-import { ArticlesFilters } from "@/components/content/articles-filters";
 import { useArticles } from "@/lib/hooks/use-articles";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
@@ -23,7 +22,6 @@ import { Article } from "@/types/article";
 import { ActionBar } from "./_components/action-bar";
 import { AnalyticsTab } from "./_components/analytics-tab";
 import { ArticlesTab } from "./_components/articles-tab";
-import { BulkActions } from "./_components/bulk-actions";
 import { DraftsTab } from "./_components/drafts-tab";
 import { ImportExportBar } from "./_components/import-export-bar";
 import { OverviewTab } from "./_components/overview-tab";
@@ -31,7 +29,7 @@ import { ErrorState, LoadingState } from "./_components/page-states";
 
 export default function ContentArticles() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [showFilters, setShowFilters] = useState(false);
+  const [tableVersion, setTableVersion] = useState(0);
   const [selectedArticles, setSelectedArticles] = useState<string[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<Article | null>(null);
   const router = useRouter();
@@ -42,22 +40,16 @@ export default function ContentArticles() {
     statistics,
     loading,
     error,
-    filters,
-    updateFilters,
-    clearFilters,
     refreshData,
     deleteArticle,
     duplicateArticle,
     publishArticle,
     archiveArticle,
-    scheduleArticle,
     bulkPublish,
     bulkArchive,
     bulkDelete,
     exportArticles,
     importArticles,
-    currentPage,
-    totalPages,
     totalItems,
   } = useArticles();
 
@@ -73,6 +65,8 @@ export default function ContentArticles() {
     };
   }, [setHeader, clearHeader]);
 
+  const bumpTable = () => setTableVersion((value) => value + 1);
+
   const handleEdit = (article: Article) => {
     router.push(`/dashboard/content/articles/edit/${article.id}`);
   };
@@ -86,6 +80,7 @@ export default function ContentArticles() {
     setDeleteTarget(null);
     try {
       await deleteArticle(deleteTarget.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error deleting article", error);
     }
@@ -94,6 +89,7 @@ export default function ContentArticles() {
   const handlePublish = async (article: Article) => {
     try {
       await publishArticle(article.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error publishing article", error);
     }
@@ -102,22 +98,16 @@ export default function ContentArticles() {
   const handleArchive = async (article: Article) => {
     try {
       await archiveArticle(article.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error archiving article", error);
-    }
-  };
-
-  const handleSchedule = async (article: Article, date: Date) => {
-    try {
-      await scheduleArticle(article.id, date);
-    } catch (error) {
-      logger.error("Error scheduling article", error);
     }
   };
 
   const handleDuplicate = async (article: Article) => {
     try {
       await duplicateArticle(article.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error duplicating article", error);
     }
@@ -141,30 +131,9 @@ export default function ContentArticles() {
         totalItems={totalItems}
         statistics={statistics}
         selectedArticles={selectedArticles}
-        onToggleFilters={() => setShowFilters(!showFilters)}
         onRefresh={refreshData}
         onAdd={() => router.push("/dashboard/content/articles/create")}
       />
-
-      {/* Filters Panel */}
-      {showFilters && (
-        <ArticlesFilters
-          filters={filters}
-          onFiltersChange={updateFilters}
-          onClearFilters={clearFilters}
-        />
-      )}
-
-      {/* Bulk Actions */}
-      {selectedArticles.length > 0 && (
-        <BulkActions
-          selectedArticles={selectedArticles}
-          bulkPublish={bulkPublish}
-          bulkArchive={bulkArchive}
-          bulkDelete={bulkDelete}
-          clearSelection={() => setSelectedArticles([])}
-        />
-      )}
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -189,19 +158,17 @@ export default function ContentArticles() {
 
         <TabsContent value="articles" className="space-y-6">
           <ArticlesTab
-            articles={articles}
             onViewDetails={(article) => router.push(`/dashboard/content/articles/${article.id}`)}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onDuplicate={handleDuplicate}
             onPublish={handlePublish}
             onArchive={handleArchive}
-            onSchedule={handleSchedule}
-            selectedArticles={selectedArticles}
+            bulkPublish={bulkPublish}
+            bulkArchive={bulkArchive}
+            bulkDelete={bulkDelete}
             onSelectionChange={setSelectedArticles}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            updateFilters={updateFilters}
+            version={tableVersion}
           />
         </TabsContent>
 

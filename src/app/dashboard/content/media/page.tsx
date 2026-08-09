@@ -19,10 +19,8 @@ import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Media } from "@/types/media";
 import { MediaUpload } from "@/components/content/media-upload";
-import { MediaFilters } from "@/components/content/media-filters";
 import { ActionBar } from "./_components/action-bar";
 import { AnalyticsTab } from "./_components/analytics-tab";
-import { BulkActions } from "./_components/bulk-actions";
 import { FolderNav } from "./_components/folder-nav";
 import { FoldersTab } from "./_components/folders-tab";
 import { ImportExportBar } from "./_components/import-export-bar";
@@ -34,7 +32,7 @@ import { StatsOverview } from "./_components/stats-overview";
 
 export default function ContentMedia() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [showFilters, setShowFilters] = useState(false);
+  const [tableVersion, setTableVersion] = useState(0);
   const [selectedMedia, setSelectedMedia] = useState<string[]>([]);
   const [viewingMedia, setViewingMedia] = useState<Media | null>(null);
   const [showUpload, setShowUpload] = useState(false);
@@ -58,14 +56,11 @@ export default function ContentMedia() {
     deleteMedia,
     duplicateMedia,
     bulkDelete,
-    bulkMove,
     exportMedia,
     importMedia,
     updateFilters,
-    clearFilters,
     refreshData,
     toggleMediaSelection,
-    clearSelection,
   } = useMedia();
 
   useEffect(() => {
@@ -79,6 +74,8 @@ export default function ContentMedia() {
       clearHeader();
     };
   }, [setHeader, clearHeader]);
+
+  const bumpTable = () => setTableVersion((value) => value + 1);
 
   const handleViewDetails = (mediaItem: Media) => {
     setViewingMedia(mediaItem);
@@ -97,6 +94,7 @@ export default function ContentMedia() {
     setDeleteTarget(null);
     try {
       await deleteMedia(deleteTarget.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error deleting media", error);
     }
@@ -105,6 +103,7 @@ export default function ContentMedia() {
   const handleDuplicate = async (mediaItem: Media) => {
     try {
       await duplicateMedia(mediaItem.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error duplicating media", error);
     }
@@ -119,6 +118,7 @@ export default function ContentMedia() {
         generatePreview: true,
         extractMetadata: true,
       });
+      bumpTable();
     } catch (error) {
       logger.error("Error uploading media", error);
     }
@@ -143,38 +143,9 @@ export default function ContentMedia() {
         selectedMedia={selectedMedia}
         folders={folders}
         selectedFolder={selectedFolder}
-        onToggleFilters={() => setShowFilters(!showFilters)}
         onRefresh={refreshData}
         onShowUpload={() => setShowUpload(true)}
       />
-
-      {/* Filters Panel */}
-      {showFilters && (
-        <div className="mb-6">
-          <MediaFilters
-            filters={filters}
-            onFiltersChange={updateFilters}
-            onClearFilters={clearFilters}
-          />
-        </div>
-      )}
-
-      {/* Folder Navigation */}
-      <FolderNav
-        folders={folders}
-        selectedFolder={selectedFolder}
-        onSelectFolder={setSelectedFolder}
-      />
-
-      {/* Bulk Actions */}
-      {selectedMedia.length > 0 && (
-        <BulkActions
-          selectedMedia={selectedMedia}
-          bulkDelete={bulkDelete}
-          bulkMove={bulkMove}
-          clearSelection={clearSelection}
-        />
-      )}
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -201,19 +172,20 @@ export default function ContentMedia() {
           <LibraryTab
             media={media}
             selectedMedia={selectedMedia}
-            setSelectedMedia={setSelectedMedia}
             toggleMediaSelection={toggleMediaSelection}
-            clearSelection={clearSelection}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
             filters={filters}
             updateFilters={updateFilters}
             currentPage={currentPage}
             totalPages={totalPages}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
             onViewDetails={handleViewDetails}
             onEdit={handleEdit}
             onDuplicate={handleDuplicate}
             onDelete={handleDelete}
+            bulkDelete={bulkDelete}
+            onSelectionChange={setSelectedMedia}
+            version={tableVersion}
           />
         </TabsContent>
 

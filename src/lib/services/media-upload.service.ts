@@ -173,6 +173,53 @@ export async function listUploads(): Promise<MediaUploadRecord[]> {
   return records.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt));
 }
 
+/** Query params accepted by the paginated media listing. */
+export interface MediaListQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+/** Paginated slice of manifest uploads for server-driven tables. */
+export interface PagedMediaList {
+  items: MediaUploadRecord[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+/**
+ * Server-paginated listing for the admin media table. Keeps manifest
+ * ordering (newest first) and matches `search` case-insensitively against
+ * file name, original name, content type, and uploader.
+ */
+export async function listUploadsPaged(query: MediaListQuery): Promise<PagedMediaList> {
+  const all = await listUploads();
+  const needle = query.search?.trim().toLowerCase();
+  const filtered = needle
+    ? all.filter((upload) =>
+        [upload.filename, upload.originalName, upload.contentType, upload.uploadedBy]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(needle),
+      )
+    : all;
+
+  const limit = Math.min(Math.max(1, query.limit ?? 20), 100);
+  const page = Math.max(1, query.page ?? 1);
+  const start = (page - 1) * limit;
+
+  return {
+    items: filtered.slice(start, start + limit),
+    page,
+    limit,
+    total: filtered.length,
+    totalPages: Math.max(1, Math.ceil(filtered.length / limit)),
+  };
+}
+
 export async function getUpload(id: string): Promise<MediaUploadRecord> {
   const records = await readManifest();
   const record = records.find((entry) => entry.id === id);

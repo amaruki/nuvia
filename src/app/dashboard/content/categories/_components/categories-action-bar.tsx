@@ -1,12 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Filter, Plus, RefreshCw } from "lucide-react";
+import { Download, Plus, RefreshCw } from "lucide-react";
 
 interface CategoriesActionBarProps {
   totalItems: number;
   activeCount?: number;
   selectedCount: number;
-  onToggleFilters: () => void;
   onRefresh: () => void;
   onAdd: () => void;
 }
@@ -15,7 +14,6 @@ export function CategoriesActionBar({
   totalItems,
   activeCount,
   selectedCount,
-  onToggleFilters,
   onRefresh,
   onAdd,
 }: CategoriesActionBarProps) {
@@ -37,15 +35,6 @@ export function CategoriesActionBar({
         )}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onToggleFilters}
-          className="flex-1 sm:flex-none"
-        >
-          <Filter className="mr-2 h-4 w-4" />
-          <span className="hidden sm:inline">Filters</span>
-        </Button>
         <Button variant="outline" size="sm" onClick={onRefresh} className="flex-1 sm:flex-none">
           <RefreshCw className="mr-2 h-4 w-4" />
           <span className="hidden sm:inline">Refresh</span>

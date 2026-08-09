@@ -56,8 +56,8 @@ export function TopPerformingCard({ statistics }: AnnouncementStatisticsCardProp
                     <span
                       className={
                         article.engagementScore > 80
-                          ? "text-emerald-600 font-medium"
-                          : "text-amber-600"
+                          ? "text-emerald-700 dark:text-emerald-400 font-medium"
+                          : "text-amber-700 dark:text-amber-400"
                       }
                     >
                       {formatPercentage(article.engagementScore)}

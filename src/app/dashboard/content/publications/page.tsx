@@ -19,10 +19,8 @@ import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Publication } from "@/types/publication";
 import { PublicationsOverviewCards } from "@/components/content/publications-overview-cards";
-import { PublicationsFilters } from "@/components/content/publications-filters";
 import { ActionBar } from "./_components/action-bar";
 import { AnalyticsTab } from "./_components/analytics-tab";
-import { BulkActions } from "./_components/bulk-actions";
 import { DraftsTab } from "./_components/drafts-tab";
 import { ImportExportBar } from "./_components/import-export-bar";
 import { OverviewTab } from "./_components/overview-tab";
@@ -31,7 +29,7 @@ import { PublicationsTab } from "./_components/publications-tab";
 
 export default function ContentPublications() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [showFilters, setShowFilters] = useState(false);
+  const [tableVersion, setTableVersion] = useState(0);
   const [selectedPublications, setSelectedPublications] = useState<string[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<Publication | null>(null);
   const router = useRouter();
@@ -42,22 +40,16 @@ export default function ContentPublications() {
     statistics,
     loading,
     error,
-    filters,
-    updateFilters,
-    clearFilters,
     refreshData,
     deletePublication,
     duplicatePublication,
     publishPublication,
     archivePublication,
-    schedulePublication,
     bulkPublish,
     bulkArchive,
     bulkDelete,
     exportPublications,
     importPublications,
-    currentPage,
-    totalPages,
     totalItems,
   } = usePublications();
 
@@ -72,6 +64,8 @@ export default function ContentPublications() {
       clearHeader();
     };
   }, [setHeader, clearHeader]);
+
+  const bumpTable = () => setTableVersion((value) => value + 1);
 
   const handleViewDetails = (publication: Publication) => {
     router.push(`/dashboard/content/publications/${publication.id}`);
@@ -94,6 +88,7 @@ export default function ContentPublications() {
     setDeleteTarget(null);
     try {
       await deletePublication(deleteTarget.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error deleting publication", error);
     }
@@ -102,6 +97,7 @@ export default function ContentPublications() {
   const handlePublish = async (publication: Publication) => {
     try {
       await publishPublication(publication.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error publishing publication", error);
     }
@@ -110,22 +106,16 @@ export default function ContentPublications() {
   const handleArchive = async (publication: Publication) => {
     try {
       await archivePublication(publication.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error archiving publication", error);
-    }
-  };
-
-  const handleSchedule = async (publication: Publication, date: Date) => {
-    try {
-      await schedulePublication(publication.id, date);
-    } catch (error) {
-      logger.error("Error scheduling publication", error);
     }
   };
 
   const handleDuplicate = async (publication: Publication) => {
     try {
       await duplicatePublication(publication.id);
+      bumpTable();
     } catch (error) {
       logger.error("Error duplicating publication", error);
     }
@@ -149,30 +139,9 @@ export default function ContentPublications() {
         totalItems={totalItems}
         publishedCount={statistics?.publishedPublications ?? null}
         selectedPublications={selectedPublications}
-        onToggleFilters={() => setShowFilters(!showFilters)}
         onRefresh={refreshData}
         onAdd={handleAdd}
       />
-
-      {/* Filters Panel */}
-      {showFilters && (
-        <PublicationsFilters
-          filters={filters}
-          onFiltersChange={updateFilters}
-          onClearFilters={clearFilters}
-        />
-      )}
-
-      {/* Bulk Actions */}
-      {selectedPublications.length > 0 && (
-        <BulkActions
-          selectedPublications={selectedPublications}
-          bulkPublish={bulkPublish}
-          bulkArchive={bulkArchive}
-          bulkDelete={bulkDelete}
-          clearSelection={() => setSelectedPublications([])}
-        />
-      )}
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -197,19 +166,17 @@ export default function ContentPublications() {
 
         <TabsContent value="publications" className="space-y-6">
           <PublicationsTab
-            publications={publications}
-            selectedPublications={selectedPublications}
-            onSelectionChange={setSelectedPublications}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            updateFilters={updateFilters}
             onViewDetails={handleViewDetails}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onDuplicate={handleDuplicate}
             onPublish={handlePublish}
             onArchive={handleArchive}
-            onSchedule={handleSchedule}
+            bulkPublish={bulkPublish}
+            bulkArchive={bulkArchive}
+            bulkDelete={bulkDelete}
+            onSelectionChange={setSelectedPublications}
+            version={tableVersion}
           />
         </TabsContent>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Filter, Plus, RefreshCw } from "lucide-react";
+import { Download, Plus, RefreshCw } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ interface ActionBarProps {
   totalItems: number;
   statistics: ArticleStatistics | null;
   selectedArticles: string[];
-  onToggleFilters: () => void;
   onRefresh: () => void;
   onAdd: () => void;
 }
@@ -19,7 +18,6 @@ export function ActionBar({
   totalItems,
   statistics,
   selectedArticles,
-  onToggleFilters,
   onRefresh,
   onAdd,
 }: ActionBarProps) {
@@ -41,15 +39,6 @@ export function ActionBar({
         )}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onToggleFilters}
-          className="flex-1 sm:flex-none"
-        >
-          <Filter className="mr-2 h-4 w-4" />
-          <span className="hidden sm:inline">Filters</span>
-        </Button>
         <Button variant="outline" size="sm" onClick={onRefresh} className="flex-1 sm:flex-none">
           <RefreshCw className="mr-2 h-4 w-4" />
           <span className="hidden sm:inline">Refresh</span>

@@ -56,8 +56,8 @@ export function TopPerformingPublicationsCard({ statistics }: PublicationStatist
                     <span
                       className={
                         publication.engagementScore > 80
-                          ? "text-emerald-600 font-medium"
-                          : "text-amber-600"
+                          ? "text-emerald-700 dark:text-emerald-400 font-medium"
+                          : "text-amber-700 dark:text-amber-400"
                       }
                     >
                       {formatPercentage(publication.engagementScore)}

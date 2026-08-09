@@ -1,4 +1,6 @@
-"use server";
+// No "use server" here: Turbopack rejects re-exports from directive files
+// ("Only async functions are allowed to be exported in a 'use server' file").
+// Each implementation module below carries the directive itself.
 
 /**
  * Auth server actions barrel.

@@ -18,10 +18,10 @@ interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
-export async function GET(_request: NextRequest, { params }: RouteContext) {
+export async function GET(request: NextRequest, { params }: RouteContext) {
   const { id } = await params;
   try {
-    const auth = await requirePermission("finance:read");
+    const auth = await requirePermission("finance:read", request.headers);
     if (!auth.success) return problemResponse(auth.error!);
 
     const tier = await getTier(id);
@@ -34,7 +34,7 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
 export async function PATCH(request: NextRequest, { params }: RouteContext) {
   const { id } = await params;
   try {
-    const auth = await requirePermission("finance:update");
+    const auth = await requirePermission("finance:update", request.headers);
     if (!auth.success) return problemResponse(auth.error!);
 
     let body: unknown;
@@ -54,10 +54,10 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   }
 }
 
-export async function DELETE(_request: NextRequest, { params }: RouteContext) {
+export async function DELETE(request: NextRequest, { params }: RouteContext) {
   const { id } = await params;
   try {
-    const auth = await requirePermission("finance:delete");
+    const auth = await requirePermission("finance:delete", request.headers);
     if (!auth.success) return problemResponse(auth.error!);
 
     await deleteTier(id);

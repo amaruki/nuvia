@@ -9,7 +9,7 @@ export {
   getEventDashboardData,
   getUserEventRegistrations,
   getUserOrganizedEvents,
+  getEventCategories,
 } from "./queries";
-export { createEvent, updateEvent, deleteEvent } from "./mutations";
+export { createEvent, updateEvent, deleteEvent, createEventCategory } from "./mutations";
 export { registerForEvent, cancelEventRegistration, checkInToEvent } from "./registrations";
-export { getEventCertificate, verifyEventCertificate } from "./certificates";

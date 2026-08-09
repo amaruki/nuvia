@@ -132,6 +132,17 @@ export async function fetchRegistrationStatus(
   return row?.status;
 }
 
+export async function fetchRegistrationMetadata(
+  registrationId: string,
+): Promise<Record<string, unknown> | null | undefined> {
+  const [row] = await db
+    .select({ metadata: eventRegistration.metadata })
+    .from(eventRegistration)
+    .where(eq(eventRegistration.id, registrationId))
+    .limit(1);
+  return row?.metadata as Record<string, unknown> | null | undefined;
+}
+
 /** Deletes every row the importing test file seeded, in FK order. */
 export async function cleanupTrackedRows(): Promise<void> {
   if (createdRegistrationIds.length > 0) {

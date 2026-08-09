@@ -111,6 +111,12 @@ function isPublicEndpoint(pathname: string): boolean {
     "/api/v1/auth/forgot-password",
     "/api/v1/auth/reset-password",
     "/api/v1/auth/verify-email",
+    // Stripe provider callback: authenticates by Stripe-Signature (HMAC
+    // against STRIPE_WEBHOOK_SECRET) inside the route handler, not by
+    // session — ADR-0015 §4. Gating it here 401'd every callback before
+    // verification could run (UI-41). Exact path only: no wildcard over
+    // /api/v1/webhooks.
+    "/api/v1/webhooks/stripe",
   ];
 
   return publicEndpoints.some((endpoint) => pathname.startsWith(endpoint));

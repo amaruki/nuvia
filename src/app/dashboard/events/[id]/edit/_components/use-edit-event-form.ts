@@ -2,17 +2,24 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { logger } from "@/lib/logger";
-import { getEventById } from "@/lib/services/event";
+import { getEventById, updateEvent } from "@/lib/services/event";
 import { Event } from "@/types/event";
 
-import { INITIAL_FORM_DATA, mapEventToFormData } from "./edit-event-helpers";
+import {
+  INITIAL_FORM_DATA,
+  buildUpdateEventRequest,
+  mapEventToFormData,
+  validateEditFormData,
+} from "./edit-event-helpers";
 import type { EventFormData } from "./edit-event-types";
 
 /**
- * Owns the edit-event page's data lifecycle and form state: fetches the event,
- * seeds the form, and exposes change handlers plus the submit/cancel actions.
+ * Owns the edit-event page's data lifecycle and form state: fetches the
+ * event, seeds the form, validates input, and persists through the real
+ * event service (PATCH /api/v1/events/:id). No simulated saves.
  */
 export function useEditEventForm(eventId: string) {
   const router = useRouter();
@@ -23,6 +30,7 @@ export function useEditEventForm(eventId: string) {
   const [tags, setTags] = React.useState<string[]>([]);
   const [tagInput, setTagInput] = React.useState("");
   const [formData, setFormData] = React.useState<EventFormData>(INITIAL_FORM_DATA);
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
     const fetchEventData = async () => {
@@ -47,12 +55,22 @@ export function useEditEventForm(eventId: string) {
     }
   }, [eventId, router]);
 
+  const clearFieldError = (name: string) => {
+    setFormErrors((prev) => {
+      if (!(name in prev)) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+    clearFieldError(name);
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -60,6 +78,7 @@ export function useEditEventForm(eventId: string) {
       ...prev,
       [name]: value,
     }));
+    clearFieldError(name);
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,6 +87,7 @@ export function useEditEventForm(eventId: string) {
       ...prev,
       [name]: checked,
     }));
+    clearFieldError(name);
   };
 
   const handleAddTag = () => {
@@ -90,19 +110,22 @@ export function useEditEventForm(eventId: string) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const errors = validateEditFormData(formData);
+    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      toast.error(Object.values(errors)[0]);
+      return;
+    }
+
     setIsSubmitting(true);
-
     try {
-      // Here you would typically call your API to update the event
-      logger.info("Updating event with data", { ...formData, tags });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Redirect to event details page
+      await updateEvent(eventId, buildUpdateEventRequest(formData, tags));
+      toast.success("Event updated");
       router.push(`/events/${eventId}`);
     } catch (error) {
       logger.error("Error updating event", error);
+      toast.error(error instanceof Error ? error.message : "Failed to update event");
     } finally {
       setIsSubmitting(false);
     }
@@ -119,6 +142,7 @@ export function useEditEventForm(eventId: string) {
     tags,
     tagInput,
     formData,
+    formErrors,
     setTagInput,
     handleInputChange,
     handleSelectChange,

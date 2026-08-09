@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Phone, X } from "lucide-react";
+import { Mail, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AuthStatus, UserStatus } from "@/types/user-management.types";
 import type { UserRole } from "@/types/dashboard.types";
 import UserFilterAuthSection from "./auth-section";
 import { getActiveFiltersCount } from "./helpers";
-import UserFilterLocationSection from "./location-section";
 import UserFilterRoleSection from "./role-section";
 import UserFilterSearchBar from "./search-bar";
 import UserFilterStatusSection from "./status-section";
@@ -58,23 +57,6 @@ export function UserFilter({
     onFilterChange({ ...filters, emailVerified: verified });
   };
 
-  const handlePhoneVerifiedChange = (verified: boolean | undefined) => {
-    onFilterChange({ ...filters, phoneVerified: verified });
-  };
-
-  const handleLocationAdd = (location: string) => {
-    if (!location.trim()) return;
-    const currentLocations = filters.locations || [];
-    const newLocations = [...currentLocations, location.trim()];
-    onFilterChange({ ...filters, locations: newLocations });
-  };
-
-  const handleLocationRemove = (locationToRemove: string) => {
-    const currentLocations = filters.locations || [];
-    const newLocations = currentLocations.filter((location) => location !== locationToRemove);
-    onFilterChange({ ...filters, locations: newLocations.length ? newLocations : undefined });
-  };
-
   const activeFiltersCount = getActiveFiltersCount(filters);
 
   return (
@@ -101,18 +83,6 @@ export function UserFilter({
           idPrefix="email"
           value={filters.emailVerified}
           onChange={handleEmailVerifiedChange}
-        />
-        <UserFilterVerificationSection
-          title="Phone Verification"
-          icon={<Phone className="size-4" />}
-          idPrefix="phone"
-          value={filters.phoneVerified}
-          onChange={handlePhoneVerifiedChange}
-        />
-        <UserFilterLocationSection
-          locations={filters.locations}
-          onAdd={handleLocationAdd}
-          onRemove={handleLocationRemove}
         />
       </div>
 

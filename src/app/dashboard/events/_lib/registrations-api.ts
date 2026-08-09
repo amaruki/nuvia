@@ -147,11 +147,15 @@ export interface CancelRegistrationResult {
 export async function cancelEventRegistrationAdmin(
   eventId: string,
   registrationId: string,
+  reason?: string,
 ): Promise<CancelRegistrationResult> {
   return (
     await apiFetch<CancelRegistrationResult>(
       `/${encodeURIComponent(eventId)}/registrations/${encodeURIComponent(registrationId)}/cancel`,
-      { method: "POST" },
+      {
+        method: "POST",
+        ...(reason ? { body: JSON.stringify({ reason }) } : {}),
+      },
     )
   ).data;
 }

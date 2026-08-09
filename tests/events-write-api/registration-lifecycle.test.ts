@@ -20,6 +20,7 @@ import {
   createCategory,
   createUser,
   fetchEventCounters,
+  fetchRegistrationMetadata,
   fetchRegistrationStatus,
   problemStatus,
   runSuffix,
@@ -219,6 +220,43 @@ describe("cancelRegistration — the service core behind POST .../registrations/
       canManage: true,
     });
     expect(canceled.status).toBe("CANCELED");
+  });
+
+  test("persists an admin-provided cancellation reason into metadata", async () => {
+    const organizerId = await createUser("organizer");
+    const attendeeId = await createUser("attendee");
+    const managerId = await createUser("manager");
+    const category = await createCategory("cancel");
+    const dto = await seedEvent(organizerId, category.name);
+
+    const { registration } = await createRegistration(dto.id, attendeeId);
+    trackRegistration(registration.id);
+
+    const { registration: canceled } = await cancelRegistration(
+      dto.id,
+      registration.id,
+      { userId: managerId, canManage: true },
+      "Double booking — moved to the afternoon session",
+    );
+
+    expect(canceled.status).toBe("CANCELED");
+    const metadata = await fetchRegistrationMetadata(registration.id);
+    expect(metadata?.cancellationReason).toBe("Double booking — moved to the afternoon session");
+  });
+
+  test("leaves metadata untouched when no reason is given", async () => {
+    const organizerId = await createUser("organizer");
+    const attendeeId = await createUser("attendee");
+    const category = await createCategory("cancel");
+    const dto = await seedEvent(organizerId, category.name);
+
+    const { registration } = await createRegistration(dto.id, attendeeId);
+    trackRegistration(registration.id);
+
+    await cancelRegistration(dto.id, registration.id, { userId: attendeeId, canManage: false });
+
+    const metadata = await fetchRegistrationMetadata(registration.id);
+    expect(metadata ?? null).toBeNull();
   });
 
   test("rejects canceling an already canceled registration with 409", async () => {

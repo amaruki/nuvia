@@ -12,9 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { fetchMembersPage } from "@/lib/hooks/use-memberships";
 import type { MemberApiItem } from "@/lib/hooks/use-memberships";
+import { useSession } from "@/hooks/use-session";
 
-/** Upper bound of rows loaded for rendering; pagination meta carries the
- * true total. B1 serves the directory from the database, not mock rows. */
 const DIRECTORY_LIMIT = 100;
 
 /** Normalize sortable profile values (dates, missing values) for comparison. */
@@ -51,6 +50,7 @@ function toUserProfile(member: MemberApiItem): UserProfile {
 export default function UserDirectoryPage() {
   const [filters, setFilters] = useState<UserFilter>({});
   const { setHeader, clearHeader } = useHeader();
+  const { user: sessionUser } = useSession();
   const [sort, setSort] = useState<UserSort>({
     field: "createdAt",
     direction: "desc",
@@ -94,11 +94,11 @@ export default function UserDirectoryPage() {
   // Stats are computed from real loaded rows. Fields without a data source
   // in the users schema (2FA, last login, suspended state) report zero.
   const stats: UserStats = useMemo(() => {
+    let activeUsers = 0;
     const roleDistribution = Object.fromEntries(USER_ROLES.map((role) => [role, 0])) as Record<
       UserRole,
       number
     >;
-    let activeUsers = 0;
     let verifiedUsers = 0;
     let newUsersThisMonth = 0;
     const monthStart = new Date();
@@ -163,22 +163,6 @@ export default function UserDirectoryPage() {
       filtered = filtered.filter((user) => user.emailVerified === filters.emailVerified);
     }
 
-    // Apply phone verification filter
-    if (filters.phoneVerified !== undefined) {
-      filtered = filtered.filter((user) => user.phoneVerified === filters.phoneVerified);
-    }
-
-    // Apply location filter
-    if (filters.locations?.length) {
-      filtered = filtered.filter(
-        (user) =>
-          user.location &&
-          filters.locations!.some((location) =>
-            user.location!.toLowerCase().includes(location.toLowerCase()),
-          ),
-      );
-    }
-
     // Apply sorting
     filtered.sort((a, b) => {
       const { field, direction } = sort;
@@ -189,28 +173,13 @@ export default function UserDirectoryPage() {
       const aValue = toComparable(rawA);
       const bValue = toComparable(rawB);
 
-      // Compare
-      let result = 0;
-      if (aValue < bValue) result = -1;
-      else if (aValue > bValue) result = 1;
-
-      return direction === "asc" ? result : -result;
+      if (aValue === bValue) return 0;
+      const comparison = aValue < bValue ? -1 : 1;
+      return direction === "asc" ? comparison : -comparison;
     });
 
     return filtered;
   }, [apiUsers, filters, sort]);
-
-  const handleFilterChange = (newFilters: UserFilter) => {
-    setFilters(newFilters);
-  };
-
-  const handleSortChange = (newSort: UserSort) => {
-    setSort(newSort);
-  };
-
-  const handleClearFilters = () => {
-    setFilters({});
-  };
 
   if (isError) {
     const message = error instanceof Error ? error.message : "Failed to load the user directory";
@@ -230,18 +199,21 @@ export default function UserDirectoryPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <UserDirectory
-        users={filteredUsers}
-        total={total}
-        stats={stats}
-        filters={filters}
-        sort={sort}
-        isLoading={isLoading}
-        onFilterChange={handleFilterChange}
-        onSortChange={handleSortChange}
-        onClearFilters={handleClearFilters}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <main className="container mx-auto max-w-7xl px-4 py-8">
+        <UserDirectory
+          users={filteredUsers}
+          total={total}
+          stats={stats}
+          filters={filters}
+          sort={sort}
+          isLoading={isLoading}
+          onFilterChange={setFilters}
+          onSortChange={setSort}
+          onClearFilters={() => setFilters({})}
+          currentUserRole={sessionUser?.role as UserRole | undefined}
+        />
+      </main>
     </div>
   );
 }

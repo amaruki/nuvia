@@ -1,9 +1,14 @@
 import { NextRequest } from "next/server";
+import { z } from "zod";
 import { hasPermission, requirePermission } from "@/lib/rbac";
-import { problemResponse, successResponse } from "@/lib/http";
+import { problem, problemResponse, successResponse } from "@/lib/http";
 import { logger } from "@/lib/logger";
 import { cancelRegistration } from "@/lib/services/registration.service";
 import { handleEventRoute } from "../../../../_lib";
+
+const cancelBodySchema = z.object({
+  reason: z.string().max(500, "Reason must be less than 500 characters").optional(),
+});
 
 /**
  * Cancels a registration. Owners may cancel their own registration;
@@ -21,16 +26,42 @@ export async function POST(
 
     const { id, registrationId } = await params;
 
+    // Optional admin reason: `{ "reason": "..." }`. An absent/empty body is
+    // fine for owner self-cancellations, which carry no reason.
+    let reason: string | undefined;
+    const rawBody = await request.text();
+    if (rawBody.trim()) {
+      let parsedBody: unknown;
+      try {
+        parsedBody = JSON.parse(rawBody);
+      } catch {
+        return problemResponse(problem("invalid-json", 400, "Invalid JSON body"));
+      }
+      const parsed = cancelBodySchema.safeParse(parsedBody);
+      if (!parsed.success) {
+        return problemResponse(
+          problem("validation-error", 400, "Validation error", parsed.error.issues[0]?.message),
+        );
+      }
+      reason = parsed.data.reason;
+    }
+
     const canManage = await hasPermission("events:manage", request.headers);
-    const result = await cancelRegistration(id, registrationId, {
-      userId: auth.user!.id,
-      canManage,
-    });
+    const result = await cancelRegistration(
+      id,
+      registrationId,
+      {
+        userId: auth.user!.id,
+        canManage,
+      },
+      reason,
+    );
 
     logger.info("event registration canceled", {
       eventId: id,
       registrationId,
       actor: auth.user!.id,
+      reason: reason ?? null,
       promoted: result.promoted?.id ?? null,
     });
 

@@ -7,9 +7,9 @@
  * refused; deactivate it (`isActive: false`) instead.
  */
 
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { db } from "@/db/client";
-import { membershipTier, type MembershipTier } from "@/db/schema";
+import { membershipSubscription, membershipTier, type MembershipTier } from "@/db/schema";
 import { BusinessLogicError, NotFoundError } from "@/lib/errors";
 import type { CreateTierInput, UpdateTierInput } from "@/lib/validation/finance.validation";
 
@@ -111,4 +111,30 @@ export async function deleteTier(id: string): Promise<void> {
     }
     throw error;
   }
+}
+
+/**
+ * Live member counts for the tiers dashboard: ACTIVE subscriptions grouped
+ * by tier. The tiers page renders these directly — no invented statistics.
+ */
+export async function countActiveMembersByTier(): Promise<{
+  memberCounts: Record<string, number>;
+  totalActiveMembers: number;
+}> {
+  const rows = await db
+    .select({
+      tierId: membershipSubscription.tierId,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(membershipSubscription)
+    .where(eq(membershipSubscription.status, "ACTIVE"))
+    .groupBy(membershipSubscription.tierId);
+
+  const memberCounts: Record<string, number> = {};
+  let totalActiveMembers = 0;
+  for (const row of rows) {
+    memberCounts[row.tierId] = row.count;
+    totalActiveMembers += row.count;
+  }
+  return { memberCounts, totalActiveMembers };
 }

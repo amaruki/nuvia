@@ -4,6 +4,7 @@ import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { QrCode, Download, ExternalLink, XCircle, CheckCircle, Clock } from "lucide-react";
 import { Event, EventRegistration, RegistrationStatus } from "@/types/event";
 
@@ -115,88 +116,46 @@ export function EventRegistrationStatus({
 
         {/* Status-specific Messages */}
         {registration.status === RegistrationStatus.PENDING && (
-          <div
-            className="p-4 rounded-lg"
-            style={{
-              backgroundColor: "var(--destructive)",
-              color: "var(--chart-5-foreground)",
-              opacity: "0.1",
-            }}
-          >
-            <div className="flex">
-              <Clock className="h-5 w-5 mr-2" style={{ color: "var(--destructive)" }} />
-              <div>
-                <p className="font-medium">Registration Pending</p>
-                <p className="text-sm mt-1">
-                  Your registration is being reviewed. You will receive a confirmation email once
-                  your registration is approved.
-                </p>
-              </div>
-            </div>
-          </div>
+          <Alert>
+            <Clock className="h-4 w-4" />
+            <AlertTitle>Registration Pending</AlertTitle>
+            <AlertDescription>
+              Your registration is being reviewed. You will receive a confirmation email once your
+              registration is approved.
+            </AlertDescription>
+          </Alert>
         )}
 
         {registration.status === RegistrationStatus.WAITLISTED && (
-          <div
-            className="p-4 rounded-lg"
-            style={{
-              backgroundColor: "var(--info)",
-              color: "var(--info-foreground)",
-              opacity: "0.1",
-            }}
-          >
-            <div className="flex">
-              <Clock className="h-5 w-5 mr-2" style={{ color: "var(--info)" }} />
-              <div>
-                <p className="font-medium">Waitlisted</p>
-                <p className="text-sm mt-1">
-                  This event is currently full. You have been added to the waitlist and will be
-                  notified if a spot becomes available.
-                </p>
-              </div>
-            </div>
-          </div>
+          <Alert>
+            <Clock className="h-4 w-4" />
+            <AlertTitle>Waitlisted</AlertTitle>
+            <AlertDescription>
+              This event is currently full. You have been added to the waitlist and will be notified
+              if a spot becomes available.
+            </AlertDescription>
+          </Alert>
         )}
 
         {registration.status === RegistrationStatus.CONFIRMED && upcoming && (
-          <div
-            className="p-4 rounded-lg"
-            style={{
-              backgroundColor: "var(--chart-2)",
-              color: "var(--chart-2-foreground)",
-              opacity: "0.1",
-            }}
-          >
-            <div className="flex">
-              <CheckCircle className="h-5 w-5 mr-2" style={{ color: "var(--chart-2)" }} />
-              <div>
-                <p className="font-medium">Registration Confirmed</p>
-                <p className="text-sm mt-1">
-                  You are successfully registered for this event. Please check your email for
-                  confirmation details.
-                </p>
-              </div>
-            </div>
-          </div>
+          <Alert>
+            <CheckCircle className="h-4 w-4" />
+            <AlertTitle>Registration Confirmed</AlertTitle>
+            <AlertDescription>
+              You are successfully registered for this event. Please check your email for
+              confirmation details.
+            </AlertDescription>
+          </Alert>
         )}
 
         {registration.status === RegistrationStatus.CANCELLED && (
-          <div
-            className="p-4 rounded-lg"
-            style={{
-              backgroundColor: "var(--destructive)",
-              color: "var(--destructive-foreground)",
-              opacity: "0.1",
-            }}
-          >
-            <div className="flex">
-              <XCircle className="h-5 w-5 mr-2" style={{ color: "var(--destructive)" }} />
-              <div>
-                <p className="font-medium">Registration Cancelled</p>
-                <p className="text-sm mt-1">Your registration for this event has been cancelled.</p>
-              </div>
-            </div>
-          </div>
+          <Alert variant="destructive">
+            <XCircle className="h-4 w-4" />
+            <AlertTitle>Registration Cancelled</AlertTitle>
+            <AlertDescription>
+              Your registration for this event has been cancelled.
+            </AlertDescription>
+          </Alert>
         )}
 
         {/* Action Buttons */}
@@ -264,28 +223,15 @@ export function EventRegistrationStatus({
 
         {/* Check-in Information */}
         {registration.checkedInAt && (
-          <div
-            className="p-4 rounded-lg"
-            style={{
-              backgroundColor: "var(--chart-2)",
-              color: "var(--chart-2-foreground)",
-              opacity: "0.1",
-            }}
-          >
-            <div className="flex">
-              <CheckCircle className="h-5 w-5 mr-2" style={{ color: "var(--chart-2)" }} />
-              <div>
-                <p className="font-medium">Checked In</p>
-                <p className="text-sm mt-1">
-                  You checked in at {formatTime(registration.checkedInAt)} on{" "}
-                  {formatDate(registration.checkedInAt)}.
-                </p>
-                {registration.checkInMethod && (
-                  <p className="text-sm mt-1">Check-in method: {registration.checkInMethod}</p>
-                )}
-              </div>
-            </div>
-          </div>
+          <Alert>
+            <CheckCircle className="h-4 w-4" />
+            <AlertTitle>Checked In</AlertTitle>
+            <AlertDescription>
+              You checked in at {formatTime(registration.checkedInAt)} on{" "}
+              {formatDate(registration.checkedInAt)}.
+              {registration.checkInMethod && <p>Check-in method: {registration.checkInMethod}</p>}
+            </AlertDescription>
+          </Alert>
         )}
       </CardContent>
     </Card>

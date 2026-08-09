@@ -23,6 +23,7 @@ import {
   hydrateRegistration,
   type ApiEnvelope,
   type ApiEvent,
+  type ApiEventCategory,
   type ApiEventDetail,
 } from "./types";
 
@@ -227,6 +228,28 @@ export async function getUserOrganizedEvents(userId: string): Promise<Event[]> {
     return await handleApiResponse<Event[]>(response);
   } catch (error) {
     logger.error(`Error fetching organized events for user ${userId}`, error);
+    throw error;
+  }
+}
+
+/**
+ * List active event categories for form reference data (UI-02).
+ * Backed by GET /api/v1/events/categories.
+ */
+export async function getEventCategories(): Promise<ApiEventCategory[]> {
+  try {
+    const response = await fetch(`${API_PREFIX}/events/categories`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+
+    const envelope = await handleApiResponse<{ data?: { categories: ApiEventCategory[] } }>(
+      response,
+    );
+    return envelope.data?.categories ?? [];
+  } catch (error) {
+    logger.error("Error fetching event categories", error);
     throw error;
   }
 }

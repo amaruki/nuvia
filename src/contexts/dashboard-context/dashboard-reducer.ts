@@ -28,18 +28,6 @@ export function dashboardReducer(state: DashboardState, action: DashboardAction)
         notifications: state.notifications.map((notif) => ({ ...notif, read: true })),
       };
 
-    case "SET_MEMBER_STATS":
-      return {
-        ...state,
-        memberStats: action.payload,
-      };
-
-    case "SET_EVENT_STATS":
-      return {
-        ...state,
-        eventStats: action.payload,
-      };
-
     case "TOGGLE_SIDEBAR":
       return {
         ...state,
@@ -64,25 +52,6 @@ export function dashboardReducer(state: DashboardState, action: DashboardAction)
         header: {},
       };
 
-    case "SET_REFRESHING":
-      return {
-        ...state,
-        isRefreshing: action.payload,
-      };
-
-    case "SET_LAST_REFRESH":
-      return {
-        ...state,
-        lastRefresh: action.payload,
-      };
-
-    case "REFRESH_DATA":
-      return {
-        ...state,
-        isRefreshing: true,
-        lastRefresh: new Date(),
-      };
-
     default:
       return state;
   }
@@ -90,11 +59,7 @@ export function dashboardReducer(state: DashboardState, action: DashboardAction)
 
 export const initialState: DashboardState = {
   notifications: [],
-  memberStats: null,
-  eventStats: null,
   sidebarCollapsed: false,
   theme: "system",
   header: {},
-  isRefreshing: false,
-  lastRefresh: null,
 };

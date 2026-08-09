@@ -3,6 +3,7 @@ import type { Role } from "./role-definitions";
 import type { Permission, PermissionModule } from "./permission-types";
 import { ROLE_HIERARCHY } from "./role-hierarchy";
 import { PERMISSION_CATEGORIES } from "./permission-categories";
+import { ROLE_PERMISSIONS } from "./role-permissions";
 
 // Utility functions for role and permission checking
 // isPredefinedRole is now imported from dashboard.types
@@ -33,4 +34,16 @@ export const formatPermission = (permission: Permission): string => {
   const [module, action] = permission.split(":");
   const category = PERMISSION_CATEGORIES[module as PermissionModule];
   return `${category?.name || module} - ${action.charAt(0).toUpperCase() + action.slice(1)}`;
+};
+
+/**
+ * Client-safe permission check against the predefined-role permission map.
+ * Custom roles have no client-side permission grants.
+ */
+export const roleHasPermission = (
+  role: string | null | undefined,
+  permission: Permission,
+): boolean => {
+  if (!role || !isPredefinedRole(role)) return false;
+  return ROLE_PERMISSIONS[role].includes(permission);
 };

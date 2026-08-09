@@ -8,7 +8,12 @@ import {
 import { ValidationError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
 import { handleApiResponse } from "./helpers";
-import { hydrateWriteEvent, type ApiEnvelope, type ApiEventWriteDto } from "./types";
+import {
+  hydrateWriteEvent,
+  type ApiEnvelope,
+  type ApiEventCategory,
+  type ApiEventWriteDto,
+} from "./types";
 
 /** Derives the DB format enum from the UI's isVirtual/isInPerson flags. */
 function deriveEventFormat(isVirtual: boolean, isInPerson: boolean): DbEventFormat {
@@ -129,6 +134,33 @@ export async function deleteEvent(id: string): Promise<void> {
     await handleApiResponse<{ data: { id: string; deleted: boolean } }>(response);
   } catch (error) {
     logger.error(`Error deleting event with ID ${id}`, error);
+    throw error;
+  }
+}
+
+/**
+ * Create an event category (UI-02). Backed by POST /api/v1/events/categories;
+ * lets a fresh install with an empty event_categories table create events.
+ */
+export async function createEventCategory(input: {
+  name: string;
+  displayName: string;
+  description?: string;
+}): Promise<ApiEventCategory> {
+  try {
+    const response = await fetch(`${API_PREFIX}/events/categories`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+
+    const envelope = await handleApiResponse<{ data?: ApiEventCategory }>(response);
+    if (!envelope.data) {
+      throw new Error("Unexpected response shape from create event category");
+    }
+    return envelope.data;
+  } catch (error) {
+    logger.error("Error creating event category", error);
     throw error;
   }
 }

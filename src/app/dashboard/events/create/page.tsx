@@ -18,6 +18,7 @@ export default function CreateEventPage() {
     tags,
     tagInput,
     formData,
+    formErrors,
     setTagInput,
     handleInputChange,
     handleCheckboxChange,
@@ -26,6 +27,13 @@ export default function CreateEventPage() {
     handleTagKeyPress,
     handleSubmit,
     handleGoBack,
+    categories,
+    categoriesLoading,
+    categoriesError,
+    newCategoryName,
+    setNewCategoryName,
+    isAddingCategory,
+    handleAddCategory,
   } = useCreateEventForm();
 
   return (
@@ -56,7 +64,18 @@ export default function CreateEventPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <BasicInfoSection formData={formData} onInputChange={handleInputChange} />
+              <BasicInfoSection
+                formData={formData}
+                onInputChange={handleInputChange}
+                errors={formErrors}
+                categories={categories}
+                categoriesLoading={categoriesLoading}
+                categoriesError={categoriesError}
+                newCategoryName={newCategoryName}
+                onNewCategoryNameChange={setNewCategoryName}
+                onAddCategory={handleAddCategory}
+                isAddingCategory={isAddingCategory}
+              />
 
               <DateTimeSection formData={formData} onInputChange={handleInputChange} />
 

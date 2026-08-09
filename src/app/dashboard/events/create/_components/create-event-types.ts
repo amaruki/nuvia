@@ -7,6 +7,7 @@ export interface CreateEventFormData {
   title: string;
   description: string;
   shortDescription: string;
+  category: string;
   eventType: EventType;
   startDate: string;
   endDate: string;

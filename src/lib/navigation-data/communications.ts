@@ -20,7 +20,8 @@ export const communicationsSection: readonly NavItemData[] = [
         title: "Notification System",
         path: "/dashboard/communications/notifications",
         roles: ["admin", "superadmin", "staff"],
-        badge: "5",
+        // UI-01: hardcoded "5" badge removed; no client badge-fetch infra exists,
+        // so no count is shown instead of a fabricated one.
       },
       {
         id: "announcement-management",

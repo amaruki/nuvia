@@ -10,9 +10,11 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Event } from "@/types/event";
-import { getEventById } from "@/lib/services/event";
+import { getEventById, updateEvent } from "@/lib/services/event";
 import { logger } from "@/lib/logger";
+import { buildUpdateEventRequest, validateEditFormData } from "./helpers";
 import { EventFormData, initialFormData } from "./types";
 
 export interface UseEditEventFormResult {
@@ -130,21 +132,21 @@ export function useEditEventForm(eventId: string): UseEditEventFormResult {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const errors = validateEditFormData(formData);
+    if (Object.keys(errors).length > 0) {
+      toast.error(Object.values(errors)[0]);
+      return;
+    }
+
     setIsSubmitting(true);
-
     try {
-      // Here you would typically call your API to update the event
-      logger.info("Updating event with data", { ...formData, tags });
-
-      // Simulate API call
-      const { promise: saveSettled, resolve: finishSave } = Promise.withResolvers<void>();
-      setTimeout(finishSave, 1000);
-      await saveSettled;
-
-      // Redirect to event details page
+      await updateEvent(eventId, buildUpdateEventRequest(formData, tags));
+      toast.success("Event updated");
       router.push(`/events/${eventId}`);
     } catch (error) {
       logger.error("Error updating event", error);
+      toast.error(error instanceof Error ? error.message : "Failed to update event");
     } finally {
       setIsSubmitting(false);
     }

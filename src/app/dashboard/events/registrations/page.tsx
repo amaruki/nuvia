@@ -6,9 +6,20 @@ import { Search, Users } from "lucide-react";
 import { useHeader } from "@/contexts/dashboard-context";
 import { getEvents } from "@/lib/services/event";
 import { formatDate } from "@/lib/utils/event-utils";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -29,6 +40,7 @@ import {
   fetchEventRegistrations,
   REGISTRATION_STATUS_BADGE_STYLES,
   REGISTRATION_STATUS_LABELS,
+  type RegistrationDto,
   type RegistrationStatusDb,
 } from "../_lib/registrations-api";
 
@@ -47,6 +59,9 @@ export default function EventRegistrationsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [actionError, setActionError] = useState<string | null>(null);
+  // Admin cancel confirmation (AlertDialog+reason pattern from users/roles).
+  const [cancelTarget, setCancelTarget] = useState<RegistrationDto | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
 
   useEffect(() => {
     setHeader({
@@ -79,10 +94,12 @@ export default function EventRegistrationsPage() {
   });
 
   const cancelMutation = useMutation({
-    mutationFn: (registrationId: string) =>
-      cancelEventRegistrationAdmin(selectedEventId, registrationId),
+    mutationFn: ({ registrationId, reason }: { registrationId: string; reason?: string }) =>
+      cancelEventRegistrationAdmin(selectedEventId, registrationId, reason),
     onSuccess: () => {
       setActionError(null);
+      setCancelTarget(null);
+      setCancelReason("");
       queryClient.invalidateQueries({ queryKey: ["event-registrations", selectedEventId] });
       queryClient.invalidateQueries({ queryKey: ["admin-events-for-registrations"] });
     },
@@ -222,8 +239,10 @@ export default function EventRegistrationsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={cancelMutation.isPending}
-                        onClick={() => cancelMutation.mutate(registration.id)}
+                        onClick={() => {
+                          setCancelTarget(registration);
+                          setCancelReason("");
+                        }}
                       >
                         Cancel
                       </Button>
@@ -245,6 +264,59 @@ export default function EventRegistrationsPage() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Cancel confirmation — mirrors the users/roles AlertDialog+reason flow. */}
+      <AlertDialog
+        open={cancelTarget !== null}
+        onOpenChange={(open) => {
+          if (!open && !cancelMutation.isPending) {
+            setCancelTarget(null);
+            setCancelReason("");
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel this registration?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {cancelTarget
+                ? `${
+                    cancelTarget.user?.name ?? cancelTarget.user?.username ?? "This attendee"
+                  } will lose their${
+                    cancelTarget.status === "WAITLISTED" ? " waitlist spot" : " seat"
+                  } for ${selectedEvent?.title ?? "this event"}. A waitlisted attendee may be promoted into the freed spot. This action is logged.`
+                : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="cancelReason">Reason (optional)</Label>
+            <Textarea
+              id="cancelReason"
+              placeholder="Why is this registration being canceled?"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              rows={3}
+              disabled={cancelMutation.isPending}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancelMutation.isPending}>Keep it</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={cancelMutation.isPending || !cancelTarget}
+              onClick={() =>
+                cancelTarget &&
+                cancelMutation.mutate({
+                  registrationId: cancelTarget.id,
+                  reason: cancelReason.trim() || undefined,
+                })
+              }
+            >
+              {cancelMutation.isPending ? "Canceling..." : "Cancel registration"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

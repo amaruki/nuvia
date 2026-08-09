@@ -7,7 +7,8 @@ export const eventSection: readonly NavItemData[] = [
     title: "Events",
     path: "/dashboard/events",
     category: "main",
-    badge: "2",
+    // UI-01: hardcoded "2" badge removed; there is no client badge-fetch infra,
+    // so the sidebar shows no count instead of a fabricated one.
     roles: [
       "admin",
       "superadmin",

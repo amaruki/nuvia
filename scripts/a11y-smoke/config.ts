@@ -29,9 +29,9 @@ export const COMPOSE_COMMAND = [
   "docker",
   "compose",
   "--file",
-  "compose.test.yml",
+  "compose.yml",
   "--project-name",
-  "nuvia-test",
+  "nuvia",
 ] as const;
 
 /** WCAG tags covering 2.0/2.1/2.2 levels A + AA. */

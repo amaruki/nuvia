@@ -12,9 +12,9 @@ import { handleEventRoute } from "../_lib";
  * similar events.
  * Requires: events:read permission
  */
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const auth = await requirePermission("events:read");
+    const auth = await requirePermission("events:read", request.headers);
 
     if (!auth.success) {
       return problemResponse(auth.error!);

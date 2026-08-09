@@ -55,19 +55,10 @@ export default function UserTableHead({
           </SortableHeader>
         </TableHead>
         <TableHead className="w-[150px]">Contact</TableHead>
-        <TableHead className="w-[120px]">Location</TableHead>
-        <TableHead className="w-[150px]">
-          <SortableHeader field="lastLoginAt" currentSort={sort} onSort={onSort}>
-            Last Login
-          </SortableHeader>
-        </TableHead>
         <TableHead className="w-[120px]">
           <SortableHeader field="createdAt" currentSort={sort} onSort={onSort}>
             Joined
           </SortableHeader>
-        </TableHead>
-        <TableHead className="w-12">
-          <span className="sr-only">Actions</span>
         </TableHead>
       </TableRow>
     </TableHeader>

@@ -31,8 +31,12 @@ export function UserTable({
         setFocusedRowIndex((prev) => (prev === null ? 0 : Math.max(prev - 1, 0)));
         break;
       case "Enter":
-        e.preventDefault();
-        // Handle row action (view details)
+        // No per-row detail surface exists today, so Enter performs the one
+        // real row action available: toggling selection (mirrors Space).
+        if (showSelection) {
+          e.preventDefault();
+          onSelectUser(users[index].id, !selectedUsers.includes(users[index].id));
+        }
         break;
       case " ":
         if (showSelection) {

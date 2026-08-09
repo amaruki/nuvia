@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useForumCategories, useForumReports, useModerationQueue } from "@/lib/hooks/use-forums";
 
 interface ForumLayoutProps {
   children: React.ReactNode;
@@ -45,27 +46,33 @@ export function ForumLayout({
     });
   }, [setHeader, title, description]);
 
+  // Tab counts come from the real forum API (react-query dedupes the
+  // queries across pages). Undefined while loading — the badge hides.
+  const { data: categories } = useForumCategories();
+  const { data: moderationQueue } = useModerationQueue();
+  const { data: reports } = useForumReports();
+
   const tabs = [
     {
       label: "Categories",
       href: "/dashboard/forums/categories",
       icon: Layers,
       isActive: pathname === "/dashboard/forums/categories",
-      count: 4,
+      count: categories?.length,
     },
     {
       label: "Moderation Queue",
       href: "/dashboard/forums/moderation",
       icon: Shield,
       isActive: pathname === "/dashboard/forums/moderation",
-      count: 2,
+      count: moderationQueue?.length,
     },
     {
       label: "User Reports",
       href: "/dashboard/forums/reports",
       icon: Flag,
       isActive: pathname === "/dashboard/forums/reports",
-      count: 3,
+      count: reports?.length,
     },
   ];
 
@@ -126,12 +133,13 @@ export function ForumLayout({
                     size="sm"
                     className={cn(
                       "gap-2 h-10 rounded-none border-b-2 border-transparent px-4 font-medium text-muted-foreground hover:text-foreground transition-all",
-                      tab.isActive && "border-primary text-primary hover:text-primary bg-accent/20",
+                      tab.isActive &&
+                        "border-primary text-foreground hover:text-foreground bg-accent/20",
                     )}
                   >
                     <tab.icon className="h-4 w-4" />
                     {tab.label}
-                    {tab.count > 0 && (
+                    {typeof tab.count === "number" && tab.count > 0 && (
                       <Badge
                         variant={tab.isActive ? "default" : "secondary"}
                         className="ml-1 h-5 px-1.5 text-xs font-medium"

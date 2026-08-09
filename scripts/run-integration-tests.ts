@@ -13,9 +13,9 @@ const COMPOSE_COMMAND = [
   "docker",
   "compose",
   "--file",
-  "compose.test.yml",
+  "compose.yml",
   "--project-name",
-  "nuvia-test",
+  "nuvia",
 ] as const;
 
 const commandEnvironment = {

@@ -2,18 +2,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { UserProfile } from "@/types/user-management.types";
 import {
   formatDate,
-  formatRelativeTime,
   getAuthStatusColor,
   getInitials,
   getRoleColor,
   getStatusColor,
 } from "./helpers";
-import UserRowActions from "./row-actions";
 
 interface UserTableRowProps {
   user: UserProfile;
@@ -135,27 +133,9 @@ export default function UserTableRow({
         </div>
       </TableCell>
       <TableCell>
-        {user.location && (
-          <div className="flex items-center gap-1 text-sm">
-            <MapPin className="size-3 text-muted-foreground" />
-            <span className="truncate max-w-[100px]">{user.location}</span>
-          </div>
-        )}
-      </TableCell>
-      <TableCell>
-        {user.lastLoginAt && (
-          <div className="text-sm" title={formatDate(user.lastLoginAt)}>
-            {formatRelativeTime(user.lastLoginAt)}
-          </div>
-        )}
-      </TableCell>
-      <TableCell>
         <div className="text-sm" title={formatDate(user.createdAt)}>
           {formatDate(user.createdAt)}
         </div>
-      </TableCell>
-      <TableCell>
-        <UserRowActions user={user} />
       </TableCell>
     </TableRow>
   );

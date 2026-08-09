@@ -4,12 +4,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
 import { UserStatus } from "@/types/user-management.types";
 import type { UserProfile } from "@/types/user-management.types";
 import { ROLE_DISPLAY_INFO, isPredefinedRole } from "@/types/role";
 import {
-  MapPin,
   Mail,
   Phone,
   Calendar,
@@ -18,19 +16,8 @@ import {
   Shield,
   ShieldCheck,
   Clock,
-  User,
-  Settings,
-  Eye,
-  MoreHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   formatDateString,
   getAuthStatusColor,
@@ -66,9 +53,11 @@ export function UserCard({ user, selected, onSelect, showSelection, className }:
       aria-label={`User: ${user.firstName} ${user.lastName}, Role: ${user.userRole}, Status: ${user.status.replace("_", " ")}`}
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
+        // No per-user detail surface exists today; the one real card action
+        // is selection, so Enter/Space toggle it when selection is enabled.
+        if ((e.key === "Enter" || e.key === " ") && showSelection && onSelect) {
           e.preventDefault();
-          // Handle card click action
+          onSelect(!selected);
         }
       }}
     >
@@ -107,33 +96,6 @@ export function UserCard({ user, selected, onSelect, showSelection, className }:
               <h3 className="font-bold text-lg text-foreground mb-1 truncate group-hover:text-primary transition-colors">
                 {user.firstName} {user.lastName}
               </h3>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <MoreHorizontal className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="gap-2">
-                    <Eye className="size-4" />
-                    View Details
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="gap-2">
-                    <Settings className="size-4" />
-                    Edit User
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="gap-2 text-destructive">
-                    <User className="size-4" />
-                    Manage Access
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
 
             {user.username && (
@@ -191,13 +153,6 @@ export function UserCard({ user, selected, onSelect, showSelection, className }:
 
         {/* Contact Info Grid */}
         <div className="space-y-2.5 mb-4 pb-4 border-b">
-          {user.location && (
-            <div className="flex items-center gap-2.5 text-sm group/item">
-              <MapPin className="size-4 text-muted-foreground group-hover/item:text-primary transition-colors flex-shrink-0" />
-              <span className="text-foreground/80 truncate">{user.location}</span>
-            </div>
-          )}
-
           <div className="flex items-center gap-2.5 text-sm group/item">
             <Mail className="size-4 text-muted-foreground group-hover/item:text-primary transition-colors flex-shrink-0" />
             <span className="text-foreground/80 truncate">{user.email}</span>
@@ -226,18 +181,6 @@ export function UserCard({ user, selected, onSelect, showSelection, className }:
               {formatDateString(user.createdAt)}
             </span>
           </div>
-
-          {user.lastLoginAt && (
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
-                <Clock className="size-3.5" />
-                <span>Last Login</span>
-              </div>
-              <span className="font-semibold text-foreground">
-                {formatDateString(user.lastLoginAt)}
-              </span>
-            </div>
-          )}
 
           {user.bio && (
             <div className="pt-2 border-t">

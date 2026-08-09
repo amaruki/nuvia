@@ -2,47 +2,46 @@
 
 import * as React from "react";
 import { WidgetContainer } from "../../ui/widget-container";
+import { EmptyState } from "../../ui/empty-state";
 import { Card, CardContent } from "../../ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "../../ui/badge";
-import {
-  Users,
-  UserCheck,
-  UserPlus,
-  UserX,
-  TrendingUp,
-  TrendingDown,
-  ExternalLink,
-} from "lucide-react";
+import { Users, UserCheck, UserPlus, UserX, TrendingUp, TrendingDown } from "lucide-react";
 import { MemberStatistics } from "@/types/dashboard.types";
 
 interface MemberStatisticsWidgetProps {
   statistics?: MemberStatistics;
-  onExportData?: () => void;
   onViewAllMembers?: () => void;
 }
 
-// Mock statistics data - in a real app, this would come from an API
-const mockStatistics: MemberStatistics = {
-  totalMembers: 1245,
-  activeMembers: 987,
-  newMembersThisMonth: 42,
-  expiredMemberships: 18,
-};
+const formatNumber = (num: number) => new Intl.NumberFormat("en-US").format(num);
 
-const formatNumber = (num: number) => {
-  return new Intl.NumberFormat("en-US").format(num);
-};
-
-const calculatePercentage = (part: number, total: number) => {
-  return Math.round((part / total) * 100);
-};
+const calculatePercentage = (part: number, total: number) =>
+  total > 0 ? Math.round((part / total) * 100) : 0;
 
 export function MemberStatisticsWidget({
-  statistics = mockStatistics,
-  onExportData,
+  statistics,
   onViewAllMembers,
 }: MemberStatisticsWidgetProps) {
+  // No real data yet (or the caller lacks memberships:read) — honest empty
+  // state instead of placeholder numbers.
+  if (!statistics) {
+    return (
+      <WidgetContainer
+        type="member-statistics"
+        title="Member Statistics"
+        description="Overview of community membership"
+        size="medium"
+      >
+        <EmptyState
+          icon={<Users className="h-8 w-8 text-muted-foreground" />}
+          title="No membership data yet"
+          description="Member totals, activity and signups appear here once people join your organization."
+        />
+      </WidgetContainer>
+    );
+  }
+
   const activePercentage = calculatePercentage(statistics.activeMembers, statistics.totalMembers);
   const newPercentage = calculatePercentage(
     statistics.newMembersThisMonth,
@@ -52,6 +51,10 @@ export function MemberStatisticsWidget({
     statistics.expiredMemberships,
     statistics.totalMembers,
   );
+  const newMemberDelta =
+    statistics.newMembersLastMonth != null
+      ? statistics.newMembersThisMonth - statistics.newMembersLastMonth
+      : null;
 
   return (
     <WidgetContainer
@@ -71,14 +74,11 @@ export function MemberStatisticsWidget({
                   {formatNumber(statistics.totalMembers)} total members
                 </span>
               </div>
-              <div className="flex space-x-2">
-                <Button variant="ghost" size="sm" onClick={onExportData} className="text-xs">
-                  Export
-                </Button>
+              {onViewAllMembers && (
                 <Button variant="ghost" size="sm" onClick={onViewAllMembers} className="text-xs">
                   View all
                 </Button>
-              </div>
+              )}
             </div>
 
             {/* Statistics cards */}
@@ -122,9 +122,8 @@ export function MemberStatisticsWidget({
                 <div className="text-2xl font-bold" style={{ color: "var(--foreground)" }}>
                   {formatNumber(statistics.activeMembers)}
                 </div>
-                <div className="flex items-center text-xs mt-1" style={{ color: "var(--chart-2)" }}>
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  <span>+5% from last month</span>
+                <div className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>
+                  {activePercentage}% of all members
                 </div>
               </div>
 
@@ -145,10 +144,26 @@ export function MemberStatisticsWidget({
                 <div className="text-2xl font-bold" style={{ color: "var(--foreground)" }}>
                   {formatNumber(statistics.newMembersThisMonth)}
                 </div>
-                <div className="flex items-center text-xs mt-1" style={{ color: "var(--chart-2)" }}>
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  <span>+12% from last month</span>
-                </div>
+                {newMemberDelta != null ? (
+                  <div
+                    className="flex items-center text-xs mt-1"
+                    style={{ color: newMemberDelta >= 0 ? "var(--chart-2)" : "var(--destructive)" }}
+                  >
+                    {newMemberDelta >= 0 ? (
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                    ) : (
+                      <TrendingDown className="h-3 w-3 mr-1" />
+                    )}
+                    <span>
+                      {newMemberDelta > 0 ? "+" : ""}
+                      {formatNumber(newMemberDelta)} vs last month
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>
+                    Signups this month
+                  </div>
+                )}
               </div>
 
               {/* Expired Memberships */}
@@ -168,12 +183,8 @@ export function MemberStatisticsWidget({
                 <div className="text-2xl font-bold" style={{ color: "var(--foreground)" }}>
                   {formatNumber(statistics.expiredMemberships)}
                 </div>
-                <div
-                  className="flex items-center text-xs mt-1"
-                  style={{ color: "var(--destructive)" }}
-                >
-                  <TrendingDown className="h-3 w-3 mr-1" />
-                  <span>-3% from last month</span>
+                <div className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>
+                  {expiredPercentage}% of all members
                 </div>
               </div>
             </div>
@@ -243,7 +254,7 @@ export function MemberStatisticsWidget({
 
             {/* Summary */}
             <div className="text-xs text-center pt-2" style={{ color: "var(--muted-foreground)" }}>
-              Membership data updated daily. Last updated: Today at 9:00 AM
+              Live counts derived from member subscriptions (statuses include active and trialing).
             </div>
           </div>
         </CardContent>

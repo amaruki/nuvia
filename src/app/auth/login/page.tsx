@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { animate } from "animejs";
@@ -38,6 +38,7 @@ function LoginForm() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -215,7 +216,13 @@ function LoginForm() {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Checkbox id="rememberMe" {...register("rememberMe")} />
+            <Controller
+              name="rememberMe"
+              control={control}
+              render={({ field }) => (
+                <Checkbox id="rememberMe" checked={field.value} onCheckedChange={field.onChange} />
+              )}
+            />
             <Label htmlFor="rememberMe" className="text-sm font-normal cursor-pointer">
               Remember me
             </Label>

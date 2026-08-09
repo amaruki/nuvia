@@ -1,6 +1,8 @@
 /**
  * GET  /api/v1/finance/tiers — list membership tiers. Requires finance:read.
- *        `?includeInactive=true` also returns deactivated tiers.
+ *        `?includeInactive=true` also returns deactivated tiers. The
+ *        response carries real ACTIVE-subscription counts per tier
+ *        (memberCounts) plus totalActiveMembers for the tiers dashboard.
  * POST /api/v1/finance/tiers — create a tier. Requires finance:create.
  *
  * Amounts are numeric(10,2) string mode; the schema accepts string decimals
@@ -10,19 +12,31 @@
 import type { NextRequest } from "next/server";
 import { problem, problemResponse, successResponse, validationProblem } from "@/lib/http";
 import { requirePermission } from "@/lib/rbac";
-import { createTier, listTiers } from "@/lib/services/membership-tier.service";
+import {
+  countActiveMembersByTier,
+  createTier,
+  listTiers,
+} from "@/lib/services/membership-tier.service";
 import { createTierSchema } from "@/lib/validation/finance.validation";
 import { problemFromFinanceError } from "../_lib/helpers";
 
 export async function GET(request: NextRequest) {
   try {
-    const auth = await requirePermission("finance:read");
+    const auth = await requirePermission("finance:read", request.headers);
     if (!auth.success) return problemResponse(auth.error!);
 
     const includeInactive = new URL(request.url).searchParams.get("includeInactive") === "true";
-    const tiers = await listTiers({ includeInactive });
+    const [tiers, counts] = await Promise.all([
+      listTiers({ includeInactive }),
+      countActiveMembersByTier(),
+    ]);
 
-    return successResponse({ tiers, total: tiers.length });
+    return successResponse({
+      tiers,
+      total: tiers.length,
+      memberCounts: counts.memberCounts,
+      totalActiveMembers: counts.totalActiveMembers,
+    });
   } catch (error) {
     return problemResponse(problemFromFinanceError(error, "List tiers error"));
   }
@@ -30,7 +44,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = await requirePermission("finance:create");
+    const auth = await requirePermission("finance:create", request.headers);
     if (!auth.success) return problemResponse(auth.error!);
 
     let body: unknown;

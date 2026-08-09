@@ -24,6 +24,12 @@ export { ROLE_HIERARCHY } from "./role-hierarchy";
 
 export { PERMISSION_CATEGORIES } from "./permission-categories";
 
-export { getRoleLevel, hasHigherRole, canManageRole, formatPermission } from "./role-utils";
+export {
+  getRoleLevel,
+  hasHigherRole,
+  canManageRole,
+  formatPermission,
+  roleHasPermission,
+} from "./role-utils";
 
 export type { UserWithRoleInfo } from "./user-with-role-info";

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -261,13 +262,13 @@ function SignupPage() {
             />
             <Label htmlFor="agreeToTerms" className="text-sm font-normal leading-relaxed">
               I agree to the{" "}
-              <a href="/terms" className="text-primary hover:underline">
+              <Link href="/terms" className="text-primary hover:underline">
                 Terms of Service
-              </a>{" "}
+              </Link>{" "}
               and{" "}
-              <a href="/privacy" className="text-primary hover:underline">
+              <Link href="/privacy" className="text-primary hover:underline">
                 Privacy Policy
-              </a>
+              </Link>
             </Label>
           </div>
           {errors.agreeToTerms && (

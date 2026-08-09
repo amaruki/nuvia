@@ -8,16 +8,7 @@ export interface UserActionsProps {
 }
 
 export interface BulkAction {
-  type:
-    | "activate"
-    | "suspend"
-    | "ban"
-    | "unban"
-    | "change_role"
-    | "verify_email"
-    | "verify_phone"
-    | "reset_password"
-    | "force_logout";
+  type: "change_role";
   label: string;
   description: string;
   icon: ReactNode;

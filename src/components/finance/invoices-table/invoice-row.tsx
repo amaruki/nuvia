@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { CreditCard, Download, Eye, Mail, MoreHorizontal, Send } from "lucide-react";
+import { CreditCard, Eye, Mail, MoreHorizontal, Send } from "lucide-react";
 import type { Invoice } from "@/types/finance";
 import { formatCurrency, getBalanceAmount, isOverdue } from "./helpers";
 import InvoiceStatusBadge from "./status-badge";
@@ -87,13 +87,6 @@ export default function InvoiceRow({
                   </DropdownMenuItem>
                 </>
               )}
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem>
-              <Download className="mr-2 h-4 w-4" />
-              Download PDF
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>

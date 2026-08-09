@@ -36,7 +36,8 @@ export const membershipSection: readonly NavItemData[] = [
         title: "Applications",
         path: "/dashboard/memberships/applications",
         roles: ["admin", "superadmin", "staff", "chapter_admin", "chapter_president"],
-        badge: "3",
+        // UI-01: hardcoded "3" badge removed; no client badge-fetch infra exists,
+        // so no count is shown instead of a fabricated one.
       },
       {
         id: "membership-renewals",

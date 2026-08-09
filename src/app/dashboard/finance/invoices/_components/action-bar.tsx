@@ -1,7 +1,6 @@
 "use client";
 
-import { Download, Plus, RefreshCw } from "lucide-react";
-import { toast } from "sonner";
+import { RefreshCw } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,23 +38,6 @@ export function ActionBar({ totalItems, statistics, onToggleFilters, onRefresh }
         <Button variant="outline" size="sm" onClick={onRefresh} className="flex-1 sm:flex-none">
           <RefreshCw className="mr-2 h-4 w-4" />
           <span className="hidden sm:inline">Refresh</span>
-        </Button>
-        <Button
-          size="sm"
-          className="flex-1 sm:flex-none"
-          onClick={() =>
-            toast.info(
-              "Invoice creation bills one subscription — use the invoices API (POST /api/v1/finance/invoices) until the dashboard gains a subscription picker.",
-            )
-          }
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          <span className="hidden sm:inline">Create Invoice</span>
-          <span className="sm:hidden">Create</span>
-        </Button>
-        <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
-          <Download className="mr-2 h-4 w-4" />
-          <span className="hidden sm:inline">Export</span>
         </Button>
       </div>
     </div>

@@ -14,7 +14,5 @@ export function getActiveFiltersCount(filters: UserFilter): number {
   if (filters.statuses?.length) count++;
   if (filters.authStatuses?.length) count++;
   if (filters.emailVerified !== undefined) count++;
-  if (filters.phoneVerified !== undefined) count++;
-  if (filters.locations?.length) count++;
   return count;
 }

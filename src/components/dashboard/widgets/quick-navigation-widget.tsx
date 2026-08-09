@@ -1,10 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { WidgetContainer } from "../../ui/widget-container";
 import { Card, CardContent } from "../../ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "../../ui/badge";
 import {
   Home,
   Users,
@@ -16,7 +15,6 @@ import {
   BookOpen,
   Star,
   TrendingUp,
-  ExternalLink,
   ChevronRight,
 } from "lucide-react";
 
@@ -24,7 +22,9 @@ interface QuickNavigationWidgetProps {
   onNavigate?: (path: string) => void;
 }
 
-// Mock navigation items data - in a real app, this would come from an API or config
+// Static navigation targets. UI-01: the fabricated badges ("New", "3", "12",
+// "5") were removed — there is no client-side count infrastructure to back
+// them, so no badge is better than a made-up one.
 const navigationItems = [
   {
     id: "1",
@@ -32,7 +32,6 @@ const navigationItems = [
     description: "Overview of your community activity",
     icon: <Home className="h-5 w-5 text-chart-1" />,
     path: "/dashboard",
-    badge: null,
     isPopular: true,
   },
   {
@@ -41,7 +40,6 @@ const navigationItems = [
     description: "Connect with other members",
     icon: <Users className="h-5 w-5 text-chart-2" />,
     path: "/community",
-    badge: "New",
     isPopular: true,
   },
   {
@@ -50,7 +48,6 @@ const navigationItems = [
     description: "Upcoming and past events",
     icon: <Calendar className="h-5 w-5 text-chart-3" />,
     path: "/events",
-    badge: "3",
     isPopular: true,
   },
   {
@@ -59,7 +56,6 @@ const navigationItems = [
     description: "Latest articles and resources",
     icon: <FileText className="h-5 w-5 text-chart-4" />,
     path: "/articles",
-    badge: null,
     isPopular: false,
   },
   {
@@ -68,7 +64,6 @@ const navigationItems = [
     description: "Join conversations with the community",
     icon: <MessageSquare className="h-5 w-5 text-chart-5" />,
     path: "/discussions",
-    badge: "12",
     isPopular: false,
   },
   {
@@ -77,7 +72,6 @@ const navigationItems = [
     description: "View and download your certificates",
     icon: <BookOpen className="h-5 w-5 text-chart-1" />,
     path: "/certificates",
-    badge: null,
     isPopular: false,
   },
   {
@@ -86,7 +80,6 @@ const navigationItems = [
     description: "Manage your account preferences",
     icon: <Settings className="h-5 w-5 text-foreground/50" />,
     path: "/settings",
-    badge: null,
     isPopular: false,
   },
   {
@@ -95,12 +88,13 @@ const navigationItems = [
     description: "View your recent notifications",
     icon: <Bell className="h-5 w-5 text-destructive" />,
     path: "/notifications",
-    badge: "5",
     isPopular: false,
   },
 ];
 
 export function QuickNavigationWidget({ onNavigate }: QuickNavigationWidgetProps) {
+  const router = useRouter();
+
   // Sort items: popular items first, then by title
   const sortedItems = [...navigationItems].sort((a, b) => {
     if (a.isPopular && !b.isPopular) return -1;
@@ -111,9 +105,9 @@ export function QuickNavigationWidget({ onNavigate }: QuickNavigationWidgetProps
   const handleNavigate = (path: string) => {
     if (onNavigate) {
       onNavigate(path);
+      return;
     }
-    // In a real app, this would use Next.js router
-    // router.push(path)
+    router.push(path);
   };
 
   return (
@@ -154,16 +148,9 @@ export function QuickNavigationWidget({ onNavigate }: QuickNavigationWidgetProps
                         <div className="flex items-center space-x-3">
                           {item.icon}
                           <div>
-                            <div className="flex items-center space-x-2">
-                              <h3 className="text-sm font-semibold text-foreground/90">
-                                {item.title}
-                              </h3>
-                              {item.badge && (
-                                <Badge className="bg-chart-1/20 text-chart-1 text-xs">
-                                  {item.badge}
-                                </Badge>
-                              )}
-                            </div>
+                            <h3 className="text-sm font-semibold text-foreground/90">
+                              {item.title}
+                            </h3>
                             <p className="text-xs text-foreground/50 mt-1">{item.description}</p>
                           </div>
                         </div>
@@ -200,16 +187,9 @@ export function QuickNavigationWidget({ onNavigate }: QuickNavigationWidgetProps
                       <div className="flex items-center space-x-2">
                         {item.icon}
                         <div>
-                          <div className="flex items-center space-x-1">
-                            <h3 className="text-sm font-semibold text-foreground/90 line-clamp-1">
-                              {item.title}
-                            </h3>
-                            {item.badge && (
-                              <Badge className="bg-chart-1/20 text-chart-1 text-xs">
-                                {item.badge}
-                              </Badge>
-                            )}
-                          </div>
+                          <h3 className="text-sm font-semibold text-foreground/90 line-clamp-1">
+                            {item.title}
+                          </h3>
                         </div>
                       </div>
                       <ChevronRight className="h-4 w-4 text-foreground/40" />
@@ -217,19 +197,6 @@ export function QuickNavigationWidget({ onNavigate }: QuickNavigationWidgetProps
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Custom navigation */}
-            <div className="pt-3 border-t border-border">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full text-xs"
-                onClick={() => handleNavigate("/settings/navigation")}
-              >
-                <Settings className="h-3 w-3 mr-1" />
-                Customize Navigation
-              </Button>
             </div>
           </div>
         </CardContent>

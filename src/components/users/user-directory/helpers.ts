@@ -11,8 +11,6 @@ export const SORT_OPTIONS = [
   { value: "userRole-desc", label: "Role ↓", icon: "👤" },
   { value: "status-asc", label: "Status ↑", icon: "🔵" },
   { value: "status-desc", label: "Status ↓", icon: "🔵" },
-  { value: "lastLoginAt-desc", label: "Recent Login", icon: "🕐" },
-  { value: "lastLoginAt-asc", label: "Last Login", icon: "🕐" },
 ];
 
 export function parseSortValue(value: string): UserSort {
@@ -31,10 +29,7 @@ export function getActiveFiltersCount(filters: UserFilter): number {
   if (filters.statuses?.length) count++;
   if (filters.authStatuses?.length) count++;
   if (filters.emailVerified !== undefined) count++;
-  if (filters.phoneVerified !== undefined) count++;
-  if (filters.locations?.length) count++;
   if (filters.registrationDateRange) count++;
-  if (filters.lastLoginRange) count++;
   return count;
 }
 

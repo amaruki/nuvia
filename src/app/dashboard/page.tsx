@@ -2,17 +2,15 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { useSession } from "@/hooks/use-session";
+import { apiFetch } from "@/lib/api-client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { UserProfileWidget } from "@/components/dashboard/widgets/user-profile-widget";
-import { NotificationsWidget } from "@/components/dashboard/widgets/notifications-widget";
 import { EnhancedUpcomingEventsWidget } from "@/components/dashboard/widgets/enhanced-upcoming-events-widget";
 import { RecentArticlesWidget } from "@/components/dashboard/widgets/recent-articles-widget";
-import { EnhancedCertificatesWidget } from "@/components/dashboard/widgets/enhanced-certificates-widget";
 import { CommunityActivityWidget } from "@/components/dashboard/widgets/community-activity-widget";
-import { PersonalRecommendationsWidget } from "@/components/dashboard/widgets/personal-recommendations-widget";
 import { MemberStatisticsWidget } from "@/components/dashboard/widgets/member-statistics-widget";
 import { EventActivityWidget } from "@/components/dashboard/widgets/event-activity-widget";
 import { RecentContentWidget } from "@/components/dashboard/widgets/recent-content-widget";
@@ -22,76 +20,56 @@ import { AnalyticsWidget } from "@/components/dashboard/widgets/analytics-widget
 import { GlobalSearchWidget } from "@/components/dashboard/widgets/global-search-widget";
 import { QuickNavigationWidget } from "@/components/dashboard/widgets/quick-navigation-widget";
 import { CommunityHighlightsWidget } from "@/components/dashboard/widgets/community-highlights-widget";
-import { UserRole } from "@/types/dashboard.types";
-import { useDashboardStats } from "@/contexts/dashboard-context";
-import { useRealtimeUpdates } from "@/hooks/use-realtime-updates";
+import { isPredefinedRole, UserRole } from "@/types/dashboard.types";
+import type {
+  EventOverviewStats,
+  FinanceOverviewStats,
+  MemberOverviewStats,
+} from "@/lib/services/dashboard-overview.service";
 
 /**
- * Mock user role - in a real app, this would come from authentication
+ * Wire shape of GET /api/v1/dashboard/overview. Sections the caller lacks
+ * permission for come back null; the widgets then render their empty state.
  */
-const userRole: UserRole = "admin"; // Change to "admin" to see admin widgets
+interface DashboardOverviewData {
+  members: MemberOverviewStats | null;
+  events: EventOverviewStats | null;
+  finance: FinanceOverviewStats | null;
+}
 
 /**
  * Dashboard page component that displays user-specific widgets and information.
  * The layout is automatically applied by Next.js from the layout.tsx file.
+ *
+ * Overview widgets (UI-01) render live aggregates from
+ * /api/v1/dashboard/overview — no mock data, no fake polling. Widgets the
+ * caller cannot read (or that have no data source yet) show an honest
+ * empty state instead of placeholder numbers.
  *
  * @returns JSX.Element
  */
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isPending } = useSession();
-  const { updateMemberStats, updateEventStats } = useDashboardStats();
 
-  // Mock data fetching functions - replace with actual API calls
-  const fetchMemberStats = React.useCallback(async () => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return {
-      totalMembers: 1245,
-      activeMembers: 892,
-      newMembers: 23,
-    };
-  }, []);
+  // Real session role (UI-01): falls back to "user" when the session carries
+  // no recognized role.
+  const userRole: UserRole = user?.role && isPredefinedRole(user.role) ? user.role : "user";
 
-  const fetchEventStats = React.useCallback(async () => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    return {
-      upcomingEvents: 8,
-      totalEvents: 156,
-      thisWeekEvents: 3,
-    };
-  }, []);
-
-  // Real-time updates for member stats (every 30 seconds)
-  const memberStatsUpdate = useRealtimeUpdates(fetchMemberStats, {
-    enabled: true,
-    interval: 30000,
-    pauseWhenHidden: true,
+  const overviewQuery = useQuery({
+    queryKey: ["dashboard", "overview"],
+    queryFn: async () => {
+      const { data } = await apiFetch<{ overview: DashboardOverviewData }>(
+        "/api/v1/dashboard/overview",
+      );
+      return data.overview;
+    },
+    enabled: Boolean(user),
   });
+  const overview = overviewQuery.data;
 
-  // Real-time updates for event stats (every 45 seconds)
-  const eventStatsUpdate = useRealtimeUpdates(fetchEventStats, {
-    enabled: true,
-    interval: 45000,
-    pauseWhenHidden: true,
-  });
-
-  // Update global state when data is fetched
-  React.useEffect(() => {
-    if (memberStatsUpdate.data) {
-      updateMemberStats(memberStatsUpdate.data);
-    }
-  }, [memberStatsUpdate.data, updateMemberStats]);
-
-  React.useEffect(() => {
-    if (eventStatsUpdate.data) {
-      updateEventStats(eventStatsUpdate.data);
-    }
-  }, [eventStatsUpdate.data, updateEventStats]);
-
-  // Show loading state while checking authentication
-  if (isPending) {
+  // Show loading state while checking authentication or fetching overview data
+  if (isPending || (user && overviewQuery.isPending)) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {/* Loading skeletons for dashboard widgets */}
@@ -132,13 +110,25 @@ export default function DashboardPage() {
     );
   }
 
+  const finance = overview?.finance ?? null;
+  const members = overview?.members ?? null;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {/* Admin-only Widgets */}
-      {userRole === "admin" && (
+      {(userRole === "admin" || userRole === "superadmin") && (
         <>
           <div className="xl:col-span-2">
-            <FinanceWidget />
+            <FinanceWidget
+              totalRevenue={finance?.totalRevenue}
+              monthlyRevenue={finance?.monthlyRevenue}
+              previousMonthRevenue={finance?.previousMonthRevenue}
+              monthlyRevenueChangePercent={finance?.monthlyRevenueChangePercent}
+              pendingPayments={finance?.pendingPayments}
+              overduePayments={finance?.overduePayments}
+              activeSubscriptions={finance?.activeSubscriptions}
+              newSubscriptionsThisMonth={finance?.newSubscriptionsThisMonth}
+            />
           </div>
 
           <div className="xl:col-span-2">
@@ -147,7 +137,19 @@ export default function DashboardPage() {
 
           {/* Statistics Section */}
           <div className="xl:col-span-4">
-            <MemberStatisticsWidget />
+            <MemberStatisticsWidget
+              statistics={
+                members
+                  ? {
+                      totalMembers: members.totalMembers,
+                      activeMembers: members.activeMembers,
+                      newMembersThisMonth: members.newMembersThisMonth,
+                      newMembersLastMonth: members.newMembersLastMonth,
+                      expiredMemberships: members.expiredMemberships,
+                    }
+                  : undefined
+              }
+            />
           </div>
 
           <div className="xl:col-span-4">

@@ -4,6 +4,8 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +22,7 @@ import {
   isRegistrationOpen,
   isEventFull,
   formatEventTimeRange,
+  getRegistrationFormState,
 } from "@/lib/utils/event-utils";
 
 interface EventRegistrationFormProps {
@@ -53,6 +56,7 @@ export function EventRegistrationForm({
 
   const registrationOpen = isRegistrationOpen(event.startDate, event.registrationDeadline);
   const eventFull = isEventFull(event.currentAttendees, event.maxAttendees);
+  const formState = getRegistrationFormState(registrationOpen, eventFull);
 
   return (
     <Card className={className}>
@@ -87,42 +91,30 @@ export function EventRegistrationForm({
           </div>
 
           {/* Registration Status Messages */}
-          {!registrationOpen && (
-            <div
-              className="p-4 rounded-lg"
-              style={{
-                backgroundColor: "var(--destructive)",
-                color: "var(--destructive-foreground)",
-                opacity: "0.1",
-              }}
-            >
-              <p className="font-medium">Registration Closed</p>
-              <p className="text-sm">
+          {formState === "closed" && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Registration Closed</AlertTitle>
+              <AlertDescription>
                 Registration for this event has closed. Please contact the event organizer for more
                 information.
-              </p>
-            </div>
+              </AlertDescription>
+            </Alert>
           )}
 
-          {eventFull && registrationOpen && (
-            <div
-              className="p-4 rounded-lg"
-              style={{
-                backgroundColor: "var(--destructive)",
-                color: "var(--chart-5-foreground)",
-                opacity: "0.1",
-              }}
-            >
-              <p className="font-medium">Event Full</p>
-              <p className="text-sm">
+          {formState === "full" && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Event Full</AlertTitle>
+              <AlertDescription>
                 This event has reached maximum capacity. You can still register to be added to the
                 waitlist.
-              </p>
-            </div>
+              </AlertDescription>
+            </Alert>
           )}
 
           {/* Registration Form */}
-          {(registrationOpen || eventFull) && (
+          {formState !== "closed" && (
             <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
               <input type="hidden" {...register("eventId")} />
 

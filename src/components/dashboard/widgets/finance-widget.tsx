@@ -2,62 +2,70 @@
 
 import * as React from "react";
 import { WidgetContainer } from "../../ui/widget-container";
+import { EmptyState } from "../../ui/empty-state";
 import { Card, CardContent } from "../../ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "../../ui/badge";
-import {
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
-  CreditCard,
-  Users,
-  Calendar,
-  ExternalLink,
-} from "lucide-react";
+import { DollarSign, TrendingUp, TrendingDown, CreditCard, Users } from "lucide-react";
 
 interface FinanceWidgetProps {
-  totalRevenue?: number;
-  monthlyRevenue?: number;
-  pendingPayments?: number;
+  /** All-time completed revenue as an ADR-0015 amount string (e.g. "12345.67"). */
+  totalRevenue?: string;
+  /** Completed revenue for the current month, amount string. */
+  monthlyRevenue?: string;
+  /** Completed revenue for the previous month, amount string. */
+  previousMonthRevenue?: string;
+  /** Month-over-month revenue change, one decimal; null when the previous month had no revenue. */
+  monthlyRevenueChangePercent?: number | null;
+  /** Outstanding balance of ISSUED invoices, amount string. */
+  pendingPayments?: string;
+  /** Portion of pendingPayments past its due date, amount string. */
+  overduePayments?: string;
   activeSubscriptions?: number;
-  onExportData?: () => void;
+  newSubscriptionsThisMonth?: number;
   onViewAllTransactions?: () => void;
 }
 
-// Mock finance data - in a real app, this would come from an API
-const mockFinanceData = {
-  totalRevenue: 45680,
-  monthlyRevenue: 8450,
-  pendingPayments: 1250,
-  activeSubscriptions: 342,
-};
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat("en-US", {
+/** Display formatting only — all money arithmetic stays in the service (ADR-0015). */
+const formatAmount = (amount: string) =>
+  new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-};
-
-const formatNumber = (num: number) => {
-  return new Intl.NumberFormat("en-US").format(num);
-};
-
-const calculatePercentage = (part: number, total: number) => {
-  return Math.round((part / total) * 100);
-};
+    maximumFractionDigits: 2,
+  }).format(Number(amount));
 
 export function FinanceWidget({
-  totalRevenue = mockFinanceData.totalRevenue,
-  monthlyRevenue = mockFinanceData.monthlyRevenue,
-  pendingPayments = mockFinanceData.pendingPayments,
-  activeSubscriptions = mockFinanceData.activeSubscriptions,
-  onExportData,
+  totalRevenue,
+  monthlyRevenue,
+  previousMonthRevenue,
+  monthlyRevenueChangePercent,
+  pendingPayments,
+  overduePayments,
+  activeSubscriptions,
+  newSubscriptionsThisMonth,
   onViewAllTransactions,
 }: FinanceWidgetProps) {
-  const pendingPercentage = calculatePercentage(pendingPayments, monthlyRevenue);
+  // No real data yet (or the caller lacks finance:read) — show the honest
+  // empty state instead of placeholder numbers.
+  if (!totalRevenue || !monthlyRevenue) {
+    return (
+      <WidgetContainer
+        type="finance"
+        title="Financial Overview"
+        description="Revenue and subscription metrics"
+        size="medium"
+      >
+        <EmptyState
+          icon={<DollarSign className="h-8 w-8 text-muted-foreground" />}
+          title="No financial data yet"
+          description="Revenue, outstanding invoices and subscription counts appear here once your organization has membership activity."
+        />
+      </WidgetContainer>
+    );
+  }
+
+  const hasOverdue = overduePayments != null && Number(overduePayments) > 0;
 
   return (
     <WidgetContainer
@@ -74,13 +82,10 @@ export function FinanceWidget({
               <div className="flex items-center space-x-2">
                 <DollarSign className="h-5 w-5 text-foreground/50" />
                 <span className="text-sm font-medium text-foreground/70">
-                  {formatCurrency(totalRevenue)} total revenue
+                  {formatAmount(totalRevenue)} total revenue
                 </span>
               </div>
-              <div className="flex space-x-2">
-                <Button variant="ghost" size="sm" onClick={onExportData} className="text-xs">
-                  Export
-                </Button>
+              {onViewAllTransactions && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -89,7 +94,7 @@ export function FinanceWidget({
                 >
                   View all
                 </Button>
-              </div>
+              )}
             </div>
 
             {/* Finance cards */}
@@ -104,12 +109,9 @@ export function FinanceWidget({
                   <Badge className="bg-chart-3/20 text-chart-3">All Time</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
-                  {formatCurrency(totalRevenue)}
+                  {formatAmount(totalRevenue)}
                 </div>
-                <div className="flex items-center text-xs text-chart-3 mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  <span>+12% from last quarter</span>
-                </div>
+                <div className="text-xs text-foreground/50 mt-1">Completed transactions</div>
               </div>
 
               {/* Monthly Revenue */}
@@ -122,12 +124,31 @@ export function FinanceWidget({
                   <Badge className="bg-chart-1/20 text-chart-1">This Month</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
-                  {formatCurrency(monthlyRevenue)}
+                  {formatAmount(monthlyRevenue)}
                 </div>
-                <div className="flex items-center text-xs text-chart-3 mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  <span>+8% from last month</span>
-                </div>
+                {monthlyRevenueChangePercent != null ? (
+                  <div
+                    className={`flex items-center text-xs mt-1 ${
+                      monthlyRevenueChangePercent >= 0 ? "text-chart-3" : "text-destructive"
+                    }`}
+                  >
+                    {monthlyRevenueChangePercent >= 0 ? (
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                    ) : (
+                      <TrendingDown className="h-3 w-3 mr-1" />
+                    )}
+                    <span>
+                      {monthlyRevenueChangePercent > 0 ? "+" : ""}
+                      {monthlyRevenueChangePercent}% vs last month
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-xs text-foreground/50 mt-1">
+                    {previousMonthRevenue != null && Number(previousMonthRevenue) > 0
+                      ? "No change vs last month"
+                      : "No revenue last month"}
+                  </div>
+                )}
               </div>
 
               {/* Pending Payments */}
@@ -135,16 +156,17 @@ export function FinanceWidget({
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-2">
                     <CreditCard className="h-5 w-5 text-chart-4" />
-                    <span className="text-sm font-medium text-foreground/70">Pending</span>
+                    <span className="text-sm font-medium text-foreground/70">Outstanding</span>
                   </div>
-                  <Badge className="bg-chart-4/20 text-chart-4">{pendingPercentage}%</Badge>
+                  <Badge className="bg-chart-4/20 text-chart-4">Invoices</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
-                  {formatCurrency(pendingPayments)}
+                  {pendingPayments != null ? formatAmount(pendingPayments) : "—"}
                 </div>
-                <div className="flex items-center text-xs text-destructive mt-1">
-                  <TrendingDown className="h-3 w-3 mr-1" />
-                  <span>+3% from last month</span>
+                <div
+                  className={`text-xs mt-1 ${hasOverdue ? "text-destructive" : "text-foreground/50"}`}
+                >
+                  {hasOverdue ? `${formatAmount(overduePayments!)} overdue` : "Nothing overdue"}
                 </div>
               </div>
 
@@ -158,54 +180,21 @@ export function FinanceWidget({
                   <Badge className="bg-chart-2/20 text-chart-2">Active</Badge>
                 </div>
                 <div className="text-2xl font-bold text-foreground/90">
-                  {formatNumber(activeSubscriptions)}
+                  {activeSubscriptions != null
+                    ? new Intl.NumberFormat("en-US").format(activeSubscriptions)
+                    : "—"}
                 </div>
-                <div className="flex items-center text-xs text-chart-3 mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  <span>+15 from last month</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Progress bars */}
-            <div className="space-y-3">
-              <div>
-                <div className="flex justify-between text-xs text-foreground/50 mb-1">
-                  <span>Monthly Revenue Target</span>
-                  <span>84%</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-chart-1 h-2 rounded-full" style={{ width: `84%` }}></div>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs text-foreground/50 mb-1">
-                  <span>Pending Payments</span>
-                  <span>{pendingPercentage}%</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div
-                    className="bg-chart-4 h-2 rounded-full"
-                    style={{ width: `${pendingPercentage}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs text-foreground/50 mb-1">
-                  <span>Subscription Renewal Rate</span>
-                  <span>92%</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-chart-3 h-2 rounded-full" style={{ width: `92%` }}></div>
+                <div className="text-xs text-foreground/50 mt-1">
+                  {newSubscriptionsThisMonth != null
+                    ? `${new Intl.NumberFormat("en-US").format(newSubscriptionsThisMonth)} new this month`
+                    : "No new-subscription data"}
                 </div>
               </div>
             </div>
 
             {/* Summary */}
             <div className="text-xs text-foreground/50 text-center pt-2">
-              Financial data updated daily. Last updated: Today at 8:00 AM
+              Live totals from completed transactions and issued invoices.
             </div>
           </div>
         </CardContent>

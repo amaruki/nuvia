@@ -25,7 +25,7 @@ export function MyRegistrationsCard({ registrations }: MyRegistrationsCardProps)
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => (window.location.href = "/events/certificates")}
+            onClick={() => (window.location.href = "/certificates")}
           >
             Certificates
             <Award className="h-4 w-4 ml-1" />

@@ -247,6 +247,27 @@ export function isEventFull(currentAttendees: number, maxAttendees?: number): bo
 }
 
 /**
+ * The registration card's banner/form state for an event page, derived from
+ * isRegistrationOpen() and isEventFull().
+ *
+ * - "open": registration open with capacity; show the registration form.
+ * - "full": registration open but at capacity; show the "Event Full" banner
+ *   plus the waitlist form.
+ * - "closed": registration closed; show the "Registration Closed" banner and
+ *   hide the form regardless of remaining capacity.
+ */
+export type RegistrationFormState = "open" | "full" | "closed";
+
+export function getRegistrationFormState(
+  registrationOpen: boolean,
+  eventFull: boolean,
+): RegistrationFormState {
+  if (!registrationOpen) return "closed";
+  if (eventFull) return "full";
+  return "open";
+}
+
+/**
  * Get event status text with proper formatting
  */
 export function formatEventStatus(status: EventStatus): string {

@@ -58,6 +58,18 @@ export interface ApiEnvelope<T> {
   meta?: ApiPaginationMeta;
 }
 
+/** Wire shape of GET/POST /api/v1/events/categories rows. */
+export interface ApiEventCategory {
+  id: string;
+  name: string;
+  displayName: string | null;
+  description: string | null;
+  color: string | null;
+  icon: string | null;
+  isActive: boolean;
+  sortOrder: number;
+}
+
 export function hydrateEvent(payload: ApiEvent): Event {
   return {
     ...payload,

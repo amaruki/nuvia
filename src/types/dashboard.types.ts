@@ -268,6 +268,8 @@ export interface MemberStatistics {
   totalMembers: number;
   activeMembers: number;
   newMembersThisMonth: number;
+  /** Signups in the previous calendar month — optional, used for a real trend line. */
+  newMembersLastMonth?: number;
   expiredMemberships: number;
 }
 

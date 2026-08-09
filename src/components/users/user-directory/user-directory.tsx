@@ -7,7 +7,7 @@ import { UserActions } from "../user-actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Users, Download, Filter, Loader2, Search, X } from "lucide-react";
+import { Users, Filter, Loader2, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserDirectoryEmptyState from "./empty-state";
 import UserDirectoryGridView from "./grid-view";
@@ -16,6 +16,7 @@ import UserDirectoryLoadingSkeleton from "./loading-skeleton";
 import UserDirectorySearchFilterBar from "./search-filter-bar";
 import { getActiveFiltersCount } from "./helpers";
 import type { UserDirectoryProps } from "./types";
+import { roleHasPermission } from "@/types/role";
 
 export function UserDirectory({
   users,
@@ -48,7 +49,9 @@ export function UserDirectory({
     setSelectedUsers([]);
   };
 
-  const isAdmin = currentUserRole === "admin" || currentUserRole === "moderator";
+  // Selection exists solely to drive the bulk-action bar, and the only real
+  // bulk operation (change role) requires the users:update permission.
+  const isAdmin = roleHasPermission(currentUserRole, "users:update");
 
   if (isLoading && users.length === 0) {
     return <UserDirectoryLoadingSkeleton className={className} />;
@@ -73,10 +76,6 @@ export function UserDirectory({
 
           {/* Quick Actions */}
           <div className="hidden md:flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-2">
-              <Download className="size-4" />
-              Export
-            </Button>
             <Button
               variant="outline"
               size="sm"

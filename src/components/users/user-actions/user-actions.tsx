@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, X } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { logger } from "@/lib/logger";
 import { type UserRole } from "@/types/dashboard.types";
+import { roleHasPermission } from "@/types/role";
 import { BulkActionsMenu } from "./bulk-actions-menu";
 import { ConfirmActionDialog } from "./confirm-action-dialog";
 import { getBulkActions } from "./helpers";
@@ -18,98 +20,74 @@ export function UserActions({
   currentUserRole,
   className,
 }: UserActionsProps) {
-  // DEBUG: Log UserRole type validation
-  logger.info("DEBUG: UserRole type validation", {
-    currentUserRole,
-    isAdmin: currentUserRole === "admin",
-    isModerator: currentUserRole === "moderator",
-    availableRoles: [
-      "member",
-      "moderator",
-      "admin",
-      "superadmin",
-      "staff",
-      "treasurer",
-      "chapter_president",
-      "chapter_admin",
-      "committee_chair",
-      "organizer",
-      "member_corporate",
-      "member_professional",
-      "member_student",
-      "user",
-    ],
-  });
-
+  const queryClient = useQueryClient();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [selectedAction, setSelectedAction] = useState<BulkAction | null>(null);
   const [reason, setReason] = useState("");
   const [newRole, setNewRole] = useState<UserRole>("member");
 
-  const isAdmin = currentUserRole === "admin";
-  const isModerator = currentUserRole === "moderator";
-
-  const bulkActions = getBulkActions({ isAdmin, isModerator });
+  // The only bulk operation backed by a real API is the bulk role update
+  // (POST /api/v1/admin/users/bulk-role-update, requires users:update).
+  const canChangeRoles = roleHasPermission(currentUserRole, "users:update");
+  const bulkActions = canChangeRoles ? getBulkActions() : [];
 
   const handleActionClick = (action: BulkAction) => {
     setSelectedAction(action);
-    if (action.requiresRole) {
-      // Show role selection dialog first
-      setReason("");
-      setShowConfirmDialog(true);
-    } else {
-      setReason("");
-      setShowConfirmDialog(true);
-    }
+    setReason("");
+    setShowConfirmDialog(true);
   };
 
-  const handleConfirmAction = () => {
-    if (!selectedAction) return;
-
-    // DEBUG: Log validation checks
-    logger.info("DEBUG: Validating action requirements", {
-      actionType: selectedAction.type,
-      requiresReason: selectedAction.requiresReason,
-      hasReason: !!reason,
-      requiresRole: selectedAction.requiresRole,
-      hasRole: !!newRole,
-      currentRole: newRole,
-    });
-
-    // Validate required fields
-    if (selectedAction.requiresReason && !reason.trim()) {
-      logger.info("DEBUG: Validation failed - reason required but not provided");
-      return;
-    }
-
-    if (selectedAction.requiresRole && !newRole) {
-      logger.info("DEBUG: Validation failed - role required but not selected");
-      return;
-    }
-
-    // Here you would implement the actual bulk action
-    const actionData = {
-      type: selectedAction.type,
-      userIds: selectedUsers,
-      reason: selectedAction.requiresReason ? reason : undefined,
-      newRole: selectedAction.requiresRole ? newRole : undefined,
-    };
-
-    logger.info("DEBUG: Performing bulk action", actionData);
-
-    // Reset state
+  const resetDialogState = () => {
     setShowConfirmDialog(false);
     setSelectedAction(null);
     setReason("");
     setNewRole("member");
-    onClearSelection();
+  };
+
+  const handleConfirmAction = async () => {
+    if (!selectedAction || selectedAction.type !== "change_role" || selectedUsers.length === 0) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/v1/admin/users/bulk-role-update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userIds: selectedUsers,
+          role: newRole,
+          reason: reason.trim() || "Bulk role update by administrator",
+          confirm: true,
+        }),
+      });
+
+      const body: unknown = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        const detail =
+          typeof body === "object" && body !== null && "detail" in body && body.detail
+            ? String(body.detail)
+            : "Failed to update roles";
+        toast.error(detail);
+        return;
+      }
+
+      const message =
+        typeof body === "object" && body !== null && "message" in body && body.message
+          ? String(body.message)
+          : "Role update completed";
+      toast.success(message);
+
+      resetDialogState();
+      onClearSelection();
+      void queryClient.invalidateQueries({ queryKey: ["user-directory"] });
+    } catch {
+      toast.error("Failed to update roles");
+    }
   };
 
   const handleCancelAction = () => {
-    setShowConfirmDialog(false);
-    setSelectedAction(null);
-    setReason("");
-    setNewRole("member");
+    resetDialogState();
   };
 
   return (
@@ -126,7 +104,7 @@ export function UserActions({
                   {selectedUsers.length} {selectedUsers.length === 1 ? "User" : "Users"} Selected
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Choose an action to perform on selected users
+                  Change the role of the selected users
                 </p>
               </div>
             </div>
@@ -137,7 +115,9 @@ export function UserActions({
                 Clear Selection
               </Button>
 
-              <BulkActionsMenu actions={bulkActions} onActionClick={handleActionClick} />
+              {bulkActions.length > 0 && (
+                <BulkActionsMenu actions={bulkActions} onActionClick={handleActionClick} />
+              )}
             </div>
           </div>
         </CardContent>
@@ -152,7 +132,7 @@ export function UserActions({
         newRole={newRole}
         onReasonChange={setReason}
         onRoleChange={setNewRole}
-        onConfirm={handleConfirmAction}
+        onConfirm={() => void handleConfirmAction()}
         onCancel={handleCancelAction}
       />
     </>

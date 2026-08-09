@@ -9,8 +9,9 @@ const memberApiItemSchema = z.object({
   name: z.string(),
   firstName: z.string().nullable(),
   lastName: z.string().nullable(),
-  image: z.string().nullable(),
-  bio: z.string().nullable(),
+  // The API omits both fields when unset, so accept absence as well as null.
+  image: z.string().nullish(),
+  bio: z.string().nullish(),
   role: z.string(),
   emailVerified: z.boolean(),
   createdAt: z.string(),
@@ -60,5 +61,13 @@ export async function fetchMembersPage(query: URLSearchParams): Promise<MembersP
       "Failed to load members";
     throw new Error(message);
   }
-  return membersPageSchema.parse(body);
+  const parsedPage = membersPageSchema.safeParse(body);
+  if (!parsedPage.success) {
+    // Never leak raw zod issue dumps to the admin; the directory renders
+    // whatever message this throws verbatim.
+    throw new Error(
+      "The user directory returned an unexpected response. Try again, or contact support if this persists.",
+    );
+  }
+  return parsedPage.data;
 }

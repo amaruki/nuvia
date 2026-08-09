@@ -1,23 +1,14 @@
 "use client";
 
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Filter, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { calendarTabs } from "./calendar-tabs";
-import { EventDialog } from "./event-dialog";
 
-interface CalendarHeaderControlsProps {
-  isDialogOpen: boolean;
-  onDialogOpenChange: (open: boolean) => void;
-  selectedDate?: Date;
-}
-
-export function CalendarHeaderControls({
-  isDialogOpen,
-  onDialogOpenChange,
-  selectedDate,
-}: CalendarHeaderControlsProps) {
+export function CalendarHeaderControls() {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <TabsList className="grid w-full max-w-md grid-cols-4">
@@ -33,20 +24,12 @@ export function CalendarHeaderControls({
         })}
       </TabsList>
       <div className="flex items-center gap-2">
-        <Button variant="outline">
-          <Filter className="h-4 w-4 mr-2" />
-          Filter
-        </Button>
-        <EventDialog
-          open={isDialogOpen}
-          onOpenChange={onDialogOpenChange}
-          defaultDate={selectedDate}
-        >
-          <Button>
+        <Button asChild>
+          <Link href="/dashboard/events/create">
             <Plus className="h-4 w-4 mr-2" />
             Add Event
-          </Button>
-        </EventDialog>
+          </Link>
+        </Button>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CreditCard, Download, Mail } from "lucide-react";
+import { CreditCard, Mail } from "lucide-react";
 import type { Invoice } from "@/types/finance";
 
 interface ModalActionsProps {
@@ -41,10 +41,6 @@ export function ModalActions({
             </Button>
           </>
         )}
-      <Button variant="outline" className="w-full sm:w-auto">
-        <Download className="h-4 w-4 mr-2" />
-        Download PDF
-      </Button>
       <Button
         variant="outline"
         className="w-full sm:w-auto sm:ml-auto"

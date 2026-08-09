@@ -13,13 +13,26 @@ import { toRegistrationDto } from "./mappers";
 import type { CancelRegistrationActor, DbRegistrationStatus, RegistrationDto } from "./types";
 
 /**
+ * Merges an admin cancellation reason into a registration's jsonb metadata
+ * without clobbering existing keys (e.g. `notes`). Non-object metadata is
+ * treated as empty. Pure so it can be unit tested without a database.
+ */
+export function withCancellationReason(metadata: unknown, reason: string): Record<string, unknown> {
+  const base =
+    metadata && typeof metadata === "object" ? { ...(metadata as Record<string, unknown>) } : {};
+  return { ...base, cancellationReason: reason };
+}
+
+/**
  * Cancels a registration (owner or events:manage). Frees the seat and
- * promotes the oldest WAITLISTED row when one exists.
+ * promotes the oldest WAITLISTED row when one exists. When `reason` is
+ * provided (admin cancel dialog), it is persisted to the row's metadata.
  */
 export async function cancelRegistration(
   eventId: string,
   registrationId: string,
   actor: CancelRegistrationActor,
+  reason?: string,
 ): Promise<{ registration: RegistrationDto; promoted: RegistrationDto | null }> {
   return db.transaction(async (tx) => {
     const [registration] = await tx
@@ -70,7 +83,10 @@ export async function cancelRegistration(
 
     const [canceled] = await tx
       .update(eventRegistration)
-      .set({ status: "CANCELED" })
+      .set({
+        status: "CANCELED",
+        ...(reason ? { metadata: withCancellationReason(registration.metadata, reason) } : {}),
+      })
       .where(eq(eventRegistration.id, registration.id))
       .returning();
 

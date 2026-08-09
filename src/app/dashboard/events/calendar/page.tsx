@@ -1,62 +1,46 @@
-"use client";
+/**
+ * Events calendar — server page (plan item UI-03).
+ *
+ * Loads real events from the event read service (drizzle direct, server
+ * component per ADR-0006) and hands serialized DTOs to the client shell.
+ * Upcoming = events starting from now onward; past = events already started,
+ * newest first. Nothing here is sampled or fabricated.
+ */
 
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { listEvents, type EventListResult } from "@/lib/services/event-read.service";
+import type { Event as UiEvent } from "@/types/event";
 
-import { CalendarHeaderControls } from "./_components/calendar-header-controls";
-import type { TabId } from "./_components/calendar-tabs";
-import { CalendarView } from "./_components/calendar-view";
-import { ListViewTab } from "./_components/list-view-tab";
-import { CalendarLoadingState } from "./_components/page-states";
-import { PastEventsTab } from "./_components/past-events-tab";
-import { UpcomingTab } from "./_components/upcoming-tab";
-import { useEventsCalendar } from "./_components/use-events-calendar";
+import { CalendarShell } from "./_components/calendar-shell";
+import type { CalendarEventDto } from "./_components/calendar-event-dto";
 
-export default function EventsCalendar() {
-  const {
-    activeTab,
-    setActiveTab,
-    isLoading,
-    isDialogOpen,
-    setIsDialogOpen,
-    selectedDate,
-    handleDateClick,
-  } = useEventsCalendar();
+export const dynamic = "force-dynamic";
 
-  // Show loading state
-  if (isLoading) {
-    return <CalendarLoadingState />;
-  }
+function toDto(event: UiEvent): CalendarEventDto {
+  const dto: CalendarEventDto = {
+    id: event.id,
+    title: event.title,
+    startDate: event.startDate.toISOString(),
+    endDate: event.endDate.toISOString(),
+    location: event.location,
+    status: event.status,
+    currentAttendees: event.currentAttendees,
+  };
+  if (event.maxAttendees !== undefined) dto.maxAttendees = event.maxAttendees;
+  return dto;
+}
+
+export default async function EventsCalendarPage() {
+  const now = new Date();
+
+  const [upcomingResult, pastResult]: [EventListResult, EventListResult] = await Promise.all([
+    listEvents({ startDate: now, sortBy: "startTime", sortOrder: "asc", limit: 100 }),
+    listEvents({ endDate: now, sortBy: "startTime", sortOrder: "desc", limit: 100 }),
+  ]);
 
   return (
-    <div className="flex flex-col space-y-6 p-6 max-w-[1600px] mx-auto ">
-      {/* Tabbed Interface */}
-      <div>
-        <Tabs
-          value={activeTab}
-          onValueChange={(value) => setActiveTab(value as TabId)}
-          className="space-y-6"
-        >
-          <CalendarHeaderControls
-            isDialogOpen={isDialogOpen}
-            onDialogOpenChange={setIsDialogOpen}
-            selectedDate={selectedDate}
-          />
-
-          {/* Calendar Tab */}
-          <TabsContent value="calendar" className="space-y-6 animate-in fade-in-50 duration-500">
-            <CalendarView onDateClick={handleDateClick} />
-          </TabsContent>
-
-          {/* List View Tab */}
-          <ListViewTab />
-
-          {/* Upcoming Events Tab */}
-          <UpcomingTab />
-
-          {/* Past Events Tab */}
-          <PastEventsTab />
-        </Tabs>
-      </div>
-    </div>
+    <CalendarShell
+      upcomingEvents={upcomingResult.events.map(toDto)}
+      pastEvents={pastResult.events.map(toDto)}
+    />
   );
 }

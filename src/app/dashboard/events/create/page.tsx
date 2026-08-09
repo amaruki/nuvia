@@ -22,6 +22,8 @@ export default function CreateEventPage() {
     setTagInput,
     handleInputChange,
     handleCheckboxChange,
+    handleSelectChange,
+    handleCheckedChange,
     handleAddTag,
     handleRemoveTag,
     handleTagKeyPress,
@@ -67,6 +69,7 @@ export default function CreateEventPage() {
               <BasicInfoSection
                 formData={formData}
                 onInputChange={handleInputChange}
+                onSelectChange={handleSelectChange}
                 errors={formErrors}
                 categories={categories}
                 categoriesLoading={categoriesLoading}
@@ -83,6 +86,7 @@ export default function CreateEventPage() {
                 formData={formData}
                 onInputChange={handleInputChange}
                 onCheckboxChange={handleCheckboxChange}
+                onCheckedChange={handleCheckedChange}
               />
 
               <CapacitySection formData={formData} onInputChange={handleInputChange} />

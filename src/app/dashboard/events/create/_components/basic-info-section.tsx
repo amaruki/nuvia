@@ -5,6 +5,13 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { EventType } from "@/types/event";
 import type { ApiEventCategory } from "@/lib/services/event/types";
@@ -24,6 +31,7 @@ const eventTypeOptions = [
 interface BasicInfoSectionProps {
   formData: CreateEventFormData;
   onInputChange: FormInputChangeHandler;
+  onSelectChange: (name: string, value: string) => void;
   errors?: Record<string, string>;
   categories: ApiEventCategory[];
   categoriesLoading: boolean;
@@ -38,6 +46,7 @@ interface BasicInfoSectionProps {
 export function BasicInfoSection({
   formData,
   onInputChange,
+  onSelectChange,
   errors,
   categories,
   categoriesLoading,
@@ -125,41 +134,42 @@ export function BasicInfoSection({
             </div>
           </div>
         ) : (
-          <select
-            id="category"
-            name="category"
+          <Select
             value={formData.category}
-            onChange={onInputChange}
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-input focus:outline-none focus:ring-ring focus:border-primary sm:text-sm rounded-md"
+            onValueChange={(value) => onSelectChange("category", value)}
           >
-            <option value="" disabled>
-              Select a category
-            </option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.name}>
-                {category.displayName ?? category.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id="category" className="mt-1 w-full">
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.name}>
+                  {category.displayName ?? category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
         {errors?.category && <p className="mt-1 text-sm text-destructive">{errors.category}</p>}
       </div>
 
       <div>
         <Label htmlFor="eventType">Event Type</Label>
-        <select
-          id="eventType"
-          name="eventType"
+        <Select
           value={formData.eventType}
-          onChange={onInputChange}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-input focus:outline-none focus:ring-ring focus:border-primary sm:text-sm rounded-md"
+          onValueChange={(value) => onSelectChange("eventType", value)}
         >
-          {eventTypeOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger id="eventType" className="mt-1 w-full">
+            <SelectValue placeholder="Select event type" />
+          </SelectTrigger>
+          <SelectContent>
+            {eventTypeOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

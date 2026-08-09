@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -13,6 +14,7 @@ interface LocationSectionProps {
   formData: CreateEventFormData;
   onInputChange: FormInputChangeHandler;
   onCheckboxChange: FormCheckboxChangeHandler;
+  onCheckedChange: (name: string, checked: boolean) => void;
 }
 
 /** Location field, in-person/virtual toggles, and the conditional virtual URL. */
@@ -20,6 +22,7 @@ export function LocationSection({
   formData,
   onInputChange,
   onCheckboxChange,
+  onCheckedChange,
 }: LocationSectionProps) {
   return (
     <div className="space-y-4">
@@ -39,13 +42,10 @@ export function LocationSection({
 
       <div className="flex items-center space-x-6">
         <div className="flex items-center">
-          <input
+          <Checkbox
             id="isInPerson"
-            name="isInPerson"
-            type="checkbox"
             checked={formData.isInPerson}
-            onChange={onCheckboxChange}
-            className="h-4 w-4 text-primary focus:ring-ring border-input rounded"
+            onCheckedChange={(checked) => onCheckedChange("isInPerson", checked === true)}
           />
           <Label htmlFor="isInPerson" className="ml-2">
             In-Person Event
@@ -53,13 +53,10 @@ export function LocationSection({
         </div>
 
         <div className="flex items-center">
-          <input
+          <Checkbox
             id="isVirtual"
-            name="isVirtual"
-            type="checkbox"
             checked={formData.isVirtual}
-            onChange={onCheckboxChange}
-            className="h-4 w-4 text-primary focus:ring-ring border-input rounded"
+            onCheckedChange={(checked) => onCheckedChange("isVirtual", checked === true)}
           />
           <Label htmlFor="isVirtual" className="ml-2">
             Virtual Event

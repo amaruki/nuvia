@@ -151,7 +151,11 @@ describe("event registration terms checkbox lives in the form state (UI-07)", ()
   });
 
   test("the terms error renders through the form's error mechanism", () => {
-    expect(REGISTRATION_FORM).toContain("errors.terms");
+    // Form-standard (UI-16): the terms field is a FormField whose error
+    // surfaces via FormMessage, not a hand-written errors.terms paragraph.
+    expect(REGISTRATION_FORM).toContain('name="terms"');
+    expect(REGISTRATION_FORM).toContain("<FormMessage />");
+    expect(REGISTRATION_FORM).not.toMatch(/text-destructive">\{errors\./);
   });
 
   test("the form schema rejects an unchecked terms box", () => {

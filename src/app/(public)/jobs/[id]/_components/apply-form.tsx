@@ -10,17 +10,31 @@
  * routed to the login page and returned here afterwards.
  */
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useSession } from "@/lib/client";
 import { useMounted } from "@/lib/hooks/use-mounted";
-import { CheckCircle2, LogIn } from "lucide-react";
+import {
+  jobApplicationSchema,
+  type JobApplicationFormInput,
+  type JobApplicationFormValues,
+} from "@/lib/validation/job.validation";
+import { CheckCircle2, Loader2, LogIn } from "lucide-react";
 
 interface ApplyFormProps {
   jobId: string;
@@ -30,14 +44,20 @@ interface ApplyFormProps {
 
 export function ApplyForm({ jobId, slug, applicationDeadline }: ApplyFormProps) {
   const { data: session, isPending } = useSession();
-  const [coverLetter, setCoverLetter] = useState("");
-  const [portfolioUrl, setPortfolioUrl] = useState("");
-  const [salaryExpectation, setSalaryExpectation] = useState("");
-  const [availability, setAvailability] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const mounted = useMounted();
+
+  const form = useForm<JobApplicationFormInput, unknown, JobApplicationFormValues>({
+    resolver: zodResolver(jobApplicationSchema),
+    defaultValues: {
+      coverLetter: "",
+      portfolioUrl: "",
+      salaryExpectation: "",
+      availability: "",
+    },
+  });
+  const { isSubmitting } = form.formState;
 
   if (!mounted || isPending) {
     return (
@@ -87,17 +107,25 @@ export function ApplyForm({ jobId, slug, applicationDeadline }: ApplyFormProps) 
     );
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
+  const onValid = async (data: JobApplicationFormValues) => {
     setError(null);
 
     try {
+      // Rebuild the POST body with the same semantics as before: only include
+      // trimmed non-empty values, and salaryExpectation as a Number. The raw
+      // salary field value is read from form state because the zod union
+      // coerces an empty string to 0, which would otherwise be ambiguous.
       const body: Record<string, unknown> = {};
-      if (coverLetter.trim()) body.coverLetter = coverLetter.trim();
-      if (portfolioUrl.trim()) body.portfolioUrl = portfolioUrl.trim();
-      if (salaryExpectation !== "") body.salaryExpectation = Number(salaryExpectation);
-      if (availability.trim()) body.availability = availability.trim();
+      const coverLetter = data.coverLetter?.trim();
+      if (coverLetter) body.coverLetter = coverLetter;
+      const portfolioUrl = data.portfolioUrl?.trim();
+      if (portfolioUrl) body.portfolioUrl = portfolioUrl;
+      const salaryExpectation = form.getValues("salaryExpectation");
+      if (salaryExpectation !== "" && salaryExpectation !== undefined) {
+        body.salaryExpectation = Number(salaryExpectation);
+      }
+      const availability = data.availability?.trim();
+      if (availability) body.availability = availability;
 
       const res = await fetch(`/api/v1/jobs/${jobId}/applications`, {
         method: "POST",
@@ -122,8 +150,6 @@ export function ApplyForm({ jobId, slug, applicationDeadline }: ApplyFormProps) 
       setSubmitted(true);
     } catch {
       setError("Something went wrong while submitting your application. Please try again.");
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -132,71 +158,102 @@ export function ApplyForm({ jobId, slug, applicationDeadline }: ApplyFormProps) 
       <CardHeader>
         <CardTitle>Apply for this role</CardTitle>
         <CardDescription>
-          You are applying as {session.user.email}
           {applicationDeadline
-            ? ` — applications close ${new Date(applicationDeadline).toLocaleDateString()}`
-            : ""}
-          .
+            ? `You are applying as ${session.user.email}. Applications close ${new Date(
+                applicationDeadline,
+              ).toLocaleDateString()}.`
+            : `You are applying as ${session.user.email}.`}
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onValid)}>
+          <CardContent className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-          <div className="space-y-2">
-            <Label htmlFor="coverLetter">Cover Letter</Label>
-            <Textarea
-              id="coverLetter"
-              placeholder="Tell the hiring team why you are a great fit..."
-              className="min-h-[160px]"
-              value={coverLetter}
-              onChange={(e) => setCoverLetter(e.target.value)}
+            <FormField
+              control={form.control}
+              name="coverLetter"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cover Letter</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Tell the hiring team why you are a great fit..."
+                      className="min-h-[160px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="portfolioUrl">Portfolio URL (optional)</Label>
-            <Input
-              id="portfolioUrl"
-              type="url"
-              placeholder="https://your-portfolio.com"
-              value={portfolioUrl}
-              onChange={(e) => setPortfolioUrl(e.target.value)}
+            <FormField
+              control={form.control}
+              name="portfolioUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Portfolio URL (optional)</FormLabel>
+                  <FormControl>
+                    <Input type="url" placeholder="https://your-portfolio.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="salaryExpectation">Salary Expectation (optional)</Label>
-              <Input
-                id="salaryExpectation"
-                type="number"
-                min="0"
-                placeholder="e.g. 75000"
-                value={salaryExpectation}
-                onChange={(e) => setSalaryExpectation(e.target.value)}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="salaryExpectation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Salary Expectation (optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="e.g. 75000"
+                        {...field}
+                        value={field.value as number}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="availability"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Availability (optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. Two weeks notice" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="availability">Availability (optional)</Label>
-              <Input
-                id="availability"
-                placeholder="e.g. Two weeks notice"
-                value={availability}
-                onChange={(e) => setAvailability(e.target.value)}
-              />
-            </div>
-          </div>
 
-          <Button type="submit" size="lg" className="w-full" disabled={submitting}>
-            {submitting ? "Submitting..." : "Submit Application"}
-          </Button>
-        </CardContent>
-      </form>
+            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                "Submit Application"
+              )}
+            </Button>
+          </CardContent>
+        </form>
+      </Form>
     </Card>
   );
 }

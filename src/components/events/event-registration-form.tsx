@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AlertTriangle } from "lucide-react";
@@ -9,7 +9,14 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Event } from "@/types/event";
 import {
@@ -43,12 +50,7 @@ export function EventRegistrationForm({
   isSubmitting = false,
   className = "",
 }: EventRegistrationFormProps) {
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RegistrationFormData>({
+  const form = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationFormSchema),
     defaultValues: {
       eventId: event.id,
@@ -120,52 +122,64 @@ export function EventRegistrationForm({
 
           {/* Registration Form */}
           {formState !== "closed" && (
-            <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
-              <input type="hidden" {...register("eventId")} />
+            <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4">
+              <Form {...form}>
+                <input type="hidden" {...form.register("eventId")} />
 
-              {/* Notes Field */}
-              <div>
-                <Label htmlFor="notes">Notes (Optional)</Label>
-                <Textarea
-                  id="notes"
-                  {...register("notes")}
-                  placeholder="Any special requirements, dietary restrictions, or questions for the organizer..."
-                  className="mt-1"
-                  rows={3}
+                {/* Notes Field */}
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes (Optional)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          placeholder="Any special requirements, dietary restrictions, or questions for the organizer..."
+                          rows={3}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {errors.notes && (
-                  <p className="mt-1 text-sm text-destructive">{errors.notes.message}</p>
-                )}
-              </div>
 
-              {/* Terms and Conditions */}
-              <div className="space-y-1">
-                <div className="flex items-start space-x-2">
-                  <Controller
-                    name="terms"
-                    control={control}
-                    render={({ field }) => (
-                      <Checkbox id="terms" checked={field.value} onCheckedChange={field.onChange} />
-                    )}
-                  />
-                  <Label htmlFor="terms" className="text-sm font-normal leading-relaxed">
-                    I agree to the event terms and conditions and understand that my information
-                    will be shared with the event organizer.
-                  </Label>
+                {/* Terms and Conditions */}
+                <FormField
+                  control={form.control}
+                  name="terms"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-start space-x-2">
+                        <FormControl>
+                          <Checkbox
+                            id="terms"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel htmlFor="terms" className="text-sm font-normal leading-relaxed">
+                          I agree to the event terms and conditions and understand that my
+                          information will be shared with the event organizer.
+                        </FormLabel>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Submit Button */}
+                <div className="pt-4">
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting
+                      ? "Submitting..."
+                      : eventFull
+                        ? "Join Waitlist"
+                        : "Register for Event"}
+                  </Button>
                 </div>
-                {errors.terms && <p className="text-sm text-destructive">{errors.terms.message}</p>}
-              </div>
-
-              {/* Submit Button */}
-              <div className="pt-4">
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting
-                    ? "Submitting..."
-                    : eventFull
-                      ? "Join Waitlist"
-                      : "Register for Event"}
-                </Button>
-              </div>
+              </Form>
             </form>
           )}
         </div>

@@ -85,6 +85,22 @@ export function useCreateEventForm() {
     clearFieldError(name);
   };
 
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    clearFieldError(name);
+  };
+
+  const handleCheckedChange = (name: string, checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
+    clearFieldError(name);
+  };
+
   const handleAddTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
       setTags([...tags, tagInput.trim()]);
@@ -158,6 +174,8 @@ export function useCreateEventForm() {
     setTagInput,
     handleInputChange,
     handleCheckboxChange,
+    handleSelectChange,
+    handleCheckedChange,
     handleAddTag,
     handleRemoveTag,
     handleTagKeyPress,

@@ -165,3 +165,24 @@ export const paymentListQuerySchema = z.object({
 });
 
 export type PaymentListQuery = z.infer<typeof paymentListQuerySchema>;
+
+/**
+ * UI-16: budget category form schema. `allocatedAmount` is coerced from the
+ * number input, and `subcategories` defaults to an empty list so the field
+ * array can start from nothing.
+ */
+export const budgetSubcategorySchema = z.object({
+  name: z.string().trim().min(1, "Subcategory name is required").max(100),
+  allocatedAmount: z.number().min(0, "Amount must not be negative"),
+});
+
+export const budgetCategorySchema = z.object({
+  name: z.string().trim().min(1, "Category name is required").max(100),
+  period: z.string().min(1, "Select a budget period"),
+  description: z.string().max(500).optional().or(z.literal("")),
+  allocatedAmount: z.coerce.number().min(0, "Amount must not be negative"),
+  color: z.string().min(1, "Pick a color"),
+  subcategories: z.array(budgetSubcategorySchema).default([]),
+});
+
+export type BudgetCategoryFormValues = z.infer<typeof budgetCategorySchema>;

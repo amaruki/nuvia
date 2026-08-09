@@ -12,11 +12,15 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { HeaderSearch } from "./header-search";
 import { NotificationsMenu } from "./notifications-menu";
 import { QuickSettingsMenu } from "./quick-settings-menu";
 import type { DashboardHeaderProps } from "./types";
 
+// UI-08 decision: the header previously rendered a desktop search input with
+// no submit handler and a mobile "command menu" button with no onClick. There
+// is no dashboard search route and no command menu, so both inert affordances
+// were removed — the header-search component was deleted and its prop dropped
+// from this header and its types — instead of shipping fake UI.
 export function DashboardHeader({
   title,
   description,
@@ -24,7 +28,6 @@ export function DashboardHeader({
   actions,
   className,
   notificationCount = 0,
-  showSearch = true,
   notifications,
   onMarkAsRead,
   onMarkAllAsRead,
@@ -81,8 +84,6 @@ export function DashboardHeader({
 
         {/* Right side actions */}
         <div className="flex items-center gap-2 ml-auto">
-          {showSearch && <HeaderSearch />}
-
           <NotificationsMenu
             notificationCount={notificationCount}
             notifications={notifications}

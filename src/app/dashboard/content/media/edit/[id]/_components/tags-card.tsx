@@ -34,7 +34,8 @@ export function TagsCard({
             value={tagInput}
             onChange={(e) => onTagInputChange(e.target.value)}
             placeholder="Add a tag"
-            onKeyPress={(e) => {
+            aria-label="Add a tag"
+            onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
                 onAddTag();
@@ -42,7 +43,7 @@ export function TagsCard({
             }}
             className="flex-1"
           />
-          <Button type="button" onClick={onAddTag} disabled={!tagInput.trim()}>
+          <Button type="button" onClick={onAddTag} disabled={!tagInput.trim()} aria-label="Add tag">
             <Plus className="h-4 w-4" />
           </Button>
         </div>
@@ -55,6 +56,7 @@ export function TagsCard({
                 <button
                   type="button"
                   onClick={() => onRemoveTag(tag)}
+                  aria-label={`Remove tag ${tag}`}
                   className="ml-1 hover:text-destructive"
                 >
                   <X className="h-3 w-3" />

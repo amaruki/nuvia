@@ -4,8 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Download, Share2, ExternalLink, Award, Calendar, User, CheckCircle } from "lucide-react";
+import { Download, Share2, ExternalLink, Award, CheckCircle } from "lucide-react";
 import type { EventCertificate } from "@/types/event";
 import { Event } from "@/types/event";
 
@@ -132,6 +131,10 @@ export function EventCertificate({
                         onClick={() => onVerify?.(certificate.verificationCode)}
                         variant="outline"
                         size="sm"
+                        aria-label="Verify certificate"
+                        // Growing the visual would unbalance the code row, so
+                        // extend the hit area instead (sidebar technique, UI-08).
+                        className="relative after:absolute after:-inset-2 md:after:hidden"
                       >
                         <ExternalLink className="h-3 w-3" />
                       </Button>
@@ -174,8 +177,6 @@ export function EventCertificateList({
   certificates,
   events = [],
   onDownload,
-  onShare,
-  onVerify,
   onViewDetails,
   className = "",
 }: EventCertificateListProps) {
@@ -244,6 +245,10 @@ export function EventCertificateList({
                       onClick={() => onViewDetails?.(certificate.id)}
                       variant="outline"
                       size="sm"
+                      aria-label="View certificate details"
+                      // Keep the sm visual next to Download; extend the touch
+                      // target via pseudo-element instead (UI-08).
+                      className="relative after:absolute after:-inset-2 md:after:hidden"
                     >
                       <ExternalLink className="h-3 w-3" />
                     </Button>

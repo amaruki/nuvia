@@ -1,3 +1,3 @@
 export default function SettingsEmail() {
-  return <h1>SettingsEmail page</h1>;
+  return <h1>Email settings</h1>;
 }

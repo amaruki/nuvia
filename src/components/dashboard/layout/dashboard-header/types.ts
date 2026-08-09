@@ -18,7 +18,6 @@ export interface DashboardHeaderProps {
   actions?: React.ReactNode;
   className?: string;
   notificationCount?: number;
-  showSearch?: boolean;
   notifications?: Notification[];
   onMarkAsRead?: (id: string) => void;
   onMarkAllAsRead?: () => void;

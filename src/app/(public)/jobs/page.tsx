@@ -41,6 +41,7 @@ export default async function PublicJobBoardPage({
                 name="q"
                 defaultValue={q ?? ""}
                 placeholder="Search job titles, companies..."
+                aria-label="Search jobs"
                 className="w-full h-12"
               />
             </div>

@@ -33,8 +33,9 @@ export function TagFilter({ selectedTags, onToggleTag, onAddTag }: TagFilterProp
             value={tagInputValue}
             onChange={(e) => setTagInputValue(e.target.value)}
             placeholder="Add a custom tag..."
+            aria-label="Add a custom tag"
             className="flex-1"
-            onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), handleAddTag())}
+            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddTag())}
             aria-describedby="tag-input-description"
           />
           <span id="tag-input-description" className="sr-only">

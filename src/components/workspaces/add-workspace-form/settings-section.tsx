@@ -158,6 +158,7 @@ export function SettingsSection({
                   variant="outline"
                   size="sm"
                   onClick={() => onRemoveFileType(index)}
+                  aria-label={`Remove file type ${index + 1}`}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -169,7 +170,8 @@ export function SettingsSection({
                 value={newFileType}
                 onChange={(e) => onNewFileTypeChange(e.target.value)}
                 placeholder="Add new file type..."
-                onKeyPress={(e) => {
+                aria-label="Add a file type"
+                onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
                     onAddFileType();
@@ -177,7 +179,13 @@ export function SettingsSection({
                 }}
                 className="flex-1"
               />
-              <Button type="button" variant="outline" size="sm" onClick={onAddFileType}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onAddFileType}
+                aria-label="Add file type"
+              >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>

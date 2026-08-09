@@ -82,6 +82,7 @@ export function CharterSection({ form }: CharterSectionProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => handleRemoveResponsibility(index)}
+                  aria-label={`Remove responsibility ${index + 1}`}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -93,14 +94,21 @@ export function CharterSection({ form }: CharterSectionProps) {
                 value={newResponsibility}
                 onChange={(e) => setNewResponsibility(e.target.value)}
                 placeholder="Add new responsibility..."
-                onKeyPress={(e) => {
+                aria-label="Add a responsibility"
+                onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
                     handleAddResponsibility();
                   }
                 }}
               />
-              <Button type="button" variant="outline" size="sm" onClick={handleAddResponsibility}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddResponsibility}
+                aria-label="Add responsibility"
+              >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>

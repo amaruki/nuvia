@@ -49,9 +49,10 @@ export function RegistrationSearchCard({
         <div className="flex space-x-2">
           <Input
             placeholder="Search by name, email, or registration ID..."
+            aria-label="Search registrations"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             className="flex-1"
           />
           <Button onClick={handleSearch} disabled={!searchTerm.trim()}>

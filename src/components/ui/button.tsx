@@ -25,6 +25,10 @@ const buttonVariants = cva(
         icon: "size-9",
         "icon-sm": "size-8",
         "icon-lg": "size-10",
+        // 44px touch targets (UI-08): `touch` for text/icon buttons that are
+        // mobile-primary controls, `icon-touch` for icon-only buttons.
+        touch: "h-11 min-w-11",
+        "icon-touch": "size-11",
       },
     },
     defaultVariants: {

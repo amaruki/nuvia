@@ -47,7 +47,13 @@ export function EventListLayout({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center">
               {showBackButton && (
-                <Button variant="ghost" onClick={handleGoBack} className="mr-4">
+                <Button
+                  variant="ghost"
+                  size="icon-touch"
+                  onClick={handleGoBack}
+                  aria-label="Back to event list"
+                  className="mr-4"
+                >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               )}
@@ -57,7 +63,7 @@ export function EventListLayout({
 
                 <div className="flex items-center gap-4">
                   <div>
-                    <h2 className="text-3xl font-bold text-foreground">{title}</h2>
+                    <h1 className="text-3xl font-bold text-foreground">{title}</h1>
 
                     {description && <p className="mt-2 text-muted-foreground">{description}</p>}
                   </div>

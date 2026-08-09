@@ -77,6 +77,7 @@ export function QrCheckInCard({ eventId, onCheckIn, isSubmitting }: QrCheckInCar
             <Button
               type="button"
               variant={checkInMethod === "qr" ? "default" : "outline"}
+              aria-pressed={checkInMethod === "qr"}
               onClick={() => setCheckInMethod("qr")}
               className="flex-1"
             >
@@ -86,6 +87,7 @@ export function QrCheckInCard({ eventId, onCheckIn, isSubmitting }: QrCheckInCar
             <Button
               type="button"
               variant={checkInMethod === "manual" ? "default" : "outline"}
+              aria-pressed={checkInMethod === "manual"}
               onClick={() => setCheckInMethod("manual")}
               className="flex-1"
             >

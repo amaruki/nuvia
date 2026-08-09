@@ -38,11 +38,17 @@ export function TagsSection({
             id="tags"
             value={tagInput}
             onChange={(e) => onTagInputChange(e.target.value)}
-            onKeyPress={onTagKeyPress}
+            onKeyDown={onTagKeyPress}
             placeholder="Add a tag..."
             className="flex-1"
           />
-          <Button type="button" onClick={onAddTag} variant="outline" className="ml-2">
+          <Button
+            type="button"
+            onClick={onAddTag}
+            variant="outline"
+            aria-label="Add tag"
+            className="ml-2"
+          >
             <Plus className="h-4 w-4" />
           </Button>
         </div>
@@ -56,6 +62,7 @@ export function TagsSection({
               <button
                 type="button"
                 onClick={() => onRemoveTag(tag)}
+                aria-label={`Remove tag ${tag}`}
                 className="ml-1 text-foreground/50 hover:text-foreground/70"
               >
                 <X className="h-3 w-3" />

@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { animate } from "animejs";
 import { authClient } from "@/lib/client";
 import { logger } from "@/lib/logger";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import Image from "next/image";
 
 export default function OAuthCallbackPage() {
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [message, setMessage] = useState("Processing authentication...");
+  const [message, setMessage] = useState("Signing you in…");
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
@@ -169,9 +170,7 @@ export default function OAuthCallbackPage() {
   const getStatusIcon = () => {
     switch (status) {
       case "loading":
-        return (
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        );
+        return <LoadingSpinner size="lg" />;
       case "success":
         return (
           <svg
@@ -224,19 +223,13 @@ export default function OAuthCallbackPage() {
         </div>
 
         {/* Status card */}
-        <div className="callback-card rounded-2xl border p-8 shadow-sm bg-card border-border">
+        <div
+          className="callback-card rounded-2xl border p-8 shadow-sm bg-card border-border"
+          aria-live="polite"
+          aria-busy={status === "loading"}
+        >
           {/* Status Icon */}
           <div className="flex justify-center mb-6">{getStatusIcon()}</div>
-
-          {/* Progress Bar for Loading State */}
-          {status === "loading" && (
-            <div className="w-full bg-muted rounded-full h-2 mb-6">
-              <div
-                className="bg-primary h-2 rounded-full animate-pulse"
-                style={{ width: "60%" }}
-              ></div>
-            </div>
-          )}
 
           {/* Additional Info */}
           <div className="text-sm text-muted-foreground text-center">

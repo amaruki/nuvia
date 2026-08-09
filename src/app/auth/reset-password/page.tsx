@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { resetPasswordAction } from "@/lib/actions/auth.actions";
 import { logger } from "@/lib/logger";
+import { FormMessage } from "@/components/auth/form-message";
 
 const resetPasswordSchema = z
   .object({
@@ -50,7 +51,7 @@ function ResetPasswordForm() {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const onSubmit = async (data: ResetPasswordFormData) => {
+  const onSubmit = async (_data: ResetPasswordFormData) => {
     setIsLoading(true);
     setError(null);
     setSuccess(null);
@@ -136,11 +137,10 @@ function ResetPasswordForm() {
             </div>
 
             {/* Error message */}
-            <div className="mb-6 p-3 rounded-lg border bg-destructive/10 border-destructive/30">
-              <p className="text-sm text-destructive">
-                Please request a new password reset link to continue.
-              </p>
-            </div>
+            <FormMessage
+              type="error"
+              message="Please request a new password reset link to continue."
+            />
 
             {/* Reset password form */}
             <div className="rounded-2xl border p-8 shadow-sm bg-card border-border space-y-4">
@@ -189,17 +189,9 @@ function ResetPasswordForm() {
             <p className="text-sm mt-1 text-muted-foreground">Enter your new password below</p>
           </div>
 
-          {error && (
-            <div className="mb-6 p-3 rounded-lg border bg-destructive/10 border-destructive/30">
-              <p className="text-sm text-destructive">{error}</p>
-            </div>
-          )}
+          {error && <FormMessage type="error" message={error} />}
 
-          {success && (
-            <div className="mb-6 p-3 rounded-lg border bg-primary/10 border-primary/30">
-              <p className="text-sm text-primary">{success}</p>
-            </div>
-          )}
+          {success && <FormMessage type="success" message={success} />}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-3">

@@ -13,6 +13,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { forgotPasswordAction } from "@/lib/actions/auth.actions";
 import { logger } from "@/lib/logger";
+import { FormMessage } from "@/components/auth/form-message";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -36,7 +37,7 @@ export default function ForgotPasswordPage() {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = async (data: ForgotPasswordFormData) => {
+  const onSubmit = async (_data: ForgotPasswordFormData) => {
     setIsLoading(true);
     setError(null);
     setSuccess(null);
@@ -112,17 +113,9 @@ export default function ForgotPasswordPage() {
             </p>
           </div>
 
-          {error && (
-            <div className="mb-6 p-3 rounded-lg border bg-destructive/10 border-destructive/30">
-              <p className="text-sm text-destructive">{error}</p>
-            </div>
-          )}
+          {error && <FormMessage type="error" message={error} />}
 
-          {success && (
-            <div className="mb-6 p-3 rounded-lg border bg-primary/10 border-primary/30">
-              <p className="text-sm text-primary">{success}</p>
-            </div>
-          )}
+          {success && <FormMessage type="success" message={success} />}
 
           {/* Forgot password form */}
           <div className="forgot-password-card rounded-2xl border p-8 shadow-sm bg-card border-border">

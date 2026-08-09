@@ -1,29 +1,34 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Event, RegistrationStatus } from "@/types/event";
+import { Event } from "@/types/event";
 import {
   eventRegistrationSchema,
   type EventRegistrationInput,
 } from "@/lib/validation/event.validation";
 import {
   formatDateLong,
-  formatTime,
   isRegistrationOpen,
   isEventFull,
   formatEventTimeRange,
   getRegistrationFormState,
 } from "@/lib/utils/event-utils";
+
+export const registrationFormSchema = eventRegistrationSchema.extend({
+  terms: z.boolean().refine((val) => val === true, "You must agree to the terms and conditions"),
+});
+
+type RegistrationFormData = z.infer<typeof registrationFormSchema>;
 
 interface EventRegistrationFormProps {
   event: Event;
@@ -40,17 +45,19 @@ export function EventRegistrationForm({
 }: EventRegistrationFormProps) {
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
-  } = useForm<EventRegistrationInput>({
-    resolver: zodResolver(eventRegistrationSchema),
+  } = useForm<RegistrationFormData>({
+    resolver: zodResolver(registrationFormSchema),
     defaultValues: {
       eventId: event.id,
       notes: "",
+      terms: false,
     },
   });
 
-  const onFormSubmit = (data: EventRegistrationInput) => {
+  const onFormSubmit = (data: RegistrationFormData) => {
     onSubmit(data);
   };
 
@@ -67,10 +74,8 @@ export function EventRegistrationForm({
         <div className="space-y-6">
           {/* Event Information */}
           <div className="bg-background p-4 rounded-lg">
-            <h3 className="font-medium mb-2" style={{ color: "var(--foreground)" }}>
-              Event Details
-            </h3>
-            <div className="space-y-2 text-sm" style={{ color: "var(--muted-foreground)" }}>
+            <h3 className="font-medium mb-2 text-foreground">Event Details</h3>
+            <div className="space-y-2 text-sm text-muted-foreground">
               <p>
                 <span className="font-medium">Date:</span> {formatDateLong(event.startDate)}
               </p>
@@ -134,27 +139,21 @@ export function EventRegistrationForm({
               </div>
 
               {/* Terms and Conditions */}
-              <div>
-                <div className="flex items-start">
-                  <input
-                    id="terms"
-                    type="checkbox"
-                    className="mt-1 h-4 w-4 border-input rounded"
-                    style={{
-                      backgroundColor: "var(--primary)",
-                      color: "var(--primary-foreground)",
-                    }}
-                    required
+              <div className="space-y-1">
+                <div className="flex items-start space-x-2">
+                  <Controller
+                    name="terms"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox id="terms" checked={field.value} onCheckedChange={field.onChange} />
+                    )}
                   />
-                  <label
-                    htmlFor="terms"
-                    className="ml-2 block text-sm"
-                    style={{ color: "var(--muted-foreground)" }}
-                  >
+                  <Label htmlFor="terms" className="text-sm font-normal leading-relaxed">
                     I agree to the event terms and conditions and understand that my information
                     will be shared with the event organizer.
-                  </label>
+                  </Label>
                 </div>
+                {errors.terms && <p className="text-sm text-destructive">{errors.terms.message}</p>}
               </div>
 
               {/* Submit Button */}

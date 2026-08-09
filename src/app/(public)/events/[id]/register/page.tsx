@@ -2,18 +2,22 @@
 
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { toast } from "sonner";
 import { EventRegistrationForm } from "@/components/events";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, CheckCircle, AlertCircle, Clock, Hourglass } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, CheckCircle, AlertCircle, Clock, Hourglass, LogIn } from "lucide-react";
 import { Event, EventRegistration } from "@/types/event";
 import { getEventById, registerForEvent } from "@/lib/services/event";
+import { useSession } from "@/lib/client";
 import { EventLayout } from "@/components/events/event-layout";
 
 export default function EventRegistrationPage() {
   const params = useParams();
   const router = useRouter();
   const eventId = params.id as string;
+  const { data: session, isPending } = useSession();
 
   const [event, setEvent] = React.useState<Event | null>(null);
   const [existingRegistration, setExistingRegistration] = React.useState<EventRegistration | null>(
@@ -58,14 +62,13 @@ export default function EventRegistrationPage() {
       });
 
       if (response.success) {
-        alert("Registration successful!");
+        toast.success("Registration successful!");
         router.push(`/events/${eventId}`);
       } else {
-        alert(response.message || "Registration failed");
+        toast.error(response.message || "Registration failed");
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Registration failed";
-      alert(errorMessage);
+      toast.error(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -74,6 +77,51 @@ export default function EventRegistrationPage() {
   const handleGoBack = () => {
     router.back();
   };
+
+  // Session gate (same pattern as the jobs apply form): registration writes a
+  // NOT NULL user reference, so anonymous visitors are routed to login and
+  // returned to this page via redirectTo.
+  if (isPending) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle>Register for this event</CardTitle>
+              <CardDescription>Checking your session...</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session?.user) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle>Register for this event</CardTitle>
+              <CardDescription>
+                Sign in to register for this event and track your registration status.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild size="lg" className="w-full">
+                <Link
+                  href={`/auth/login?redirectTo=${encodeURIComponent(`/events/${eventId}/register`)}`}
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign in to register
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

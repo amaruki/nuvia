@@ -1,6 +1,7 @@
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { Heart } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { ContactLink, OrganizationCopyright } from "./organization-branding";
 
 interface DashboardFooterProps {
@@ -32,7 +33,10 @@ export function DashboardFooter({ className }: DashboardFooterProps) {
 
         <div className="mt-4 pt-4 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-xs text-foreground/75">Built with ❤️ by the Nuvia community</p>
+            <p className="text-xs text-foreground/75">
+              Built with <Heart aria-hidden="true" className="inline size-3 align-baseline" />
+              <span className="sr-only">love</span> by the Nuvia community
+            </p>
             <div className="mt-2 md:mt-0">
               <p className="text-xs text-foreground/75">Version 1.0.0</p>
             </div>

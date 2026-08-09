@@ -65,12 +65,17 @@ export default function ListHeader({
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
-            {SORT_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value} className="font-medium">
-                <span className="mr-2">{option.icon}</span>
-                {option.label}
-              </SelectItem>
-            ))}
+            {SORT_OPTIONS.map((option) => {
+              const OptionIcon = option.icon;
+              return (
+                <SelectItem key={option.value} value={option.value} className="font-medium">
+                  <span className="flex items-center gap-2">
+                    <OptionIcon aria-hidden="true" className="size-4 text-muted-foreground" />
+                    {option.label}
+                  </span>
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
 

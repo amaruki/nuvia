@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { CATEGORY_COLORS } from "@/types/category.types";
 
 import type { VisualSettingsSectionProps } from "./types";
+import { CategoryIconPicker } from "./icon-picker";
 
 export function VisualSettingsSection({
   form,
@@ -64,21 +65,7 @@ export function VisualSettingsSection({
             )}
           </div>
         ) : (
-          <div className="space-y-2">
-            <Label htmlFor="icon">Icon Name</Label>
-            <Input
-              id="icon"
-              {...form.register("icon")}
-              placeholder="folder"
-              className={cn(form.formState.errors.icon && "border-red-500")}
-            />
-            <p className="text-xs text-muted-foreground">
-              Use Lucide React icon names (e.g., folder, book, calendar)
-            </p>
-            {form.formState.errors.icon && (
-              <p className="text-sm text-red-500">{form.formState.errors.icon.message}</p>
-            )}
-          </div>
+          <CategoryIconPicker form={form} />
         )}
       </div>
     </div>

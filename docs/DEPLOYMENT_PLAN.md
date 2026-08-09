@@ -134,7 +134,7 @@ Operational consequences, stated plainly:
 2. Point a Stripe webhook endpoint at
    `https://<APP_URL>/api/v1/webhooks/stripe`.
 3. Subscribe the endpoint to the event types the processor understands
-   (`src/lib/payments/stripe.ts`): `checkout.session.completed`,
+   (`src/lib/payments/stripe/index.ts`): `checkout.session.completed`,
    `checkout.session.async_payment_succeeded`,
    `checkout.session.async_payment_failed`, `checkout.session.expired`,
    `invoice.paid`, `invoice.payment_succeeded`, `invoice.payment_failed`,

@@ -44,7 +44,7 @@ Wave B preamble: each item = authorized API + service + UI de-mock + tests for t
   - Why: the content hooks today serve `mock-article-data`/`mock-publication-data` (and inline category mocks) instead of database rows.
   - Acceptance: per the wave bar — authorized `content:*` CRUD API + service + UI de-mock + tests across articles/publications/announcements/categories, with the media sub-decision recorded.
   - Deps: none.
-  - Status: done. Articles/publications/announcements/categories served from the `content` table (discriminated by `type`; new `PUBLICATION` enum value in migration 0003) via `/api/v1/content/**` with `content:*` authorization; UI-only fields round-trip through `content.metadata.ui`; the four mock hooks are API-backed. Tests: `tests/content-api.test.ts`.
+  - Status: done. Articles/publications/announcements/categories served from the `content` table (discriminated by `type`; new `PUBLICATION` enum value in migration 0003) via `/api/v1/content/**` with `content:*` authorization; UI-only fields round-trip through `content.metadata.ui`; the four mock hooks are API-backed. Tests: `tests/content-api/`.
   - Execution note (media sub-decision): chose local-disk storage — uploads write to `storage/uploads/` with metadata in a JSON manifest (`storage/uploads/manifest.json`), because no media table exists and migrations were frozen; no new dependency. Served via `/api/v1/media` + `/api/v1/media/[id]` under `content:*` permissions (no media permission module exists). `use-media` uploads POST real multipart; listing/versions/folders remain service-internal until a media table lands.
 
 - **B5 — Forums real.** Posts/comments/categories CRUD + moderation actions with `forum:*` authorization; de-mock `report-list`, `category-manager`, `moderation-queue`; keep per-category `requiredRole` gate.
@@ -93,7 +93,7 @@ Wave C preamble: finance/dues is the product core for an AMS and the first modul
   - Why: chapters is the first module after finance in the declared promotion order, and its UI currently renders mock data rather than real records.
   - Acceptance: chapters clears the same promotion bar as C5 — schema + authorized API + UI de-mock of `mock-chapter-data` + tests + docs, with the module flag flipped on.
   - Deps: C5 pattern.
-  - Status: done 2026-08-08. Chapters cleared the C5 promotion bar: schema (`chapters` + `chapter_members` tables, `ChapterStatus`/`ChapterRole` enums, migration 0005), authorized API `/api/v1/chapters/**` on `chapters:*` permissions, UI de-mocked (`mock-chapter-data.ts` deleted; hooks and pages on `apiFetch`), 22 tests in `tests/chapters-api.test.ts`, module docs at `docs/modules/chapters.md`, and `chapters: true` in `config/features.ts` with `/dashboard/organization/chapters` added to the axe smoke (14 pages PASS, 0 critical/serious).
+  - Status: done 2026-08-08. Chapters cleared the C5 promotion bar: schema (`chapters` + `chapter_members` tables, `ChapterStatus`/`ChapterRole` enums, migration 0005), authorized API `/api/v1/chapters/**` on `chapters:*` permissions, UI de-mocked (`mock-chapter-data.ts` deleted; hooks and pages on `apiFetch`), 22 tests in `tests/chapters-api/`, module docs at `docs/modules/chapters.md`, and `chapters: true` in `config/features.ts` with `/dashboard/organization/chapters` added to the axe smoke (14 pages PASS, 0 critical/serious).
 
 - **D2 — Committees real (same bar; `mock-committee-data`).**
   - Why: committees is the next module in the post-1.0 promotion order, and its UI currently renders mock data rather than real records.
@@ -105,19 +105,19 @@ Wave C preamble: finance/dues is the product core for an AMS and the first modul
   - Why: learning/CPD is the next module in the post-1.0 promotion order, and its courses/certifications pages currently render mock data.
   - Acceptance: learning/CPD clears the same promotion bar as C5 — schema + authorized API + courses/certifications pages on real data + tests + docs, with the module flag flipped on.
   - Deps: C5 pattern.
-  - Status: done 2026-08-08. Learning cleared the C5 promotion bar: schema (`course` + `certificate` tables, `course_level`/`certificate_status` enums, migration 0009), authorized API `/api/v1/learning/**` on `learning:*` permissions, courses/certifications/admin pages de-mocked (`courses/_data/mock-data.ts` deleted; hooks and pages on `learning.service.ts` via `use-learning-courses`/`use-learning-certificates`), 27 tests in `tests/learning-api.test.ts`, module docs at `docs/modules/learning.md`, and `learning: true` in `config/features.ts` with `/dashboard/learning/courses` added to the axe smoke (16 pages PASS, 0 critical/serious).
+  - Status: done 2026-08-08. Learning cleared the C5 promotion bar: schema (`course` + `certificate` tables, `course_level`/`certificate_status` enums, migration 0009), authorized API `/api/v1/learning/**` on `learning:*` permissions, courses/certifications/admin pages de-mocked (`courses/_data/mock-data.ts` deleted; hooks and pages on `learning.service.ts` via `use-learning-courses`/`use-learning-certificates`), 27 tests in `tests/learning-api/`, module docs at `docs/modules/learning.md`, and `learning: true` in `config/features.ts` with `/dashboard/learning/courses` added to the axe smoke (16 pages PASS, 0 critical/serious).
 
 - **D4 — Awards real (same bar; no schema exists yet — item includes schema design).**
   - Why: awards is the next module in the post-1.0 promotion order, and it has no schema today, so the item must include schema design.
   - Acceptance: awards clears the same promotion bar as C5 — schema designed and landed + authorized API + UI + tests + docs, with the module flag flipped on.
   - Deps: C5 pattern.
-  - Status: done 2026-08-08. Awards cleared the C5 promotion bar: schema designed and landed (`award_programs` + `award_nominations` tables, `AwardProgramStatus`/`AwardCategory`/`AwardNominationStatus` enums, migration 0007), authorized API `/api/v1/awards/**` (programs + nominations) on `awards:*` permissions, programs/nominations pages on `award.service.ts` via `use-awards`, 27 tests in `tests/awards-api.test.ts`, module docs at `docs/modules/awards.md`, and `awards: true` in `config/features.ts` with `/dashboard/awards/programs` added to the axe smoke (17 pages PASS, 0 critical/serious).
+  - Status: done 2026-08-08. Awards cleared the C5 promotion bar: schema designed and landed (`award_programs` + `award_nominations` tables, `AwardProgramStatus`/`AwardCategory`/`AwardNominationStatus` enums, migration 0007), authorized API `/api/v1/awards/**` (programs + nominations) on `awards:*` permissions, programs/nominations pages on `award.service.ts` via `use-awards`, 27 tests in `tests/awards-api/`, module docs at `docs/modules/awards.md`, and `awards: true` in `config/features.ts` with `/dashboard/awards/programs` added to the axe smoke (17 pages PASS, 0 critical/serious).
 
 - **D5 — Workspaces real (same bar; `mock-workspace-data`).**
   - Why: workspaces is the last module in the post-1.0 promotion order, and its UI currently renders mock data rather than real records.
   - Acceptance: workspaces clears the same promotion bar as C5 — schema + authorized API + UI de-mock of `mock-workspace-data` + tests + docs, with the module flag flipped on.
   - Deps: C5 pattern.
-  - Status: done 2026-08-08. Workspaces cleared the C5 promotion bar: `workspaces` table with `WorkspaceType`/`WorkspaceStatus` enums and migration 0008, authorized API `/api/v1/workspaces/**` on `workspaces:*` permissions, directory + detail pages de-mocked off `mock-workspace-data` onto `workspace.service.ts` via `use-workspaces` (mock file deleted), 24 tests in `tests/workspaces-api.test.ts`, module docs at `docs/modules/workspaces.md`, and `workspaces: true` in `config/features.ts` with `/dashboard/organization/workspaces` added to the axe smoke (18 pages PASS, 0 critical/serious). This drains the §13.4 promotion queue — all eleven modules are now Promoted.
+  - Status: done 2026-08-08. Workspaces cleared the C5 promotion bar: `workspaces` table with `WorkspaceType`/`WorkspaceStatus` enums and migration 0008, authorized API `/api/v1/workspaces/**` on `workspaces:*` permissions, directory + detail pages de-mocked off `mock-workspace-data` onto `workspace.service.ts` via `use-workspaces` (mock file deleted), 24 tests in `tests/workspaces-api/`, module docs at `docs/modules/workspaces.md`, and `workspaces: true` in `config/features.ts` with `/dashboard/organization/workspaces` added to the axe smoke (18 pages PASS, 0 critical/serious). This drains the §13.4 promotion queue — all eleven modules are now Promoted.
 
 ## Wave E — M4: OSS launch
 
@@ -154,9 +154,9 @@ Wave C preamble: finance/dues is the product core for an AMS and the first modul
 
 ## Wave F — Debt & companion docs surfaced by the audit
 
-- **F1 — Retire dead `src/lib/config.ts` (parallel to canonical `src/lib/env.ts`).**
-  - Why: the audit surfaced `src/lib/config.ts` as a dead parallel config source alongside the canonical `src/lib/env.ts`.
-  - Acceptance: remaining importers are migrated to `src/lib/env.ts` and `src/lib/config.ts` is deleted.
+- **F1 — Retire dead `src/lib/env.ts` (parallel to canonical `src/lib/env.ts`).**
+  - Why: the audit surfaced `src/lib/env.ts` as a dead parallel config source alongside the canonical `src/lib/env.ts`.
+  - Acceptance: remaining importers are migrated to `src/lib/env.ts` and `src/lib/env.ts` is deleted.
   - Deps: none.
 
 - **F2 — Mock residue sweep after B/C land (delete `src/lib/mock/` and only the wired `src/lib/data/mock-*.ts`).**

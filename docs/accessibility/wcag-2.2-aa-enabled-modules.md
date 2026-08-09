@@ -47,7 +47,7 @@ Status at this record: `bunx oxlint` exits 0 (remaining diagnostics are pre-exis
 
 `scripts/a11y-smoke.ts` (Bun script, no test runner). Self-contained and idempotent:
 
-1. Boots the test Postgres/Redis stack (`compose.test.yml`, project `nuvia-test`) if not already up, pushes the schema (`drizzle-kit push --force`), and seeds the admin accounts with a fresh per-run `SEED_ADMIN_PASSWORD` (never reused, satisfies the password-strength policy).
+1. Boots the test Postgres/Redis stack (`compose.yml`, project `nuvia-test`) if not already up, pushes the schema (`drizzle-kit push --force`), and seeds the admin accounts with a fresh per-run `SEED_ADMIN_PASSWORD` (never reused, satisfies the password-strength policy).
 2. Spawns `next dev` on a dedicated port (default **3111**, override `A11Y_SMOKE_PORT`) unless something already answers there. A server the script spawned is killed on exit (whole process group); a pre-existing one is left alone. Port 3111 is used because 3100 is occupied by an unrelated local service.
 3. Signs in as the seeded superadmin (`admin@nuvia.com`) via `POST /api/auth/sign-in/email` and installs the session cookie into the Playwright context.
 4. Runs `AxeBuilder` (`@axe-core/playwright`, tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`) against the eighteen pages above.
@@ -61,7 +61,7 @@ Final run for the D1 promotion extension (2026-08-08): **all 14 pages PASS — 0
 
 Final run for the D2 promotion extension (2026-08-08): **all 15 pages PASS — 0 critical/serious, 0 moderate/minor**, including the new committees directory page with no axe violations found (raw results: `/tmp/nuvia-a11y-smoke-2026-08-08T13-18-43-973Z-161234/`).
 
-Final run for the D3 promotion extension (2026-08-08): **all 16 pages PASS — 0 critical/serious, 0 moderate/minor**, including the new learning courses page with no axe violations found (raw results: `/tmp/nuvia-a11y-smoke-2026-08-08T14-29-22-147Z-414724/`). The audit surfaced two latent violations that accumulated test data now renders: white on `--destructive` badges at 3.76:1 (finance dues/invoices) and `text-destructive/90` alert text at 4.49:1 (chapters). Both were fixed by darkening `--destructive` to `oklch(0.505 0.213 27.518)` (≥5.6:1 across the destructive combinations). The member directory sort control also intermittently lacked an accessible name (axe `button-name`); it now carries an explicit `aria-label` (`src/components/memberships/membership-list.tsx`). Finally, the smoke harness flushes the test Redis before auditing so stale IP-keyed rate-limit buckets from earlier runs cannot inject 429 error states mid-audit.
+Final run for the D3 promotion extension (2026-08-08): **all 16 pages PASS — 0 critical/serious, 0 moderate/minor**, including the new learning courses page with no axe violations found (raw results: `/tmp/nuvia-a11y-smoke-2026-08-08T14-29-22-147Z-414724/`). The audit surfaced two latent violations that accumulated test data now renders: white on `--destructive` badges at 3.76:1 (finance dues/invoices) and `text-destructive/90` alert text at 4.49:1 (chapters). Both were fixed by darkening `--destructive` to `oklch(0.505 0.213 27.518)` (≥5.6:1 across the destructive combinations). The member directory sort control also intermittently lacked an accessible name (axe `button-name`); it now carries an explicit `aria-label` (`src/components/memberships/membership-list/index.ts`). Finally, the smoke harness flushes the test Redis before auditing so stale IP-keyed rate-limit buckets from earlier runs cannot inject 429 error states mid-audit.
 
 Final run for the D4 promotion extension (2026-08-08): **all 17 pages PASS — 0 critical/serious, 0 moderate/minor**, including the new awards programs page with no axe violations found (raw results: `/tmp/nuvia-a11y-smoke-2026-08-08T14-35-53-636Z-438484/`).
 
@@ -85,7 +85,7 @@ Known-benign static finding left in place per the C5 brief: one `jsx-a11y(prefer
 Notable structural fixes:
 
 - `src/app/dashboard/jobs/[jobId]/applicants/page.tsx` — the clickable applicant row became a `next/link` `Link` (navigation is a link, not a button).
-- `src/components/ui/full-calendar.tsx` — the month-view day cell was a mouse-only clickable `div`; the click action moved to a real `<button>` (the date number, labelled `Create event on <date>`), and the event chips became native `<button>` popover triggers, which also makes the event popover keyboard-operable. This additionally fixed the `aria-allowed-attr` axe finding (Radix popover ARIA attributes on a role-less `div`).
+- `src/components/ui/full-calendar/index.ts` — the month-view day cell was a mouse-only clickable `div`; the click action moved to a real `<button>` (the date number, labelled `Create event on <date>`), and the event chips became native `<button>` popover triggers, which also makes the event popover keyboard-operable. This additionally fixed the `aria-allowed-attr` axe finding (Radix popover ARIA attributes on a role-less `div`).
 - `src/components/dashboard/layout/sidebar-footer.tsx` — the account-menu trigger gained an sr-only label (`button-name` critical on every dashboard page when the sidebar is icon-collapsed).
 
 ### Runtime (axe): first audited run found 12 critical/serious violations

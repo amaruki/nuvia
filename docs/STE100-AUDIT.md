@@ -171,7 +171,7 @@ owner decision to accept the risk.
 
 The new instructions preserve the command names and service names as
 literals or technical nouns. The source for each technical behavior is
-`package.json`, `lefthook.yml`, `compose.test.yml`, or
+`package.json`, `lefthook.yml`, `compose.yml`, or
 `.github/workflows/ci.yml`.
 
 The scan reported no candidate on a new line in `README.md` or the ADR.

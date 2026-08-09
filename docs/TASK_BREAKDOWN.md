@@ -11,7 +11,7 @@ Conventions used below:
 - **Routes** are Next.js App Router handlers under `src/app/api/**` — one
   `route.ts` per endpoint group, exporting the HTTP verbs.
 - **Permissions** come from `AVAILABLE_PERMISSIONS` in
-  `src/types/role.types.ts` and are enforced through `requirePermission` /
+  `src/types/role/index.ts` and are enforced through `requirePermission` /
   `requireRole` (`src/lib/rbac/`).
 - **Errors** are RFC 9457 problems built only through `src/lib/http.ts`.
 - All 48 tables were created by migrations `drizzle/0000`–`0009`.
@@ -20,16 +20,16 @@ Conventions used below:
 
 Cross-cutting infrastructure every other module imports.
 
-| Piece                    | Entry point                | Notes                                                                                                                     |
-| ------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Environment validation   | `src/lib/env.ts`           | Zod schema; required vs defaulted vars; `superRefine` pairs (Stripe, Redis); see `DEPLOYMENT_PLAN.md`                     |
-| HTTP envelope + problems | `src/lib/http.ts`          | `successResponse`, `problemResponse`, `problems.*`, `validationProblem` (ADR-0002)                                        |
-| Authorization            | `src/lib/rbac/`            | `requirePermission`, `requireRole`, `hasPermission`, `getCurrentUser`, `changeUserRole`, `canGrantPermissions` (ADR-0001) |
-| Rate limiting            | `src/lib/rate-limit.ts`    | Redis sliding-window log; `RATE_LIMITS` buckets (ADR-0003)                                                                |
-| Logging                  | `src/lib/logger.ts`        | One structured logger, `no-console` lint rule (ADR-0004)                                                                  |
-| Session cache            | `src/lib/session-cache.ts` | Redis-backed session cache used by the auth v1 routes                                                                     |
-| Edge proxy               | `src/proxy.ts`             | Boundary 1→2 gate: session presence before authenticated groups                                                           |
-| Feature flags            | `config/features.ts`       | Module gates consumed by nav and dashboard access                                                                         |
+| Piece                    | Entry point                      | Notes                                                                                                                     |
+| ------------------------ | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Environment validation   | `src/lib/env.ts`                 | Zod schema; required vs defaulted vars; `superRefine` pairs (Stripe, Redis); see `DEPLOYMENT_PLAN.md`                     |
+| HTTP envelope + problems | `src/lib/http.ts`                | `successResponse`, `problemResponse`, `problems.*`, `validationProblem` (ADR-0002)                                        |
+| Authorization            | `src/lib/rbac/`                  | `requirePermission`, `requireRole`, `hasPermission`, `getCurrentUser`, `changeUserRole`, `canGrantPermissions` (ADR-0001) |
+| Rate limiting            | `src/lib/rate-limit.ts`          | Redis sliding-window log; `RATE_LIMITS` buckets (ADR-0003)                                                                |
+| Logging                  | `src/lib/logger.ts`              | One structured logger, `no-console` lint rule (ADR-0004)                                                                  |
+| Session cache            | `src/lib/session-cache/index.ts` | Redis-backed session cache used by the auth v1 routes                                                                     |
+| Edge proxy               | `src/proxy.ts`                   | Boundary 1→2 gate: session presence before authenticated groups                                                           |
+| Feature flags            | `config/features.ts`             | Module gates consumed by nav and dashboard access                                                                         |
 
 Schema tables: none owned directly (this layer defines the rules other
 modules' tables obey).
@@ -42,7 +42,7 @@ Tests: `tests/env.test.ts`, `tests/logger.test.ts`, `tests/rate-limit.test.ts`,
 
 Session, credentials, email verification, devices, and account lifecycle.
 
-- **Entry points:** `src/lib/auth.ts` (better-auth config: email+password,
+- **Entry points:** `src/lib/auth/index.ts` (better-auth config: email+password,
   OAuth providers, session hooks), `src/app/api/auth/**` (better-auth
   handler + cache endpoints + OAuth callbacks), `src/app/api/v1/auth/**`
   (13 custom routes: login, signup, profile, password flows, devices,
@@ -63,7 +63,7 @@ Session, credentials, email verification, devices, and account lifecycle.
 Roles, permissions, and user management for administrators.
 
 - **Entry points:** `src/app/api/v1/admin/**` (permissions, roles, users,
-  role assignment, bulk role update), `src/types/role.types.ts`
+  role assignment, bulk role update), `src/types/role/index.ts`
   (`AVAILABLE_PERMISSIONS`, `ROLE_PERMISSIONS`, `canManageRole`),
   `src/lib/rbac/` (`changeUserRole` with audit-trail transaction).
 - **Schema tables:** `custom_roles`, `role_change_history`,
@@ -88,7 +88,7 @@ stored; it is computed from subscription rows).
   search/role[]/memberStatus[]/sort).
 - **Spec:** [`api-specs/members.md`](api-specs/members.md).
 - **Tests:** `tests/members-api/`,
-  `tests/member-status-derivation.test.ts`.
+  `tests/member-status-derivation/`.
 
 ## 5. Events (backlog B2/B3)
 
@@ -105,7 +105,7 @@ Event CRUD plus registration, waitlist, check-in, and cancel.
 - **Schema tables:** `events`, `event_categories`, `event_registrations`,
   `event_sessions`, `event_speakers`, `event_sponsors` (all migration 0000).
 - **Spec:** [`api-specs/events.md`](api-specs/events.md).
-- **Tests:** `tests/events-read-api.test.ts`,
+- **Tests:** `tests/events-read-api/`,
   `tests/events-write-api/`.
 
 ## 6. Content & media (backlog B4)
@@ -133,7 +133,7 @@ Four collections on one table, plus disk-backed uploads.
 Posts, comments, categories, moderation queue, and reports.
 
 - **Entry points:** `src/app/api/v1/forums/**` (18 routes),
-  `src/lib/services/forum.service.ts` (schemas + rules: status derivation
+  `src/lib/services/forum/index.ts` (schemas + rules: status derivation
   into `PENDING_REVIEW`, soft deletes, counter maintenance, report
   resolution).
 - **Schema tables:** `forum_categories`, `forum_posts`, `forum_comments`,
@@ -141,7 +141,7 @@ Posts, comments, categories, moderation queue, and reports.
 - **Spec:** [`api-specs/forums.md`](api-specs/forums.md) — note the known
   double-wrap divergence recorded in
   [`api-specs/_index.md`](api-specs/_index.md#known-divergences).
-- **Tests:** `tests/forums-api.test.ts` (service layer; route layer carries
+- **Tests:** `tests/forums-api/` (service layer; route layer carries
   the divergence).
 
 ## 8. Jobs (backlog B6)
@@ -150,7 +150,7 @@ Job postings and applications with reference data for form dropdowns.
 
 - **Entry points:** `src/app/api/v1/jobs/**` (12 routes incl. `meta`),
   `src/app/api/v1/jobs/_lib.ts` (`handleJobRoute`, `parsePagination`),
-  `src/lib/services/job.service.ts`, `src/lib/services/job.schemas.ts`,
+  `src/lib/services/job/index.ts`, `src/lib/services/job.schemas.ts`,
   `src/types/jobs.types.ts` (enum values).
 - **Schema tables:** `job_categories`, `job_types`, `locations`,
   `companies`, `job_postings`, `job_applications` (all 0000).
@@ -204,7 +204,7 @@ Pages and components consuming the API above.
 
 - **Entry points:** `src/app/` (landing `(public)`, `auth/`, `dashboard/`),
   `src/components/**` (dashboard, finance, auth, landing, ...),
-  `src/lib/navigation-data.ts` + `src/lib/dashboard-access.ts` (permission-
+  `src/lib/navigation-data/index.ts` + `src/lib/dashboard-access.ts` (permission-
   derived nav and the server-side dashboard gate), `src/contexts/`,
   `src/hooks/` (session, OAuth, realtime).
 - **Rules:** Server Components by default (ADR-0006); nav derives from
@@ -267,7 +267,7 @@ Award programs and nominations.
 
 - **Entry points:** `src/app/api/v1/awards/**` (10 endpoints across
   `programs` and `nominations`), `src/app/api/v1/awards/_lib.ts`,
-  `src/lib/services/award.service.ts` (schemas colocated).
+  `src/lib/services/award/index.ts` (schemas colocated).
 - **Schema tables:** `award_programs`, `award_nominations` (0007).
 - **Spec:** [`api-specs/awards.md`](api-specs/awards.md).
 - **Tests:** `tests/awards-api/`.

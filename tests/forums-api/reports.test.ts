@@ -40,12 +40,12 @@ describe("forum reports", () => {
     expect(report.targetContent?.title).toBe(post.title);
 
     const list = await listReports();
-    expect(list.some((row) => row.id === report.id)).toBe(true);
+    expect(list.items.some((row) => row.id === report.id)).toBe(true);
 
     const pendingOnly = await listReports("PENDING");
-    expect(pendingOnly.some((row) => row.id === report.id)).toBe(true);
+    expect(pendingOnly.items.some((row) => row.id === report.id)).toBe(true);
     const resolvedOnly = await listReports("RESOLVED");
-    expect(resolvedOnly.some((row) => row.id === report.id)).toBe(false);
+    expect(resolvedOnly.items.some((row) => row.id === report.id)).toBe(false);
   });
 
   test("report a comment", async () => {
@@ -154,12 +154,12 @@ describe("forum reports", () => {
     });
 
     const queue = await getModerationQueue();
-    const entry = queue.find((row) => row.id === post.id);
+    const entry = queue.items.find((row) => row.id === post.id);
     expect(entry?.reportCount).toBe(2);
 
     // Approving the post does not resolve its reports.
     await moderatePost(post.id, { action: "approve" }, moderator);
     const reports = await listReports("PENDING");
-    expect(reports.filter((row) => row.targetId === post.id)).toHaveLength(2);
+    expect(reports.items.filter((row) => row.targetId === post.id)).toHaveLength(2);
   });
 });

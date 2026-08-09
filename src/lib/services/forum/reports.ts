@@ -1,4 +1,4 @@
-import { desc, eq, inArray } from "drizzle-orm";
+import { count, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
 import { forumComment, forumPost, forumReport, user, type ForumReport } from "@/db/schema";
@@ -92,10 +92,30 @@ async function getReportDto(id: string): Promise<ReportDto | undefined> {
   return toReportDto(row, targetContent);
 }
 
-export async function listReports(status?: string): Promise<ReportDto[]> {
+export interface ReportListResult {
+  items: ReportDto[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export async function listReports(
+  status?: string,
+  pagination: { page?: number; limit?: number } = {},
+): Promise<ReportListResult> {
+  const page = pagination.page ?? 1;
+  const limit = pagination.limit ?? 20;
+  const statusFilter = status ? eq(forumReport.status, status as ForumReport["status"]) : undefined;
+
+  const [totalRow] = await db.select({ total: count() }).from(forumReport).where(statusFilter);
+  const total = totalRow?.total ?? 0;
+
   const rows = await reportWithReporter()
-    .where(status ? eq(forumReport.status, status as ForumReport["status"]) : undefined)
-    .orderBy(desc(forumReport.createdAt));
+    .where(statusFilter)
+    .orderBy(desc(forumReport.createdAt))
+    .limit(limit)
+    .offset((page - 1) * limit);
 
   const postIds = rows.map((row) => row.postId).filter((id): id is string => Boolean(id));
   const commentIds = rows.map((row) => row.commentId).filter((id): id is string => Boolean(id));
@@ -121,7 +141,7 @@ export async function listReports(status?: string): Promise<ReportDto[]> {
   const postById = new Map(posts.map((post) => [post.id, post]));
   const commentById = new Map(comments.map((comment) => [comment.id, comment]));
 
-  return rows.map((row) => {
+  const items = rows.map((row) => {
     const targetPost = row.postId ? postById.get(row.postId) : undefined;
     const targetComment = row.commentId ? commentById.get(row.commentId) : undefined;
     const targetContent = targetPost
@@ -132,6 +152,8 @@ export async function listReports(status?: string): Promise<ReportDto[]> {
 
     return toReportDto(row, targetContent);
   });
+
+  return { items, page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) };
 }
 
 export async function createReport(

@@ -19,7 +19,7 @@ describe("moderation queue", () => {
     expect(post.author.id).toBe(member.id);
 
     const queue = await getModerationQueue();
-    const entry = queue.find((row) => row.id === post.id);
+    const entry = queue.items.find((row) => row.id === post.id);
     expect(entry).toBeDefined();
     expect(entry?.category.id).toBe(category.id);
     expect(entry?.reportCount).toBe(0);
@@ -28,7 +28,7 @@ describe("moderation queue", () => {
     expect(approved.status).toBe("PUBLISHED");
 
     const queueAfter = await getModerationQueue();
-    expect(queueAfter.some((row) => row.id === post.id)).toBe(false);
+    expect(queueAfter.items.some((row) => row.id === post.id)).toBe(false);
   });
 
   test("explicit PUBLISHED from a non-moderator is forced to PENDING_REVIEW", async () => {

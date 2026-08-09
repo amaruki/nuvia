@@ -12,8 +12,18 @@ import type { UserRole } from "@/types/dashboard.types";
 
 const FORUMS_API = "/api/v1/forums";
 
-/** Unwraps the success envelope; throws Error(detail) on Problem responses. */
-async function forumFetch<T>(path: string, init?: RequestInit): Promise<T> {
+interface ForumEnvelopeMeta {
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+}
+
+/** Fetches and unwraps the success envelope; throws Error(detail) on Problems. */
+async function forumRequest<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<{ data: T; meta?: ForumEnvelopeMeta }> {
   const response = await fetch(`${FORUMS_API}${path}`, {
     headers: { "content-type": "application/json" },
     ...init,
@@ -30,8 +40,21 @@ async function forumFetch<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error(detail);
   }
 
-  const body = (await response.json()) as { data: T };
-  return body.data;
+  return (await response.json()) as { data: T; meta?: ForumEnvelopeMeta };
+}
+
+/** Unwraps the success envelope to just the data array. */
+async function forumFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  return (await forumRequest<T>(path, init)).data;
+}
+
+/** Page envelope shape shared by the moderation queue and reports hooks. */
+export interface ForumPageResult<T> {
+  items: T[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
 
 /** API category row -> UI shape (form "Name" maps to displayName). */
@@ -107,16 +130,23 @@ export function useDeleteForumCategory() {
 // Moderation queue
 // ---------------------------------------------------------------------------
 
-export function useModerationQueue() {
+export function useModerationQueue(page = 1, limit = 20) {
   return useQuery({
-    queryKey: ["forums", "moderation", "queue"],
+    queryKey: ["forums", "moderation", "queue", page, limit],
     queryFn: async () => {
-      const rows = await forumFetch<ForumPost[]>("/moderation/queue");
+      const body = await forumRequest<ForumPost[]>(`/moderation/queue?page=${page}&limit=${limit}`);
       // Role comes off a free-text DB column; narrow for the UI type.
-      return rows.map((post) => ({
+      const items = body.data.map((post) => ({
         ...post,
         author: { ...post.author, role: post.author.role as UserRole },
       }));
+      return {
+        items,
+        page: body.meta?.page ?? page,
+        limit: body.meta?.limit ?? limit,
+        total: body.meta?.total ?? items.length,
+        totalPages: body.meta?.totalPages ?? 1,
+      } satisfies ForumPageResult<ForumPost>;
     },
   });
 }
@@ -148,10 +178,21 @@ export function useModeratePost() {
 // Reports
 // ---------------------------------------------------------------------------
 
-export function useForumReports() {
+export function useForumReports(page = 1, limit = 20, status?: string) {
+  const query = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (status) query.set("status", status);
   return useQuery({
-    queryKey: ["forums", "reports"],
-    queryFn: () => forumFetch<Report[]>("/reports"),
+    queryKey: ["forums", "reports", page, limit, status ?? null],
+    queryFn: async () => {
+      const body = await forumRequest<Report[]>(`/reports?${query.toString()}`);
+      return {
+        items: body.data,
+        page: body.meta?.page ?? page,
+        limit: body.meta?.limit ?? limit,
+        total: body.meta?.total ?? body.data.length,
+        totalPages: body.meta?.totalPages ?? 1,
+      } satisfies ForumPageResult<Report>;
+    },
   });
 }
 

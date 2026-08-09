@@ -9,7 +9,7 @@ import {
 } from "@/lib/services/forum";
 
 /**
- * GET /api/v1/forums/reports - List content reports (filter: status)
+ * GET /api/v1/forums/reports - List content reports (filter: status; page/limit)
  * Requires: forum:moderate permission
  */
 export async function GET(request: NextRequest) {
@@ -21,8 +21,20 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") ?? undefined;
-    const reports = await listReports(status);
-    return NextResponse.json(successResponse(reports));
+    const rawPage = Number.parseInt(searchParams.get("page") ?? "", 10);
+    const rawLimit = Number.parseInt(searchParams.get("limit") ?? "", 10);
+    const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+    const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 100) : 20;
+
+    const result = await listReports(status, { page, limit });
+    return NextResponse.json(
+      successResponse(result.items, {
+        page: result.page,
+        limit: result.limit,
+        total: result.total,
+        totalPages: result.totalPages,
+      }),
+    );
   } catch (error) {
     return problemResponse(forumProblemFromError(error));
   }

@@ -1,10 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Edit, Eye, FileText, MoreHorizontal, Plus, Trash2, Users } from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useHeader } from "@/contexts/dashboard-context";
-import { Plus, Search, Edit, Trash2, Eye, MoreHorizontal, FileText, Users } from "lucide-react";
-
+import {
+  DataTable,
+  DataTablePagination,
+  DataTableSearch,
+  useDataTableState,
+} from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -15,7 +21,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -25,26 +30,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-import { useLearningCourses } from "@/lib/hooks/use-learning-courses";
+import { useDeleteCourse, useLearningCoursesPage } from "@/lib/hooks/use-learning-courses";
 import type { Course } from "@/types/learning.types";
 
 export default function CourseManagementPage() {
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
-  const [searchQuery, setSearchQuery] = useState("");
+  const { state, setGlobalFilter, setPage, setPageSize } = useDataTableState();
+  const search = state.globalFilter ?? "";
+
+  // Search is server-side; the courses route has no sort param, so sorting is manual.
+  const {
+    data: pageData,
+    isPending,
+    isFetching,
+    error,
+    refetch,
+  } = useLearningCoursesPage({
+    search: search || undefined,
+    page: state.page,
+    limit: state.pageSize,
+  });
+  const courses = pageData?.courses ?? [];
+  const totalPages = Math.max(1, pageData?.totalPages ?? 1);
+  const totalStudents = courses.reduce((sum, course) => sum + course.students, 0);
+
+  const deleteMutation = useDeleteCourse();
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
-  const [isDeletingCourse, setIsDeletingCourse] = useState(false);
-  const { courses, loading, error, deleteCourse } = useLearningCourses();
+  const isDeletingCourse = deleteMutation.isPending;
 
   useEffect(() => {
     setHeader({
@@ -57,22 +71,94 @@ export default function CourseManagementPage() {
     };
   }, [setHeader, clearHeader]);
 
-  const filteredCourses = courses.filter((course) =>
-    course.title.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
   const confirmDeleteCourse = async () => {
     if (!courseToDelete) return;
     try {
-      setIsDeletingCourse(true);
-      await deleteCourse(courseToDelete.id);
+      await deleteMutation.mutateAsync(courseToDelete.id);
       setCourseToDelete(null);
     } catch {
       // The hook already toasts the failure; keep the dialog open to retry.
-    } finally {
-      setIsDeletingCourse(false);
     }
   };
+
+  const columns: ColumnDef<Course>[] = [
+    {
+      accessorKey: "title",
+      header: "Title",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex flex-col font-medium">
+          <span>{row.original.title}</span>
+          <span className="text-xs font-normal text-muted-foreground">{row.original.category}</span>
+        </div>
+      ),
+    },
+    {
+      id: "status",
+      header: "Status",
+      enableSorting: false,
+      cell: () => (
+        // Course records carry no status field today; the wire shape is always published.
+        <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
+          Published
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "level",
+      header: "Level",
+      enableSorting: false,
+    },
+    {
+      accessorKey: "students",
+      header: () => <span className="block text-right">Students</span>,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <span className="block text-right">{row.original.students.toLocaleString()}</span>
+      ),
+    },
+    {
+      accessorKey: "rating",
+      header: () => <span className="block text-right">Rating</span>,
+      enableSorting: false,
+      cell: ({ row }) => <span className="block text-right">{row.original.rating}</span>,
+    },
+    {
+      id: "actions",
+      enableSorting: false,
+      enableHiding: false,
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => router.push(`/dashboard/learning/courses/${row.original.id}`)}
+            >
+              <Eye className="mr-2 h-4 w-4" /> View
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => router.push(`/dashboard/learning/admin/${row.original.id}/edit`)}
+            >
+              <Edit className="mr-2 h-4 w-4" /> Edit
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-destructive"
+              onClick={() => setCourseToDelete(row.original)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" /> Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-8 animate-fadeInUp">
@@ -95,133 +181,58 @@ export default function CourseManagementPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{courses.length}</div>
+            <div className="text-2xl font-bold">{pageData?.total ?? courses.length}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Students
+              Total Students (this page)
             </CardTitle>
             <div className="h-8 w-8 rounded-full bg-green-50 flex items-center justify-center">
               <Users className="h-4 w-4 text-green-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {courses.reduce((sum, course) => sum + course.students, 0).toLocaleString()}
-            </div>
+            <div className="text-2xl font-bold">{totalStudents.toLocaleString()}</div>
           </CardContent>
         </Card>
       </div>
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
+
+      <DataTable
+        columns={columns}
+        data={courses}
+        loading={isPending}
+        error={error ? (error instanceof Error ? error.message : "Failed to load courses.") : null}
+        onRetry={() => void refetch()}
+        caption="Courses you manage"
+        manualSorting
+        getRowId={(course) => course.id}
+        emptyTitle={search ? "No results found." : "No courses yet. Create your first course."}
+        emptyDescription={
+          search ? "Try a different search term." : "Use the Create New Course button to begin."
+        }
+        toolbar={
+          <div className="flex items-center gap-2 py-4">
+            <DataTableSearch
+              value={search}
+              onValueChange={setGlobalFilter}
               placeholder="Search courses..."
-              className="pl-9"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-        </div>
-
-        <div className="rounded-md border bg-card">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Level</TableHead>
-                <TableHead className="text-right">Students</TableHead>
-                <TableHead className="text-right">Rating</TableHead>
-                <TableHead className="w-[80px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading && (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                    Loading courses…
-                  </TableCell>
-                </TableRow>
-              )}
-              {!loading && error && (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-destructive">
-                    {error}
-                  </TableCell>
-                </TableRow>
-              )}
-              {!loading &&
-                !error &&
-                filteredCourses.map((course) => (
-                  <TableRow key={course.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex flex-col">
-                        <span>{course.title}</span>
-                        <span className="text-xs text-muted-foreground">{course.category}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className="bg-green-500/10 text-green-600 border-green-500/20"
-                      >
-                        Published
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{course.level}</TableCell>
-                    <TableCell className="text-right">{course.students.toLocaleString()}</TableCell>
-                    <TableCell className="text-right">{course.rating}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => router.push(`/dashboard/learning/courses/${course.id}`)}
-                          >
-                            <Eye className="mr-2 h-4 w-4" /> View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              router.push(`/dashboard/learning/admin/${course.id}/edit`)
-                            }
-                          >
-                            <Edit className="mr-2 h-4 w-4" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => setCourseToDelete(course)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              {!loading && !error && filteredCourses.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                    {courses.length === 0
-                      ? "No courses yet. Create your first course."
-                      : "No results found."}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+        }
+        pagination={
+          <DataTablePagination
+            page={Math.min(state.page, totalPages)}
+            pageCount={totalPages}
+            total={pageData?.total ?? 0}
+            pageSize={state.pageSize}
+            loading={isFetching}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
+        }
+      />
 
       <AlertDialog
         open={courseToDelete !== null}

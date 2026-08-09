@@ -1,59 +1,104 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { logger } from "@/lib/logger";
-import { ActivityList } from "./_components/activity-list";
-import { ActivityPagination } from "./_components/activity-pagination";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
+import { DataTable, DataTablePagination, useDataTableState } from "@/components/data-table";
+import { getActivityIcon } from "@/lib/utils/activity-icons";
+import { formatDate } from "@/lib/utils/date-utils";
+import { cn } from "@/lib/utils";
 import type { LoginActivity, LoginActivitiesResponse } from "./_components/types";
 
+function getDeviceName(userAgent: string) {
+  // Simple device detection based on user agent
+  if (userAgent.includes("Mobile")) {
+    return "Mobile Device";
+  } else if (userAgent.includes("Tablet")) {
+    return "Tablet";
+  } else if (userAgent.includes("Windows")) {
+    return "Windows PC";
+  } else if (userAgent.includes("Mac")) {
+    return "Mac";
+  } else if (userAgent.includes("Linux")) {
+    return "Linux PC";
+  }
+  return "Unknown Device";
+}
+
+const activityColumns: ColumnDef<LoginActivity>[] = [
+  {
+    id: "device",
+    accessorFn: (row) => getDeviceName(row.userAgent),
+    header: "Device",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <div className="flex items-center gap-3">
+        {getActivityIcon(row.original.successful, row.original.deviceType)}
+        <span className="text-sm font-medium">{getDeviceName(row.original.userAgent)}</span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "successful",
+    header: "Status",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <span
+        className={cn(
+          "text-xs font-medium",
+          row.original.successful ? "text-success" : "text-destructive",
+        )}
+      >
+        {row.original.successful ? "Successful" : "Failed"}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "location",
+    header: "Location",
+    enableSorting: false,
+    cell: ({ row }) =>
+      row.original.location && row.original.location !== "Unknown"
+        ? row.original.location
+        : "Location Unknown",
+  },
+  {
+    accessorKey: "ipAddress",
+    header: "IP Address",
+    enableSorting: false,
+  },
+  {
+    accessorKey: "loginAt",
+    header: "Date",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {formatDate(row.original.loginAt, "MMM d, yyyy h:mm a")}
+      </span>
+    ),
+  },
+];
+
 export default function LoginActivitiesPage() {
-  const [activities, setActivities] = useState<LoginActivity[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
+  const { state, setPage, setPageSize } = useDataTableState({ defaultPageSize: 10 });
 
-  useEffect(() => {
-    fetchLoginActivities(currentPage);
-  }, [currentPage]);
-
-  const fetchLoginActivities = async (page: number) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // In a real implementation, you would get the user ID from the session
-      const userId = "user-id-placeholder"; // This would come from authentication
-
-      const response = await fetch(`/api/v1/auth/login-activities?page=${page}&limit=10`, {
-        headers: {
-          "x-user-id": userId,
-        },
-      });
-
-      const data: LoginActivitiesResponse = await response.json();
-
-      if (data.success) {
-        setActivities(data.data.activities);
-        setTotalPages(data.data.pagination.pages);
-        setTotalItems(data.data.pagination.total);
-      } else {
-        setError(data.message || "Failed to fetch login activities");
+  // Read-only audit list: the route scopes results to the session user, so
+  // only page/limit travel to the API.
+  const { data, isPending, isFetching, error, refetch } = useQuery({
+    queryKey: ["login-activities", state.page, state.pageSize],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/v1/auth/login-activities?page=${state.page}&limit=${state.pageSize}`,
+      );
+      const body: LoginActivitiesResponse = await response.json();
+      if (!body.success) {
+        throw new Error(body.message || "Failed to fetch login activities");
       }
-    } catch (err) {
-      setError("An error occurred while fetching login activities");
-      logger.error("Failed to fetch login activities", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return body.data;
+    },
+    placeholderData: keepPreviousData,
+  });
 
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
+  const totalPages = Math.max(1, data?.pagination.pages ?? 1);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -64,48 +109,28 @@ export default function LoginActivitiesPage() {
         </p>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      ) : error ? (
-        <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-destructive"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-destructive">Error</h3>
-              <div className="mt-2 text-sm text-destructive">
-                <p>{error}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          <ActivityList activities={activities} />
-          {totalPages > 1 && (
-            <ActivityPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              onPageChange={handlePageChange}
-            />
-          )}
-        </>
-      )}
+      <DataTable
+        columns={activityColumns}
+        data={data?.activities ?? []}
+        loading={isPending}
+        error={
+          error ? (error instanceof Error ? error.message : "Failed to load activities.") : null
+        }
+        onRetry={() => void refetch()}
+        caption="Login attempts on your account"
+        getRowId={(activity) => activity.id}
+        pagination={
+          <DataTablePagination
+            page={Math.min(state.page, totalPages)}
+            pageCount={totalPages}
+            total={data?.pagination.total ?? 0}
+            pageSize={state.pageSize}
+            loading={isFetching}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
+        }
+      />
     </div>
   );
 }

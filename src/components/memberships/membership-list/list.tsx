@@ -5,7 +5,16 @@ import { MemberCard } from "../member-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Users, X, Loader2 } from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Users, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { countActiveFilters, parseSortValue } from "./helpers";
 import ListHeader from "./list-header";
@@ -15,13 +24,15 @@ import type { MembershipListProps } from "./types";
 export function MembershipList({
   members,
   isLoading,
+  isFetching,
   total,
+  totalPages,
+  page,
+  onPageChange,
   filters,
   sort,
   onSortChange,
   onClearFilters,
-  onLoadMore,
-  hasMore,
   className,
 }: MembershipListProps) {
   const [isGridView, setIsGridView] = useState(true);
@@ -94,44 +105,54 @@ export function MembershipList({
         </Card>
       )}
 
-      {/* Load More Section */}
-      {hasMore && !isLoading && members.length > 0 && (
-        <div className="flex flex-col items-center gap-3 pt-4">
-          <div className="text-sm text-muted-foreground">
-            Showing {members.length} of {total} members
+      {/* Server-side pagination (replaces load-more) */}
+      {members.length > 0 && (
+        <div className={cn("space-y-3 pt-4", isFetching && "opacity-70 transition-opacity")}>
+          <div className="text-center text-sm text-muted-foreground">
+            Page {page} of {totalPages} · {total} member{total === 1 ? "" : "s"} total
           </div>
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={onLoadMore}
-            disabled={!onLoadMore}
-            className="min-w-[200px] font-medium"
-          >
-            Load More Members
-          </Button>
-        </div>
-      )}
-
-      {/* Loading More Indicator */}
-      {isLoading && members.length > 0 && (
-        <div className="flex justify-center pt-6">
-          <Card className="border-dashed">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <Loader2 className="size-5 animate-spin text-primary" />
-                <span className="font-medium">Loading more members...</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Bottom Info Bar */}
-      {members.length > 0 && !hasMore && (
-        <div className="flex justify-center pt-4">
-          <div className="text-sm text-muted-foreground px-4 py-2 rounded-full bg-muted/50">
-            All {total} members loaded
-          </div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => onPageChange(Math.max(1, page - 1))}
+                  aria-disabled={page <= 1}
+                  className={cn(page <= 1 && "pointer-events-none opacity-50")}
+                />
+              </PaginationItem>
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                .reduce<(number | "ellipsis")[]>((acc, p, idx, list) => {
+                  if (idx > 0 && p - (list[idx - 1] as number) > 1) acc.push("ellipsis");
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((entry, idx) =>
+                  entry === "ellipsis" ? (
+                    <PaginationItem key={`ellipsis-${idx}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={entry}>
+                      <PaginationLink
+                        onClick={() => onPageChange(entry)}
+                        isActive={entry === page}
+                        aria-current={entry === page ? "page" : undefined}
+                      >
+                        {entry}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ),
+                )}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+                  aria-disabled={page >= totalPages}
+                  className={cn(page >= totalPages && "pointer-events-none opacity-50")}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       )}
     </div>

@@ -1,11 +1,25 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search, Users } from "lucide-react";
+/**
+ * Event registrations admin — server-paginated DataTable (UI-09 Tier A).
+ * Page/search/status travel to GET /api/v1/events/:id/registrations instead
+ * of fetching a silent 100-row cap and filtering in the browser.
+ */
+
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Users } from "lucide-react";
 import { useHeader } from "@/contexts/dashboard-context";
 import { getEvents } from "@/lib/services/event";
 import { formatDate } from "@/lib/utils/event-utils";
+import {
+  DataTable,
+  DataTableFacetedFilter,
+  DataTablePagination,
+  DataTableSearch,
+  useDataTableState,
+} from "@/components/data-table";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -17,7 +31,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -27,14 +40,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   cancelEventRegistrationAdmin,
   fetchEventRegistrations,
@@ -51,17 +56,31 @@ const CANCELABLE_STATUSES: Partial<Record<RegistrationStatusDb, true>> = {
   WAITLISTED: true,
 };
 
+/**
+ * Selector cap, not a table cap: the event dropdown intentionally lists at
+ * most this many events. The registrations table itself paginates fully
+ * server-side.
+ */
+const EVENT_SELECTOR_LIMIT = 100;
+
+const STATUS_FACET_OPTIONS = (
+  Object.keys(REGISTRATION_STATUS_LABELS) as RegistrationStatusDb[]
+).map((status) => ({ value: status, label: REGISTRATION_STATUS_LABELS[status] }));
+
 export default function EventRegistrationsPage() {
   const { setHeader, clearHeader } = useHeader();
   const queryClient = useQueryClient();
 
   const [selectedEventId, setSelectedEventId] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [actionError, setActionError] = useState<string | null>(null);
   // Admin cancel confirmation (AlertDialog+reason pattern from users/roles).
   const [cancelTarget, setCancelTarget] = useState<RegistrationDto | null>(null);
   const [cancelReason, setCancelReason] = useState("");
+
+  const { state, setGlobalFilter, setColumnFilters, setPage, setPageSize } = useDataTableState({
+    defaultPageSize: 20,
+    filterParams: { status: "status" },
+  });
 
   useEffect(() => {
     setHeader({
@@ -75,7 +94,7 @@ export default function EventRegistrationsPage() {
 
   const { data: eventsData } = useQuery({
     queryKey: ["admin-events-for-registrations"],
-    queryFn: () => getEvents(undefined, 1, 100),
+    queryFn: () => getEvents(undefined, 1, EVENT_SELECTOR_LIMIT),
   });
   const events = eventsData?.events ?? [];
 
@@ -87,11 +106,43 @@ export default function EventRegistrationsPage() {
 
   const selectedEvent = events.find((eventItem) => eventItem.id === selectedEventId);
 
-  const { data: registrationsData, isLoading } = useQuery({
-    queryKey: ["event-registrations", selectedEventId],
-    queryFn: () => fetchEventRegistrations(selectedEventId, { limit: 100 }),
+  const statusFilter = useMemo<RegistrationStatusDb[]>(
+    () =>
+      ((state.columnFilters.find((filter) => filter.id === "status")?.value as string[]) ??
+        []) as RegistrationStatusDb[],
+    [state.columnFilters],
+  );
+
+  const registrationsQuery = useQuery({
+    queryKey: [
+      "event-registrations",
+      selectedEventId,
+      state.page,
+      state.pageSize,
+      statusFilter,
+      state.globalFilter,
+    ],
+    queryFn: () =>
+      fetchEventRegistrations(selectedEventId, {
+        status: statusFilter.length > 0 ? statusFilter : undefined,
+        search: state.globalFilter.trim() || undefined,
+        page: state.page,
+        limit: state.pageSize,
+      }),
     enabled: Boolean(selectedEventId),
+    placeholderData: keepPreviousData,
   });
+
+  const registrations = registrationsQuery.data;
+  const totalPages = Math.max(1, registrations?.totalPages ?? 1);
+  const safePage = Math.min(state.page, totalPages);
+
+  // A page that outlives its result set (rows canceled away) snaps back.
+  useEffect(() => {
+    if (registrations && state.page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [registrations, state.page, totalPages, setPage]);
 
   const cancelMutation = useMutation({
     mutationFn: ({ registrationId, reason }: { registrationId: string; reason?: string }) =>
@@ -108,26 +159,111 @@ export default function EventRegistrationsPage() {
     },
   });
 
-  const registrations = useMemo(() => {
-    const items = registrationsData?.items ?? [];
-    const term = searchQuery.trim().toLowerCase();
-    return items.filter((registration) => {
-      if (statusFilter !== "all" && registration.status !== statusFilter) return false;
-      if (!term) return true;
-      return (
-        registration.user?.name.toLowerCase().includes(term) ||
-        registration.user?.email.toLowerCase().includes(term) ||
-        registration.user?.username.toLowerCase().includes(term)
-      );
-    });
-  }, [registrationsData, searchQuery, statusFilter]);
+  const columns = useMemo<ColumnDef<RegistrationDto>[]>(
+    () => [
+      {
+        id: "attendee",
+        accessorFn: (row) => row.user?.name ?? row.user?.username ?? "",
+        header: "Attendee",
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className="flex flex-col">
+            <span className="text-base font-semibold">
+              {row.original.user?.name ?? row.original.user?.username ?? "Unknown user"}
+            </span>
+            <span className="text-xs text-muted-foreground">{row.original.user?.email}</span>
+          </div>
+        ),
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        enableSorting: false,
+        cell: ({ row }) => (
+          <Badge
+            variant="outline"
+            className={REGISTRATION_STATUS_BADGE_STYLES[row.original.status]}
+          >
+            {REGISTRATION_STATUS_LABELS[row.original.status]}
+          </Badge>
+        ),
+      },
+      {
+        id: "registeredAt",
+        accessorFn: (row) => row.registeredAt,
+        header: "Registered",
+        enableSorting: false,
+        cell: ({ row }) => formatDate(new Date(row.original.registeredAt)),
+      },
+      {
+        accessorKey: "notes",
+        header: "Notes",
+        enableSorting: false,
+        cell: ({ row }) =>
+          row.original.notes ? (
+            <span
+              className="text-sm text-muted-foreground truncate max-w-[220px] inline-block align-middle"
+              title={row.original.notes}
+            >
+              {row.original.notes}
+            </span>
+          ) : (
+            <span className="text-sm text-muted-foreground">—</span>
+          ),
+      },
+      {
+        id: "actions",
+        header: () => <span className="sr-only">Actions</span>,
+        enableSorting: false,
+        enableHiding: false,
+        cell: ({ row }) =>
+          CANCELABLE_STATUSES[row.original.status] ? (
+            <div className="text-right">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setCancelTarget(row.original);
+                  setCancelReason("");
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          ) : (
+            <span className="text-sm text-muted-foreground">—</span>
+          ),
+      },
+    ],
+    [],
+  );
+
+  // Facet counts reflect the loaded page in manual mode (the API does not
+  // return cross-status aggregates).
+  const facetCounts = useCallback(
+    (columnId: string) => {
+      const counts = new Map<string, number>();
+      if (columnId !== "status") return counts;
+      for (const registration of registrations?.items ?? []) {
+        counts.set(registration.status, (counts.get(registration.status) ?? 0) + 1);
+      }
+      return counts;
+    },
+    [registrations],
+  );
 
   return (
     <div className="space-y-6 animate-fadeInUp">
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
         <div className="flex items-center gap-3 w-full md:w-auto">
           <Users className="h-5 w-5 text-muted-foreground shrink-0" />
-          <Select value={selectedEventId} onValueChange={setSelectedEventId}>
+          <Select
+            value={selectedEventId}
+            onValueChange={(eventId) => {
+              setSelectedEventId(eventId);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="w-full md:w-[320px]">
               <SelectValue placeholder="Select an event" />
             </SelectTrigger>
@@ -141,39 +277,14 @@ export default function EventRegistrationsPage() {
           </Select>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search attendees..."
-              className="pl-9"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+        {selectedEvent && (
+          <div className="text-sm text-muted-foreground">
+            {registrations?.total ?? 0} registration
+            {(registrations?.total ?? 0) === 1 ? "" : "s"} for{" "}
+            <span className="font-medium text-foreground">{selectedEvent.title}</span>
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-[160px]">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              {(Object.keys(REGISTRATION_STATUS_LABELS) as RegistrationStatusDb[]).map((status) => (
-                <SelectItem key={status} value={status}>
-                  {REGISTRATION_STATUS_LABELS[status]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        )}
       </div>
-
-      {selectedEvent && (
-        <div className="text-sm text-muted-foreground">
-          {registrationsData?.total ?? 0} registration
-          {(registrationsData?.total ?? 0) === 1 ? "" : "s"} for{" "}
-          <span className="font-medium text-foreground">{selectedEvent.title}</span>
-        </div>
-      )}
 
       {actionError && (
         <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
@@ -181,89 +292,64 @@ export default function EventRegistrationsPage() {
         </div>
       )}
 
-      <div className="rounded-md border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Attendee</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Registered</TableHead>
-              <TableHead>Notes</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading && (
-              <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  Loading registrations...
-                </TableCell>
-              </TableRow>
-            )}
-            {!isLoading &&
-              registrations.map((registration) => (
-                <TableRow key={registration.id}>
-                  <TableCell className="font-medium">
-                    <div className="flex flex-col">
-                      <span className="text-base font-semibold">
-                        {registration.user?.name ?? registration.user?.username ?? "Unknown user"}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {registration.user?.email}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={REGISTRATION_STATUS_BADGE_STYLES[registration.status]}
-                    >
-                      {REGISTRATION_STATUS_LABELS[registration.status]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{formatDate(new Date(registration.registeredAt))}</TableCell>
-                  <TableCell>
-                    {registration.notes ? (
-                      <span
-                        className="text-sm text-muted-foreground truncate max-w-[220px] inline-block align-middle"
-                        title={registration.notes}
-                      >
-                        {registration.notes}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {CANCELABLE_STATUSES[registration.status] ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setCancelTarget(registration);
-                          setCancelReason("");
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            {!isLoading && registrations.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  {selectedEventId
-                    ? "No registrations found for this event."
-                    : "Select an event to view registrations."}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={registrations?.items ?? []}
+        loading={registrationsQuery.isPending}
+        error={
+          registrationsQuery.error
+            ? registrationsQuery.error instanceof Error
+              ? registrationsQuery.error.message
+              : "Failed to load registrations."
+            : null
+        }
+        onRetry={() => void registrationsQuery.refetch()}
+        caption={`Registrations for ${selectedEvent?.title ?? "the selected event"}`}
+        manualSorting
+        manualFiltering
+        globalFilter={state.globalFilter}
+        onGlobalFilterChange={(updater) =>
+          setGlobalFilter(typeof updater === "function" ? updater(state.globalFilter) : updater)
+        }
+        columnFilters={state.columnFilters}
+        onColumnFiltersChange={(updater) =>
+          setColumnFilters(typeof updater === "function" ? updater(state.columnFilters) : updater)
+        }
+        getFacetedUniqueValues={facetCounts}
+        getRowId={(row) => row.id}
+        emptyTitle={selectedEventId ? "No registrations found for this event" : "Select an event"}
+        emptyDescription={
+          selectedEventId
+            ? "Try adjusting the search or status filter."
+            : "Pick an event above to view its registrations."
+        }
+        toolbar={(table) => (
+          <>
+            <DataTableSearch
+              value={state.globalFilter}
+              onValueChange={setGlobalFilter}
+              placeholder="Search attendees..."
+              id="registrations-search"
+            />
+            <DataTableFacetedFilter
+              column={table.getColumn("status")}
+              title="Status"
+              options={STATUS_FACET_OPTIONS}
+            />
+          </>
+        )}
+        pagination={
+          <DataTablePagination
+            page={safePage}
+            pageCount={totalPages}
+            total={registrations?.total ?? 0}
+            pageSize={state.pageSize}
+            loading={registrationsQuery.isFetching}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
+        }
+      />
 
       {/* Cancel confirmation — mirrors the users/roles AlertDialog+reason flow. */}
       <AlertDialog

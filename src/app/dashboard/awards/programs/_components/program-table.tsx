@@ -1,19 +1,8 @@
 "use client";
 
 import { format } from "date-fns";
-import { Trophy, X } from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { EmptyState } from "@/components/ui/empty-state";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import type { AwardProgram } from "@/types/award.types";
 import {
   CATEGORY_BADGE_CLASSES,
@@ -22,80 +11,68 @@ import {
   formatEnumLabel,
 } from "./program-utils";
 
-interface ProgramTableProps {
-  programs: AwardProgram[];
-  hasActiveFilters: boolean;
-  clearFilters: () => void;
-}
-
-export function ProgramTable({ programs, hasActiveFilters, clearFilters }: ProgramTableProps) {
-  return (
-    <Card>
-      <CardContent className="p-0">
-        {programs.length === 0 ? (
-          <EmptyState
-            icon={<Trophy className="h-10 w-10 text-muted-foreground" />}
-            title={hasActiveFilters ? "No programs match your filters" : "No award programs yet"}
-            description={
-              hasActiveFilters
-                ? "Try adjusting the status, category, or search terms."
-                : "Award programs created through the awards API will appear here."
-            }
-            actions={
-              hasActiveFilters ? (
-                <Button variant="outline" onClick={clearFilters}>
-                  <X className="h-4 w-4" />
-                  Clear filters
-                </Button>
-              ) : undefined
-            }
-          />
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Program</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Nominations</TableHead>
-                <TableHead>Nomination Window</TableHead>
-                <TableHead>Award Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {programs.map((program) => (
-                <TableRow key={program.id}>
-                  <TableCell className="max-w-xs">
-                    <div className="font-medium">{program.name}</div>
-                    {program.description && (
-                      <div className="truncate text-sm text-muted-foreground">
-                        {program.description}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={CATEGORY_BADGE_CLASSES[program.category]}>
-                      {formatEnumLabel(program.category)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={STATUS_BADGE_VARIANTS[program.status]}>
-                      {formatEnumLabel(program.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">{program.nominationCount}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {formatDateRange(program)}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {program.awardDate ? format(program.awardDate, "MMM d, yyyy") : "—"}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+/**
+ * Award program columns for the DataTable. Sorting is fixed server-side
+ * (name asc), so every column disables sorting; status/category ids double
+ * as the facet filter column ids.
+ */
+export const programColumns: ColumnDef<AwardProgram>[] = [
+  {
+    id: "name",
+    accessorKey: "name",
+    header: "Program",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <div className="max-w-xs">
+        <div className="font-medium">{row.original.name}</div>
+        {row.original.description && (
+          <div className="truncate text-sm text-muted-foreground">{row.original.description}</div>
         )}
-      </CardContent>
-    </Card>
-  );
-}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "category",
+    header: "Category",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <Badge variant="outline" className={CATEGORY_BADGE_CLASSES[row.original.category]}>
+        {formatEnumLabel(row.original.category)}
+      </Badge>
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <Badge variant={STATUS_BADGE_VARIANTS[row.original.status]}>
+        {formatEnumLabel(row.original.status)}
+      </Badge>
+    ),
+  },
+  {
+    accessorKey: "nominationCount",
+    header: () => <span className="block text-right">Nominations</span>,
+    enableSorting: false,
+    cell: ({ getValue }) => <span className="block text-right">{getValue<number>()}</span>,
+  },
+  {
+    id: "nominationWindow",
+    header: "Nomination Window",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">{formatDateRange(row.original)}</span>
+    ),
+  },
+  {
+    id: "awardDate",
+    header: "Award Date",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {row.original.awardDate ? format(row.original.awardDate, "MMM d, yyyy") : "—"}
+      </span>
+    ),
+  },
+];

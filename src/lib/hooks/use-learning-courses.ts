@@ -10,7 +10,7 @@
  */
 
 import { useMemo } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { apiFetch, ApiClientError } from "@/lib/api-client";
 import type { Course } from "@/types/learning.types";
@@ -146,5 +146,74 @@ export function useCourse(id: string | undefined) {
       return toCourseUi(data);
     },
     enabled: Boolean(id),
+  });
+}
+
+/** Query for the server-paginated admin list (search/category/level are server-side). */
+export interface LearningCoursesPageQuery {
+  search?: string;
+  category?: string;
+  level?: string;
+  page: number;
+  limit: number;
+}
+
+export interface LearningCoursesPage {
+  courses: Course[];
+  total: number;
+  totalPages: number;
+  page: number;
+}
+
+/** Server-paginated course list for the DataTable admin surface. */
+export function useLearningCoursesPage({
+  search,
+  category,
+  level,
+  page,
+  limit,
+}: LearningCoursesPageQuery) {
+  return useQuery({
+    queryKey: [
+      "learning",
+      "courses",
+      "page",
+      { search: search ?? "", category: category ?? "", level: level ?? "", page, limit },
+    ],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (category) params.set("category", category);
+      if (level) params.set("level", level);
+      params.set("page", String(page));
+      params.set("limit", String(limit));
+      const { data, meta } = await apiFetch<WireCourse[]>(
+        `/api/v1/learning/courses?${params.toString()}`,
+      );
+      return {
+        courses: data.map(toCourseUi),
+        total: meta?.total ?? data.length,
+        totalPages: meta?.totalPages ?? 1,
+        page: meta?.page ?? page,
+      } satisfies LearningCoursesPage;
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+/** Standalone delete mutation for surfaces that paginate (e.g. the admin DataTable). */
+export function useDeleteCourse() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await apiFetch(`/api/v1/learning/courses/${id}`, { method: "DELETE" });
+    },
+    onSuccess: () => {
+      toast.success("Course deleted");
+      queryClient.invalidateQueries({ queryKey: ["learning", "courses"] });
+    },
+    onError: (error) => {
+      toast.error(error instanceof ApiClientError ? error.message : "Failed to delete course");
+    },
   });
 }

@@ -4,20 +4,29 @@ import { MembershipFilter } from "@/components/memberships/membership-filter";
 import { MembershipList } from "@/components/memberships/membership-list";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useMemberships } from "@/lib/hooks/use-memberships";
-import { MembershipFilter as MembershipFilterType, MembershipSort } from "@/types/membership.types";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function MembershipDirectory() {
-  const { members, error, total, hasMore, filters, sort, updateFilters, updateSort, loadMore } =
-    useMemberships({
-      pageSize: 12,
-      initialSort: { field: "name", direction: "asc" },
-    });
+  const {
+    members,
+    error,
+    total,
+    totalPages,
+    page,
+    isFetching,
+    filters,
+    sort,
+    updateFilters,
+    updateSort,
+    setPage,
+  } = useMemberships({
+    pageSize: 12,
+    initialSort: { field: "name", direction: "asc" },
+  });
 
   const params = useParams();
   const { setHeader, clearHeader } = useHeader();
-  const [isLoading, setIsLoading] = useState(true);
   // Set header and active tab from URL parameter if available
   useEffect(() => {
     // Set the header
@@ -27,21 +36,11 @@ export default function MembershipDirectory() {
         "Browse and search through our community of members. Connect with professionals in your field and expand your network",
     });
 
-    setIsLoading(false);
-
     // Cleanup header on unmount
     return () => {
       clearHeader();
     };
   }, [params.tab, setHeader, clearHeader]);
-
-  const handleFiltersChange = (newFilters: MembershipFilterType) => {
-    updateFilters(newFilters);
-  };
-
-  const handleSortChange = (newSort: MembershipSort) => {
-    updateSort(newSort);
-  };
 
   if (error) {
     return (
@@ -65,22 +64,20 @@ export default function MembershipDirectory() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Filters */}
-      <MembershipFilter
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-        isLoading={isLoading}
-      />
+      <MembershipFilter filters={filters} onFiltersChange={updateFilters} isLoading={isFetching} />
 
-      {/* Members List */}
+      {/* Members List — server-paginated cards (UI-09 Tier A) */}
       <MembershipList
         members={members}
-        isLoading={isLoading}
+        isLoading={isFetching}
+        isFetching={isFetching}
         total={total}
+        totalPages={totalPages}
+        page={page}
+        onPageChange={setPage}
         filters={filters}
         sort={sort}
-        onSortChange={handleSortChange}
-        onLoadMore={loadMore}
-        hasMore={hasMore}
+        onSortChange={updateSort}
       />
     </div>
   );

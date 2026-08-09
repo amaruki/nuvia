@@ -10,7 +10,7 @@
  */
 
 import { useMemo } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { apiFetch, ApiClientError } from "@/lib/api-client";
 import type { Certificate } from "@/types/learning.types";
@@ -106,5 +106,75 @@ export function useCertificate(id: string | undefined) {
       return toCertificateUi(data);
     },
     enabled: Boolean(id),
+  });
+}
+
+/** Query for the server-paginated management list (search/status are server-side). */
+export interface LearningCertificatesPageQuery {
+  search?: string;
+  status?: string;
+  page: number;
+  limit: number;
+}
+
+export interface LearningCertificatesPage {
+  certificates: Certificate[];
+  total: number;
+  totalPages: number;
+  page: number;
+}
+
+/** Server-paginated certificate list for the DataTable management surface. */
+export function useLearningCertificatesPage({
+  search,
+  status,
+  page,
+  limit,
+}: LearningCertificatesPageQuery) {
+  return useQuery({
+    queryKey: [
+      "learning",
+      "certificates",
+      "page",
+      { search: search ?? "", status: status ?? "", page, limit },
+    ],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (status) params.set("status", status);
+      params.set("page", String(page));
+      params.set("limit", String(limit));
+      const { data, meta } = await apiFetch<WireCertificate[]>(
+        `/api/v1/learning/certificates?${params.toString()}`,
+      );
+      return {
+        certificates: data.map(toCertificateUi),
+        total: meta?.total ?? data.length,
+        totalPages: meta?.totalPages ?? 1,
+        page: meta?.page ?? page,
+      } satisfies LearningCertificatesPage;
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+/** Standalone revoke mutation for surfaces that paginate (e.g. the management DataTable). */
+export function useRevokeCertificate() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await apiFetch<WireCertificate>(`/api/v1/learning/certificates/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "revoked" }),
+      });
+      return toCertificateUi(data);
+    },
+    onSuccess: () => {
+      toast.success("Certificate revoked");
+      queryClient.invalidateQueries({ queryKey: ["learning", "certificates"] });
+    },
+    onError: (error) => {
+      toast.error(error instanceof ApiClientError ? error.message : "Failed to revoke certificate");
+    },
   });
 }

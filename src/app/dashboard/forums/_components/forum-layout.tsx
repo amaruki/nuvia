@@ -65,14 +65,14 @@ export function ForumLayout({
       href: "/dashboard/forums/moderation",
       icon: Shield,
       isActive: pathname === "/dashboard/forums/moderation",
-      count: moderationQueue?.length,
+      count: moderationQueue?.total,
     },
     {
       label: "User Reports",
       href: "/dashboard/forums/reports",
       icon: Flag,
       isActive: pathname === "/dashboard/forums/reports",
-      count: reports?.length,
+      count: reports?.total,
     },
   ];
 

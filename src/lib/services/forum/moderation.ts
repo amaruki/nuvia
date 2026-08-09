@@ -13,11 +13,32 @@ import type { PostDto, QueuePostDto } from "./types";
 // Moderation
 // ---------------------------------------------------------------------------
 
+export interface ModerationQueueResult {
+  items: QueuePostDto[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 /** Posts awaiting review, oldest first, with pending-report counts. */
-export async function getModerationQueue(): Promise<QueuePostDto[]> {
+export async function getModerationQueue(
+  pagination: { page?: number; limit?: number } = {},
+): Promise<ModerationQueueResult> {
+  const page = pagination.page ?? 1;
+  const limit = pagination.limit ?? 20;
+
+  const [totalRow] = await db
+    .select({ total: count() })
+    .from(forumPost)
+    .where(eq(forumPost.status, "PENDING_REVIEW"));
+  const total = totalRow?.total ?? 0;
+
   const rows = await postWithJoins()
     .where(eq(forumPost.status, "PENDING_REVIEW"))
-    .orderBy(asc(forumPost.createdAt));
+    .orderBy(asc(forumPost.createdAt))
+    .limit(limit)
+    .offset((page - 1) * limit);
 
   const reportCounts = await db
     .select({ postId: forumReport.postId, pending: count() })
@@ -26,7 +47,7 @@ export async function getModerationQueue(): Promise<QueuePostDto[]> {
     .groupBy(forumReport.postId);
   const pendingByPost = new Map(reportCounts.map((row) => [row.postId as string, row.pending]));
 
-  return rows.map((row) => {
+  const items = rows.map((row) => {
     const dto = toPostDto(row);
     return {
       id: dto.id,
@@ -39,6 +60,8 @@ export async function getModerationQueue(): Promise<QueuePostDto[]> {
       reportCount: pendingByPost.get(dto.id) ?? 0,
     };
   });
+
+  return { items, page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) };
 }
 
 export async function moderatePost(

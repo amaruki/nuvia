@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Announcement } from "@/types/announcement";
+
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -100,19 +100,19 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
   const getBannerColor = (type: string) => {
     switch (type) {
       case "banner":
-        return "bg-gradient-to-r from-purple-600 to-pink-600";
+        return "bg-gradient-to-r from-primary to-chart-2 text-primary-foreground";
       case "celebration":
-        return "bg-gradient-to-r from-yellow-500 to-orange-500";
+        return "bg-gradient-to-r from-chart-3 to-chart-5 text-primary-foreground";
       case "event":
-        return "bg-gradient-to-r from-blue-600 to-cyan-600";
+        return "bg-gradient-to-r from-chart-4 to-primary text-primary-foreground";
       default:
-        return "bg-gradient-to-r from-gray-600 to-gray-700";
+        return "bg-gradient-to-r from-muted to-muted/60 text-foreground";
     }
   };
 
   return (
     <div className={`fixed bottom-0 left-0 right-0 z-50 ${className}`}>
-      <div className={`${getBannerColor(currentBanner.type)} text-white shadow-lg`}>
+      <div className={`${getBannerColor(currentBanner.type)} shadow-lg`}>
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -147,7 +147,7 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
                     variant="ghost"
                     size="sm"
                     onClick={handlePrevious}
-                    className="text-white hover:bg-white/20 p-1 h-8 w-8"
+                    className="hover:bg-current/10 p-1 h-8 w-8"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -160,7 +160,7 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
                     variant="ghost"
                     size="sm"
                     onClick={handleNext}
-                    className="text-white hover:bg-white/20 p-1 h-8 w-8"
+                    className="hover:bg-current/10 p-1 h-8 w-8"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
@@ -171,7 +171,7 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
                 variant="ghost"
                 size="sm"
                 onClick={handleDismiss}
-                className="text-white hover:bg-white/20 p-1 h-8 w-8"
+                className="hover:bg-current/10 p-1 h-8 w-8"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -185,7 +185,7 @@ export function AnnouncementBanner({ className = "" }: AnnouncementBannerProps) 
                 <div
                   key={index}
                   className={`h-1 rounded-full transition-all duration-300 ${
-                    index === currentIndex ? "bg-white w-8" : "bg-white/40 w-4"
+                    index === currentIndex ? "bg-current w-8" : "bg-current/40 w-4"
                   }`}
                 />
               ))}

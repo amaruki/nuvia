@@ -31,13 +31,14 @@ export default function SecurityTab({ user }: SecurityTabProps) {
               <div
                 className={cn(
                   "size-8 rounded-full flex items-center justify-center",
-                  user.emailVerified
-                    ? "bg-green-100 dark:bg-green-900"
-                    : "bg-gray-100 dark:bg-gray-900",
+                  user.emailVerified ? "bg-success/15" : "bg-muted",
                 )}
               >
                 <Mail
-                  className={cn("size-4", user.emailVerified ? "text-green-600" : "text-gray-500")}
+                  className={cn(
+                    "size-4",
+                    user.emailVerified ? "text-success" : "text-muted-foreground",
+                  )}
                 />
               </div>
             </div>
@@ -52,13 +53,14 @@ export default function SecurityTab({ user }: SecurityTabProps) {
               <div
                 className={cn(
                   "size-8 rounded-full flex items-center justify-center",
-                  user.phoneVerified
-                    ? "bg-green-100 dark:bg-green-900"
-                    : "bg-gray-100 dark:bg-gray-900",
+                  user.phoneVerified ? "bg-success/15" : "bg-muted",
                 )}
               >
                 <Phone
-                  className={cn("size-4", user.phoneVerified ? "text-green-600" : "text-gray-500")}
+                  className={cn(
+                    "size-4",
+                    user.phoneVerified ? "text-success" : "text-muted-foreground",
+                  )}
                 />
               </div>
             </div>
@@ -73,17 +75,13 @@ export default function SecurityTab({ user }: SecurityTabProps) {
               <div
                 className={cn(
                   "size-8 rounded-full flex items-center justify-center",
-                  user.authStatus === "two_factor_enabled"
-                    ? "bg-purple-100 dark:bg-purple-900"
-                    : "bg-orange-100 dark:bg-orange-900",
+                  user.authStatus === "two_factor_enabled" ? "bg-info/15" : "bg-warning/15",
                 )}
               >
                 <Key
                   className={cn(
                     "size-4",
-                    user.authStatus === "two_factor_enabled"
-                      ? "text-purple-600"
-                      : "text-orange-600",
+                    user.authStatus === "two_factor_enabled" ? "text-info" : "text-warning",
                   )}
                 />
               </div>
@@ -100,15 +98,13 @@ export default function SecurityTab({ user }: SecurityTabProps) {
               <div
                 className={cn(
                   "size-8 rounded-full flex items-center justify-center",
-                  user.status === UserStatus.ACTIVE
-                    ? "bg-green-100 dark:bg-green-900"
-                    : "bg-gray-100 dark:bg-gray-900",
+                  user.status === UserStatus.ACTIVE ? "bg-success/15" : "bg-muted",
                 )}
               >
                 <Shield
                   className={cn(
                     "size-4",
-                    user.status === UserStatus.ACTIVE ? "text-green-600" : "text-gray-500",
+                    user.status === UserStatus.ACTIVE ? "text-success" : "text-muted-foreground",
                   )}
                 />
               </div>

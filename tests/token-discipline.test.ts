@@ -28,6 +28,9 @@
  *       palette dark: overrides; the emails resolve their colors through the
  *       shared email-theme tailwind config (email clients never load
  *       globals.css); the shared footer rides the same theme.
+ *   (h) Wave 4: user stats, the security tab, and the announcement banner
+ *       gradients carry zero raw palette classes; banner gradient stops use
+ *       token colors, not raw palette stops.
  *
  * Run ONLY this file: `bun test tests/token-discipline.test.ts`.
  */
@@ -554,5 +557,35 @@ describe("wave-3 tier map and email templates migrated off raw palette", () => {
   test("shared email footer stays on the email theme", () => {
     const source = src("src/components/email-template/shared-footer.tsx");
     expect(source.match(RAW_PALETTE), "shared-footer palette classes").toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// (h) Wave 4: user stats, security tab, announcement banner gradients
+// ---------------------------------------------------------------------------
+
+const BADGE_MAP_FILES_WAVE4 = [
+  "src/components/users/user-stats.tsx",
+  "src/components/users/user-detail-modal/security-tab.tsx",
+  "src/components/content/announcement-banner.tsx",
+];
+
+describe("wave-4 stats, security tab, and banner migrated off raw palette", () => {
+  for (const file of BADGE_MAP_FILES_WAVE4) {
+    const source = src(file);
+
+    test(`${file}: zero raw palette classes`, () => {
+      expect(source.match(RAW_PALETTE), `${file} palette classes`).toBeNull();
+    });
+
+    test(`${file}: no palette dark: overrides (tokens adapt per theme)`, () => {
+      expect(source).not.toMatch(/dark:(bg|text|border)-[a-z]+-\d{2,3}\b/);
+    });
+  }
+
+  test("announcement-banner gradient stops use token colors", () => {
+    const source = src("src/components/content/announcement-banner.tsx");
+    expect(source).not.toMatch(/\b(from|to|via)-[a-z]+-\d{2,3}\b/);
+    expect(source).toContain("getBannerColor");
   });
 });

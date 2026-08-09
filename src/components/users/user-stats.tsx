@@ -15,7 +15,6 @@ import {
   Activity,
   Crown,
   ShieldCheck,
-  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -49,12 +48,12 @@ function StatCard({ title, value, description, icon, trend, className }: StatCar
         {trend && (
           <div className="flex items-center gap-1 mt-2">
             <TrendingUp
-              className={cn("size-3", trend.isPositive ? "text-green-500" : "text-red-500")}
+              className={cn("size-3", trend.isPositive ? "text-success" : "text-destructive")}
             />
             <span
               className={cn(
                 "text-xs font-medium",
-                trend.isPositive ? "text-green-500" : "text-red-500",
+                trend.isPositive ? "text-success" : "text-destructive",
               )}
             >
               {trend.value}
@@ -172,9 +171,9 @@ export function UserStats({ stats, className }: UserStatsProps) {
                   <div
                     className={cn(
                       "size-2 rounded-full",
-                      role === "admin" && "bg-red-500",
-                      role === "moderator" && "bg-indigo-500",
-                      role === "member" && "bg-green-500",
+                      role === "admin" && "bg-chart-1",
+                      role === "moderator" && "bg-chart-3",
+                      role === "member" && "bg-chart-2",
                     )}
                   />
                   <span className="font-medium capitalize">{role}</span>
@@ -204,20 +203,20 @@ export function UserStats({ stats, className }: UserStatsProps) {
             <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">User Health</p>
-                <p className="text-lg font-bold text-green-600">{activePercentage}% Active</p>
+                <p className="text-lg font-bold text-success">{activePercentage}% Active</p>
               </div>
-              <div className="size-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                <UserCheck className="size-5 text-green-600" />
+              <div className="size-10 rounded-full bg-success/15 flex items-center justify-center">
+                <UserCheck className="size-5 text-success" />
               </div>
             </div>
 
             <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Security Score</p>
-                <p className="text-lg font-bold text-blue-600">{twoFactorPercentage}% 2FA</p>
+                <p className="text-lg font-bold text-info">{twoFactorPercentage}% 2FA</p>
               </div>
-              <div className="size-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                <Key className="size-5 text-blue-600" />
+              <div className="size-10 rounded-full bg-info/15 flex items-center justify-center">
+                <Key className="size-5 text-info" />
               </div>
             </div>
           </div>

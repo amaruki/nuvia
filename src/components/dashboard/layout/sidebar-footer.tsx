@@ -23,6 +23,7 @@ import { useSession } from "@/hooks/use-session";
 import { useState } from "react";
 import { logoutAction } from "@/lib/actions/auth.actions";
 import { logger } from "@/lib/logger";
+import { toast } from "sonner";
 import { useSidebar } from "@/components/ui/sidebar";
 
 interface SidebarFooterComponentProps {
@@ -31,7 +32,7 @@ interface SidebarFooterComponentProps {
 
 export function SidebarFooterComponent({ className }: SidebarFooterComponentProps) {
   const router = useRouter();
-  const { user, isPending: status } = useSession();
+  const { user, isPending: _status } = useSession();
   const { isMobile } = useSidebar();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -53,11 +54,11 @@ export function SidebarFooterComponent({ className }: SidebarFooterComponentProp
         router.refresh();
       } else {
         logger.error("Logout failed", result.message);
-        alert(result.message || "Failed to logout");
+        toast.error(result.message || "Failed to logout");
       }
     } catch (error) {
       logger.error("Logout error", error);
-      alert("An error occurred during logout");
+      toast.error("An error occurred during logout");
     } finally {
       setIsLoggingOut(false);
     }

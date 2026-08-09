@@ -3,6 +3,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 import { AddChapterForm } from "@/components/chapters/add-chapter-form";
 import { ChaptersFilters } from "@/components/chapters/chapters-filters";
@@ -24,6 +34,8 @@ export default function OrganizationChapters() {
   const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
+  const [chapterToDelete, setChapterToDelete] = useState<Chapter | null>(null);
+  const [isDeletingChapter, setIsDeletingChapter] = useState(false);
   const { setHeader, clearHeader } = useHeader();
 
   const {
@@ -77,17 +89,20 @@ export default function OrganizationChapters() {
     }
   };
 
-  const handleDelete = async (chapter: Chapter) => {
-    if (
-      confirm(
-        `Are you sure you want to delete "${chapter.displayName}"? This action cannot be undone.`,
-      )
-    ) {
-      try {
-        await deleteChapter(chapter.id);
-      } catch (error) {
-        logger.error("Error deleting chapter", error);
-      }
+  const handleDelete = (chapter: Chapter) => {
+    setChapterToDelete(chapter);
+  };
+
+  const confirmDeleteChapter = async () => {
+    if (!chapterToDelete) return;
+    try {
+      setIsDeletingChapter(true);
+      await deleteChapter(chapterToDelete.id);
+      setChapterToDelete(null);
+    } catch (error) {
+      logger.error("Error deleting chapter", error);
+    } finally {
+      setIsDeletingChapter(false);
     }
   };
 
@@ -181,6 +196,30 @@ export default function OrganizationChapters() {
         initialData={editingChapter || undefined}
         isEditing={!!editingChapter}
       />
+
+      <AlertDialog
+        open={chapterToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open && !isDeletingChapter) setChapterToDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete "{chapterToDelete?.displayName}"?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingChapter}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={isDeletingChapter || !chapterToDelete}
+              onClick={confirmDeleteChapter}
+            >
+              {isDeletingChapter ? "Deleting..." : "Delete chapter"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

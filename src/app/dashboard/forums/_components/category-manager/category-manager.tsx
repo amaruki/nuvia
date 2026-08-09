@@ -3,6 +3,15 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { Plus } from "lucide-react";
 
@@ -31,17 +40,22 @@ export function CategoryManager() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [currentCategory, setCurrentCategory] = useState<ForumCategory | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   // Form states — "name" maps to the category's display name; the API
   // derives the unique slug from it.
   const [formData, setFormData] = useState<CategoryFormData>({ name: "", description: "" });
 
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this category?")) {
-      deleteCategory.mutate(id, {
-        onError: (error) => logger.error("Failed to delete category", error),
-      });
-    }
+    setDeleteTargetId(id);
+  };
+
+  const confirmDeleteCategory = () => {
+    if (!deleteTargetId) return;
+    deleteCategory.mutate(deleteTargetId, {
+      onSuccess: () => setDeleteTargetId(null),
+      onError: (error) => logger.error("Failed to delete category", error),
+    });
   };
 
   const handleEdit = (category: ForumCategory) => {
@@ -131,6 +145,30 @@ export function CategoryManager() {
         onFormDataChange={setFormData}
         onSave={handleUpdate}
       />
+
+      <AlertDialog
+        open={deleteTargetId !== null}
+        onOpenChange={(open) => {
+          if (!open && !deleteCategory.isPending) setDeleteTargetId(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this category?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteCategory.isPending}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={deleteCategory.isPending || !deleteTargetId}
+              onClick={confirmDeleteCategory}
+            >
+              {deleteCategory.isPending ? "Deleting..." : "Delete category"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </ForumLayout>
   );
 }

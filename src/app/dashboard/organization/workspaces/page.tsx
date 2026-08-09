@@ -2,6 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 import { AddWorkspaceForm } from "@/components/workspaces/add-workspace-form";
 import { WorkspacesFilters } from "@/components/workspaces/workspaces-filters";
@@ -21,6 +31,8 @@ export default function OrganizationWorkspaces() {
   const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingWorkspace, setEditingWorkspace] = useState<CommitteeWorkspace | null>(null);
+  const [workspaceToDelete, setWorkspaceToDelete] = useState<CommitteeWorkspace | null>(null);
+  const [isDeletingWorkspace, setIsDeletingWorkspace] = useState(false);
   const { setHeader, clearHeader } = useHeader();
 
   const {
@@ -74,15 +86,20 @@ export default function OrganizationWorkspaces() {
     }
   };
 
-  const handleDelete = async (workspace: CommitteeWorkspace) => {
-    if (
-      confirm(`Are you sure you want to delete "${workspace.name}"? This action cannot be undone.`)
-    ) {
-      try {
-        await deleteWorkspace(workspace.id);
-      } catch (error) {
-        logger.error("Error deleting workspace", error);
-      }
+  const handleDelete = (workspace: CommitteeWorkspace) => {
+    setWorkspaceToDelete(workspace);
+  };
+
+  const confirmDeleteWorkspace = async () => {
+    if (!workspaceToDelete) return;
+    try {
+      setIsDeletingWorkspace(true);
+      await deleteWorkspace(workspaceToDelete.id);
+      setWorkspaceToDelete(null);
+    } catch (error) {
+      logger.error("Error deleting workspace", error);
+    } finally {
+      setIsDeletingWorkspace(false);
     }
   };
 
@@ -148,6 +165,30 @@ export default function OrganizationWorkspaces() {
         initialData={editingWorkspace || undefined}
         isEditing={!!editingWorkspace}
       />
+
+      <AlertDialog
+        open={workspaceToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open && !isDeletingWorkspace) setWorkspaceToDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete "{workspaceToDelete?.name}"?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingWorkspace}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={isDeletingWorkspace || !workspaceToDelete}
+              onClick={confirmDeleteWorkspace}
+            >
+              {isDeletingWorkspace ? "Deleting..." : "Delete workspace"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -16,6 +16,7 @@ import { ArrowLeft, Ban, Edit, Share2, QrCode } from "lucide-react";
 import { RegistrationStatus } from "@/types/event";
 import { useEvent } from "@/lib/hooks/use-events";
 import { cancelEventRegistration } from "@/lib/services/event";
+import { toast } from "sonner";
 import type { OrganizerCredit } from "@/lib/services/member/public-profile";
 
 import { OrganizerCreditCard } from "./organizer-credit";
@@ -47,10 +48,10 @@ export function EventDetailClient({ currentUserId, organizerCredit }: EventDetai
       if (response.success) {
         await refetch();
       } else {
-        alert(response.message || "Failed to cancel registration");
+        toast.error(response.message || "Failed to cancel registration");
       }
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to cancel registration");
+      toast.error(err instanceof Error ? err.message : "Failed to cancel registration");
     }
   };
 
@@ -58,18 +59,27 @@ export function EventDetailClient({ currentUserId, organizerCredit }: EventDetai
     router.push(`/events/${eventId}/check-in`);
   };
 
-  const handleShare = (_eventId: string) => {
-    // Handle share logic
+  const handleShare = async (_eventId: string) => {
     if (navigator.share) {
-      navigator.share({
-        title: event?.title,
-        text: event?.shortDescription,
-        url: window.location.href,
-      });
+      try {
+        await navigator.share({
+          title: event?.title,
+          text: event?.shortDescription,
+          url: window.location.href,
+        });
+      } catch (error) {
+        // Dismissing the native share sheet rejects with AbortError — not a failure.
+        if (error instanceof Error && error.name === "AbortError") return;
+        toast.error("Could not share the event link");
+      }
     } else {
       // Fallback: copy to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      alert("Event link copied to clipboard!");
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Event link copied to clipboard!");
+      } catch {
+        toast.error("Could not copy the event link");
+      }
     }
   };
 

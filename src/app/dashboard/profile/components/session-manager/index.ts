@@ -8,7 +8,6 @@
  *   - session-card.tsx    current-session card
  *   - session-row.tsx     one revocable session row
  *   - session-list.tsx    other-sessions card, revoke-all button, empty state
- *   - confirm-revoke.ts   revoke-all confirmation prompt
  *   - session-helpers.ts  device/browser/location/time formatting + payload transform
  *   - types.ts            shared SessionData and props types
  */

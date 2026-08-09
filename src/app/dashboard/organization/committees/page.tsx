@@ -2,6 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 import { CommitteesOverviewCards } from "@/components/committees/committees-overview-cards";
 import { CommitteesFilters } from "@/components/committees/committees-filters";
@@ -25,6 +35,8 @@ export default function OrganizationCommittees() {
   const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCommittee, setEditingCommittee] = useState<Committee | null>(null);
+  const [committeeToDelete, setCommitteeToDelete] = useState<Committee | null>(null);
+  const [isDeletingCommittee, setIsDeletingCommittee] = useState(false);
   const { setHeader, clearHeader } = useHeader();
 
   const {
@@ -82,17 +94,20 @@ export default function OrganizationCommittees() {
     }
   };
 
-  const handleDelete = async (committee: Committee) => {
-    if (
-      confirm(
-        `Are you sure you want to delete "${committee.displayName}"? This action cannot be undone.`,
-      )
-    ) {
-      try {
-        await deleteCommittee(committee.id);
-      } catch (error) {
-        logger.error("Error deleting committee", error);
-      }
+  const handleDelete = (committee: Committee) => {
+    setCommitteeToDelete(committee);
+  };
+
+  const confirmDeleteCommittee = async () => {
+    if (!committeeToDelete) return;
+    try {
+      setIsDeletingCommittee(true);
+      await deleteCommittee(committeeToDelete.id);
+      setCommitteeToDelete(null);
+    } catch (error) {
+      logger.error("Error deleting committee", error);
+    } finally {
+      setIsDeletingCommittee(false);
     }
   };
 
@@ -172,6 +187,30 @@ export default function OrganizationCommittees() {
         initialData={editingCommittee || undefined}
         isEditing={!!editingCommittee}
       />
+
+      <AlertDialog
+        open={committeeToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open && !isDeletingCommittee) setCommitteeToDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete "{committeeToDelete?.displayName}"?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingCommittee}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={isDeletingCommittee || !committeeToDelete}
+              onClick={confirmDeleteCommittee}
+            >
+              {isDeletingCommittee ? "Deleting..." : "Delete committee"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

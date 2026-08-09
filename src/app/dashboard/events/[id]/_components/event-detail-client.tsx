@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AsyncContent } from "@/components/ui/async-content";
 import { ArrowLeft, Edit, Share2, QrCode } from "lucide-react";
+import { toast } from "sonner";
 import { RegistrationStatus } from "@/types/event";
 import { useEvent } from "@/lib/hooks/use-events";
-import { formatDateLong, formatEventTimeRange } from "@/lib/utils/event-utils";
 import { logger } from "@/lib/logger";
 
 interface EventDetailClientProps {
@@ -37,7 +37,7 @@ export function EventDetailClient({ currentUserId }: EventDetailClientProps) {
     router.push(`/events/${eventId}/register`);
   };
 
-  const handleCancelRegistration = (eventId: string) => {
+  const _handleCancelRegistration = (eventId: string) => {
     // Handle cancellation logic
     logger.info("Cancel registration for event", eventId);
   };
@@ -46,18 +46,27 @@ export function EventDetailClient({ currentUserId }: EventDetailClientProps) {
     router.push(`/events/${eventId}/check-in`);
   };
 
-  const handleShare = (eventId: string) => {
-    // Handle share logic
+  const handleShare = async (_eventId: string) => {
     if (navigator.share) {
-      navigator.share({
-        title: event?.title,
-        text: event?.shortDescription,
-        url: window.location.href,
-      });
+      try {
+        await navigator.share({
+          title: event?.title,
+          text: event?.shortDescription,
+          url: window.location.href,
+        });
+      } catch (error) {
+        // Dismissing the native share sheet rejects with AbortError — not a failure.
+        if (error instanceof Error && error.name === "AbortError") return;
+        toast.error("Could not share the event link");
+      }
     } else {
       // Fallback: copy to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      alert("Event link copied to clipboard!");
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Event link copied to clipboard!");
+      } catch {
+        toast.error("Could not copy the event link");
+      }
     }
   };
 

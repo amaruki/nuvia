@@ -4,6 +4,16 @@ import { useState, useEffect } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 import { AlertCircle, CheckCircle } from "lucide-react";
 
@@ -14,7 +24,6 @@ import {
 } from "@/lib/actions/auth.actions";
 import { logger } from "@/lib/logger";
 
-import { confirmRevokeAllOtherSessions } from "./confirm-revoke";
 import { CurrentSessionCard } from "./session-card";
 import { errorMessage, transformSessions } from "./session-helpers";
 import { OtherSessionsCard } from "./session-list";
@@ -29,6 +38,8 @@ export function SessionManager(_props: SessionManagerProps) {
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isRevoking, setIsRevoking] = useState(false);
+  const [isRevokeAllOpen, setIsRevokeAllOpen] = useState(false);
+  const [isRevokingAll, setIsRevokingAll] = useState(false);
 
   const loadSessions = async () => {
     try {
@@ -78,20 +89,22 @@ export function SessionManager(_props: SessionManagerProps) {
   };
 
   const handleRevokeAllOtherSessions = async () => {
-    if (confirmRevokeAllOtherSessions()) {
-      try {
-        const result = await revokeAllOtherSessionsAction();
-        if (result.success) {
-          setIsSuccess(true);
-          // Keep only the current session
-          setSessions(sessions.filter((s) => s.isCurrent));
-          setTimeout(() => setIsSuccess(false), 3000);
-        } else {
-          setError(result.message || "Failed to revoke other sessions");
-        }
-      } catch (err) {
-        setError(errorMessage(err, "Failed to revoke other sessions"));
+    try {
+      setIsRevokingAll(true);
+      const result = await revokeAllOtherSessionsAction();
+      if (result.success) {
+        setIsRevokeAllOpen(false);
+        setIsSuccess(true);
+        // Keep only the current session
+        setSessions(sessions.filter((s) => s.isCurrent));
+        setTimeout(() => setIsSuccess(false), 3000);
+      } else {
+        setError(result.message || "Failed to revoke other sessions");
       }
+    } catch (err) {
+      setError(errorMessage(err, "Failed to revoke other sessions"));
+    } finally {
+      setIsRevokingAll(false);
     }
   };
 
@@ -148,7 +161,7 @@ export function SessionManager(_props: SessionManagerProps) {
         sessions={otherSessions}
         isRevoking={isRevoking}
         selectedSessionId={selectedSessionId}
-        onRevokeAll={handleRevokeAllOtherSessions}
+        onRevokeAll={() => setIsRevokeAllOpen(true)}
         onRevokeSession={handleRevokeSession}
       />
 
@@ -164,6 +177,33 @@ export function SessionManager(_props: SessionManagerProps) {
           </ul>
         </CardContent>
       </Card>
+
+      {/* Revoke-all confirmation (AlertDialog contract; was a native confirm()). */}
+      <AlertDialog
+        open={isRevokeAllOpen}
+        onOpenChange={(open) => {
+          if (!open && !isRevokingAll) setIsRevokeAllOpen(false);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Revoke all other sessions?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will sign you out from all other devices.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRevokingAll}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={isRevokingAll}
+              onClick={handleRevokeAllOtherSessions}
+            >
+              {isRevokingAll ? "Revoking..." : "Revoke all"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -5,6 +5,15 @@ import Link from "next/link";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Download, Eye, Ban, Search, Filter, Award, ShieldCheck, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -31,6 +40,8 @@ export default function AdminCertificationsPage() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setHeader, clearHeader } = useHeader();
   const { certificates, loading, error, revokeCertificate } = useLearningCertificates();
+  const [certificateToRevoke, setCertificateToRevoke] = React.useState<string | null>(null);
+  const [isRevokingCertificate, setIsRevokingCertificate] = React.useState(false);
 
   useEffect(() => {
     setHeader({
@@ -51,8 +62,19 @@ export default function AdminCertificationsPage() {
   );
 
   const handleRevoke = (id: string) => {
-    if (window.confirm("Revoke this certificate? This cannot be undone.")) {
-      void revokeCertificate(id);
+    setCertificateToRevoke(id);
+  };
+
+  const confirmRevokeCertificate = async () => {
+    if (!certificateToRevoke) return;
+    try {
+      setIsRevokingCertificate(true);
+      await revokeCertificate(certificateToRevoke);
+      setCertificateToRevoke(null);
+    } catch {
+      // The hook already toasts the failure; keep the dialog open to retry.
+    } finally {
+      setIsRevokingCertificate(false);
     }
   };
 
@@ -253,6 +275,30 @@ export default function AdminCertificationsPage() {
           </Button>
         </div>
       </div>
+
+      <AlertDialog
+        open={certificateToRevoke !== null}
+        onOpenChange={(open) => {
+          if (!open && !isRevokingCertificate) setCertificateToRevoke(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Revoke this certificate?</AlertDialogTitle>
+            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRevokingCertificate}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={isRevokingCertificate || !certificateToRevoke}
+              onClick={confirmRevokeCertificate}
+            >
+              {isRevokingCertificate ? "Revoking..." : "Revoke certificate"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -83,11 +83,10 @@ export default function EventCheckInPage() {
     }
   };
 
-  const handleSearchRegistration = async (searchTerm: string) => {
-    // In a real implementation, this would call an API to search for registrations
-    // For now, we'll just mock some results
-    alert(`Searching for registrations with term: ${searchTerm}`);
-    setSearchResults([]); // Reset search results
+  const handleSearchRegistration = (_searchTerm: string) => {
+    // No registration search API exists yet — the old handler only alerted the
+    // search term. Clear stale results so the list never shows an old lookup.
+    setSearchResults([]);
   };
 
   const handleGoBack = () => {

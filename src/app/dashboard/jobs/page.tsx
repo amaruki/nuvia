@@ -38,6 +38,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { fetchJobPostings, deleteJobPosting } from "./_lib/jobs-api";
+import { DeleteJobDialog, type DeleteJobTarget } from "./_components/delete-job-dialog";
 import {
   EMPLOYMENT_TYPE_LABELS,
   formatDate,
@@ -61,6 +62,7 @@ export default function JobsAdminPage() {
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<DeleteJobTarget | null>(null);
 
   useEffect(() => {
     setHeader({
@@ -88,6 +90,7 @@ export default function JobsAdminPage() {
     mutationFn: deleteJobPosting,
     onSuccess: () => {
       setDeleteError(null);
+      setDeleteTarget(null);
       queryClient.invalidateQueries({ queryKey: ["jobs-list"] });
     },
     onError: (err) => {
@@ -100,11 +103,7 @@ export default function JobsAdminPage() {
   const totalApplicants = jobs.reduce((acc, job) => acc + job.applicationCount, 0);
 
   const handleDelete = (jobId: string, title: string) => {
-    if (
-      confirm(`Are you sure you want to delete "${title}"? This also removes its applications.`)
-    ) {
-      deleteMutation.mutate(jobId);
-    }
+    setDeleteTarget({ id: jobId, title });
   };
 
   return (
@@ -289,6 +288,15 @@ export default function JobsAdminPage() {
           </Table>
         </div>
       </div>
+
+      <DeleteJobDialog
+        target={deleteTarget}
+        isPending={deleteMutation.isPending}
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

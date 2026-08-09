@@ -6,6 +6,15 @@ import { useHeader } from "@/contexts/dashboard-context";
 import { Plus, Search, Edit, Trash2, Eye, MoreHorizontal, FileText, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -27,11 +36,14 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { useLearningCourses } from "@/lib/hooks/use-learning-courses";
+import type { Course } from "@/types/learning.types";
 
 export default function CourseManagementPage() {
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
   const [searchQuery, setSearchQuery] = useState("");
+  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
+  const [isDeletingCourse, setIsDeletingCourse] = useState(false);
   const { courses, loading, error, deleteCourse } = useLearningCourses();
 
   useEffect(() => {
@@ -48,6 +60,19 @@ export default function CourseManagementPage() {
   const filteredCourses = courses.filter((course) =>
     course.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  const confirmDeleteCourse = async () => {
+    if (!courseToDelete) return;
+    try {
+      setIsDeletingCourse(true);
+      await deleteCourse(courseToDelete.id);
+      setCourseToDelete(null);
+    } catch {
+      // The hook already toasts the failure; keep the dialog open to retry.
+    } finally {
+      setIsDeletingCourse(false);
+    }
+  };
 
   return (
     <div className="space-y-8 animate-fadeInUp">
@@ -175,13 +200,7 @@ export default function CourseManagementPage() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="text-destructive"
-                            onClick={() => {
-                              if (
-                                window.confirm(`Delete "${course.title}"? This cannot be undone.`)
-                              ) {
-                                void deleteCourse(course.id);
-                              }
-                            }}
+                            onClick={() => setCourseToDelete(course)}
                           >
                             <Trash2 className="mr-2 h-4 w-4" /> Delete
                           </DropdownMenuItem>
@@ -203,6 +222,30 @@ export default function CourseManagementPage() {
           </Table>
         </div>
       </div>
+
+      <AlertDialog
+        open={courseToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open && !isDeletingCourse) setCourseToDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete "{courseToDelete?.title}"?</AlertDialogTitle>
+            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingCourse}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={isDeletingCourse || !courseToDelete}
+              onClick={confirmDeleteCourse}
+            >
+              {isDeletingCourse ? "Deleting..." : "Delete course"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

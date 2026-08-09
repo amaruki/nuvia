@@ -23,3 +23,13 @@ export enum RegistrationStatus {
   CANCELLED = "cancelled",
   WAITLISTED = "waitlisted",
 }
+
+/**
+ * Registration window as surfaced in the public UI (UI-24).
+ *
+ * The DB event lifecycle (REGISTRATION_OPEN / REGISTRATION_CLOSED /
+ * IN_PROGRESS …) is intentionally collapsed into the four UI EventStatus
+ * buckets for admin list compatibility, so public CTAs read this derived
+ * window state instead to know whether registration is actually open.
+ */
+export type EventRegistrationWindow = "open" | "closed" | "live";

@@ -2,7 +2,7 @@
  * Utility functions for event-related operations
  */
 
-import { EventStatus, EventType, RegistrationStatus } from "@/types/event";
+import { EventRegistrationWindow, EventStatus, EventType, RegistrationStatus } from "@/types/event";
 
 // ---------------------------------------------------------------------------
 // DB <-> UI enum translation (backlog B2)
@@ -232,11 +232,59 @@ export function isEventTomorrow(date: Date): boolean {
 /**
  * Check if event registration is still open
  */
-export function isRegistrationOpen(startDate: Date, registrationDeadline?: Date): boolean {
+export function isRegistrationOpen(
+  startDate: Date,
+  registrationDeadline?: Date,
+  now: Date = new Date(),
+): boolean {
   if (registrationDeadline) {
-    return new Date() < new Date(registrationDeadline);
+    return now < registrationDeadline;
   }
-  return new Date() < new Date(startDate);
+  return now < startDate;
+}
+
+/**
+ * True registration-window state derived from the DB event lifecycle (UI-24).
+ *
+ * The UI status buckets collapse REGISTRATION_OPEN/CLOSED/IN_PROGRESS into
+ * "published", so public CTAs cannot trust event.status alone: a
+ * REGISTRATION_CLOSED event used to keep "Register Now" enabled. This helper
+ * recovers the real window from the DB lifecycle and the date rules
+ * (registration closes at registrationDeadline, or at startTime when no
+ * deadline is set).
+ *
+ * - IN_PROGRESS → "live": the event itself is running; registration is over.
+ * - REGISTRATION_CLOSED / CANCELED / COMPLETED / DRAFT → "closed".
+ * - PUBLISHED / REGISTRATION_OPEN / POSTPONED / unknown → date rule.
+ */
+export function getRegistrationWindowState(
+  dbStatus: DbEventStatus | undefined,
+  startDate: Date,
+  registrationDeadline?: Date,
+  now: Date = new Date(),
+): EventRegistrationWindow {
+  if (dbStatus === "IN_PROGRESS") return "live";
+  if (
+    dbStatus === "REGISTRATION_CLOSED" ||
+    dbStatus === "CANCELED" ||
+    dbStatus === "COMPLETED" ||
+    dbStatus === "DRAFT"
+  ) {
+    return "closed";
+  }
+  return isRegistrationOpen(startDate, registrationDeadline, now) ? "open" : "closed";
+}
+
+/** Human-facing copy for the registration window (UI-24). */
+export function getRegistrationWindowLabel(window: EventRegistrationWindow): string {
+  switch (window) {
+    case "open":
+      return "Registration open";
+    case "live":
+      return "Event in progress";
+    case "closed":
+      return "Registration closed";
+  }
 }
 
 /**

@@ -1,4 +1,5 @@
 export { EventStatus, EventType, RegistrationStatus } from "./enums";
+export type { EventRegistrationWindow } from "./enums";
 export type { Event, EventRegistration, EventCertificate, EventCheckIn } from "./event";
 export type { EventFilter } from "./filters";
 export type {

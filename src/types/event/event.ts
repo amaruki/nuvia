@@ -1,7 +1,7 @@
 // Core event entities for Nuvia community platform
 
 import { SafeUser } from "../auth.types";
-import { EventStatus, EventType, RegistrationStatus } from "./enums";
+import { EventRegistrationWindow, EventStatus, EventType, RegistrationStatus } from "./enums";
 
 export interface Event {
   id: string;
@@ -19,6 +19,7 @@ export interface Event {
   maxAttendees?: number;
   currentAttendees: number;
   registrationDeadline?: Date;
+  registrationWindow?: EventRegistrationWindow;
   organizerId: string;
   organizer?: SafeUser;
   coverImage?: string;

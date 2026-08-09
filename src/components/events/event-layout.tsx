@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useSafeBack } from "@/lib/hooks/use-safe-back";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { Event, EventStatus, EventType } from "@/types/event";
 import {
   getEventTypeColor,
   getEventStatusColor,
+  getRegistrationWindowLabel,
   formatDateLong,
   formatTime,
   formatEventType,
@@ -39,11 +40,20 @@ export function EventLayout({
   className,
   children,
 }: EventLayoutProps) {
-  const router = useRouter();
+  // Deep-linked visitors have no in-app history; back() would leave the site
+  // (UI-24 item 6), so fall back to the events list instead.
+  const goBack = useSafeBack("/events");
 
-  const handleGoBack = () => {
-    router.back();
-  };
+  /**
+   * Register CTA reflects the real registration window (UI-24 item 3): the
+   * UI status buckets collapse the DB registration lifecycle into
+   * "published", so the CTA reads the propagated registrationWindow. The
+   * fallback preserves prior behavior for events built without the window
+   * (legacy client-side create flows).
+   */
+  const registrationWindow =
+    event.registrationWindow ?? (event.status === EventStatus.PUBLISHED ? "open" : "closed");
+  const canRegister = registrationWindow === "open" && !isRegistered;
 
   return (
     <div className={cn("min-h-screen bg-background", className)}>
@@ -51,7 +61,7 @@ export function EventLayout({
       <div className="relative bg-background border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center mb-6">
-            <Button variant="ghost" onClick={handleGoBack} className="mr-4">
+            <Button variant="ghost" onClick={goBack} className="mr-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
@@ -94,12 +104,22 @@ export function EventLayout({
             {showActions && (
               <div className="flex flex-col sm:flex-row gap-3">
                 {onRegister && (
-                  <Button
-                    onClick={() => onRegister(event.id)}
-                    disabled={event.status !== EventStatus.PUBLISHED || isRegistered}
-                  >
-                    {isRegistered ? "Registered" : "Register Now"}
-                  </Button>
+                  <div className="flex flex-col gap-1">
+                    <Button onClick={() => onRegister(event.id)} disabled={!canRegister}>
+                      {isRegistered
+                        ? "Registered"
+                        : registrationWindow === "open"
+                          ? "Register Now"
+                          : getRegistrationWindowLabel(registrationWindow)}
+                    </Button>
+                    {!isRegistered && registrationWindow !== "open" && (
+                      <p className="text-muted-foreground text-xs text-center" role="status">
+                        {registrationWindow === "live"
+                          ? "This event is in progress; registration has closed."
+                          : "Registration for this event is closed."}
+                      </p>
+                    )}
+                  </div>
                 )}
 
                 {onShare && (

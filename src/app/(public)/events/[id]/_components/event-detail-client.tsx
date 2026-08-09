@@ -16,6 +16,7 @@
  */
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { EventLayout } from "@/components/events";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,8 @@ import { ArrowLeft, Ban, Edit, Share2, QrCode } from "lucide-react";
 import { RegistrationStatus } from "@/types/event";
 import type { Event, EventRegistration } from "@/types/event";
 import { cancelEventRegistration } from "@/lib/services/event";
+import { useSafeBack } from "@/lib/hooks/use-safe-back";
+import { formatEventDateTime } from "@/lib/utils/event-utils";
 import { toast } from "sonner";
 import type { OrganizerCredit } from "@/lib/services/member/public-profile";
 
@@ -34,6 +37,8 @@ export interface EventDetailData {
   event: Event;
   isRegistered: boolean;
   registration?: EventRegistration;
+  /** Same-category / overlapping-tag events, computed server-side (UI-24 item 4). */
+  similarEvents?: Event[];
 }
 
 interface EventDetailClientProps {
@@ -55,9 +60,9 @@ export function EventDetailClient({
 }: EventDetailClientProps) {
   const router = useRouter();
 
-  const handleGoBack = () => {
-    router.back();
-  };
+  // Deep-linked visitors have no in-app history; back() would leave the site
+  // (UI-24 item 6), so fall back to the events list instead.
+  const goBack = useSafeBack("/events");
 
   // Missing event: the server wrapper resolved null. Render the same
   // not-found card the client fetch used to show for this case.
@@ -69,7 +74,7 @@ export function EventDetailClient({
           <p className="text-foreground/60 mb-6">
             The event you're looking for doesn't exist or has been removed.
           </p>
-          <Button onClick={handleGoBack}>
+          <Button onClick={goBack}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Events
           </Button>
@@ -82,6 +87,7 @@ export function EventDetailClient({
   const registration = detail.registration || null;
 
   const isOrganizer = currentUserId !== null && event.organizerId === currentUserId;
+  const hasSimilarEvents = (detail.similarEvents?.length ?? 0) > 0;
 
   const handleRegister = (eventId: string) => {
     router.push(`/events/${eventId}/register`);
@@ -102,8 +108,9 @@ export function EventDetailClient({
     }
   };
 
+  // Members get the self-service flow; staff check-in stays on its own route (UI-24 item 5).
   const handleCheckIn = (eventId: string) => {
-    router.push(`/events/${eventId}/check-in`);
+    router.push(`/events/${eventId}/self-check-in`);
   };
 
   const handleShare = async (_eventId: string) => {
@@ -177,7 +184,7 @@ export function EventDetailClient({
                   className="w-full justify-start"
                 >
                   <QrCode className="h-4 w-4 mr-2" />
-                  Check In
+                  {registration?.checkedInAt ? "Checked In" : "Check In"}
                 </Button>
               )}
 
@@ -208,15 +215,28 @@ export function EventDetailClient({
           </CardContent>
         </Card>
 
-        {/* Similar Events */}
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-lg mb-4">Similar Events</h3>
-            <p className="text-foreground/60 text-sm">
-              More events like this will be shown here based on your interests.
-            </p>
-          </CardContent>
-        </Card>
+        {/* Similar events (UI-24 item 4) — hidden entirely when there are none. */}
+        {hasSimilarEvents && (
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="font-semibold text-lg mb-4">Similar Events</h3>
+              <div className="space-y-3">
+                {detail.similarEvents!.map((similar) => (
+                  <Link
+                    key={similar.id}
+                    href={`/events/${similar.id}`}
+                    className="block rounded-lg border p-3 transition-colors hover:bg-accent"
+                  >
+                    <p className="text-sm font-medium line-clamp-1">{similar.title}</p>
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      {formatEventDateTime(similar.startDate, similar.endDate)}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </EventLayout>
   );

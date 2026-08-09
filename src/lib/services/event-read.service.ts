@@ -26,6 +26,7 @@ import {
   DB_TO_UI_EVENT_STATUS,
   DB_TO_UI_EVENT_TYPE,
   DB_TO_UI_REGISTRATION_STATUS,
+  getRegistrationWindowState,
 } from "@/lib/utils/event-utils";
 import {
   Event as UiEvent,
@@ -123,6 +124,11 @@ export function toUiEvent(row: EventSelect): UiEvent {
     maxAttendees: row.capacity ?? undefined,
     currentAttendees: row.registeredCount,
     registrationDeadline: row.registrationEnd ?? undefined,
+    registrationWindow: getRegistrationWindowState(
+      row.status,
+      row.startTime,
+      row.registrationEnd ?? undefined,
+    ),
     organizerId: row.createdBy,
     tags: row.tags,
     createdAt: row.createdAt,

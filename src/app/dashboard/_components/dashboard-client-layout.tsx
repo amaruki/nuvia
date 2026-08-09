@@ -102,7 +102,10 @@ export function DashboardClientLayout({
           <div className="flex flex-col h-full">
             <DashboardHeaderWrapper user={user} />
 
-            <main className="flex-1 pb-20">
+            {/* UI-11: skip-to-content link target (see src/app/layout.tsx).
+                tabIndex={-1} lets activation of the skip link move focus
+                here without adding an extra tab stop. */}
+            <main id="main-content" tabIndex={-1} className="flex-1 pb-20">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</div>
             </main>
 

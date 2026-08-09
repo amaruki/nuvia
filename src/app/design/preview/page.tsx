@@ -61,7 +61,8 @@ export default async function DesignPreviewPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl space-y-14 px-4 py-10">
+      {/* UI-11: skip-to-content link target (see src/app/layout.tsx). */}
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl space-y-14 px-4 py-10">
         <div className="space-y-2">
           <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
             Dev-only preview, returns 404 in production

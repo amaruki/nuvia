@@ -29,7 +29,8 @@ const EventGroup = ({ events, hour }: { events: CalendarEvent[]; hour: Date }) =
                 }}
               >
                 <span className="block font-semibold truncate">{event.title}</span>
-                <span className="block text-[10px] opacity-75 mt-0.5">
+                {/* UI-11: event time raised from 10px to the 11px floor. */}
+                <span className="block text-[11px] opacity-75 mt-0.5">
                   {format(event.start, "HH:mm")} - {format(event.end, "HH:mm")}
                 </span>
               </button>

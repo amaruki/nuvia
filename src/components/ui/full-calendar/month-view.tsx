@@ -74,7 +74,8 @@ const CalendarMonthView = () => {
                           )}
                         ></span>
                         <span className="flex-1 truncate font-medium">{event.title}</span>
-                        <time className="tabular-nums text-muted-foreground text-[10px]">
+                        {/* UI-11: event time raised from 10px to the 11px floor. */}
+                        <time className="tabular-nums text-muted-foreground text-[11px]">
                           {format(event.start, "HH:mm")}
                         </time>
                       </button>

@@ -35,6 +35,13 @@ const CalendarYearView = () => {
             {format(setMonth(date, i), "MMMM", { locale })}
           </span>
 
+          {/* Day-of-week header row. UI-11 acceptance rule (docs/planning/
+              03-frontend-improvement-plan.md, Phase 4: "zero text-[10px]
+              outside calendar day-of-week headers — if kept, documented")
+              permits keeping text-[10px] here and only here: these are the
+              abbreviated weekday column headers repeated 12x across the year
+              grid's mini-months. All other calendar text-[10px] sites
+              (event-group, month-view) were raised to 11px. */}
           <div className="grid grid-cols-7 gap-1 mb-3">
             {weekDays.map((day) => (
               <div
@@ -70,7 +77,7 @@ const CalendarYearView = () => {
                     {format(_date, "d")}
                     {hasEvents && getMonth(_date) === i && (
                       <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 flex gap-0.5">
-                        {dayEvents.slice(0, 3).map((event, idx) => (
+                        {dayEvents.slice(0, 3).map((event) => (
                           <div
                             key={event.id}
                             className={cn(

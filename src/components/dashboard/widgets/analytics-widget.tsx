@@ -11,6 +11,13 @@ import { BarChart3 } from "lucide-react";
  * visitor/page-view numbers as if they were real — that mock data and its
  * fake trends were removed rather than kept behind optional props nobody
  * fills with real values.
+ *
+ * UI-11 chart a11y: no hand-built div bars remain here to retrofit (UI-01
+ * removed them), so no progressbar semantics are needed today. When an
+ * analytics source is connected, build charts with shadcn chart (plan
+ * decision D5); any interim div bars must carry role="progressbar" with
+ * aria-valuenow/min/max and an accessible name — enforced by
+ * tests/a11y-manual-fixes.test.ts.
  */
 export function AnalyticsWidget() {
   return (

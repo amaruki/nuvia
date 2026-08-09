@@ -78,8 +78,9 @@ export function EventListLayout({
         </div>
       </div>
 
-      {/* Page Content */}
-      <main className="flex-1">
+      {/* Page Content. UI-11: skip-to-content link target (see
+          src/app/layout.tsx). */}
+      <main id="main-content" tabIndex={-1} className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</div>
       </main>
     </div>

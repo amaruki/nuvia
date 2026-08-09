@@ -11,7 +11,8 @@ export default function Home() {
   return (
     <div className="min-h-[100dvh] bg-background text-foreground">
       <SiteHeader />
-      <main>
+      {/* UI-11: skip-to-content link target (see src/app/layout.tsx). */}
+      <main id="main-content" tabIndex={-1}>
         <HeroSection />
         <FeaturesSection />
         <ModulesSection />

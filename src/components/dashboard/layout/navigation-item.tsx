@@ -5,7 +5,6 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
-  SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -250,7 +249,8 @@ function SubNavigationItem({ subItem, isActive }: SubNavigationItemProps) {
           className="cursor-not-allowed justify-between gap-2"
         >
           <span>{subItem.title}</span>
-          <PreviewBadge className="h-4 px-1 text-[10px]" />
+          {/* UI-11: badge text raised from 10px to the 11px floor. */}
+          <PreviewBadge className="h-4 px-1 text-[11px]" />
         </SidebarMenuSubButton>
       </SidebarMenuSubItem>
     );
@@ -264,7 +264,7 @@ function SubNavigationItem({ subItem, isActive }: SubNavigationItemProps) {
         <Link href={subItem.path} className="flex items-center justify-between gap-2">
           <span>{subItem.title}</span>
           {subItem.badge && (
-            <Badge variant="secondary" className="h-4 min-w-4 px-1 text-[10px] shrink-0">
+            <Badge variant="secondary" className="h-4 min-w-4 px-1 text-[11px] shrink-0">
               {subItem.badge}
             </Badge>
           )}
@@ -279,8 +279,10 @@ interface NavigationBadgeProps {
 }
 
 function NavigationBadge({ badge }: NavigationBadgeProps) {
+  // UI-11: destructive token instead of hardcoded bg-red-500 text-white;
+  // 11px text floor.
   return (
-    <div className="absolute -top-1 -right-1 h-4 min-w-4 p-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-medium border border-background">
+    <div className="absolute -top-1 -right-1 h-4 min-w-4 p-1 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[11px] font-medium border border-background">
       {badge}
     </div>
   );

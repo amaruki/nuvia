@@ -41,6 +41,18 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}
       >
+        {/*
+          WCAG 2.4.1 skip-to-content link (UI-11). First node in <body> so it
+          is the first tab stop; visually hidden until focused. Targets
+          id="main-content", carried by the <main> of every route group that
+          renders one (dashboard shell, landing page, event list layout).
+        */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-md"
+        >
+          Skip to main content
+        </a>
         <QueryProvider>
           <ThemeProvider
             enableSystem={true}

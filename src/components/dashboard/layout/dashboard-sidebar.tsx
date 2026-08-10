@@ -78,7 +78,7 @@ export function DashboardSidebarSkeleton({ className }: DashboardSidebarProps) {
   return (
     <Sidebar collapsible="icon" className={className}>
       <SidebarHeaderComponent />
-      <SidebarContent role="status" aria-label="Loading navigation">
+      <SidebarContent role="status" aria-label="Loading navigation" aria-busy="true">
         <SidebarGroup>
           <SidebarGroupLabel>
             <Skeleton className="h-3 w-24" />

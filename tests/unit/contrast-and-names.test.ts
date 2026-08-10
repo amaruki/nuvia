@@ -157,6 +157,15 @@ describe("theme token contrast (WCAG 1.4.3)", () => {
     const blended = blend(rgbToken('[data-theme="dark"]', "destructive"), DARK_CARD, 0.6);
     expect(contrast(blended, WHITE)).toBeGreaterThanOrEqual(4.5);
   });
+
+  test("dark destructive text on --card clears 4.5:1 (settings danger titles)", () => {
+    // The a11y smoke gate audits this in a real browser (settings/security
+    // card title); this unit check fails the moment the token drifts back
+    // below the threshold, without needing the stack or Chromium.
+    expect(
+      contrast(rgbToken('[data-theme="dark"]', "destructive"), DARK_CARD),
+    ).toBeGreaterThanOrEqual(4.5);
+  });
 });
 
 // ---------------------------------------------------------------------------

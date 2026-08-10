@@ -113,7 +113,11 @@
   --muted-foreground: oklch(0.6736 0.0244 248.1893);
   --accent: oklch(0.3152 0.0427 202.4332);
   --accent-foreground: oklch(0.9328 0.0025 228.7857);
-  --destructive: oklch(0.6188 0.2376 25.7658);
+  /* Lightened from oklch(0.6188 0.2376 25.7658) (#f4212e, 4.31:1) so
+     text-destructive clears WCAG 1.4.3 (4.5:1) on --card in dark mode —
+     caught by the a11y smoke gate on /dashboard/settings/security.
+     Kept white-on-destructive viable for badges (see contrast-and-names). */
+  --destructive: oklch(0.64 0.22 25.7658);
   --destructive-foreground: oklch(1 0 0);
   --success: oklch(0.74 0.15 145);
   --warning: oklch(0.79 0.14 78);

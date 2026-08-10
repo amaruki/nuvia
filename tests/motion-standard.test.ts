@@ -116,14 +116,12 @@ describe("auth entrances use the landing pattern", () => {
 });
 
 describe("animation plan index reflects reality", () => {
-  test.each(["001", "002", "003", "004", "005"])("plan %s is marked DONE", (plan) => {
+  // 006 (arrow-nudge cohesion) was executed after the landing split: the
+  // pattern lives in features-section.tsx ("Browse events", "Job board")
+  // and cta-section.tsx (final "Get started"), with no data-icon remnants.
+  test.each(["001", "002", "003", "004", "005", "006"])("plan %s is marked DONE", (plan) => {
     const row = plansReadme.split("\n").find((line) => line.startsWith(`| ${plan} |`));
     expect(row).toBeDefined();
     expect(row).toContain("DONE");
-  });
-
-  test("plan 006 stays open until executed", () => {
-    const row = plansReadme.split("\n").find((line) => line.startsWith("| 006 |"));
-    expect(row).toContain("TODO");
   });
 });

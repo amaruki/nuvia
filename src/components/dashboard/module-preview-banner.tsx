@@ -5,11 +5,21 @@ import { isModuleEnabled, MODULE_LABELS, type ModuleName } from "../../../config
  * do not rebuild their own warning — their section layout renders this.
  *
  * It returns null once the module's flag flips on at promotion, so removing
- * the banner is part of the flag flip itself. Server-compatible on purpose:
- * no hooks, no client state, so section layouts can stay server components.
+ * the banner is part of the flag flip itself. `flags` overrides the global
+ * registry (config/features.ts) and threads through to
+ * isModuleEnabled(module, flags) so callers and tests can exercise the
+ * flag-off branch without mutating MODULE_FLAGS; omitting it keeps today's
+ * registry behavior. Server-compatible on purpose: no hooks, no client
+ * state, so section layouts can stay server components.
  */
-export function ModulePreviewBanner({ module }: { module: ModuleName }) {
-  if (isModuleEnabled(module)) {
+export function ModulePreviewBanner({
+  module,
+  flags,
+}: {
+  module: ModuleName;
+  flags?: Record<ModuleName, boolean>;
+}) {
+  if (isModuleEnabled(module, flags)) {
     return null;
   }
 

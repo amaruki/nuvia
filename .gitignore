@@ -60,5 +60,4 @@ next-env.d.ts
 
 # agent planning artifacts — not part of the product
 /plans/
-/docs/plans/
 /.omo/

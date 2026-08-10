@@ -1,7 +1,12 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["jsx-a11y"],
+  // UI-05 bans inline opacity overrides (e.g. style={{ opacity: "0.1" }}).
+  // oxlint 1.75.0 has no no-restricted-syntax rule, so an AST selector for
+  // that pattern is not expressible here; it stays a review-time guard.
   "rules": {
+    // UI-06 removed native alert/confirm/prompt dialogs; keep them banned.
+    "no-alert": "error",
     "no-console": "error",
     "max-lines": ["warn", { "max": 300, "skipBlankLines": true, "skipComments": true }],
     "jsx-a11y/alt-text": "error",

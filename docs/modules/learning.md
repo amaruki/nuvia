@@ -20,10 +20,10 @@ Learning & Development manages the association's course catalogue and the certif
 
 Drizzle schema: `src/db/schema/learning.ts`. UI-only documents (color, features, modules, reviews) travel as `jsonb` under `metadata.ui` — the same technique content/events use — and the instructor is denormalized as flat columns on the course.
 
-| Table          | Drizzle constant (`learning.ts`) | Landed in                                      |
-| -------------- | -------------------------------- | ---------------------------------------------- |
-| `courses`      | `course` (:36)                   | `drizzle/0009_slimy_mole_man.sql` (backlog D3) |
-| `certificates` | `certificate` (:77)              | `drizzle/0009_slimy_mole_man.sql` (backlog D3) |
+| Table          | Drizzle constant (`learning.ts`) | Landed in                                                         |
+| -------------- | -------------------------------- | ----------------------------------------------------------------- |
+| `courses`      | `course` (:36)                   | `drizzle/0009_learning_courses_and_certificates.sql` (backlog D3) |
+| `certificates` | `certificate` (:77)              | `drizzle/0009_learning_courses_and_certificates.sql` (backlog D3) |
 
 Key shape: `courses.level` uses the `course_level` pgEnum (:32) and is indexed together with `category` for list filters; `duration` is a display label derived from the curriculum on create when omitted (`computeDuration` sums lesson durations). `certificates.verification_code` carries a unique constraint; `course_id` is a nullable FK with `ON DELETE SET NULL` so revoking or deleting a course never destroys issued certificates — the denormalized `course_name`/`instructor_*`/`image` columns keep the record printable. `status` uses the `certificate_status` pgEnum (:34) and is indexed along with `course_id` and `student_email`. `created_by`/`updated_by`/`issued_by` are actor identifiers (`text`, better-auth email ids).
 
@@ -96,7 +96,7 @@ WCAG 2.2 AA is part of the promotion bar for an enabled module. The learning pag
 
 | Criterion (ADR-0008 tier 4)            | Evidence                                                                                                          |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Real Drizzle schema                    | `src/db/schema/learning.ts`; migration `drizzle/0009_slimy_mole_man.sql` (backlog D3)                             |
+| Real Drizzle schema                    | `src/db/schema/learning.ts`; migration `drizzle/0009_learning_courses_and_certificates.sql` (backlog D3)          |
 | Authorized API                         | 9 handlers under `src/app/api/v1/learning/**`, each calling `requirePermission("learning:*")` before body parsing |
 | Tests                                  | `tests/learning-api/` — 27 tests against the real tables                                                          |
 | Documentation                          | This document                                                                                                     |

@@ -21,15 +21,15 @@ Finance manages the association's dues billing: membership tiers, member subscri
 
 Drizzle schema: `src/db/schema/membership.ts`; status enums in `src/db/schema/enums.ts`. All amounts are `numeric(10,2)` in string mode.
 
-| Table                       | Drizzle constant (`membership.ts`) | Landed in                                                              |
-| --------------------------- | ---------------------------------- | ---------------------------------------------------------------------- |
-| `membership_tiers`          | `membershipTier` (:22)             | `drizzle/0000_cute_norman_osborn.sql` (Prisma→Drizzle, commit c688925) |
-| `membership_subscriptions`  | `membershipSubscription` (:50)     | `drizzle/0000_cute_norman_osborn.sql`                                  |
-| `membership_transactions`   | `membershipTransaction` (:75)      | `drizzle/0000_cute_norman_osborn.sql`                                  |
-| `membership_invoices`       | `membershipInvoice` (:114)         | `drizzle/0004_plain_ultimo.sql` (commit 9a53fbe)                       |
-| `membership_invoice_items`  | `membershipInvoiceItem` (:145)     | `drizzle/0004_plain_ultimo.sql` (commit 9a53fbe)                       |
-| `membership_payments`       | `membershipPayment` (:159)         | `drizzle/0004_plain_ultimo.sql` (commit 9a53fbe)                       |
-| `membership_webhook_events` | `membershipWebhookEvent` (:195)    | `drizzle/0004_plain_ultimo.sql` (commit 9a53fbe)                       |
+| Table                       | Drizzle constant (`membership.ts`) | Landed in                                                       |
+| --------------------------- | ---------------------------------- | --------------------------------------------------------------- |
+| `membership_tiers`          | `membershipTier` (:22)             | `drizzle/0000_init_schema.sql` (Prisma→Drizzle, commit c688925) |
+| `membership_subscriptions`  | `membershipSubscription` (:50)     | `drizzle/0000_init_schema.sql`                                  |
+| `membership_transactions`   | `membershipTransaction` (:75)      | `drizzle/0000_init_schema.sql`                                  |
+| `membership_invoices`       | `membershipInvoice` (:114)         | `drizzle/0004_membership_invoices.sql` (commit 9a53fbe)         |
+| `membership_invoice_items`  | `membershipInvoiceItem` (:145)     | `drizzle/0004_membership_invoices.sql` (commit 9a53fbe)         |
+| `membership_payments`       | `membershipPayment` (:159)         | `drizzle/0004_membership_invoices.sql` (commit 9a53fbe)         |
+| `membership_webhook_events` | `membershipWebhookEvent` (:195)    | `drizzle/0004_membership_invoices.sql` (commit 9a53fbe)         |
 
 Enums: `MembershipStatus` (`enums.ts:13`), `TransactionStatus` (`enums.ts:22`), `InvoiceStatus` (`enums.ts:34`). `membership_webhook_events` deduplicates provider deliveries with a unique constraint on `(provider, event_id)` (`membership.ts:207`).
 
@@ -114,7 +114,7 @@ WCAG 2.2 AA is part of the promotion bar for an enabled module. All six finance 
 
 | Criterion (ADR-0008 tier 4)            | Evidence                                                                                                                                                 |
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Real Drizzle schema                    | `src/db/schema/membership.ts` + `enums.ts`; migrations `drizzle/0000_cute_norman_osborn.sql`, `drizzle/0004_plain_ultimo.sql` (commits c688925, 9a53fbe) |
+| Real Drizzle schema                    | `src/db/schema/membership.ts` + `enums.ts`; migrations `drizzle/0000_init_schema.sql`, `drizzle/0004_membership_invoices.sql` (commits c688925, 9a53fbe) |
 | Authorized API                         | 25 handlers under `src/app/api/v1/finance/**`, each calling `requirePermission("finance:*")` (commits d8e4251, df6de14, e672c11, a17439c)                |
 | Tests                                  | `tests/subscription-lifecycle/`, `tests/invoice-payment/`, `tests/finance-dashboard-api/` — 79 tests (commits d8e4251, df6de14, e672c11, a17439c)        |
 | Documentation                          | This document                                                                                                                                            |

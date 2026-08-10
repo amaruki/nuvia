@@ -3,7 +3,7 @@
 Articles, publications, announcements, and categories (backlog B4). All four
 collections are stored in the single `content` table discriminated by `type`
 (the `PUBLICATION` enum value was added in migration
-`drizzle/0003_quick_katie_power.sql`), and every route delegates to the
+`drizzle/0003_content_type_publication.sql`), and every route delegates to the
 shared handlers in `src/app/api/v1/content/shared.ts`. UI-level fields
 round-trip through `content.metadata.ui`; the per-collection `type` field is
 stored at `metadata.ui.type`.

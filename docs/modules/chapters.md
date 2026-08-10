@@ -16,7 +16,7 @@ Chapters tracks the association's regional chapters: identity and status, contac
 
 ## Schema
 
-Drizzle schema: `src/db/schema/chapters.ts` (migration `drizzle/0005_nosy_the_fallen.sql`); status/role enums in `src/db/schema/enums.ts` (`ChapterStatus`, `ChapterRole`).
+Drizzle schema: `src/db/schema/chapters.ts` (migration `drizzle/0005_chapters.sql`); status/role enums in `src/db/schema/enums.ts` (`ChapterStatus`, `ChapterRole`).
 
 | Table             | Purpose                                                                                                                                                                                                                                                                                                                                         |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

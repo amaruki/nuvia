@@ -21,10 +21,10 @@ Committees manages the association's committees and working groups: their charte
 
 Drizzle schema: `src/db/schema/committees.ts`. Nested documents (charter, meetings, metrics) travel as `jsonb` — the same technique events/content/membership use — and leadership officers and regular members share one `committee_members` table, split by `role` in the service layer.
 
-| Table               | Drizzle constant (`committees.ts`) | Landed in                                   |
-| ------------------- | ---------------------------------- | ------------------------------------------- |
-| `committees`        | `committee` (:26)                  | `drizzle/0006_early_thing.sql` (backlog D2) |
-| `committee_members` | `committeeMember` (:71)            | `drizzle/0006_early_thing.sql` (backlog D2) |
+| Table               | Drizzle constant (`committees.ts`) | Landed in                                  |
+| ------------------- | ---------------------------------- | ------------------------------------------ |
+| `committees`        | `committee` (:26)                  | `drizzle/0006_committees.sql` (backlog D2) |
+| `committee_members` | `committeeMember` (:71)            | `drizzle/0006_committees.sql` (backlog D2) |
 
 Key shape: `committees.name` carries a unique constraint (duplicate creates return 409); `parent_committee_id` is a self-FK for the hierarchy (indexed); `created_by`/`updated_by` reference `users.id` (`text` — better-auth ids are text); `committee_members.committee_id` cascades on committee delete and `user_id` is nullable (rosters may list people without a login yet). Leadership roles (`chair`, `co_chair`, `secretary`, `treasurer`, `advisor`) vs plain `member` rows drive the leadership/member split in the DTO.
 
@@ -82,7 +82,7 @@ WCAG 2.2 AA is part of the promotion bar for an enabled module. The committees p
 
 | Criterion (ADR-0008 tier 4)            | Evidence                                                                                                              |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Real Drizzle schema                    | `src/db/schema/committees.ts`; migration `drizzle/0006_early_thing.sql` (backlog D2)                                  |
+| Real Drizzle schema                    | `src/db/schema/committees.ts`; migration `drizzle/0006_committees.sql` (backlog D2)                                   |
 | Authorized API                         | 5 handlers under `src/app/api/v1/committees/**`, each calling `requirePermission("committees:*")` before body parsing |
 | Tests                                  | `tests/committees-api/` — 14 tests against the real tables                                                            |
 | Documentation                          | This document                                                                                                         |

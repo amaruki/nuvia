@@ -21,9 +21,9 @@ Workspaces manages the association's committee workspaces — the collaboration 
 
 Drizzle schema: `src/db/schema/workspaces.ts`, including its own pgEnums (`WorkspaceType`, `WorkspaceStatus`). Nested collections travel as `jsonb` — the same technique committees/events/content use — because the UI edits each workspace's roster, documents, tasks, discussions, meetings, and activity as whole documents rather than as independently queryable rows.
 
-| Table        | Drizzle constant (`workspaces.ts`) | Landed in                                      |
-| ------------ | ---------------------------------- | ---------------------------------------------- |
-| `workspaces` | `workspace`                        | `drizzle/0008_wonderful_sage.sql` (backlog D5) |
+| Table        | Drizzle constant (`workspaces.ts`) | Landed in                                  |
+| ------------ | ---------------------------------- | ------------------------------------------ |
+| `workspaces` | `workspace`                        | `drizzle/0008_workspaces.sql` (backlog D5) |
 
 Key shape: `workspaces.name` carries a unique constraint (duplicate creates return 409); `committee_id` is a nullable FK to `committees.id` with `ON DELETE SET NULL` (deleting a committee orphans its workspaces rather than cascading them); `created_by`/`updated_by` reference `users.id` (`text` — better-auth ids are text); `type`/`status` default to `GENERAL`/`ACTIVE`; `settings` is a jsonb object and `members`/`documents`/`tasks`/`discussions`/`meetings`/`activity` are jsonb arrays defaulting to `{}`/`[]`. Indexes cover `status`, `type`, and `committee_id`.
 
@@ -88,7 +88,7 @@ WCAG 2.2 AA is part of the promotion bar for an enabled module. The workspaces p
 
 | Criterion (ADR-0008 tier 4)            | Evidence                                                                                                              |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Real Drizzle schema                    | `src/db/schema/workspaces.ts`; migration `drizzle/0008_wonderful_sage.sql` (backlog D5)                               |
+| Real Drizzle schema                    | `src/db/schema/workspaces.ts`; migration `drizzle/0008_workspaces.sql` (backlog D5)                                   |
 | Authorized API                         | 5 handlers under `src/app/api/v1/workspaces/**`, each calling `requirePermission("workspaces:*")` before body parsing |
 | Tests                                  | `tests/workspaces-api/` — 24 tests against the real tables                                                            |
 | Documentation                          | This document                                                                                                         |

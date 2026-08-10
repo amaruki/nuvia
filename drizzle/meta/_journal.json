@@ -6,49 +6,49 @@
       "idx": 0,
       "version": "7",
       "when": 1785080226587,
-      "tag": "0000_cute_norman_osborn",
+      "tag": "0000_init_schema",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
       "when": 1786154560679,
-      "tag": "0001_conscious_next_avengers",
+      "tag": "0001_auth_logs_user_cascade",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
       "when": 1786184092723,
-      "tag": "0002_complete_gorilla_man",
+      "tag": "0002_forum_reports",
       "breakpoints": true
     },
     {
       "idx": 3,
       "version": "7",
       "when": 1786184293095,
-      "tag": "0003_quick_katie_power",
+      "tag": "0003_content_type_publication",
       "breakpoints": true
     },
     {
       "idx": 4,
       "version": "7",
       "when": 1786186879672,
-      "tag": "0004_plain_ultimo",
+      "tag": "0004_membership_invoices",
       "breakpoints": true
     },
     {
       "idx": 5,
       "version": "7",
       "when": 1786193584130,
-      "tag": "0005_nosy_the_fallen",
+      "tag": "0005_chapters",
       "breakpoints": true
     },
     {
       "idx": 6,
       "version": "7",
       "when": 1786193704505,
-      "tag": "0006_early_thing",
+      "tag": "0006_committees",
       "breakpoints": true
     },
     {
@@ -62,28 +62,28 @@
       "idx": 8,
       "version": "7",
       "when": 1786197691969,
-      "tag": "0008_wonderful_sage",
+      "tag": "0008_workspaces",
       "breakpoints": true
     },
     {
       "idx": 9,
       "version": "7",
       "when": 1786197912915,
-      "tag": "0009_slimy_mole_man",
+      "tag": "0009_learning_courses_and_certificates",
       "breakpoints": true
     },
     {
       "idx": 10,
       "version": "7",
       "when": 1786256393549,
-      "tag": "0010_naive_selene",
+      "tag": "0010_membership_applications",
       "breakpoints": true
     },
     {
       "idx": 11,
       "version": "7",
       "when": 1786260177099,
-      "tag": "0011_even_stranger",
+      "tag": "0011_course_enrollments",
       "breakpoints": true
     }
   ]

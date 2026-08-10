@@ -215,9 +215,13 @@ over with a stub; the visible UI states the gap instead.
   and the budget/donations pages are honest empty states — there are no budget
   or donation tables in the schema. Wire these components when the stores land.
 
+### Phase 8 re-verification notes
+
+- 2026-08-10: claim-gap map row 1 ("Five modules connect to a real PostgreSQL database through Drizzle") re-verified; the claim still holds. Every backing artifact the row cites is present: `member.service.ts`, `event-read.service.ts` plus `event-write/` (split from `event-write.service.ts`), `src/lib/services/content/`, `forum/` (split from `forum.service.ts`), `job/` (split from `job.service.ts`), the `/api/v1/members` and `/api/v1/events` (incl. `[id]`) routes, and migrations 0000-0009. Two of the row's recorded checks no longer hold literally: four component-level `mock-data.ts` files now exist under `src/components/` (media-details-modal, media-permissions-manager, media-analytics, personal-recommendations-widget) and media-permissions-manager defines a `mockUsers` list again; these are UI-presentational fixtures added after the row was written, not read paths of the claimed modules. The hero line the row cites at `src/app/page.tsx:162` is now registry-derived: `hero-section.tsx` renders the live-module count from `LIVE_MODULES` instead of naming five modules.
+
 ## Good first issues
 
-- Remove any dead nav links, or point them at real pages, in `navigation-config.tsx`. Verify the current count first: `tests/nav-links.test.ts` only checks that leaf paths resolve to a real page, so a stale count here could be off if a parent-only nav item is involved.
+- ~~Remove any dead nav links, or point them at real pages, in `navigation-config.tsx`. Verify the current count first: `tests/nav-links.test.ts` only checks that leaf paths resolve to a real page, so a stale count here could be off if a parent-only nav item is involved.~~ **Resolved (UI-22)**: `tests/nav-links.test.ts` pins every leaf nav path to a real `page.tsx` and `tests/sidebar-correctness.test.ts` pins the nav manifest, so a dead link now fails CI.
 - ~~Clean up the role lists in `navigation-data.ts`: most of them omit `superadmin`…~~ **Done (backlog F3, commit `3998b75`)**: the nav role lists now include superadmin, matching the gate and sidebar special case.
 - Fix the singular-versus-plural mismatch in the Awards nav item.
 - ~~Pick and migrate off one duplicate dependency, once its ADR lands.~~ **Stale as of the M2 "Duplicate dependencies, re-examined" finding above**: all three flagged pairs (toast library, mail transport, animation library) are already resolved, and none needed an ADR. No open duplicate-dependency item remains here.

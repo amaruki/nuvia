@@ -33,7 +33,7 @@ A `CustomRole` (a database row, not one of the above) has level 0 by default und
 
 ## 9.4 Permission model
 
-A `Permission` is a `${PermissionModule}:${PermissionAction}` string. `PERMISSION_MODULES`: `users`, `events`, `memberships`, `finance`, `content`, `communications`, `analytics`, `organization`, `forum`, `jobs`, `learning`, `system`. `PERMISSION_ACTIONS`: `create`, `read`, `update`, `delete`, `manage`, `publish`, `approve`, `export`, `import`, `moderate`. `superadmin` resolves to every permission in `AVAILABLE_PERMISSIONS`; every other predefined role resolves through its own entry in `ROLE_PERMISSIONS`. See Section 12 for the full resolution algorithm.
+A `Permission` is a `${PermissionModule}:${PermissionAction}` string. `PERMISSION_MODULES`: `users`, `events`, `memberships`, `finance`, `content`, `communications`, `analytics`, `organization`, `forum`, `jobs`, `learning`, `chapters`, `committees`, `awards`, `workspaces`, `system`. `PERMISSION_ACTIONS`: `create`, `read`, `update`, `delete`, `manage`, `publish`, `approve`, `export`, `import`, `moderate`. `superadmin` resolves to every permission in `AVAILABLE_PERMISSIONS`; every other predefined role resolves through its own entry in `ROLE_PERMISSIONS`. See Section 12 for the full resolution algorithm.
 
 ## 9.5 Secrets
 

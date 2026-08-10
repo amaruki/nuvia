@@ -3,9 +3,9 @@ import { requireDashboardRole } from "@/lib/require-dashboard-role";
 
 export default async function EditEventLayout({ children }: { children: ReactNode }) {
   // Event editing is a management action; this page lives under
-  // (public) (URL-compatible with event.actions.ts's revalidatePath calls)
+  // (public) (URL-compatible with event revalidatePath calls)
   // but proxy.ts's matcher never reaches /events/**, so it gets no
-  // authorization at all otherwise. See TODO.md M1.
+  // authorization at all otherwise.
   await requireDashboardRole("/dashboard/events");
 
   return <>{children}</>;

@@ -4,9 +4,9 @@ Nuvia is an open-source Association Management System (AMS): the software a prof
 
 ## 1.1 Terminology
 
-This document uses the vocabulary defined in [`CONTEXT.md`](../../CONTEXT.md) at the repository root. Read that glossary first: `Organization`, `User`, `Role`, `Permission`, `CustomRole`, `Module`, `Maturity Tier`, and the per-module entities (`Member`, `MembershipTier`, `MembershipSubscription`, `Event`, `Registration`, `Content`, `ForumPost`, `ForumComment`, `JobPosting`, `JobApplication`) all carry a specific, opinionated meaning there. This document does not redefine them.
+This document uses a fixed domain vocabulary: `Organization`, `User`, `Role`, `Permission`, `CustomRole`, `Module`, `Maturity Tier`, and the per-module entities (`Member`, `MembershipTier`, `MembershipSubscription`, `Event`, `Registration`, `Content`, `ForumPost`, `ForumComment`, `JobPosting`, `JobApplication`) all carry a specific, opinionated meaning in this spec. This document does not redefine them.
 
-One open question the glossary flags and this spec does not resolve: `Member` (a `Role` value like `member_professional`) and `MembershipSubscription` (a paid subscription to a `MembershipTier`) are two separate, unreconciled concepts in the schema today. A user's role does not derive from or sync with their subscription status. Section 6.7 documents this as a real data-model gap, not a naming inconsistency.
+One open question this spec does not resolve: `Member` (a `Role` value like `member_professional`) and `MembershipSubscription` (a paid subscription to a `MembershipTier`) are two separate, unreconciled concepts in the schema today. A user's role does not derive from or sync with their subscription status. Section 6.7 documents this as a real data-model gap, not a naming inconsistency.
 
 ## 1.2 Goals
 

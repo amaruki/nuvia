@@ -15,10 +15,8 @@ of routing around the check.
 ## Linked issue / backlog item
 
 <!--
-Reference the TODO.md item, GitHub issue, or planning backlog ID this PR
-addresses. Planning backlog IDs are the stable A1…F4 identifiers in
-docs/planning/01-todo-backlog.md (for example: E5). Write "none" only for
-a trivial fix with no tracked item.
+Reference the GitHub issue this PR addresses. Write "none" only for a
+trivial fix with no tracked issue.
 -->
 
 Closes #

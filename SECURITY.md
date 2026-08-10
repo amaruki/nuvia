@@ -22,7 +22,7 @@ This is a young, actively-hardening project without a dedicated security team or
 
 ## Known, tracked issues
 
-This project is transparent about its own security gaps. It does not hide them behind a policy document that implies everything is fine. See [`TODO.md`](TODO.md) M1 for the current list. As of this writing, it includes:
+This project is transparent about its own security gaps. It does not hide them behind a policy document that implies everything is fine. As of this writing, the open list includes:
 
 - An account-deletion endpoint that does not delete anything
 - Missing rate limiting on the login endpoint

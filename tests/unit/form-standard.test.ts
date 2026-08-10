@@ -191,7 +191,6 @@ describe("native select and checkbox controls are gone", () => {
     "src/app/dashboard/profile/components/social-links-form/add-link-form.tsx",
     "src/components/content/media-upload/media-upload.tsx",
     "src/app/dashboard/content/media/_components/media-grid.tsx",
-    "src/components/content/category-card.tsx",
     "src/components/finance/reports-table/index.tsx",
     "src/components/finance/reports-table/report-row.tsx",
     "src/app/(public)/events/[id]/edit/_components/location-section.tsx",

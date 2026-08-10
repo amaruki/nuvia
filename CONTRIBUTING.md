@@ -4,7 +4,7 @@ Thank you for considering a contribution. This document is the practical "how". 
 
 ## Before you start
 
-1. Check [`TODO.md`](TODO.md) first. It might already list your idea, with constraints you should know before you start work. Items with the label **good first issue** are deliberately small and well-bounded.
+1. Check the [open issues](https://github.com/amaruki/nuvia/issues) first. Your idea might already be listed there, with constraints you should know before you start work. Items labeled **good first issue** are deliberately small and well-bounded.
 2. Check [`docs/adr/README.md`](docs/adr/README.md) first. If your change touches an existing decision (for example, the authorization helper, error shape, or ORM), match it. Do not add a new alternative.
 3. For anything not already scoped, open an issue that describes the change before you write a large PR. This avoids a finished PR that does not fit the project's direction.
 
@@ -45,7 +45,7 @@ Use the format `<type>(<scope>): <subject>`, in the imperative mood, under 80 ch
 ## Pull requests
 
 - Keep pull requests scoped to one concern, the same discipline as commits above.
-- Reference the `TODO.md` item or issue it addresses.
+- Reference the issue it addresses.
 - Confirm that `bun run guard:heavy` passes locally before you open the pull request.
 - Once branch protection is configured (`docs/adr/0010`), it requires CI checks and one human review before merge. Until branch protection is configured, treat that bar as the expectation anyway.
 

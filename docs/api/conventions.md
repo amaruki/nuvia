@@ -45,10 +45,9 @@ Validation failures add an `errors` extension member:
 to build one of these — not `NextResponse.json` with an error-shaped
 literal inline. Every route under `/api/v1/**` uses it as of the RFC 9457
 migration; `AuthResponseFactory` and the ad-hoc inline shapes it replaced
-are gone from that surface (server actions like `event.actions.ts` are a
-separate lane — RFC 9457 is an HTTP response-shape standard, and actions
-don't return HTTP responses — and keep using `errors.ts`'s
-`createSuccessResponse`/`createErrorResponse`).
+are gone from that surface (server actions like
+`oauth-better-auth.actions.ts` are a separate lane — RFC 9457 is an HTTP
+response-shape standard, and actions don't return HTTP responses).
 
 ## Success envelope
 

@@ -9,7 +9,7 @@ This file gives guidance to AI coding agents that work in this repository. It st
 ## Before writing code
 
 1. Check `docs/adr/README.md` for whether this decision is already made. If a canonical helper, pattern, or dependency exists, use it. Do not introduce an alternative because it seems cleaner in isolation.
-2. Check `TODO.md` for whether the thing you are about to build is already scoped there, with known constraints.
+2. Check `TODO.md`, if present at the repository root, for whether the thing you are about to build is already scoped there, with known constraints.
 3. If you are about to import something that oxlint's `no-restricted-imports` blocks, that block has a message that names the replacement. Use the replacement. Do not work around the lint rule.
 
 ## Commands
@@ -29,17 +29,17 @@ Integration tests (`bun run test:integration`), the Playwright WCAG 2.2 AA gate 
 
 ## Canonical choices (see the linked ADR for why)
 
-| Concern                   | Use                                                                 | Never                                                                                                                                        |
-| ------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Authorization             | `requirePermission`/`requireRole` from `src/lib/rbac/`              | `withAuth`, `withRole`, `withResourceAuth`, `authorizeApi` — deleted, [0001](docs/adr/0001-one-authorization-helper.md)                      |
-| API errors                | RFC 9457 via `problemResponse()` (`src/lib/http.ts`)                | Ad-hoc `NextResponse.json({ error: ... })`, [0002](docs/adr/0002-rfc9457-error-contract.md)                                                  |
-| Rate limiting             | The Redis-backed limiter (`src/lib/rate-limit.ts`)                  | In-memory `Map`-based limiters, [0003](docs/adr/0003-single-rate-limiter.md)                                                                 |
-| Logging                   | The structured logger (`src/lib/logger.ts`), never bare `console.*` | `security.ts:logSecurityEvent` (file deleted), `logging.service.ts` console output (removed), [0004](docs/adr/0004-one-structured-logger.md) |
-| ORM                       | Drizzle (`src/db/client.ts`, `src/db/schema/`)                      | Prisma — fully removed, [0011](docs/adr/0011-prisma-to-drizzle.md)                                                                           |
-| Package manager / runtime | Bun (`bun`, `bunx`)                                                 | npm, yarn, pnpm, [0012](docs/adr/0012-bun-package-manager-and-runtime.md)                                                                    |
-| Lint / format             | oxlint / oxfmt                                                      | ESLint, Prettier — removed, [0013](docs/adr/0013-oxlint-oxfmt-toolchain.md)                                                                  |
-| Nav visibility            | Derived from the permission a route requires                        | A parallel `roles: string[]` list, [0005](docs/adr/0005-permissions-not-roles.md)                                                            |
-| Components                | Server Component by default                                         | `"use client"` without a specific interactivity reason, [0006](docs/adr/0006-server-first-components.md)                                     |
+| Concern                   | Use                                                                 | Never                                                                                                                              |
+| ------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Authorization             | `requirePermission`/`requireRole` from `src/lib/rbac/`              | `withAuth`, `withRole`, `withResourceAuth`, `authorizeApi` — deleted, [0001](docs/adr/0001-one-authorization-helper.md)            |
+| API errors                | RFC 9457 via `problemResponse()` (`src/lib/http.ts`)                | Ad-hoc `NextResponse.json({ error: ... })`, [0002](docs/adr/0002-rfc9457-error-contract.md)                                        |
+| Rate limiting             | The Redis-backed limiter (`src/lib/rate-limit.ts`)                  | In-memory `Map`-based limiters, [0003](docs/adr/0003-single-rate-limiter.md)                                                       |
+| Logging                   | The structured logger (`src/lib/logger.ts`), never bare `console.*` | `security.ts:logSecurityEvent` (file deleted), `logging.service.ts` (file deleted), [0004](docs/adr/0004-one-structured-logger.md) |
+| ORM                       | Drizzle (`src/db/client.ts`, `src/db/schema/`)                      | Prisma — fully removed, [0011](docs/adr/0011-prisma-to-drizzle.md)                                                                 |
+| Package manager / runtime | Bun (`bun`, `bunx`)                                                 | npm, yarn, pnpm, [0012](docs/adr/0012-bun-package-manager-and-runtime.md)                                                          |
+| Lint / format             | oxlint / oxfmt                                                      | ESLint, Prettier — removed, [0013](docs/adr/0013-oxlint-oxfmt-toolchain.md)                                                        |
+| Nav visibility            | Derived from the permission a route requires                        | A parallel `roles: string[]` list, [0005](docs/adr/0005-permissions-not-roles.md)                                                  |
+| Components                | Server Component by default                                         | `"use client"` without a specific interactivity reason, [0006](docs/adr/0006-server-first-components.md)                           |
 
 ## Dependency versions are pinned, not ranged
 
@@ -67,7 +67,7 @@ oxlint's `max-lines` warns at 300 (skipping blanks/comments). Keep files ≤300 
 
 ## When you find a bug outside your task's scope
 
-Log the bug in `TODO.md` with a file:line reference. Do not fix it silently as part of an unrelated change. An exception applies to a one-line fix caused directly by the change you are already making. For example, if a dependency bump you performed broke a call site, fix that call site. It is your bug now. See the Drizzle migration commit's own `TODO.md` entries for the standard this sets.
+Log the bug in `TODO.md` (if present) with a file:line reference. Do not fix it silently as part of an unrelated change. An exception applies to a one-line fix caused directly by the change you are already making. For example, if a dependency bump you performed broke a call site, fix that call site. It is your bug now. See the Drizzle migration commit's own `TODO.md` entries for the standard this sets.
 
 ## What "done" means for a claim in this repo
 

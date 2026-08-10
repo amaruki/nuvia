@@ -240,17 +240,12 @@ describe("growth and remote-work stats", () => {
       "src/app/dashboard/organization/chapters/_components/overview-tab.tsx",
       "src/app/dashboard/organization/chapters/[id]/_components/chapter-helpers.tsx",
       "src/app/dashboard/organization/chapters/[id]/_components/chapter-finances-tab.tsx",
-      "src/components/chapters/chapter-details-modal/helpers.tsx",
       "src/app/dashboard/organization/committees/_components/committees-overview-tab.tsx",
       "src/components/chapters/chapters-overview-cards/stat-cards.tsx",
-      "src/components/chapters/chapter-details-modal/finances-tab.tsx",
       "src/app/dashboard/organization/committees/_components/committees-list-tab.tsx",
       "src/app/dashboard/awards/nominations/page.tsx",
-      "src/components/content/announcements-overview-cards/top-performing-card.tsx",
       "src/components/content/articles-overview-cards/top-performing-card.tsx",
       "src/components/content/publications-overview-cards/top-performing-card.tsx",
-      "src/components/finance/gateways-overview-cards/stat-cards.tsx",
-      "src/components/finance/gateways-overview-cards/top-performing-card.tsx",
     ];
     for (const file of files) {
       const source = src(file);

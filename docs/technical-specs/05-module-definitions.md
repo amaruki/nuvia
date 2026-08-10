@@ -1,6 +1,6 @@
 # 5. Module Definitions
 
-Each module below states its responsibility, its public surface, the entities it owns (see [`CONTEXT.md`](../../CONTEXT.md) for definitions), and its maturity tier (Section 13). The operational endpoints (health monitor, reset-db-state) are documented in Section 5.7, since they belong to no single business module.
+Each module below states its responsibility, its public surface, the entities it owns, and its maturity tier (Section 13). The operational endpoints (health monitor, reset-db-state) are documented in Section 5.7, since they belong to no single business module.
 
 ## 5.1 Members (`Backed`, enabled by default)
 

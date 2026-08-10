@@ -38,4 +38,4 @@ The logger itself performs redaction, by key name pattern. Redaction does not de
 
 ## What this replaces
 
-This logger replaces four things: `src/lib/security.ts:logSecurityEvent`, the console output of `src/lib/services/logging.service.ts`, `src/lib/errors.ts:logError`, and 301 bare `console.*` calls across `src/`. See `TODO.md` M2 for the migration plan and the `no-console` ratchet.
+This logger replaces four things: `src/lib/security.ts:logSecurityEvent` (since deleted), the console output of `src/lib/services/logging.service.ts` (since deleted), `src/lib/errors.ts:logError`, and 301 bare `console.*` calls across `src/`. See [ADR-0004](adr/0004-one-structured-logger.md) for the ratchet rationale.

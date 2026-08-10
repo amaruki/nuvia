@@ -79,9 +79,6 @@ const SWEPT_PAGE_FILES = [
   "src/app/(public)/events/dashboard/_components/upcoming-events-card.tsx",
   // Loading chrome + dashboard widgets
   "src/components/dashboard/loading/dashboard-content-skeleton.tsx",
-  "src/components/dashboard/widgets/upcoming-events-widget.tsx",
-  "src/components/dashboard/widgets/user-profile-widget.tsx",
-  "src/components/dashboard/widgets/certificates-widget.tsx",
   // Dashboard metric cards
   "src/app/dashboard/awards/programs/_components/program-stats-cards.tsx",
   "src/app/dashboard/content/announcements/_components/overview-tab.tsx",
@@ -94,14 +91,10 @@ const SWEPT_PAGE_FILES = [
   "src/components/chapters/chapters-overview-cards/stat-cards.tsx",
   "src/components/committees/committees-overview-cards.tsx",
   // Content overview-card families
-  "src/components/content/announcements-overview-cards/key-metrics-cards.tsx",
   "src/components/content/articles-overview-cards/stat-cards.tsx",
   "src/components/content/publications-overview-cards/stat-cards.tsx",
-  "src/components/content/media-overview-cards/stat-cards.tsx",
-  "src/components/content/media-overview-cards/helpers.tsx",
   "src/components/content/media-analytics/overview-tab.tsx",
   "src/components/content/media-analytics/helpers.tsx",
-  "src/components/finance/gateways-overview-cards/stat-cards.tsx",
   "src/components/finance/reports-overview-cards.tsx",
   "src/components/workspaces/workspaces-overview-cards/stat-cards.tsx",
   // Certificates, calendar variants, roles

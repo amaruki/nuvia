@@ -2,13 +2,13 @@
 
 Nuvia is an open-source Association Management System (AMS) for a professional association or similar member organization. It manages member records, dues, events, chapters, and communications. The system uses Next.js, Drizzle, PostgreSQL, and Bun.
 
-**Status: pre-1.0, actively hardening.** See [`TODO.md`](TODO.md) for what works today, what is mock data, and what is planned before a 1.0 release. Read `TODO.md` before you evaluate this project for production use. `TODO.md` is more accurate than a features list at this stage.
+**Status: pre-1.0, actively hardening.** The sections below state what works today and what is still mock data. Read the maturity notes in this README before you evaluate this project for production use.
 
 ## What actually works today
 
 Five modules connect to a real PostgreSQL database through Drizzle: **members, events, content, forums, jobs**. Authentication gates access to all five. Everything else in the dashboard (finance, awards, learning, chapters, committees, workspaces) is UI built against mock data. `src/proxy.ts` role-gates these pages the same way it gates other dashboard sections. `src/proxy.ts` checks the role list that `src/lib/navigation-data/index.ts` declares for each path. As a result, a plain member cannot reach `/dashboard/finance/reports`, for example.
 
-**A module-level maturity flag does not yet exist**, independent of role. Today, an admin or treasurer who opens `/dashboard/finance/reports` sees a fully mock UI with no real schema behind it. The page gives no indication that this is not a working feature. `config/features.ts` ([ADR-0008](docs/adr/0008-module-maturity-gate.md)) is the planned fix. This file does not exist yet (`TODO.md` M3).
+**A module-level maturity flag does not yet exist**, independent of role. Today, an admin or treasurer who opens `/dashboard/finance/reports` sees a fully mock UI with no real schema behind it. The page gives no indication that this is not a working feature. `config/features.ts` ([ADR-0008](docs/adr/0008-module-maturity-gate.md)) is the planned fix. This file does not exist yet.
 
 ## Technology stack
 
@@ -144,7 +144,6 @@ src/
 
 ## Documentation
 
-- [`TODO.md`](TODO.md) — the real roadmap: what works, what is mock, what is planned, in order.
 - [`docs/PRINCIPLES.md`](docs/PRINCIPLES.md) — the eight principles this project holds itself to, and the two places they conflict.
 - [`docs/architecture/`](docs/architecture/) — layering, route-group security taxonomy, data model conventions.
 - [`docs/api/conventions.md`](docs/api/conventions.md) — the RFC 9457 error contract and route shape.
@@ -156,7 +155,7 @@ src/
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md). [`TODO.md`](TODO.md) tags several items **good first issue**.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Security
 

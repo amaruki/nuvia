@@ -113,22 +113,22 @@ Every multi-table write — a mutation plus its audit-log entry, a role change p
 
 ## 6. Testing Standards
 
-- `bun test` — no separate test-runner dependency (`docs/adr/0012-bun-package-manager-and-runtime.md`).
+- `bun test` — no separate test-runner dependency (`docs/adr/0012-bun-package-manager-and-runtime.md`). Runner-level config (preload, timeouts, coverage flags) lives in `bunfig.toml`; `tests/preload.ts` pins `TZ=UTC` so date-window assertions never depend on the host timezone.
+- **Suite split.** `tests/unit/` is the infra-free unit suite (`bun run test:unit`): no docker, no network, runs in seconds, and is what the pre-push hook and `guard:light` execute. Everything else under `tests/` is integration: it talks to the compose stack (Postgres `127.0.0.1:15433`, Redis `127.0.0.1:16380`) and runs via `bun run test:integration` locally and in CI. New tests go in `tests/unit/` unless they genuinely need a live database, Redis, or the auth handler stack. The Playwright gates (`bun run test:a11y`, `bun run test:smoke`) are separate commands and run in CI's `browser` job.
 - Write backend service and repository-equivalent (Drizzle query) tests for new code. Write frontend tests when a component carries non-trivial logic, not for every presentational component.
-- **Mock at the database client boundary** (`src/db/client.ts`'s `db` export), not at an intermediate service or repository layer. If you mock an intermediate module, a change to that module's internals breaks unrelated tests that happen to import through it.
+- **Unit tests that touch data mock at the database client boundary** (`src/db/client.ts`'s `db` export) using `tests/unit/db-mock.ts` — never at an intermediate service or repository layer. If you mock an intermediate module, a change to that module's internals breaks unrelated tests that happen to import through it. The full usage contract — including when holding a db mock is safe — lives in `tests/unit/db-mock.ts`.
 
 ```ts
-const mockFindFirst = mock((): Promise<User | undefined> => Promise.resolve(undefined));
-mock.module("@/db/client", () => ({
-  db: {
-    query: { user: { findFirst: mockFindFirst } },
-    transaction: (fn: any) => fn({}),
-  },
-}));
-const { getUserWithRoleInfo } = await import("./role.service");
+import { mockDbClient, restoreDbClient } from "./db-mock";
+
+mockDbClient(stubDb); // register BEFORE importing the module under test
+const { getUserWithRoleInfo } = await import("@/lib/services/role.service");
+// …assert…
+restoreDbClient(); // in afterAll when the file mixes mocked and real imports
 ```
 
-`bun`'s `mock.module()` is global for the test file. If you mock anything other than the DB client boundary, you risk silently breaking a sibling test. That test may import the same module for an unrelated reason.
+- **Isolation — the hard-won rule:** `mock.module()` rewrites the module registry of the ENTIRE test process, not of one file. Bun runs every file of a `bun test` invocation in one process, files concurrently, so a registered mock is visible to every file in the same run. Holding a db stub during a full `bun test` run corrupts concurrent integration files (`db.insert is not a function`) — this happened, and is why the db mock is restricted to `bun run test:unit` runs with at most one holder at a time. Leaf-module mocks that only the mocking file imports (session hooks, `next/navigation`) do not need this discipline. Inside one file, `mock.module()` is likewise global: register before importing the module under test, and restore in `afterAll` if later tests in the same file need the real module. Note `mock.restore()` only resets function mocks (`mock()`/`spyOn()`), not module mocks; that is why `restoreDbClient()` exists.
+- **Speed budget:** the unit suite must stay runnable with docker down. Never import a module that opens connections at import time; clients in this repo are lazy (connections on first query), and the unit suite proves it by running with the stack down.
 
 ## 7. Git Workflow
 

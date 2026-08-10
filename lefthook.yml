@@ -27,4 +27,6 @@ pre-push:
     - name: typecheck
       run: bun run typecheck
     - name: test
-      run: bun run test:integration
+      # Infra-free unit suite (~10s, no docker). The integration suite needs
+      # the compose stack and runs in CI; see docs/adr/0010.
+      run: bun run test:unit

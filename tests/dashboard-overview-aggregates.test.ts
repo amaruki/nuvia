@@ -11,7 +11,6 @@ import { inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import { membershipSubscription, user } from "@/db/schema";
 import {
-  changePercent,
   getDashboardOverview,
   getEventOverviewStats,
   getFinanceOverviewStats,
@@ -142,17 +141,7 @@ afterAll(async () => {
   await eventsFixture.cleanup();
 });
 
-describe("changePercent (pure helper)", () => {
-  test("computes growth from minor-unit amounts", () => {
-    expect(changePercent(1500, 1000)).toBe(50);
-    expect(changePercent(800, 1000)).toBe(-20);
-    expect(changePercent(1234, 1000)).toBe(23.4);
-  });
-
-  test("returns null when there is no previous period to compare against", () => {
-    expect(changePercent(500, 0)).toBeNull();
-  });
-});
+// changePercent (pure helper) is covered in tests/unit/dashboard-overview.test.ts.
 
 describe("getMemberOverviewStats", () => {
   test("counts totals, derived-active, derived-expired, and new members", async () => {

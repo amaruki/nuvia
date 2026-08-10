@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "check:copy": "bun run scripts/check-copy-style.ts",
     "test": "bun test",
+    "test:unit": "bun test tests/unit",
     "test:integration": "bun run scripts/run-integration-tests.ts",
     "test:a11y": "bun run scripts/a11y-smoke.ts",
     "test:smoke": "bun run scripts/route-smoke/run.ts",
@@ -23,7 +24,7 @@
     "db:seed": "bun run scripts/seed.ts",
     "db:reset": "drizzle-kit push --force && bun run db:seed",
     "prepare": "lefthook install",
-    "guard:light": "bun run lint && bun run format:check && bun run typecheck && bun run check:copy",
+    "guard:light": "bun run lint && bun run format:check && bun run typecheck && bun run check:copy && bun run test:unit",
     "guard:heavy": "bun run guard:light && bun run test:integration && bunx drizzle-kit check && bun run build && (bun audit --prod || true)",
     "guard": "bun run guard:heavy"
   },

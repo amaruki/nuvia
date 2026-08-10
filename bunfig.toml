@@ -1,0 +1,21 @@
+# Bun runtime configuration for this repository.
+#
+# [test] — consumed by `bun test` (all suites, including `test:unit`).
+# Bun auto-loads .env/.env.local for scripts, so DATABASE_URL etc. come from
+# the developer's environment exactly like every other script; only
+# runner-level knobs live here.
+
+[test]
+# Loaded before every test file in every worker: pins timezone determinism
+# (see tests/preload.ts). Keep this cheap — it runs once per test file.
+preload = ["./tests/preload.ts"]
+
+# Per-test default timeout in milliseconds (Bun's own default is 5000).
+# Suites that spawn real services or subprocesses (seed-script, demo-mode)
+# already raise their own per-test timeouts; this gives ordinary tests slack
+# on slow CI runners without masking a genuinely hung assertion.
+timeout = 10000
+
+# `bun test --coverage` is opt-in (never on by default — it slows every run).
+# When enabled, test files themselves are excluded from coverage accounting.
+coverageSkipTestFiles = true

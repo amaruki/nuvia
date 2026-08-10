@@ -15,6 +15,7 @@
     "test": "bun test",
     "test:integration": "bun run scripts/run-integration-tests.ts",
     "test:a11y": "bun run scripts/a11y-smoke.ts",
+    "test:smoke": "bun run scripts/route-smoke/run.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",

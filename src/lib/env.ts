@@ -114,6 +114,16 @@ const envSchema = z
     FEATURE_SOCIAL_LOGIN: boolFromString(true),
     FEATURE_ACCOUNT_DELETION: boolFromString(true),
     FEATURE_PASSWORD_STRENGTH_METER: boolFromString(true),
+
+    // Test-only speedup (see src/lib/auth/tokens.ts): swap better-auth's
+    // default scrypt (N=16384, ~60ms/hash) for a cheap scrypt (N=1024,
+    // ~4ms/hash) behind the documented emailAndPassword.password seam.
+    // NODE_ENV=test alone cannot be the gate because `next dev`/`next start`
+    // force NODE_ENV away from test, while the seed script that wrote the
+    // hashes keeps it — a mismatch that breaks every sign-in. Set it in the
+    // same environment that seeds test users (scripts/a11y-smoke's TEST_ENV
+    // does; bun test runs get it via the NODE_ENV fallback in tokens.ts).
+    TEST_FAST_PASSWORD_HASH: boolFromString(false),
   })
   .superRefine((data, ctx) => {
     // PAYMENT_GATEWAY=stripe is unusable without both credentials: the

@@ -46,6 +46,12 @@ export const TEST_ENV = {
   REDIS_URL: "redis://127.0.0.1:16380",
   RATE_LIMIT_MAX_REQUESTS: "1000",
   RATE_LIMIT_WINDOW_MINUTES: "15",
+  // `next dev` below forces NODE_ENV=development, which would silently
+  // switch verification back to better-auth's default scrypt while the
+  // seed script (NODE_ENV=test) wrote the cheap test hashes — every
+  // sign-in would then throw "Invalid password hash". This explicit flag
+  // keeps both sides on the same fast hash (src/lib/auth/tokens.ts).
+  TEST_FAST_PASSWORD_HASH: "true",
 } as const;
 
 export const COMPOSE_COMMAND = [

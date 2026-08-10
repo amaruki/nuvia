@@ -7,6 +7,9 @@ const TEST_ENV = {
   DATABASE_URL: "postgresql://nuvia:nuvia@127.0.0.1:15433/nuvia",
   NODE_ENV: "test",
   REDIS_URL: "redis://127.0.0.1:16380",
+  // Explicit flag (not just the NODE_ENV fallback) so the runner keeps
+  // working if NODE_ENV handling ever changes; see src/lib/auth/tokens.ts.
+  TEST_FAST_PASSWORD_HASH: "true",
 } as const;
 
 const COMPOSE_COMMAND = [

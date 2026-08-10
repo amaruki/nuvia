@@ -9,7 +9,7 @@
  *   - .card-hover transitions explicit properties, not `all`;
  *   - the shared button press scale is motion-safe;
  *   - auth entrances use the CSS landing-rise pattern, no anime.js;
- *   - plans/README.md reflects the implemented state (001-005 DONE).
+ *   - plans/README.md reflects the implemented state (local-only ratchet).
  */
 import { describe, expect, test } from "bun:test";
 import { join } from "node:path";
@@ -19,7 +19,10 @@ const read = (p: string) => Bun.file(join(root, p)).text();
 
 const globals = await read("src/app/globals.css");
 const button = await read("src/components/ui/button.tsx");
-const plansReadme = await read("plans/README.md");
+// plans/ is gitignored agent-planning state, so CI checkouts lack the index;
+// the ratchet below then skips instead of crashing the whole file's load.
+const plansReadme = await read("plans/README.md").catch(() => null);
+const planIndex = plansReadme ?? "";
 
 describe("motion tokens", () => {
   test("easing and duration tokens live in :root", () => {
@@ -115,12 +118,12 @@ describe("auth entrances use the landing pattern", () => {
   });
 });
 
-describe("animation plan index reflects reality", () => {
+describe.skipIf(plansReadme === null)("animation plan index reflects reality", () => {
   // 006 (arrow-nudge cohesion) was executed after the landing split: the
   // pattern lives in features-section.tsx ("Browse events", "Job board")
   // and cta-section.tsx (final "Get started"), with no data-icon remnants.
   test.each(["001", "002", "003", "004", "005", "006"])("plan %s is marked DONE", (plan) => {
-    const row = plansReadme.split("\n").find((line) => line.startsWith(`| ${plan} |`));
+    const row = planIndex.split("\n").find((line) => line.startsWith(`| ${plan} |`));
     expect(row).toBeDefined();
     expect(row).toContain("DONE");
   });

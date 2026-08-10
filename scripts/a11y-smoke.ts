@@ -6,7 +6,7 @@
  *
  * What it does, self-contained and idempotent:
  *   1. Boots the test Postgres/Redis stack (compose.test.yml) if not up,
- *      pushes the schema (drizzle-kit push --force) and seeds the admin
+ *      applies the migrations (drizzle-kit migrate) and seeds the admin
  *      accounts with a fresh per-run password (SEED_ADMIN_PASSWORD).
  *   2. Spawns `next dev` on a dedicated port (default 3111, override with
  *      A11Y_SMOKE_PORT) unless something already answers there — a server it

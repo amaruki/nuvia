@@ -94,7 +94,7 @@ jobs:
     # self-contained (it raises its own compose stack on the runner); the
     # route smoke and the production build need the service containers below
     # (the build prerenders session-aware pages like /forums against the DB,
-    # so its schema is pushed first, exactly like the heavy job's runner).
+    # so its migrations are applied first, exactly like the heavy job's runner).
     name: Playwright a11y gate + route smoke
     runs-on: ubuntu-latest
     needs: fast
@@ -136,8 +136,8 @@ jobs:
       - run: bunx playwright install --with-deps chromium
       - name: WCAG 2.2 AA smoke (axe via Playwright, light + dark)
         run: bun run test:a11y
-      - name: Push database schema
-        run: bunx drizzle-kit push --force
+      - name: Apply database migrations
+        run: bun run db:migrate
       - name: Production build
         run: bun run build
       - name: Route boot smoke (next start)

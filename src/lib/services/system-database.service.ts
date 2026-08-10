@@ -63,8 +63,8 @@ export interface MigrationJournalState {
 
 export interface AppliedMigrationsState {
   /**
-   * The `__drizzle_migrations` bookkeeping table exists. It is absent when
-   * the database was set up with `drizzle-kit push` (db:push/db:reset),
+   * The `drizzle.__drizzle_migrations` bookkeeping table exists. It is absent when
+   * the database was set up with a legacy `drizzle-kit push` workflow,
    * which applies schema without recording migrations.
    */
   bookkeepingTablePresent: boolean;
@@ -165,12 +165,15 @@ async function readMigrationJournal(): Promise<MigrationJournalState> {
 
 /**
  * The applied-migration side of the ledger, straight from Drizzle's
- * `__drizzle_migrations` bookkeeping table. Absent when the database was
- * created with `drizzle-kit push`, which keeps no ledger.
+ * `drizzle.__drizzle_migrations` bookkeeping table (drizzle-kit keeps it in
+ * its own `drizzle` schema). Absent when the database was created with a
+ * legacy `drizzle-kit push` workflow, which keeps no ledger.
  */
 async function readAppliedMigrations(): Promise<AppliedMigrationsState> {
   try {
-    const rows = await db.execute(sql`select count(*)::int as applied from __drizzle_migrations`);
+    const rows = await db.execute(
+      sql`select count(*)::int as applied from drizzle.__drizzle_migrations`,
+    );
     const row = rows[0] as { applied?: number | string } | undefined;
     return { bookkeepingTablePresent: true, count: Number(row?.applied ?? 0) };
   } catch {

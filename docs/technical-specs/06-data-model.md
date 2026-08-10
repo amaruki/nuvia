@@ -202,7 +202,7 @@ export default defineConfig({
 });
 ```
 
-Stable commands: `bun run db:generate` (generate a migration from the current schema diff), `bun run db:migrate` (apply tracked migrations, the production path), `bun run db:push` (direct schema push, development only), `bun run db:seed` (`scripts/seed.ts`, requires `SEED_ADMIN_PASSWORD`, refuses to run without it per [ADR-0009](../adr/0009-security-hardening-p0.md)), `bun run db:reset` (`drizzle-kit push --force && bun run db:seed`, development only).
+Stable commands: `bun run db:generate` (generate a migration from the current schema diff), `bun run db:migrate` (apply tracked migrations — the only supported apply path, in development and production), `bun run db:seed` (`scripts/seed.ts`, requires `SEED_ADMIN_PASSWORD`, refuses to run without it per [ADR-0009](../adr/0009-security-hardening-p0.md)), `bun run db:reset` (`scripts/db-reset.ts` wipe, then `db:migrate && db:seed`, development only).
 
 **Forbidden pattern**: a hardcoded absolute migration path, an inlined connection string, or a raw read/exec of one `.sql` file outside the migration ledger. This breaks inside a distroless or minimal deployment image where the operator cannot locate the files, and it applies schema changes the migration history never records.
 

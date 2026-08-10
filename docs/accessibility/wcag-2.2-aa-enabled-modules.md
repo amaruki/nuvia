@@ -47,7 +47,7 @@ Status at this record: `bunx oxlint` exits 0 (remaining diagnostics are pre-exis
 
 `scripts/a11y-smoke.ts` (Bun script, no test runner). Self-contained and idempotent:
 
-1. Boots the test Postgres/Redis stack (`compose.yml`, project `nuvia-test`) if not already up, pushes the schema (`drizzle-kit push --force`), and seeds the admin accounts with a fresh per-run `SEED_ADMIN_PASSWORD` (never reused, satisfies the password-strength policy).
+1. Boots the test Postgres/Redis stack (`compose.yml`, project `nuvia-test`) if not already up, applies the tracked migrations (`drizzle-kit migrate`), and seeds the admin accounts with a fresh per-run `SEED_ADMIN_PASSWORD` (never reused, satisfies the password-strength policy).
 2. Spawns `next dev` on a dedicated port (default **3111**, override `A11Y_SMOKE_PORT`) unless something already answers there. A server the script spawned is killed on exit (whole process group); a pre-existing one is left alone. Port 3111 is used because 3100 is occupied by an unrelated local service.
 3. Signs in as the seeded superadmin (`admin@nuvia.com`) via `POST /api/auth/sign-in/email` and installs the session cookie into the Playwright context.
 4. Runs `AxeBuilder` (`@axe-core/playwright`, tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`) against the eighteen pages above.

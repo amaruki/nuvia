@@ -44,7 +44,7 @@ Every choice below was already made and recorded in an ADR before this document 
 
 ### Migration and seed mechanism
 
-`drizzle-kit` is the migration tool. `drizzle.config.ts` resolves `schema: "./src/db/schema/index.ts"` and `out: "./drizzle"` relative to the project root, and reads `DATABASE_URL` from the environment (not hardcoded). Commands: `bun run db:generate` (generate a migration from the current schema), `bun run db:migrate` (apply tracked migrations), `bun run db:push` (dev-only direct schema push), `bun run db:seed` (`scripts/seed.ts`, requires `SEED_ADMIN_PASSWORD`), `bun run db:reset` (`drizzle-kit push --force && bun run db:seed`, development only). See Section 6.8 for the full migration/seed specification and Section 6.9 for the reset-db-state endpoint that wraps this for QA.
+`drizzle-kit` is the migration tool. `drizzle.config.ts` resolves `schema: "./src/db/schema/index.ts"` and `out: "./drizzle"` relative to the project root, and reads `DATABASE_URL` from the environment (not hardcoded). Commands: `bun run db:generate` (generate a migration from the current schema), `bun run db:migrate` (apply tracked migrations — the only supported apply path), `bun run db:seed` (`scripts/seed.ts`, requires `SEED_ADMIN_PASSWORD`), `bun run db:reset` (`scripts/db-reset.ts` wipe, then `db:migrate && db:seed`, development only). See Section 6.8 for the full migration/seed specification and Section 6.9 for the reset-db-state endpoint that wraps this for QA.
 
 ## 4.5 Tooling
 

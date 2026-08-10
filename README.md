@@ -68,7 +68,7 @@ The integration test command starts isolated PostgreSQL and Redis containers. It
 
    ```bash
    bun run db:generate   # generate a migration from the current schema
-   bun run db:push       # apply it (dev) — or db:migrate for a tracked migration
+   bun run db:migrate    # apply the tracked migrations
    ```
 
 5. Seed an admin account. This step **requires an explicit password**, on purpose. An earlier seed script hardcoded one shared password across five privileged accounts (see [ADR-0009](docs/adr/0009-security-hardening-p0.md)). Pick a strong password you will remember — you will use it to sign in as every seeded account:
@@ -99,21 +99,21 @@ The integration test command starts isolated PostgreSQL and Redis containers. It
 
 ### Scripts
 
-| Command                                                        | Does                                                                      |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `bun run dev`                                                  | Start the dev server                                                      |
-| `bun run build`                                                | Production build                                                          |
-| `bun run lint` / `lint:fix`                                    | oxlint                                                                    |
-| `bun run format` / `format:check`                              | oxfmt                                                                     |
-| `bun run typecheck`                                            | `tsc --noEmit`                                                            |
-| `bun run test:unit`                                            | Infra-free unit suite (`tests/unit/`, no docker needed)                   |
-| `bun test`                                                     | Run unit + integration tests against services that are already available  |
-| `bun run test:integration`                                     | Start isolated services, apply the schema, and run tests                  |
-| `bun run test:a11y` / `test:smoke`                             | Playwright WCAG 2.2 AA audit / production route-boot smoke (need docker)  |
-| `bun run guard:light`                                          | lint + format + typecheck + copy check + unit tests (fast)                |
-| `bun run guard:heavy`                                          | `guard:light` + test + migration-drift check + build + `bun audit --prod` |
-| `bun run db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle                                                                   |
-| `bun run db:seed`                                              | Seed an admin account (`SEED_ADMIN_PASSWORD` required)                    |
+| Command                                                         | Does                                                                      |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `bun run dev`                                                   | Start the dev server                                                      |
+| `bun run build`                                                 | Production build                                                          |
+| `bun run lint` / `lint:fix`                                     | oxlint                                                                    |
+| `bun run format` / `format:check`                               | oxfmt                                                                     |
+| `bun run typecheck`                                             | `tsc --noEmit`                                                            |
+| `bun run test:unit`                                             | Infra-free unit suite (`tests/unit/`, no docker needed)                   |
+| `bun test`                                                      | Run unit + integration tests against services that are already available  |
+| `bun run test:integration`                                      | Start isolated services, apply the schema, and run tests                  |
+| `bun run test:a11y` / `test:smoke`                              | Playwright WCAG 2.2 AA audit / production route-boot smoke (need docker)  |
+| `bun run guard:light`                                           | lint + format + typecheck + copy check + unit tests (fast)                |
+| `bun run guard:heavy`                                           | `guard:light` + test + migration-drift check + build + `bun audit --prod` |
+| `bun run db:generate` / `db:migrate` / `db:reset` / `db:studio` | Drizzle                                                                   |
+| `bun run db:seed`                                               | Seed an admin account (`SEED_ADMIN_PASSWORD` required)                    |
 
 ### Code quality
 

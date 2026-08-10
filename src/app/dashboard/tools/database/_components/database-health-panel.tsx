@@ -120,15 +120,15 @@ export function DatabaseHealthPanel({ health }: { health: DatabaseHealth }) {
           {migrations?.applied.bookkeepingTablePresent ? (
             <p>
               Applied migrations: <strong>{migrations.applied.count}</strong> recorded in{" "}
-              <code className="font-mono text-xs">__drizzle_migrations</code>.
+              <code className="font-mono text-xs">drizzle.__drizzle_migrations</code>.
             </p>
           ) : (
             <p className="text-muted-foreground">
-              Applied migrations: no <code className="font-mono text-xs">__drizzle_migrations</code>{" "}
-              bookkeeping table. That is expected when the database was created with{" "}
-              <code className="font-mono text-xs">drizzle-kit push</code> (db:push / db:reset),
-              which applies schema without a ledger — it does not by itself mean the schema is
-              wrong.
+              Applied migrations: no{" "}
+              <code className="font-mono text-xs">drizzle.__drizzle_migrations</code> bookkeeping
+              table. That is expected when the database was created with a legacy{" "}
+              <code className="font-mono text-xs">drizzle-kit push</code> workflow, which applies
+              schema without a ledger — it does not by itself mean the schema is wrong.
             </p>
           )}
         </CardContent>

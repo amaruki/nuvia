@@ -100,7 +100,7 @@ async function main(): Promise<void> {
   }
 
   await waitForDependencies();
-  await run(["bunx", "drizzle-kit", "push", "--force"]);
+  await run(["bun", "run", "db:migrate"]);
   await run(["bun", "test"]);
 
   // Deliberately leave the local project running: the dev server's .env

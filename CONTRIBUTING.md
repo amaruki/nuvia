@@ -16,7 +16,7 @@ cd nuvia
 bun install   # also installs git hooks — see below
 cp .env.example .env.local
 # fill in DATABASE_URL, BETTER_AUTH_SECRET at minimum
-bun run db:generate && bun run db:push
+bun run db:generate && bun run db:migrate
 SEED_ADMIN_PASSWORD='Your-Strong-Passw0rd' bun run db:seed   # remember it — you sign in with it
 bun run dev
 ```

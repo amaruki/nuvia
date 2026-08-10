@@ -1,4 +1,4 @@
-/** Test infrastructure: compose stack, schema push, admin seed, rate-limit flush. */
+/** Test infrastructure: compose stack, migrations, admin seed, rate-limit flush. */
 
 import { ADMIN_EMAIL, COMPOSE_COMMAND, TEST_ENV } from "./config";
 import { Redis } from "ioredis";
@@ -8,8 +8,8 @@ import { log, run } from "./helpers";
 export async function ensureTestStack(): Promise<void> {
   log("Ensuring test Postgres/Redis stack is up (compose.yml)…");
   await run([...COMPOSE_COMMAND, "up", "--detach", "--wait"]);
-  log("Pushing database schema (drizzle-kit push --force)…");
-  await run(["bunx", "drizzle-kit", "push", "--force"]);
+  log("Applying database migrations (drizzle-kit migrate)…");
+  await run(["bun", "run", "db:migrate"]);
 }
 
 export async function seedAdmin(password: string): Promise<void> {

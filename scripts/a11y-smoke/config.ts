@@ -202,6 +202,22 @@ export const PAGES: readonly PageTarget[] = [
     module: "communications",
     auth: true,
   },
+  // Phase 7 dashboard surfaces (Phase 8 guardrail item 2)
+  { slug: "analytics-overview", path: "/dashboard/analytics", module: "analytics", auth: true },
+  {
+    slug: "settings-security",
+    path: "/dashboard/settings/security",
+    module: "settings",
+    auth: true,
+  },
+  { slug: "tools-cache", path: "/dashboard/tools/cache", module: "tools", auth: true },
+  { slug: "events-pricing", path: "/dashboard/events/pricing", module: "events", auth: true },
+  {
+    slug: "memberships-renewals",
+    path: "/dashboard/memberships/renewals",
+    module: "memberships",
+    auth: true,
+  },
   // Wave UI-10: detail pages + deliberately-empty lists. Paths resolve
   // against the demo seed (scripts/seed-demo.ts), which demo-content.ts
   // re-establishes when other suites wiped it; expectText proves each URL

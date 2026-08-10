@@ -2,11 +2,12 @@
 # the local lefthook enforcement. Local hooks catch problems before push;
 # this catches anything bypassed locally (--no-verify is always possible).
 #
-# Split into a fast job (lint/format/typecheck, no DB needed) and a slower
-# job (test/build/audit, needs Postgres) so a lint failure reports in
-# under a minute instead of waiting on the full suite — see the phased
-# adoption note in docs/adr/0009-security-hardening-p0.md: this workflow
-# only enforces what the codebase can currently pass (oxlint's baseline is
+# Split into a fast job (lint/format/typecheck, no DB needed), a slower job
+# (test/build/audit, needs Postgres), and a browser job (Playwright-driven
+# WCAG 2.2 AA accessibility gate plus the production route-boot smoke) so a
+# lint failure reports in under a minute instead of waiting on the full
+# suite — see the phased adoption note in docs/adr/0009-security-hardening-p0.md.
+# This workflow only enforces what the codebase can currently pass (oxlint's
 # warnings-only for now on pre-existing `any`/`console` usage; see
 # docs/adr/0004 and docs/adr/0013 for the ratchet this will tighten into).
 #
@@ -85,3 +86,64 @@ jobs:
       - run: bun run build
       - run: bun audit --prod
         continue-on-error: true # see docs/supply-chain.md — triage by reachability, not a hard gate yet
+
+  browser:
+    # Playwright gates that cannot run under `bun test`: the axe-core WCAG
+    # 2.2 AA audit over a real signed-in browser session (light + dark), and
+    # the production route-boot smoke against `next start`. The a11y gate is
+    # self-contained (it raises its own compose stack on the runner); the
+    # route smoke needs the service containers below for `next start`.
+    name: Playwright a11y gate + route smoke
+    runs-on: ubuntu-latest
+    needs: fast
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nuvia
+          POSTGRES_PASSWORD: nuvia
+          POSTGRES_DB: nuvia
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://nuvia:nuvia@localhost:5432/nuvia
+      REDIS_URL: redis://localhost:6379
+      BETTER_AUTH_SECRET: ci-only-secret-not-for-production-use-0000000000
+      APP_URL: http://localhost:3000
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
+      - name: WCAG 2.2 AA smoke (axe via Playwright, light + dark)
+        run: bun run test:a11y
+      - name: Production build
+        run: bun run build
+      - name: Route boot smoke (next start)
+        run: bun run test:smoke
+      - name: Upload a11y audit artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-smoke-results
+          path: |
+            /tmp/nuvia-a11y-smoke-*/summary.json
+            /tmp/nuvia-a11y-smoke-*/next-dev.log
+          if-no-files-found: ignore

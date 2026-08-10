@@ -6,7 +6,7 @@ import { Redis } from "ioredis";
 import { log, run } from "./helpers";
 
 export async function ensureTestStack(): Promise<void> {
-  log("Ensuring test Postgres/Redis stack is up (compose.test.yml)…");
+  log("Ensuring test Postgres/Redis stack is up (compose.yml)…");
   await run([...COMPOSE_COMMAND, "up", "--detach", "--wait"]);
   log("Pushing database schema (drizzle-kit push --force)…");
   await run(["bunx", "drizzle-kit", "push", "--force"]);

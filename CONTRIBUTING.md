@@ -32,9 +32,9 @@ Install Docker with Docker Compose before you run the integration tests.
 
 - **pre-commit**: `oxlint` and `oxfmt --check` on staged files. A failing check blocks the commit. Fix the code (`bun run lint:fix`, `bun run format`). Do not bypass it with `--no-verify`.
 - **commit-msg**: Conventional Commits format, with a hard block on any `Co-Authored-By:` trailer. This rule applies identically whether you are a human or an AI agent working in this repo.
-- **pre-push**: `bun run typecheck` and `bun run test:integration`.
+- **pre-push**: `bun run typecheck` and `bun run test:unit` (the infra-free suite — no docker needed, finishes in seconds).
 
-Run `bun run guard:heavy` locally before you open a PR. The integration test command starts an isolated PostgreSQL and Redis stack.
+CI runs the rest: the integration suite against isolated services, plus the Playwright WCAG 2.2 AA audit and the route-boot smoke. Run `bun run guard:heavy` locally before you open a PR if you want the full picture first.
 
 The formatting standard is pinned in `.oxfmtrc.json`, so `oxfmt` formats identically on every machine and every oxfmt version. Do not run `oxfmt --init` or change the pinned options casually; the pre-commit gate enforces exactly this configuration.
 

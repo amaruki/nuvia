@@ -19,12 +19,13 @@ bun run dev              # dev server
 bun run typecheck        # tsc --noEmit
 bun run lint             # oxlint        (bun run lint:fix to autofix)
 bun run format:check     # oxfmt --check (bun run format to apply)
-bun test                 # unit + integration suites (all files run in one process)
-bun run guard:light      # lint + format:check + typecheck — the fast pre-commit loop
+bun run test:unit        # infra-free unit suite (tests/unit/, ~10s, no docker)
+bun test                 # unit + integration suites (needs the docker stack)
+bun run guard:light      # lint + format:check + typecheck + copy check + unit suite — the fast pre-commit loop
 bun run guard:heavy      # guard:light + integration tests + drizzle-kit check + build
 ```
 
-Integration tests (`bun run test:integration`, `bun run test:a11y`) need the docker stack up: Postgres on `127.0.0.1:15433` and Redis on `127.0.0.1:16380`.
+Integration tests (`bun run test:integration`), the Playwright WCAG 2.2 AA gate (`bun run test:a11y`), and the route-boot smoke (`bun run test:smoke`) need the docker stack up: Postgres on `127.0.0.1:15433` and Redis on `127.0.0.1:16380`. The Playwright gates also run in CI (the `browser` job), so they do not run on every local push.
 
 ## Canonical choices (see the linked ADR for why)
 

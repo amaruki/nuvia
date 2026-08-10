@@ -106,9 +106,11 @@ The integration test command starts isolated PostgreSQL and Redis containers. It
 | `bun run lint` / `lint:fix`                                    | oxlint                                                                    |
 | `bun run format` / `format:check`                              | oxfmt                                                                     |
 | `bun run typecheck`                                            | `tsc --noEmit`                                                            |
-| `bun test`                                                     | Run tests against services that are already available                     |
+| `bun run test:unit`                                            | Infra-free unit suite (`tests/unit/`, no docker needed)                   |
+| `bun test`                                                     | Run unit + integration tests against services that are already available  |
 | `bun run test:integration`                                     | Start isolated services, apply the schema, and run tests                  |
-| `bun run guard:light`                                          | lint + format + typecheck (fast)                                          |
+| `bun run test:a11y` / `test:smoke`                             | Playwright WCAG 2.2 AA audit / production route-boot smoke (need docker)  |
+| `bun run guard:light`                                          | lint + format + typecheck + copy check + unit tests (fast)                |
 | `bun run guard:heavy`                                          | `guard:light` + test + migration-drift check + build + `bun audit --prod` |
 | `bun run db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle                                                                   |
 | `bun run db:seed`                                              | Seed an admin account (`SEED_ADMIN_PASSWORD` required)                    |
@@ -117,9 +119,10 @@ The integration test command starts isolated PostgreSQL and Redis containers. It
 
 - **oxlint** and **oxfmt** replaced ESLint and Prettier ([ADR-0013](docs/adr/0013-oxlint-oxfmt-toolchain.md)). The previous ESLint config downgraded most rules to warnings. As a result, nothing actually blocked a build.
 - **TypeScript** runs in strict mode.
-- **bun test** runs the test suite against services that are already available.
-- **bun run test:integration** starts isolated services and applies the database schema before it runs the test suite.
-- **lefthook** — pre-commit (lint + format), commit-msg (Conventional Commits, no `Co-Authored-By` trailers), pre-push (typecheck + integration test).
+- **bun run test:unit** runs the infra-free unit suite (`tests/unit/`); it needs no docker stack and finishes in seconds.
+- **bun test** runs unit + integration together against services that are already available.
+- **bun run test:integration** starts isolated services and applies the database schema before it runs the test suite. The Playwright gates (`test:a11y`, `test:smoke`) manage their own stack and run in CI's `browser` job.
+- **lefthook** — pre-commit (lint + format), commit-msg (Conventional Commits, no `Co-Authored-By` trailers), pre-push (typecheck + unit suite). Integration and browser gates are enforced by CI.
 
 ### Project structure
 

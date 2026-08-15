@@ -21,8 +21,8 @@
  * planning prose legitimately contains em dashes. The guard only polices
  * src/ copy.
  *
- * RATCHET BASELINE: the tree currently carries 146 pre-Phase-8 violations
- * across 87 files (prose em dashes, "—" null placeholders, pagination/sort
+ * RATCHET BASELINE: the tree currently carries 142 pre-Phase-8 violations
+ * across 85 files (prose em dashes, "—" null placeholders, pagination/sort
  * arrows, emoji log prefixes, and the category-emoji feature defaults).
  * Removing them all is the UI-13 copy sweep and is intentionally NOT done
  * piecemeal here: Phase 8 guardrail work may not edit src/**, and several of
@@ -48,7 +48,7 @@ const VARIATION_SELECTOR = 0xfe0f;
  * Known pre-Phase-8 violations per file (see header). May only shrink; any
  * mismatch with the actual scan fails the guard. Notable entries:
  *   - do-dont-demo.tsx: deliberate emoji anti-example in the design preview.
- *   - add-category-form/visual-settings-section: category emoji feature,
+ *   - category-form/visual-settings-section: category emoji feature,
  *     removed by the UI-13 sweep.
  *   - lib/auth/email.ts etc.: emoji log prefixes (not user-visible, but the
  *     guard scans every string literal by design).
@@ -80,6 +80,7 @@ export const BASELINE: Record<string, number> = {
   "src/app/dashboard/awards/programs/_components/program-utils.ts": 1,
   "src/app/dashboard/awards/programs/_components/program-table.tsx": 1,
   "src/app/dashboard/content/articles/[id]/_components/article-helpers.ts": 1,
+  "src/app/dashboard/content/categories/_components/category-form/visual-settings-section.tsx": 1,
   "src/app/dashboard/events/checkin/page.tsx": 2,
   "src/app/dashboard/events/create/_components/basic-info-section.tsx": 1,
   "src/app/dashboard/events/pricing/page.tsx": 2,
@@ -115,8 +116,6 @@ export const BASELINE: Record<string, number> = {
   "src/app/dashboard/users/security/page.tsx": 1,
   "src/app/design/preview/_components/do-dont-demo.tsx": 2,
   "src/app/global-error.tsx": 1,
-  "src/components/content/add-category-form/index.tsx": 1,
-  "src/components/content/add-category-form/visual-settings-section.tsx": 1,
   "src/components/content/content-data-table/cells.tsx": 2,
   "src/components/content/content-data-table/media-columns.tsx": 1,
   "src/components/dashboard/module-preview-banner.tsx": 2,

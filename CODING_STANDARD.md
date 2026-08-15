@@ -92,6 +92,24 @@ Default to a Server Component (`docs/adr/0006-server-first-components.md`). Add 
 
 Use React Hook Form with `zodResolver`. Import the schema from the domain's `src/lib/validation/*.ts` file (§3.2). Do not redefine it inline in the form component. The form shows field errors inline, in English (§10).
 
+### 4.4 Dashboard CRUD forms
+
+Dashboard CRUD opens in a Sheet on the list page, not on a separate route. The open state lives in the URL (`?form=new` for create, `?form=<id>` for edit) so forms are shareable, refresh-safe, and closed by the back button. Do not add new `/create` or `/[id]/edit` dashboard pages; the ratchet in `tests/unit/form-standard.test.ts` enforces this and the matching schema-location rule from §3.2.
+
+Build forms from `src/components/dashboard/form-sheet/`:
+
+- `useFormSheet()` owns the URL open state (`openCreate`, `openEdit(id)`, `close`).
+- `FormSheet` is the container: fixed header, scrollable body, sticky footer, and the dirty-close confirmation via `UnsavedChangesGuard`.
+- `FormActions` renders Cancel + submit in the footer; the submit button is linked to the form by id.
+- `FormSection` groups fields under a small heading inside the body.
+- Field shorthands (`TextField`, `TextareaField`, `SelectField`, `NumberField`, `CheckboxField`, `DateField`) keep labels, help text, required markers, and error messages identical everywhere. The `required` prop renders the asterisk.
+
+Widgets the shorthands cannot express (file uploads, rich editors, icon pickers, field arrays) compose the `ui/form` primitives (`FormField`, `FormItem`, `FormLabel`, `FormControl`, `FormMessage`) directly. Never hand-roll error text or red borders outside `FormMessage`.
+
+On success: sonner toast, close the sheet, invalidate queries. On failure: inline destructive `Alert` inside the sheet body. Settings-style forms that legitimately stay full pages follow the same field, schema, and validation rules without the Sheet.
+
+Reference implementation: `src/app/dashboard/content/categories/_components/category-form/`.
+
 ## 5. Database Standards (Drizzle ORM)
 
 See `docs/architecture/data-model.md` for full detail. Summary:

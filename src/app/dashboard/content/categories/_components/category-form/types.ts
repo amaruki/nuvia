@@ -1,27 +1,11 @@
 import type { UseFormReturn } from "react-hook-form";
 
-import type {
-  Category,
-  CategoryFormData,
-  CategoryScope,
-  CategoryType,
-} from "@/types/category.types";
-
-export interface AddCategoryFormProps {
-  onSubmit: (data: CategoryFormData) => Promise<void>;
-  onCancel: () => void;
-  editingCategory?: Category;
-  isLoading?: boolean;
-}
+import type { CategoryFormData, CategoryScope } from "@/types/category.types";
 
 export type CategoryForm = UseFormReturn<CategoryFormData>;
 
 export interface CategoryFormSectionProps {
   form: CategoryForm;
-}
-
-export interface TypeStatusSectionProps extends CategoryFormSectionProps {
-  watchedType: CategoryType;
 }
 
 export interface ScopeOrderSectionProps extends CategoryFormSectionProps {
@@ -35,6 +19,6 @@ export interface VisualSettingsSectionProps extends CategoryFormSectionProps {
   onToggleEmojiMode: () => void;
 }
 
-export interface AccessControlSectionProps extends CategoryFormSectionProps {
+export interface AccessControlSectionProps {
   watchedScope: CategoryScope;
 }

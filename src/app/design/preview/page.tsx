@@ -121,9 +121,9 @@ export default async function DesignPreviewPage() {
         <SectionShell
           id="form-standard"
           index={5}
-          title="Form standard: react-hook-form plus zod"
-          description="One schema per form, validation errors rendered inline by FormMessage, submit button shows a pending state. No bare useState submits (UI-16)."
-          consumers={["Member application form", "Event create and edit", "All backoffice forms"]}
+          title="Form standard: form sheets plus react-hook-form and zod"
+          description="Dashboard CRUD opens in a URL-driven FormSheet built from field shorthands. One schema per form in src/lib/validation, errors rendered inline by FormMessage, submit shows a pending state, dirty closes ask first (UI-16)."
+          consumers={["Dashboard CRUD sheets", "Member application form", "All backoffice forms"]}
         >
           <FormDemo />
         </SectionShell>

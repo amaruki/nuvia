@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { useCategories } from "@/lib/hooks/use-categories";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
@@ -20,7 +21,7 @@ import type { Category, CategoryFormData, CategoryStatus } from "@/types/categor
 
 import { CategoriesActionBar } from "./_components/categories-action-bar";
 import { CategoriesAnalyticsTab } from "./_components/categories-analytics-tab";
-import { CategoriesFormView } from "./_components/categories-form-view";
+import { CategoryFormSheet } from "./_components/category-form";
 import { CategoriesImportExportBar } from "./_components/categories-import-export-bar";
 import { CategoriesListTab } from "./_components/categories-list-tab";
 import { CategoriesOverviewTab } from "./_components/categories-overview-tab";
@@ -31,9 +32,8 @@ export default function ContentCategories() {
   const [activeTab, setActiveTab] = useState("overview");
   const [tableVersion, setTableVersion] = useState(0);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
+  const sheet = useFormSheet();
   const { setHeader, clearHeader } = useHeader();
 
   const {
@@ -62,30 +62,6 @@ export default function ContentCategories() {
       clearHeader();
     };
   }, [setHeader, clearHeader]);
-
-  const closeForm = () => {
-    setShowAddForm(false);
-    setEditingCategory(null);
-  };
-
-  const openForm = (category: Category | null) => {
-    setEditingCategory(category);
-    setShowAddForm(true);
-  };
-
-  const handleFormSubmit = async (data: CategoryFormData) => {
-    try {
-      if (editingCategory) {
-        await updateCategory(editingCategory.id, data);
-      } else {
-        await createCategory(data);
-      }
-      bumpTable();
-      closeForm();
-    } catch (error) {
-      logger.error(editingCategory ? "Error updating category" : "Error adding category", error);
-    }
-  };
 
   const handleDelete = (category: Category) => {
     setDeleteTarget(category);
@@ -139,17 +115,6 @@ export default function ContentCategories() {
 
   if (error) return <CategoriesError error={error} onRetry={refreshData} />;
 
-  if (showAddForm) {
-    return (
-      <CategoriesFormView
-        editingCategory={editingCategory}
-        isLoading={loading}
-        onSubmit={handleFormSubmit}
-        onCancel={closeForm}
-      />
-    );
-  }
-
   return (
     <div className="space-y-6">
       {/* Action Bar */}
@@ -158,7 +123,7 @@ export default function ContentCategories() {
         activeCount={statistics?.activeCategories}
         selectedCount={selectedCategories.length}
         onRefresh={refreshData}
-        onAdd={() => openForm(null)}
+        onAdd={() => sheet.openCreate()}
       />
 
       {/* Main Content Tabs */}
@@ -180,7 +145,7 @@ export default function ContentCategories() {
 
         <CategoriesOverviewTab statistics={statistics} />
         <CategoriesListTab
-          onEdit={openForm}
+          onEdit={(category) => sheet.openEdit(category.id)}
           onDuplicate={handleDuplicate}
           onDelete={handleDelete}
           onStatusChange={handleStatusChange}
@@ -220,6 +185,13 @@ export default function ContentCategories() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <CategoryFormSheet
+        sheet={sheet}
+        onCreate={createCategory}
+        onUpdate={updateCategory}
+        onSaved={bumpTable}
+      />
     </div>
   );
 }

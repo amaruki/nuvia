@@ -1,12 +1,16 @@
-import { Button } from "@/components/ui/button";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CATEGORY_COLORS } from "@/types/category.types";
 
 import type { VisualSettingsSectionProps } from "./types";
 import { CategoryIconPicker } from "./icon-picker";
 
+/**
+ * Color swatches and the icon picker are custom widgets (escape hatch);
+ * the emoji input stays a standard FormField composition.
+ */
 export function VisualSettingsSection({
   form,
   selectedColor,
@@ -16,17 +20,15 @@ export function VisualSettingsSection({
 }: VisualSettingsSectionProps) {
   return (
     <div className="space-y-4">
-      <Label>Visual Appearance</Label>
-
-      {/* Color Selection */}
       <div className="space-y-2">
-        <Label>Color</Label>
-        <div className="flex flex-wrap gap-2">
+        <FormLabel>Color</FormLabel>
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Category color">
           {CATEGORY_COLORS.map((color) => (
             <button
               key={color.value}
               type="button"
               onClick={() => onColorSelect(color.value)}
+              aria-pressed={selectedColor === color.value}
               className={cn(
                 "w-8 h-8 rounded-lg border-2 transition-all",
                 selectedColor === color.value
@@ -41,29 +43,28 @@ export function VisualSettingsSection({
         </div>
       </div>
 
-      {/* Icon/Emoji Selection */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label>Icon Type</Label>
+          <FormLabel>Icon type</FormLabel>
           <Button type="button" variant="outline" size="sm" onClick={onToggleEmojiMode}>
             {useEmoji ? "Use Icon" : "Use Emoji"}
           </Button>
         </div>
 
         {useEmoji ? (
-          <div className="space-y-2">
-            <Label htmlFor="emoji">Emoji</Label>
-            <Input
-              id="emoji"
-              {...form.register("emoji")}
-              placeholder="📁"
-              maxLength={2}
-              className={cn(form.formState.errors.emoji && "border-red-500")}
-            />
-            {form.formState.errors.emoji && (
-              <p className="text-sm text-red-500">{form.formState.errors.emoji.message}</p>
+          <FormField
+            control={form.control}
+            name="emoji"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Emoji</FormLabel>
+                <FormControl>
+                  <Input placeholder="📁" maxLength={2} autoComplete="off" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
-          </div>
+          />
         ) : (
           <CategoryIconPicker form={form} />
         )}

@@ -1,33 +1,26 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import {
+  CheckboxField,
+  FormActions,
+  FormSection,
+  FormSheet,
+  SelectField,
+  TextareaField,
+  TextField,
+} from "@/components/dashboard/form-sheet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Form } from "@/components/ui/form";
 
+// Demo-only schema: design preview is outside the src/lib/validation
+// ratchet, real forms import their schema from the domain validation file.
 const memberFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.email("Enter a valid email address"),
@@ -39,9 +32,21 @@ const memberFormSchema = z.object({
 
 type MemberFormValues = z.infer<typeof memberFormSchema>;
 
-const CHAPTERS = ["Jakarta", "Bandung", "Surabaya", "Yogyakarta", "Denpasar"];
+const ROLE_OPTIONS = [
+  { value: "member", label: "Member" },
+  { value: "moderator", label: "Moderator" },
+  { value: "staff", label: "Staff" },
+  { value: "admin", label: "Admin" },
+];
+
+const CHAPTER_OPTIONS = ["Jakarta", "Bandung", "Surabaya", "Yogyakarta", "Denpasar"].map(
+  (chapter) => ({ value: chapter, label: chapter }),
+);
+
+const FORM_ID = "design-preview-member-form";
 
 export function FormDemo() {
+  const [open, setOpen] = useState(false);
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberFormSchema),
     defaultValues: {
@@ -55,149 +60,95 @@ export function FormDemo() {
 
   const onSubmit = async (values: MemberFormValues) => {
     // Real forms call a server action or API route here; the demo only reports.
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    const { promise, resolve } = Promise.withResolvers<void>();
+    setTimeout(resolve, 600);
+    await promise;
     toast.success(`Saved ${values.name} (${values.role})`, {
       description: "Demo submit, nothing was persisted.",
     });
+    setOpen(false);
     form.reset();
   };
+
+  const { isDirty, isSubmitting } = form.formState;
 
   return (
     <Card className="max-w-xl">
       <CardHeader>
         <CardTitle>Add member</CardTitle>
         <CardDescription>
-          Submit empty to see inline validation, then fill it in to see the pending state.
+          The dashboard CRUD standard: field shorthands grouped in sections inside a FormSheet. Open
+          it, submit while empty to see inline validation, then close after typing to see the
+          unsaved-changes guard.
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <Button onClick={() => setOpen(true)}>Open form sheet</Button>
+      </CardContent>
+
+      <FormSheet
+        open={open}
+        onOpenChange={setOpen}
+        title="Add member"
+        description="Demo of the standard dashboard form container."
+        isDirty={isDirty && !isSubmitting}
+        footer={
+          <FormActions
+            formId={FORM_ID}
+            mode="create"
+            submitting={isSubmitting}
+            onCancel={() => setOpen(false)}
+            entityLabel="Member"
+          />
+        }
+      >
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5" noValidate>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Dewi Kusuma" autoComplete="name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="dewi.kusuma@example.org" autoComplete="email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid gap-5 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a role" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="member">Member</SelectItem>
-                        <SelectItem value="moderator">Moderator</SelectItem>
-                        <SelectItem value="staff">Staff</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+          <form
+            id={FORM_ID}
+            onSubmit={form.handleSubmit(onSubmit)}
+            noValidate
+            className="space-y-6 p-6"
+          >
+            <FormSection title="Identity">
+              <TextField
+                name="name"
+                label="Full name"
+                required
+                placeholder="Dewi Kusuma"
+                autoComplete="name"
               />
-
-              <FormField
-                control={form.control}
-                name="chapter"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Chapter</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a chapter" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {CHAPTERS.map((chapter) => (
-                          <SelectItem key={chapter} value={chapter}>
-                            {chapter}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+              <TextField
+                name="email"
+                label="Email"
+                required
+                type="email"
+                placeholder="dewi.kusuma@example.org"
+                autoComplete="email"
               />
-            </div>
+            </FormSection>
 
-            <FormField
-              control={form.control}
-              name="bio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bio (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Short public biography, shown only when the profile is public (D7)."
-                      rows={3}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>At most 240 characters.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FormSection title="Membership">
+              <SelectField name="role" label="Role" required options={ROLE_OPTIONS} />
+              <SelectField name="chapter" label="Chapter" required options={CHAPTER_OPTIONS} />
+            </FormSection>
 
-            <FormField
-              control={form.control}
-              name="updates"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Send announcement emails</FormLabel>
-                    <FormDescription>
-                      Announcements published by the content module (D11).
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting && (
-                <Loader2 aria-hidden="true" className="animate-spin" />
-              )}
-              {form.formState.isSubmitting ? "Saving..." : "Save member"}
-            </Button>
+            <FormSection title="Profile">
+              <TextareaField
+                name="bio"
+                label="Bio (optional)"
+                rows={3}
+                description="At most 240 characters."
+                placeholder="Short public biography, shown only when the profile is public (D7)."
+              />
+              <CheckboxField
+                name="updates"
+                label="Send announcement emails"
+                description="Announcements published by the content module (D11)."
+              />
+            </FormSection>
           </form>
         </Form>
-      </CardContent>
+      </FormSheet>
     </Card>
   );
 }

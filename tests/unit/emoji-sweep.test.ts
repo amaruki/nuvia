@@ -116,9 +116,12 @@ describe("welcome email drops the celebration glyph (UI-13)", () => {
 // (d) Category form pairs the emoji field with a lucide icon picker
 // ---------------------------------------------------------------------------
 
-const ICON_PICKER = "src/components/content/add-category-form/icon-picker.tsx";
-const ICON_OPTIONS = "src/components/content/add-category-form/icon-options.ts";
-const VISUAL_SECTION = "src/components/content/add-category-form/visual-settings-section.tsx";
+const ICON_PICKER =
+  "src/app/dashboard/content/categories/_components/category-form/icon-picker.tsx";
+const ICON_OPTIONS =
+  "src/app/dashboard/content/categories/_components/category-form/icon-options.ts";
+const VISUAL_SECTION =
+  "src/app/dashboard/content/categories/_components/category-form/visual-settings-section.tsx";
 
 describe("category form pairs the emoji field with a lucide icon picker (UI-13)", () => {
   test("a curated icon option registry exists with broad lucide coverage", () => {
@@ -148,7 +151,7 @@ describe("category form pairs the emoji field with a lucide icon picker (UI-13)"
   test("the visual settings section renders the picker and keeps the emoji field", () => {
     const source = src(VISUAL_SECTION);
     expect(source).toContain("<CategoryIconPicker");
-    expect(source).toContain('form.register("emoji")');
+    expect(source).toContain('name="emoji"');
   });
 });
 
@@ -159,9 +162,8 @@ describe("category form pairs the emoji field with a lucide icon picker (UI-13)"
 const EMOJI_ALLOWLIST = [
   // Deliberate "Don't" example teaching this rule on the design preview page.
   "src/app/design/preview/_components/do-dont-demo.tsx",
-  // Emoji user-data affordance (accepted by the plan): placeholder and default.
-  "src/components/content/add-category-form/index.tsx",
-  "src/components/content/add-category-form/visual-settings-section.tsx",
+  // Emoji user-data affordance (accepted by the plan): input placeholder.
+  "src/app/dashboard/content/categories/_components/category-form/visual-settings-section.tsx",
   // Logger strings, not UI chrome; tracked in TODO.md's good-first-issue list.
   "src/lib/auth/email.ts",
   "src/lib/session-cache/cache-ops.ts",

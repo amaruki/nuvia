@@ -3,6 +3,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   SidebarFooter,
   SidebarMenu,
@@ -18,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BadgeCheck, CreditCard, Settings, Bell, LogOut, ChevronsUpDown } from "lucide-react";
+import { BadgeCheck, CreditCard, Settings, LogOut, ChevronsUpDown } from "lucide-react";
 import { useSession } from "@/hooks/use-session";
 import { useState } from "react";
 import { logoutAction } from "@/lib/actions/auth.actions";
@@ -133,22 +134,22 @@ export function SidebarFooterComponent({ className }: SidebarFooterComponentProp
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <a href="/dashboard/profile" className="flex items-center">
+                <Link href="/dashboard/profile" className="flex items-center">
                   <BadgeCheck className="mr-2 size-4" />
                   Account
-                </a>
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard className="mr-2 size-4" />
-                Billing
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/my/finance" className="flex items-center">
+                  <CreditCard className="mr-2 size-4" />
+                  My Finance
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 size-4" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell className="mr-2 size-4" />
-                Notifications
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/preferences" className="flex items-center">
+                  <Settings className="mr-2 size-4" />
+                  Settings
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut}>

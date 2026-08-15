@@ -70,8 +70,9 @@ function CollapsibleSubItemsPopover({
             tooltip={item.title}
             isActive={isItemActive || hasActiveSubItem}
             className={cn(
-              "relative h-15 w-15 p-0 mx-auto",
-              "flex items-center justify-center",
+              // The base button forces size-8/p-2 in icon-rail mode; keep the
+              // standard footprint instead of dead size overrides.
+              "relative flex items-center justify-center",
               "transition-colors duration-200",
             )}
           >
@@ -186,11 +187,9 @@ interface RegularNavigationItemProps {
 }
 
 function RegularNavigationItem({ item, isItemActive }: RegularNavigationItemProps) {
-  const tooltipString = `${item.title}${item.category ? ` (${item.category})` : ""}${item.badge ? ` - ${item.badge} new` : ""}`;
-
   return (
     <SidebarMenuItem key={item.id}>
-      <SidebarMenuButton tooltip={tooltipString} isActive={isItemActive} asChild>
+      <SidebarMenuButton tooltip={item.title} isActive={isItemActive} asChild>
         <Link href={item.path} prefetch={false}>
           {item.icon}
           <span>{item.title}</span>

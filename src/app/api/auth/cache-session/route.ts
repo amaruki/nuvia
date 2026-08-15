@@ -4,6 +4,12 @@ import { auth } from "@/lib/auth";
 import { problemResponse, problems, successResponse } from "@/lib/http";
 import { logger } from "@/lib/logger";
 
+// Session-dependent by definition — and without this Next.js tries to
+// collect the route statically at build time, evaluating env.ts (which
+// refuses to boot without a valid BETTER_AUTH_SECRET) before any request
+// exists. Same class as the force-dynamic (public) DB-backed pages.
+export const dynamic = "force-dynamic";
+
 /**
  * POST /api/auth/cache-session — warm the Redis session cache for the
  * caller's own session.

@@ -49,6 +49,17 @@ ARG NEXT_PUBLIC_ENABLE_REDIS_CACHE
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_ENABLE_REDIS_CACHE=$NEXT_PUBLIC_ENABLE_REDIS_CACHE
 
+# next build imports route modules to collect page data, which evaluates
+# src/lib/env.ts at import time — and env.ts refuses to boot without a
+# valid APP_URL and a >=32-char BETTER_AUTH_SECRET. Provide build-only
+# placeholders that satisfy validation; the runner stage gets the real
+# values from container env at deploy time (this ENV lives only in the
+# builder stage and never reaches the shipped image).
+ENV APP_URL=http://localhost:3000
+ENV BETTER_AUTH_SECRET=build-time-placeholder-not-a-real-secret-0000000
+ENV DATABASE_URL=postgresql://build-time-placeholder
+ENV REDIS_URL=redis://build-time-placeholder
+
 RUN bun run build
 
 # ---------------------------------------------------------------------------

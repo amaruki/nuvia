@@ -41,7 +41,12 @@
   --info: oklch(0.475 0.12 255);
   --danger: oklch(0.505 0.213 27.518);
   --border: oklch(0.9317 0.0118 231.6594);
-  --input: oklch(0.9809 0.0025 228.7836);
+  /* Darkened from oklch(0.9809 0.0025 228.7836), which was lighter than
+     --card itself: border-input fields (Input, Textarea, Select, Checkbox)
+     rendered with a ~1.01:1 boundary and read as borderless on auth and
+     dashboard cards. Now a conventional form-border gray, ~1.4:1 against
+     both --card and --background. */
+  --input: oklch(0.87 0.01 230);
   --ring: oklch(0.8012 0.1089 201.1736);
   --chart-1: oklch(0.8012 0.1089 201.1736);
   --chart-2: oklch(0.6907 0.1554 160.3454);
@@ -124,7 +129,10 @@
   --info: oklch(0.75 0.11 245);
   --danger: oklch(0.7 0.19 25.7658);
   --border: oklch(0.3184 0.0077 240.0771);
-  --input: oklch(0.2086 0.0085 264.373);
+  /* Dark-theme twin of the light --input fix above: oklch(0.2086 0.0085
+     264.373) sat ~1:1 against --card, leaving field boundaries invisible.
+     Raised to a visible gray (~1.8:1 on --card). */
+  --input: oklch(0.38 0.012 240);
   --ring: oklch(0.8012 0.1089 201.1736);
   --chart-1: oklch(0.8012 0.1089 201.1736);
   --chart-2: oklch(0.6907 0.1554 160.3454);

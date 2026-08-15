@@ -64,13 +64,6 @@ const STATUS_ICONS: Record<string, typeof CheckCircle> = {
   error: AlertTriangle,
 };
 
-const STATUS_VARIANTS: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
-  active: "default",
-  inactive: "secondary",
-  testing: "outline",
-  error: "destructive",
-};
-
 export function GatewaysTable({
   gateways,
   onViewDetails,
@@ -113,8 +106,6 @@ export function GatewaysTable({
         switch (id) {
           case "provider":
             return gateway.provider.toLowerCase();
-          case "status":
-            return gateway.status;
           case "totalTransactions":
             return gateway.statistics.totalTransactions;
           case "totalVolume":
@@ -161,6 +152,17 @@ export function GatewaysTable({
                 <div className="text-sm text-muted-foreground">
                   {row.original.currencies.join(", ")}
                 </div>
+                {row.original.lastTestedAt && (
+                  <div
+                    className="text-xs text-muted-foreground"
+                    title={format(new Date(row.original.lastTestedAt), "MMM d, yyyy HH:mm")}
+                  >
+                    Tested{" "}
+                    {formatDistanceToNow(new Date(row.original.lastTestedAt), {
+                      addSuffix: true,
+                    })}
+                  </div>
+                )}
               </div>
               {row.original.isDefault && (
                 <Star className="h-4 w-4 text-yellow-500" aria-label="Default gateway" />
@@ -177,27 +179,6 @@ export function GatewaysTable({
           <Badge variant="outline" className="capitalize">
             {row.original.provider}
           </Badge>
-        ),
-      },
-      {
-        id: "status",
-        accessorKey: "status",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-        cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <Badge variant={STATUS_VARIANTS[row.original.status] ?? "secondary"}>
-              {row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1)}
-            </Badge>
-            {row.original.lastTestedAt && (
-              <span
-                className="text-xs text-muted-foreground"
-                title={format(new Date(row.original.lastTestedAt), "MMM d, yyyy HH:mm")}
-              >
-                Tested{" "}
-                {formatDistanceToNow(new Date(row.original.lastTestedAt), { addSuffix: true })}
-              </span>
-            )}
-          </div>
         ),
       },
       {

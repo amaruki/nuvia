@@ -10,9 +10,9 @@ import { logger } from "@/lib/logger";
 import { CATEGORIES_API_PATH, CATEGORIES_PAGE_LIMIT } from "./constants";
 import { toErrorMessage } from "./error-message";
 
-/** Builds the /api/v1/content/categories list URL the dashboard fetches. */
-export function categoriesQueryPath(): string {
-  return `${CATEGORIES_API_PATH}?page=1&limit=${CATEGORIES_PAGE_LIMIT}`;
+/** Builds a /api/v1/content/categories list URL the dashboard fetches. */
+export function categoriesQueryPath(page: number): string {
+  return `${CATEGORIES_API_PATH}?page=${page}&limit=${CATEGORIES_PAGE_LIMIT}`;
 }
 
 /** Flattens hydrated categories into the serializable JSON export payload. */

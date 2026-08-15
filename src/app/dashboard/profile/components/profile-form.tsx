@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,22 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle, AlertCircle, Save } from "lucide-react";
 
 import { updateProfile } from "@/lib/client";
-
-// Simple form validation schema
-const profileFormSchema = z.object({
-  displayName: z
-    .string()
-    .min(1, "Display name is required")
-    .max(50, "Display name must be less than 50 characters"),
-  bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters")
-    .max(30, "Username must be less than 30 characters")
-    .optional(),
-});
-
-type ProfileFormData = z.infer<typeof profileFormSchema>;
+import { profileFormSchema, type ProfileFormData } from "@/lib/validation/profile.validation";
 
 interface ProfileFormProps {
   user: any;

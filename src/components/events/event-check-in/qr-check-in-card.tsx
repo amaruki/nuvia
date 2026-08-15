@@ -8,8 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { QrCode, UserCheck } from "lucide-react";
-import type { EventCheckInInput } from "@/lib/validation/event.validation";
-import { checkInFormSchema, type CheckInFormInput } from "./types";
+import {
+  checkInFormSchema,
+  type CheckInFormInput,
+  type EventCheckInInput,
+} from "@/lib/validation/event.validation";
 
 interface QrCheckInCardProps {
   eventId: string;

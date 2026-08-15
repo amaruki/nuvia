@@ -14,15 +14,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageErrorState, PageLoadingState } from "@/components/dashboard/page-states";
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
-import type { Announcement, AnnouncementFormData } from "@/types/announcement";
+import type { Announcement } from "@/types/announcement";
 import type { ArticleStatus } from "@/types/article";
 import { ActionBar } from "./_components/action-bar";
 import { AcknowledgmentsTab } from "./_components/acknowledgments-tab";
-import { AddAnnouncementView } from "./_components/add-announcement-view";
+import { AnnouncementFormSheet } from "./_components/announcement-form-sheet";
 import { AnnouncementsTab } from "./_components/announcements-tab";
 import { DraftsTab } from "./_components/drafts-tab";
 import { ImportExportBar } from "./_components/import-export-bar";
@@ -32,8 +33,8 @@ export default function ContentAnnouncements() {
   const [activeTab, setActiveTab] = useState("overview");
   const [tableVersion, setTableVersion] = useState(0);
   const [selectedAnnouncements, setSelectedAnnouncements] = useState<string[]>([]);
-  const [showAddForm, setShowAddForm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Announcement | null>(null);
+  const sheet = useFormSheet();
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
 
@@ -75,7 +76,7 @@ export default function ContentAnnouncements() {
   };
 
   const handleEdit = (announcement: Announcement) => {
-    router.push(`/dashboard/content/announcements/edit/${announcement.id}`);
+    sheet.openEdit(announcement.id);
   };
 
   const handleDelete = (announcement: Announcement) => {
@@ -120,31 +121,12 @@ export default function ContentAnnouncements() {
     }
   };
 
-  const handleAddAnnouncement = async (data: AnnouncementFormData) => {
-    try {
-      await addAnnouncement(data);
-      bumpTable();
-      setShowAddForm(false);
-    } catch (error) {
-      logger.error("Error adding announcement", error);
-    }
-  };
-
   if (loading) {
     return <PageLoadingState />;
   }
 
   if (error) {
     return <PageErrorState error={error} onRetry={refreshData} />;
-  }
-
-  if (showAddForm) {
-    return (
-      <AddAnnouncementView
-        onSubmit={handleAddAnnouncement}
-        onCancel={() => setShowAddForm(false)}
-      />
-    );
   }
 
   return (
@@ -155,7 +137,7 @@ export default function ContentAnnouncements() {
         statistics={statistics}
         selectedCount={selectedAnnouncements.length}
         onRefresh={refreshData}
-        onAdd={() => setShowAddForm(true)}
+        onAdd={() => sheet.openCreate()}
       />
 
       {/* Main Content Tabs */}
@@ -233,6 +215,13 @@ export default function ContentAnnouncements() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AnnouncementFormSheet
+        sheet={sheet}
+        onCreate={addAnnouncement}
+        onUpdate={updateAnnouncement}
+        onSaved={bumpTable}
+      />
     </div>
   );
 }

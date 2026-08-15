@@ -75,8 +75,7 @@ describe("UI-08: icon-only buttons carry accessible names", () => {
   test("tag entry forms: icon-only add/remove buttons labeled", () => {
     const tagForms = [
       "src/app/(public)/events/[id]/edit/_components/tags-section.tsx",
-      "src/app/dashboard/events/[id]/edit/_components/tags-section.tsx",
-      "src/app/dashboard/events/create/_components/tags-section.tsx",
+      "src/app/dashboard/events/_components/event-form/tag-input.tsx",
       "src/app/dashboard/content/media/edit/[id]/_components/tags-card.tsx",
     ];
     for (const rel of tagForms) {
@@ -88,11 +87,15 @@ describe("UI-08: icon-only buttons carry accessible names", () => {
   });
 
   test("charter-section and workspace settings-section: icon-only buttons labeled", () => {
-    const charter = read("src/components/committees/add-committee-form/charter-section.tsx");
+    const charter = read(
+      "src/app/dashboard/organization/committees/_components/committee-form/charter-section.tsx",
+    );
     expect(charter).toContain('aria-label="Add responsibility"');
     expect(charter).toContain("Remove responsibility");
 
-    const workspace = read("src/components/workspaces/add-workspace-form/settings-section.tsx");
+    const workspace = read(
+      "src/app/dashboard/organization/workspaces/_components/workspace-form/settings-section.tsx",
+    );
     expect(workspace).toContain('aria-label="Add file type"');
     expect(workspace).toContain("Remove file type");
   });

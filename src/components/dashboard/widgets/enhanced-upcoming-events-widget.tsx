@@ -139,7 +139,7 @@ export function EnhancedUpcomingEventsWidget({
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => (window.location.href = "/events/create")}
+            onClick={() => (window.location.href = "/dashboard/events?form=new")}
           >
             Create New Event
           </Button>

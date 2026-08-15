@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { CommitteesOverviewCards } from "@/components/committees/committees-overview-cards";
-import { AddCommitteeForm } from "@/components/committees/add-committee-form";
 import { useCommittees } from "@/lib/hooks/use-committees";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 
 import { CommitteesActionBar } from "./_components/committees-action-bar";
 import { CommitteesAnalyticsTab } from "./_components/committees-analytics-tab";
+import { CommitteeFormSheet } from "./_components/committee-form";
 import { CommitteesLeadershipTab } from "./_components/committees-leadership-tab";
 import { CommitteesListTab } from "./_components/committees-list-tab";
 import { CommitteesOverviewTab } from "./_components/committees-overview-tab";
@@ -31,8 +32,7 @@ import { CommitteesError, CommitteesLoading } from "./_components/committees-sta
 export default function OrganizationCommittees() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [editingCommittee, setEditingCommittee] = useState<Committee | null>(null);
+  const sheet = useFormSheet();
   const [committeeToDelete, setCommitteeToDelete] = useState<Committee | null>(null);
   const [isDeletingCommittee, setIsDeletingCommittee] = useState(false);
   const { setHeader, clearHeader } = useHeader();
@@ -63,30 +63,6 @@ export default function OrganizationCommittees() {
 
   const handleViewDetails = (committee: Committee) => {
     router.push(`/dashboard/organization/committees/${committee.id}`);
-  };
-
-  const handleEdit = (committee: Committee) => {
-    setEditingCommittee(committee);
-    setShowAddForm(true);
-  };
-
-  const handleAdd = () => {
-    setEditingCommittee(null);
-    setShowAddForm(true);
-  };
-
-  const handleFormSubmit = async (data: any) => {
-    try {
-      if (editingCommittee) {
-        await updateCommittee(editingCommittee.id, data);
-      } else {
-        await addCommittee(data);
-      }
-      setShowAddForm(false);
-      setEditingCommittee(null);
-    } catch (error) {
-      logger.error("Error saving committee", error);
-    }
   };
 
   const handleDelete = (committee: Committee) => {
@@ -132,7 +108,7 @@ export default function OrganizationCommittees() {
         totalCount={committees.length}
         activeCount={statistics?.activeCommittees}
         onRefresh={refreshData}
-        onAdd={handleAdd}
+        onAdd={() => sheet.openCreate()}
       />
 
       {/* Main Content Tabs */}
@@ -155,7 +131,7 @@ export default function OrganizationCommittees() {
         <CommitteesOverviewTab committees={committees} statistics={statistics} />
         <CommitteesListTab
           onViewDetails={handleViewDetails}
-          onEdit={handleEdit}
+          onEdit={(committee) => sheet.openEdit(committee.id)}
           onDelete={handleDelete}
           onToggleStatus={handleToggleStatus}
         />
@@ -163,14 +139,7 @@ export default function OrganizationCommittees() {
         <CommitteesAnalyticsTab statistics={statistics} />
       </Tabs>
 
-      {/* Modals */}
-      <AddCommitteeForm
-        open={showAddForm}
-        onOpenChange={setShowAddForm}
-        onSubmit={handleFormSubmit}
-        initialData={editingCommittee || undefined}
-        isEditing={!!editingCommittee}
-      />
+      <CommitteeFormSheet sheet={sheet} onCreate={addCommittee} onUpdate={updateCommittee} />
 
       <AlertDialog
         open={committeeToDelete !== null}

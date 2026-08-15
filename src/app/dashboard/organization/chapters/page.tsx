@@ -15,14 +15,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
-import { AddChapterForm } from "@/components/chapters/add-chapter-form";
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { ChaptersOverviewCards } from "@/components/chapters/chapters-overview-cards";
 import { PageErrorState, PageLoadingState } from "@/components/dashboard/page-states";
 import { useChapters } from "@/lib/hooks/use-chapters";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
-import type { Chapter, ChapterFormData } from "@/types/chapter.types";
+import type { Chapter } from "@/types/chapter.types";
 import { ActionBar } from "./_components/action-bar";
+import { ChapterFormSheet } from "./_components/chapter-form";
 import { AnalyticsTab } from "./_components/analytics-tab";
 import { ChaptersTab } from "./_components/chapters-tab";
 import { LeadershipTab } from "./_components/leadership-tab";
@@ -32,8 +33,7 @@ export default function OrganizationChapters() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("overview");
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
+  const sheet = useFormSheet();
   const [chapterToDelete, setChapterToDelete] = useState<Chapter | null>(null);
   const [isDeletingChapter, setIsDeletingChapter] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
@@ -68,31 +68,6 @@ export default function OrganizationChapters() {
       clearHeader();
     };
   }, [setHeader, clearHeader]);
-
-  const handleEdit = (chapter: Chapter) => {
-    setEditingChapter(chapter);
-    setShowAddForm(true);
-  };
-
-  const handleAdd = () => {
-    setEditingChapter(null);
-    setShowAddForm(true);
-  };
-
-  const handleFormSubmit = async (data: ChapterFormData) => {
-    try {
-      if (editingChapter) {
-        await updateChapter(editingChapter.id, data);
-      } else {
-        await addChapter(data);
-      }
-      setShowAddForm(false);
-      setEditingChapter(null);
-      invalidateChaptersList();
-    } catch (error) {
-      logger.error("Error saving chapter", error);
-    }
-  };
 
   const handleDelete = (chapter: Chapter) => {
     setChapterToDelete(chapter);
@@ -147,7 +122,7 @@ export default function OrganizationChapters() {
         totalChapters={chapters.length}
         statistics={statistics}
         onRefresh={handleRefresh}
-        onAdd={handleAdd}
+        onAdd={() => sheet.openCreate()}
       />
 
       {/* Main Content Tabs */}
@@ -177,7 +152,7 @@ export default function OrganizationChapters() {
             onViewDetails={(chapter) =>
               router.push(`/dashboard/organization/chapters/${chapter.id}`)
             }
-            onEdit={handleEdit}
+            onEdit={(chapter) => sheet.openEdit(chapter.id)}
             onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}
           />
@@ -192,14 +167,12 @@ export default function OrganizationChapters() {
         </TabsContent>
       </Tabs>
 
-      {/* Modals */}
-
-      <AddChapterForm
-        open={showAddForm}
-        onOpenChange={setShowAddForm}
-        onSubmit={handleFormSubmit}
-        initialData={editingChapter || undefined}
-        isEditing={!!editingChapter}
+      <ChapterFormSheet
+        sheet={sheet}
+        chapters={chapters}
+        onCreate={addChapter}
+        onUpdate={updateChapter}
+        onSaved={invalidateChaptersList}
       />
 
       <AlertDialog

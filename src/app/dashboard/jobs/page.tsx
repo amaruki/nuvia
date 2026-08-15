@@ -16,6 +16,7 @@ import {
   Clock,
 } from "lucide-react";
 
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -37,8 +38,15 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { fetchJobPostings, deleteJobPosting } from "./_lib/jobs-api";
+import {
+  createJobPosting,
+  deleteJobPosting,
+  fetchJobPostings,
+  updateJobPosting,
+  type JobPostingUpdateInput,
+} from "./_lib/jobs-api";
 import { DeleteJobDialog, type DeleteJobTarget } from "./_components/delete-job-dialog";
+import { JobFormSheet } from "./_components/job-form-sheet";
 import {
   EMPLOYMENT_TYPE_LABELS,
   formatDate,
@@ -63,6 +71,7 @@ export default function JobsAdminPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DeleteJobTarget | null>(null);
+  const sheet = useFormSheet();
 
   useEffect(() => {
     setHeader({
@@ -98,6 +107,22 @@ export default function JobsAdminPage() {
     },
   });
 
+  const createMutation = useMutation({
+    mutationFn: createJobPosting,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jobs-list"] });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, input }: { id: string; input: JobPostingUpdateInput }) =>
+      updateJobPosting(id, input),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["jobs-list"] });
+      queryClient.invalidateQueries({ queryKey: ["job", id] });
+    },
+  });
+
   const jobs = data?.items ?? [];
   const activeCount = jobs.filter((job) => job.status === "PUBLISHED").length;
   const totalApplicants = jobs.reduce((acc, job) => acc + job.applicationCount, 0);
@@ -109,7 +134,7 @@ export default function JobsAdminPage() {
   return (
     <div className="space-y-8 animate-fadeInUp">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <Button onClick={() => router.push("/dashboard/jobs/create")}>
+        <Button onClick={() => sheet.openCreate()}>
           <Plus className="h-4 w-4 mr-2" />
           Post New Job
         </Button>
@@ -259,9 +284,7 @@ export default function JobsAdminPage() {
                           >
                             <Users className="mr-2 h-4 w-4" /> View Applicants
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => router.push(`/dashboard/jobs/${job.id}/edit`)}
-                          >
+                          <DropdownMenuItem onClick={() => sheet.openEdit(job.id)}>
                             <Edit className="mr-2 h-4 w-4" /> Edit
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -296,6 +319,12 @@ export default function JobsAdminPage() {
           if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
         }}
         onCancel={() => setDeleteTarget(null)}
+      />
+
+      <JobFormSheet
+        sheet={sheet}
+        onCreate={(input) => createMutation.mutateAsync(input)}
+        onUpdate={(id, input) => updateMutation.mutateAsync({ id, input })}
       />
     </div>
   );

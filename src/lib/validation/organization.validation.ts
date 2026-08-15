@@ -139,3 +139,174 @@ export const membershipApplicationSchema = z.object({
 export type MembershipApplicationFormValues = z.infer<typeof membershipApplicationSchema>;
 
 export type MembershipApplicationFormInput = z.input<typeof membershipApplicationSchema>;
+
+/**
+ * Committee create/edit form (organization dashboard form sheet). The API
+ * request schemas in src/lib/services/committee/schemas.ts stay the wire
+ * contract; this client form schema carries the same rules plus the
+ * field-level messages the form displays.
+ */
+export const committeeFormSchema = z.object({
+  name: z
+    .string()
+    .min(3, "Name must be at least 3 characters")
+    .max(50, "Name must be less than 50 characters"),
+  displayName: z
+    .string()
+    .min(3, "Display name must be at least 3 characters")
+    .max(100, "Display name must be less than 100 characters"),
+  description: z.string().optional(),
+  purpose: z
+    .string()
+    .min(10, "Purpose must be at least 10 characters")
+    .max(500, "Purpose must be less than 500 characters"),
+  status: z.enum(["active", "inactive", "pending", "suspended"] as const),
+  type: z.enum(["executive", "functional", "special_interest", "ad_hoc", "standing"] as const),
+  contactInfo: z.object({
+    email: z.string().email("Invalid email address"),
+    phone: z.string().optional(),
+    meetingLocation: z.string().optional(),
+    virtualMeetingLink: z.string().url("Invalid URL").optional().or(z.literal("")),
+    website: z.string().url("Invalid URL").optional().or(z.literal("")),
+  }),
+  charter: z.object({
+    missionStatement: z
+      .string()
+      .min(10, "Mission statement must be at least 10 characters")
+      .max(500, "Mission statement must be less than 500 characters"),
+    responsibilities: z
+      .array(z.string().min(5, "Each responsibility must be at least 5 characters"))
+      .min(1, "At least one responsibility is required"),
+    authorityLevel: z.enum(["advisory", "operational", "strategic", "executive"] as const),
+    decisionMakingProcess: z
+      .string()
+      .min(10, "Decision making process must be at least 10 characters")
+      .max(500, "Decision making process must be less than 500 characters"),
+    reportingStructure: z
+      .string()
+      .min(10, "Reporting structure must be at least 10 characters")
+      .max(500, "Reporting structure must be less than 500 characters"),
+    termLimits: z
+      .object({
+        chairTerm: z
+          .number()
+          .min(1, "Chair term must be at least 1 month")
+          .max(60, "Chair term must be less than 60 months"),
+        memberTerm: z
+          .number()
+          .min(1, "Member term must be at least 1 month")
+          .max(60, "Member term must be less than 60 months"),
+        maxTerms: z
+          .number()
+          .min(1, "Max terms must be at least 1")
+          .max(10, "Max terms must be less than 10"),
+      })
+      .optional(),
+  }),
+  parentCommitteeId: z.string().optional(),
+});
+
+export type CommitteeFormValues = z.infer<typeof committeeFormSchema>;
+
+/** Workspace create/edit form (organization dashboard form sheet). */
+export const workspaceFormSchema = z.object({
+  name: z
+    .string()
+    .min(3, "Name must be at least 3 characters")
+    .max(50, "Name must be less than 50 characters"),
+  description: z.string().optional(),
+  type: z.enum(["general", "project", "document", "discussion", "meeting"] as const),
+  settings: z.object({
+    isPublic: z.boolean(),
+    allowGuestAccess: z.boolean(),
+    requireApproval: z.boolean(),
+    enableNotifications: z.boolean(),
+    autoArchiveDays: z
+      .number()
+      .min(1, "Auto archive must be at least 1 day")
+      .max(1095, "Auto archive must be less than 3 years"),
+    maxFileSize: z
+      .number()
+      .min(1, "Max file size must be at least 1MB")
+      .max(1000, "Max file size must be less than 1000MB"),
+    allowedFileTypes: z.array(z.string()).min(1, "At least one file type must be allowed"),
+    memberPermissions: z
+      .array(
+        z.object({
+          role: z.enum([
+            "chair",
+            "co_chair",
+            "secretary",
+            "treasurer",
+            "member",
+            "advisor",
+          ] as const),
+          permissions: z.array(
+            z.enum([
+              "view",
+              "edit",
+              "delete",
+              "upload",
+              "download",
+              "manage_members",
+              "manage_settings",
+            ] as const),
+          ),
+        }),
+      )
+      .min(1, "At least one permission set is required"),
+  }),
+});
+
+export type WorkspaceFormValues = z.infer<typeof workspaceFormSchema>;
+
+/** Chapter create/edit form (organization dashboard form sheet). */
+export const chapterFormSchema = z.object({
+  name: z
+    .string()
+    .min(3, "Chapter name must be at least 3 characters")
+    .max(50, "Chapter name must be less than 50 characters"),
+  displayName: z
+    .string()
+    .min(3, "Display name must be at least 3 characters")
+    .max(100, "Display name must be less than 100 characters"),
+  description: z.string().optional(),
+  status: z.enum(["active", "inactive", "pending", "suspended"]),
+  location: z.object({
+    address: z.string().min(5, "Address must be at least 5 characters"),
+    city: z.string().min(2, "City must be at least 2 characters"),
+    state: z.string().min(2, "State must be at least 2 characters"),
+    country: z.string().min(2, "Country must be at least 2 characters"),
+    postalCode: z.string().min(3, "Postal code must be at least 3 characters"),
+    timezone: z.string().min(1, "Timezone is required"),
+    region: z.string().min(2, "Region must be at least 2 characters"),
+  }),
+  contactInfo: z.object({
+    email: z.string().email("Invalid email address"),
+    phone: z.string().optional(),
+    website: z.string().url("Invalid website URL").optional().or(z.literal("")),
+    address: z.string().min(5, "Address must be at least 5 characters"),
+    mailingAddress: z.string().optional(),
+  }),
+  socialMedia: z.object({
+    facebook: z.string().url("Invalid Facebook URL").optional().or(z.literal("")),
+    twitter: z.string().url("Invalid Twitter URL").optional().or(z.literal("")),
+    linkedin: z.string().url("Invalid LinkedIn URL").optional().or(z.literal("")),
+    instagram: z.string().url("Invalid Instagram URL").optional().or(z.literal("")),
+    youtube: z.string().url("Invalid YouTube URL").optional().or(z.literal("")),
+  }),
+  settings: z.object({
+    allowOnlineRegistration: z.boolean(),
+    requireApproval: z.boolean(),
+    membershipDues: z.number().min(0, "Membership dues must be a positive number"),
+    meetingFrequency: z.enum(["weekly", "biweekly", "monthly", "quarterly"]),
+    meetingDay: z.string().optional(),
+    meetingTime: z.string().optional(),
+    autoRenewMembership: z.boolean(),
+    sendReminders: z.boolean(),
+    publicDirectory: z.boolean(),
+  }),
+  parentChapterId: z.string().optional(),
+});
+
+export type ChapterFormValues = z.infer<typeof chapterFormSchema>;

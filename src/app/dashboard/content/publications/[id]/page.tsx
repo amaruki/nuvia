@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { usePublications } from "@/lib/hooks/use-publications";
 import { useHeader } from "@/contexts/dashboard-context";
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { PublicationContentSection } from "./_components/publication-content-section";
 import { PublicationHeader } from "./_components/publication-header";
 import { PublicationHeaderActions } from "./_components/publication-header-actions";
@@ -23,16 +24,25 @@ import { PublicationMetricsCard } from "./_components/publication-metrics-card";
 import { PublicationSeoCard } from "./_components/publication-seo-card";
 import { PublicationError, PublicationLoading } from "./_components/publication-states";
 
+import { PublicationFormSheet } from "../_components/publication-form-sheet";
+
 export default function PublicationDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
   const queryClient = useQueryClient();
+  const sheet = useFormSheet();
   const [error, setError] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const { getPublication, deletePublication, publishPublication, archivePublication } =
-    usePublications();
+  const {
+    getPublication,
+    addPublication,
+    updatePublication,
+    deletePublication,
+    publishPublication,
+    archivePublication,
+  } = usePublications();
 
   // Query for publication data
   const {
@@ -76,7 +86,7 @@ export default function PublicationDetailsPage() {
   }, [publication, setHeader, clearHeader]);
 
   const handleEdit = () => {
-    router.push(`/dashboard/content/publications/edit/${params.id}`);
+    sheet.openEdit(params.id as string);
   };
 
   const handleDelete = async () => {
@@ -180,6 +190,13 @@ export default function PublicationDetailsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <PublicationFormSheet
+        sheet={sheet}
+        onCreate={addPublication}
+        onUpdate={updatePublication}
+        onSaved={() => queryClient.invalidateQueries({ queryKey: ["publication", params.id] })}
+      />
     </div>
   );
 }

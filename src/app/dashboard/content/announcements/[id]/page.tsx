@@ -3,10 +3,13 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
 import { logger } from "@/lib/logger";
 import type { Announcement } from "@/types/announcement";
+
+import { AnnouncementFormSheet } from "../_components/announcement-form-sheet";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -37,8 +40,15 @@ export default function AnnouncementViewPage() {
   const params = useParams();
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
-  const { getAnnouncement, deleteAnnouncement, publishAnnouncement, archiveAnnouncement } =
-    useAnnouncements();
+  const {
+    getAnnouncement,
+    addAnnouncement,
+    updateAnnouncement,
+    deleteAnnouncement,
+    publishAnnouncement,
+    archiveAnnouncement,
+  } = useAnnouncements();
+  const sheet = useFormSheet();
 
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [loading, setLoading] = useState(true);
@@ -83,7 +93,7 @@ export default function AnnouncementViewPage() {
   }, [announcementId, getAnnouncement]);
 
   const handleEdit = () => {
-    router.push(`/dashboard/content/announcements/edit/${announcementId}`);
+    sheet.openEdit(announcementId);
   };
 
   const handleDelete = () => {
@@ -185,6 +195,12 @@ export default function AnnouncementViewPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AnnouncementFormSheet
+        sheet={sheet}
+        onCreate={addAnnouncement}
+        onUpdate={updateAnnouncement}
+      />
     </div>
   );
 }

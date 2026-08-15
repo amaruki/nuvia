@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, Edit, ExternalLink, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useHeader } from "@/contexts/dashboard-context";
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { useArticles } from "@/lib/hooks/use-articles";
 import { Article } from "@/types/article";
 import { ArticleActionsCard } from "./_components/article-actions-card";
 import { ArticleContentCard } from "./_components/article-content-card";
+import { ArticleFormSheet } from "../_components/article-form-sheet";
 import { ArticleHeaderCard } from "./_components/article-header-card";
 import { ArticleMetricsCard } from "./_components/article-metrics-card";
 import { ArticleTagsCard } from "./_components/article-tags-card";
@@ -22,7 +24,8 @@ export default function ArticleDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
-  const { getArticle } = useArticles();
+  const { getArticle, addArticle, updateArticle } = useArticles();
+  const sheet = useFormSheet();
 
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,7 +69,7 @@ export default function ArticleDetailsPage() {
   }, [articleId, getArticle]);
 
   const handleEdit = () => {
-    router.push(`/dashboard/content/articles/edit/${articleId}`);
+    sheet.openEdit(articleId);
   };
 
   const handleShare = () => {
@@ -137,6 +140,8 @@ export default function ArticleDetailsPage() {
 
       {/* Actions */}
       <ArticleActionsCard downloadEnabled={article.downloadEnabled} onShare={handleShare} />
+
+      <ArticleFormSheet sheet={sheet} onCreate={addArticle} onUpdate={updateArticle} />
     </div>
   );
 }

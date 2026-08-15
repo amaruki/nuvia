@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, X, ChevronDown, ChevronUp } from "lucide-react";
 import { EventStatus, EventType } from "@/types/event";
-import { eventFilterSchema } from "./types";
+import { eventFilterFormSchema } from "@/lib/validation/event.validation";
 import type { EventFilterForm, EventFilterProps, FilterChipKind } from "./types";
 import { ActiveFilterChips } from "./active-filter-chips";
 import { DateRangeFilter } from "./date-range-filter";
@@ -29,7 +29,7 @@ export function EventFilterComponent({
   const [selectedTags, setSelectedTags] = React.useState<string[]>(filter.tags || []);
 
   const { register, handleSubmit, watch, setValue, reset } = useForm<EventFilterForm>({
-    resolver: zodResolver(eventFilterSchema),
+    resolver: zodResolver(eventFilterFormSchema),
     defaultValues: {
       searchQuery: filter.searchQuery || "",
       status: filter.status || [],

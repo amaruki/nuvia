@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // ---------------------------------------------------------------------------
-// Validation schemas (mirror src/components/committees/add-committee-form/schema.ts)
+// Validation schemas (mirror committeeFormSchema in src/lib/validation/organization.validation.ts)
 // ---------------------------------------------------------------------------
 
 export const COMMITTEE_STATUSES = ["active", "inactive", "pending", "suspended"] as const;

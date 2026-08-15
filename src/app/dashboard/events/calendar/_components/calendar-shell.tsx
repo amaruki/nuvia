@@ -3,8 +3,8 @@
 /**
  * Client shell for the events calendar. Owns tab state (formerly
  * use-events-calendar) and distributes the real event DTOs fetched by the
- * server page to the individual tabs. Event creation lives at
- * /dashboard/events/create (linked from CalendarHeaderControls).
+ * server page to the individual tabs. Event creation opens the form
+ * sheet at /dashboard/events?form=new (linked from CalendarHeaderControls).
  */
 
 import { useEffect, useMemo, useState } from "react";

@@ -16,12 +16,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { ArticlesOverviewCards } from "@/components/content/articles-overview-cards";
 import { PageErrorState, PageLoadingState } from "@/components/dashboard/page-states";
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { useArticles } from "@/lib/hooks/use-articles";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Article } from "@/types/article";
 import { ActionBar } from "./_components/action-bar";
 import { AnalyticsTab } from "./_components/analytics-tab";
+import { ArticleFormSheet } from "./_components/article-form-sheet";
 import { ArticlesTab } from "./_components/articles-tab";
 import { DraftsTab } from "./_components/drafts-tab";
 import { ImportExportBar } from "./_components/import-export-bar";
@@ -34,6 +36,7 @@ export default function ContentArticles() {
   const [deleteTarget, setDeleteTarget] = useState<Article | null>(null);
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
+  const sheet = useFormSheet();
 
   const {
     articles,
@@ -41,6 +44,8 @@ export default function ContentArticles() {
     loading,
     error,
     refreshData,
+    addArticle,
+    updateArticle,
     deleteArticle,
     duplicateArticle,
     publishArticle,
@@ -68,7 +73,7 @@ export default function ContentArticles() {
   const bumpTable = () => setTableVersion((value) => value + 1);
 
   const handleEdit = (article: Article) => {
-    router.push(`/dashboard/content/articles/edit/${article.id}`);
+    sheet.openEdit(article.id);
   };
 
   const handleDelete = (article: Article) => {
@@ -132,7 +137,7 @@ export default function ContentArticles() {
         statistics={statistics}
         selectedArticles={selectedArticles}
         onRefresh={refreshData}
-        onAdd={() => router.push("/dashboard/content/articles/create")}
+        onAdd={() => sheet.openCreate()}
       />
 
       {/* Main Content Tabs */}
@@ -208,6 +213,13 @@ export default function ContentArticles() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ArticleFormSheet
+        sheet={sheet}
+        onCreate={addArticle}
+        onUpdate={updateArticle}
+        onSaved={bumpTable}
+      />
     </div>
   );
 }

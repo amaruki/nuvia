@@ -55,19 +55,18 @@ Routes map service errors in `src/app/api/v1/learning/_lib.ts`: `LearningService
 
 ## Dashboard UI
 
-Nine pages under `src/app/dashboard/learning/`, wired to the API through `src/lib/hooks/use-learning-courses.ts` and `src/lib/hooks/use-learning-certificates.ts` (react-query over `apiFetch`, backlog D3 — the `courses/_data` and `courses/_types` mock files were deleted once their last importers moved; shared types live in `src/types/learning.types.ts`):
+Eight pages under `src/app/dashboard/learning/`, wired to the API through `src/lib/hooks/use-learning-courses.ts` and `src/lib/hooks/use-learning-certificates.ts` (react-query over `apiFetch`, backlog D3 — the `courses/_data` and `courses/_types` mock files were deleted once their last importers moved; shared types live in `src/types/learning.types.ts`):
 
-| Page                  | Path                                                 |
-| --------------------- | ---------------------------------------------------- |
-| Course catalogue      | `/dashboard/learning/courses`                        |
-| Course detail         | `/dashboard/learning/courses/[courseId]`             |
-| Admin — courses       | `/dashboard/learning/admin`                          |
-| Admin — create course | `/dashboard/learning/admin/create`                   |
-| Admin — edit course   | `/dashboard/learning/admin/[courseId]/edit`          |
-| Certifications        | `/dashboard/learning/certifications`                 |
-| Certificate view      | `/dashboard/learning/certifications/[certificateId]` |
-| Certificate mgmt      | `/dashboard/learning/certificate-management`         |
-| Settings              | `/dashboard/learning/settings` (presentation-only)   |
+| Page             | Path                                                                      |
+| ---------------- | ------------------------------------------------------------------------- |
+| Course catalogue | `/dashboard/learning/courses`                                             |
+| Course detail    | `/dashboard/learning/courses/[courseId]`                                  |
+| My courses       | `/dashboard/learning/my-courses`                                          |
+| Admin — courses  | `/dashboard/learning/admin` (course create/edit open as a `?form=` sheet) |
+| Certifications   | `/dashboard/learning/certifications`                                      |
+| Certificate view | `/dashboard/learning/certifications/[certificateId]`                      |
+| Certificate mgmt | `/dashboard/learning/certificate-management`                              |
+| Settings         | `/dashboard/learning/settings` (presentation-only)                        |
 
 The list hooks fetch pages (`limit=100`) and expose plain async mutations (`createCourse`/`updateCourse`/`deleteCourse`, `revokeCertificate`) that toast on success/error and invalidate the `["learning", "courses" | "certificates"]` query keys; wire dates are hydrated to display labels in the mapper. Admin analytics (total courses, total students) are reduced from fetched rows — nothing is invented; loading/error/empty states are honest and distinguish "no data yet" from "no filter matches". The certificate card badge reflects `status` ("Verified"/"Revoked"), and the certificate view prints the real `studentName`.
 

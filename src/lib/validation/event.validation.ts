@@ -230,3 +230,184 @@ export type EventRegistrationInput = z.infer<typeof eventRegistrationSchema>;
 export type EventCheckInInput = z.infer<typeof eventCheckInSchema>;
 export type EventCertificateInput = z.infer<typeof eventCertificateSchema>;
 export type EventStatisticsQueryInput = z.infer<typeof eventStatisticsQuerySchema>;
+
+// ---------------------------------------------------------------------------
+// Dashboard form schemas (URL-driven FormSheet CRUD, CODING_STANDARD
+// "Dashboard CRUD forms"). Unlike the API schemas above, these validate
+// form-control values: dates are `datetime-local` strings and the optional
+// capacity is either a positive integer or the empty string.
+// ---------------------------------------------------------------------------
+
+/** Parses a `datetime-local` string; null when empty or invalid. */
+function parseDateTimeInput(value: string): Date | null {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+/**
+ * Shared create/edit form shape for the dashboard event sheet. Cross-field
+ * rules mirror the API's write schemas but report against form paths.
+ */
+export const eventFormSchema = z
+  .object({
+    title: z
+      .string()
+      .trim()
+      .min(3, "Title must be at least 3 characters")
+      .max(200, "Title must be at most 200 characters"),
+    shortDescription: z
+      .string()
+      .trim()
+      .max(300, "Short description must be at most 300 characters"),
+    description: z
+      .string()
+      .trim()
+      .min(10, "Description must be at least 10 characters")
+      .max(5000, "Description must be at most 5000 characters"),
+    category: z.string(),
+    eventType: eventTypeSchema,
+    status: eventStatusSchema,
+    startDate: z.string(),
+    endDate: z.string(),
+    registrationDeadline: z.string(),
+    location: z
+      .string()
+      .trim()
+      .min(3, "Location must be at least 3 characters")
+      .max(200, "Location must be at most 200 characters"),
+    virtualEventUrl: z.string(),
+    isVirtual: z.boolean(),
+    isInPerson: z.boolean(),
+    maxAttendees: z.union([z.number(), z.literal("")]),
+    tags: z
+      .array(
+        z
+          .string()
+          .min(1, "Tag must be at least 1 character")
+          .max(30, "Tag must be at most 30 characters"),
+      )
+      .max(10, "Maximum 10 tags allowed"),
+  })
+  .superRefine((data, ctx) => {
+    const startDate = parseDateTimeInput(data.startDate);
+    if (!startDate) {
+      ctx.addIssue({ code: "custom", path: ["startDate"], message: "Start date is required" });
+    }
+
+    const endDate = parseDateTimeInput(data.endDate);
+    if (!endDate) {
+      ctx.addIssue({ code: "custom", path: ["endDate"], message: "End date is required" });
+    } else if (startDate && endDate <= startDate) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endDate"],
+        message: "End date must be after the start date",
+      });
+    }
+
+    if (data.registrationDeadline) {
+      const deadline = parseDateTimeInput(data.registrationDeadline);
+      if (!deadline) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["registrationDeadline"],
+          message: "Registration deadline must be a valid date",
+        });
+      } else if (startDate && deadline >= startDate) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["registrationDeadline"],
+          message: "Registration deadline must be before the start date",
+        });
+      }
+    }
+
+    // NumberField reports a number or ""; the integer/positive rules live
+    // here (not on the union) so the error message stays human.
+    if (
+      typeof data.maxAttendees === "number" &&
+      (!Number.isInteger(data.maxAttendees) || data.maxAttendees <= 0)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["maxAttendees"],
+        message: "Capacity must be a positive whole number",
+      });
+    }
+
+    if (!data.isVirtual && !data.isInPerson) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["isInPerson"],
+        message: "Choose at least one of virtual or in-person",
+      });
+    }
+
+    if (data.isVirtual) {
+      const url = data.virtualEventUrl.trim();
+      if (!url) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["virtualEventUrl"],
+          message: "Virtual event URL is required for virtual events",
+        });
+      } else {
+        try {
+          new URL(url);
+        } catch {
+          ctx.addIssue({
+            code: "custom",
+            path: ["virtualEventUrl"],
+            message: "Virtual event URL must be a valid URL",
+          });
+        }
+      }
+    }
+  });
+
+/**
+ * Create mode additionally requires a category: the events table has no
+ * default and the select is part of the create sheet only.
+ */
+export const eventCreateFormSchema = eventFormSchema.refine(
+  (data) => data.category.trim().length > 0,
+  {
+    message: "Category is required",
+    path: ["category"],
+  },
+);
+
+export type EventFormValues = z.infer<typeof eventFormSchema>;
+export type EventCreateFormValues = z.infer<typeof eventCreateFormSchema>;
+
+// ---------------------------------------------------------------------------
+// Check-in form schema (moved from src/components/events/event-check-in).
+// ---------------------------------------------------------------------------
+
+export const checkInFormSchema = z.object({
+  verificationCode: z.string().min(1, "Verification code is required"),
+});
+
+export type CheckInFormInput = z.infer<typeof checkInFormSchema>;
+
+// ---------------------------------------------------------------------------
+// Event filter form schema (moved from src/components/events/event-filter).
+// Distinct from the API's eventFilterSchema above: this one validates the
+// dashboard filter panel's form values, where status/eventType arrive as
+// plain string arrays before the caller narrows them to enums.
+// ---------------------------------------------------------------------------
+
+export const eventFilterFormSchema = z.object({
+  searchQuery: z.string().optional(),
+  status: z.array(z.string()).optional(),
+  eventType: z.array(z.string()).optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+  organizerId: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  isVirtual: z.boolean().optional(),
+  isInPerson: z.boolean().optional(),
+});
+
+export type EventFilterForm = z.infer<typeof eventFilterFormSchema>;

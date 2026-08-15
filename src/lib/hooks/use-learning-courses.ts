@@ -47,16 +47,14 @@ export function toCourseUi(wire: WireCourse): Course {
 // Hooks
 // ---------------------------------------------------------------------------
 
-export function useLearningCourses() {
+/**
+ * Mutation-only slice of the course hooks (same arrangement as
+ * use-committees/use-committee-mutations). Surfaces that own their own list
+ * query — the admin form sheet — use this directly so mounting them never
+ * fires the full limit=100 list fetch.
+ */
+export function useCourseMutations() {
   const queryClient = useQueryClient();
-
-  const listQuery = useQuery({
-    queryKey: ["learning", "courses", "list"],
-    queryFn: async () => {
-      const { data } = await apiFetch<WireCourse[]>("/api/v1/learning/courses?limit=100");
-      return data.map(toCourseUi);
-    },
-  });
 
   const invalidateCourses = () =>
     queryClient.invalidateQueries({ queryKey: ["learning", "courses"] });
@@ -108,8 +106,6 @@ export function useLearningCourses() {
     },
   });
 
-  const courses = useMemo(() => listQuery.data ?? [], [listQuery.data]);
-
   const createCourse = async (input: CreateCourseInput) => {
     await createMutation.mutateAsync(input);
   };
@@ -123,6 +119,30 @@ export function useLearningCourses() {
   };
 
   return {
+    createCourse,
+    updateCourse,
+    deleteCourse,
+    refreshData: invalidateCourses,
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+  };
+}
+
+export function useLearningCourses() {
+  const listQuery = useQuery({
+    queryKey: ["learning", "courses", "list"],
+    queryFn: async () => {
+      const { data } = await apiFetch<WireCourse[]>("/api/v1/learning/courses?limit=100");
+      return data.map(toCourseUi);
+    },
+  });
+
+  const { createCourse, updateCourse, deleteCourse, refreshData } = useCourseMutations();
+
+  const courses = useMemo(() => listQuery.data ?? [], [listQuery.data]);
+
+  return {
     courses,
     loading: listQuery.isPending,
     error: listQuery.error
@@ -133,11 +153,11 @@ export function useLearningCourses() {
     createCourse,
     updateCourse,
     deleteCourse,
-    refreshData: invalidateCourses,
+    refreshData,
   };
 }
 
-/** Single-course query for the detail and admin edit pages. */
+/** Single-course query for the detail page and the admin form sheet. */
 export function useCourse(id: string | undefined) {
   return useQuery({
     queryKey: ["learning", "courses", "detail", id],

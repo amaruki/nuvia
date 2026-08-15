@@ -1,19 +1,9 @@
-import { z } from "zod";
 import type { EventFilter } from "@/types/event";
 
-export const eventFilterSchema = z.object({
-  searchQuery: z.string().optional(),
-  status: z.array(z.string()).optional(),
-  eventType: z.array(z.string()).optional(),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
-  organizerId: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  isVirtual: z.boolean().optional(),
-  isInPerson: z.boolean().optional(),
-});
-
-export type EventFilterForm = z.infer<typeof eventFilterSchema>;
+// The filter panel's form schema lives in the domain validation module
+// (CODING_STANDARD 3.2); the type is re-exported here so existing
+// "./types" imports in this folder keep working.
+export type { EventFilterForm } from "@/lib/validation/event.validation";
 
 export interface EventFilterProps {
   filter: EventFilter;

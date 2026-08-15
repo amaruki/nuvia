@@ -13,13 +13,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
-import { AddWorkspaceForm } from "@/components/workspaces/add-workspace-form";
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { WorkspacesOverviewCards } from "@/components/workspaces/workspaces-overview-cards";
 import { useHeader } from "@/contexts/dashboard-context";
 import { useWorkspaces } from "@/lib/hooks/use-workspaces";
 import { logger } from "@/lib/logger";
-import type { CommitteeWorkspace, WorkspaceFormData } from "@/types/committee";
+import type { CommitteeWorkspace } from "@/types/committee";
 
+import { WorkspaceFormSheet } from "./_components/workspace-form";
 import { WorkspacesActionBar } from "./_components/workspaces-action-bar";
 import { WorkspacesError, WorkspacesLoading } from "./_components/workspaces-states";
 import { WorkspacesTabs } from "./_components/workspaces-tabs";
@@ -27,8 +28,7 @@ import { WorkspacesTabs } from "./_components/workspaces-tabs";
 export default function OrganizationWorkspaces() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [editingWorkspace, setEditingWorkspace] = useState<CommitteeWorkspace | null>(null);
+  const sheet = useFormSheet();
   const [workspaceToDelete, setWorkspaceToDelete] = useState<CommitteeWorkspace | null>(null);
   const [isDeletingWorkspace, setIsDeletingWorkspace] = useState(false);
   const { setHeader, clearHeader } = useHeader();
@@ -56,30 +56,6 @@ export default function OrganizationWorkspaces() {
       clearHeader();
     };
   }, [setHeader, clearHeader]);
-
-  const handleEdit = (workspace: CommitteeWorkspace) => {
-    setEditingWorkspace(workspace);
-    setShowAddForm(true);
-  };
-
-  const handleAdd = () => {
-    setEditingWorkspace(null);
-    setShowAddForm(true);
-  };
-
-  const handleFormSubmit = async (data: WorkspaceFormData) => {
-    try {
-      if (editingWorkspace) {
-        await updateWorkspace(editingWorkspace.id, data);
-      } else {
-        await addWorkspace(data);
-      }
-      setShowAddForm(false);
-      setEditingWorkspace(null);
-    } catch (error) {
-      logger.error("Error saving workspace", error);
-    }
-  };
 
   const handleDelete = (workspace: CommitteeWorkspace) => {
     setWorkspaceToDelete(workspace);
@@ -126,7 +102,7 @@ export default function OrganizationWorkspaces() {
         totalWorkspaces={workspaces.length}
         statistics={statistics}
         onRefresh={refreshData}
-        onAdd={handleAdd}
+        onAdd={() => sheet.openCreate()}
       />
 
       {/* Main Content Tabs */}
@@ -137,19 +113,12 @@ export default function OrganizationWorkspaces() {
         onViewDetails={(workspace) =>
           router.push(`/dashboard/organization/workspaces/${workspace.id}`)
         }
-        onEdit={handleEdit}
+        onEdit={(workspace) => sheet.openEdit(workspace.id)}
         onDelete={handleDelete}
         onToggleStatus={handleToggleStatus}
       />
 
-      {/* Modals */}
-      <AddWorkspaceForm
-        open={showAddForm}
-        onOpenChange={setShowAddForm}
-        onSubmit={handleFormSubmit}
-        initialData={editingWorkspace || undefined}
-        isEditing={!!editingWorkspace}
-      />
+      <WorkspaceFormSheet sheet={sheet} onCreate={addWorkspace} onUpdate={updateWorkspace} />
 
       <AlertDialog
         open={workspaceToDelete !== null}

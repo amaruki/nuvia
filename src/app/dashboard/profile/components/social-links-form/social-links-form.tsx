@@ -26,7 +26,7 @@ import {
   type StoredLinkValue,
 } from "./platforms";
 import { SocialLinkRow } from "./social-link-row";
-import { socialLinksFormSchema, validateSocialUrl } from "./validation";
+import { socialLinksFormSchema, validateSocialUrl } from "@/lib/validation/profile.validation";
 
 // The profile page passes the session user; external links and OAuth accounts
 // are only present once the auth provider has synced them.

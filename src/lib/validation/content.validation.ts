@@ -1,6 +1,23 @@
 import { z } from "zod";
 
 import { CATEGORY_SCOPES, CATEGORY_STATUSES, CATEGORY_TYPES } from "@/types/category.types";
+import {
+  ANNOUNCEMENT_PRIORITIES,
+  ANNOUNCEMENT_TARGET_AUDIENCES,
+  ANNOUNCEMENT_TYPES as ANNOUNCEMENT_FORM_TYPES,
+} from "@/types/announcement";
+import {
+  ARTICLE_CATEGORIES as ARTICLE_FORM_CATEGORIES,
+  ARTICLE_DIFFICULTIES as ARTICLE_FORM_DIFFICULTIES,
+  ARTICLE_FORMATS as ARTICLE_FORM_FORMATS,
+  ARTICLE_STATUSES as ARTICLE_FORM_STATUSES,
+  ARTICLE_TYPES as ARTICLE_FORM_TYPES,
+} from "@/types/article";
+import {
+  PUBLICATION_CATEGORIES as PUBLICATION_FORM_CATEGORIES,
+  PUBLICATION_STATUSES as PUBLICATION_FORM_STATUSES,
+  PUBLICATION_TYPES as PUBLICATION_FORM_TYPES,
+} from "@/types/publication";
 
 /**
  * Content domain validation (articles, publications, announcements, categories).
@@ -191,6 +208,141 @@ export const categoryFormSchema = z.object({
   metadata: z.record(z.string(), z.any()).optional(),
 });
 
+// ── Dashboard form sheets ───────────────────────────────────────────────────
+// The announcement/article/publication sheets validate against these
+// enum-based UI schemas (moved verbatim from the legacy co-located
+// add-*-form/schema.ts files), while the API payload uses the looser
+// create/update schemas above. Both live here so the form and the route
+// never drift apart.
+
+export const announcementFormSchema = z.object({
+  title: z
+    .string()
+    .min(3, "Title must be at least 3 characters")
+    .max(200, "Title must be less than 200 characters"),
+  excerpt: z
+    .string()
+    .min(10, "Excerpt must be at least 10 characters")
+    .max(500, "Excerpt must be less than 500 characters"),
+  content: z.string().min(50, "Content must be at least 50 characters"),
+  type: z.enum(ANNOUNCEMENT_FORM_TYPES),
+  priority: z.enum(ANNOUNCEMENT_PRIORITIES),
+  targetAudience: z.enum(ANNOUNCEMENT_TARGET_AUDIENCES),
+  status: z.enum(["draft", "published", "scheduled", "review", "archived"]),
+  authorId: z.string().min(1, "Author is required"),
+  tagIds: z.array(z.string()).default([]),
+  featuredImage: z.string().optional(),
+  expiresAt: z.date().optional(),
+  isPinned: z.boolean().default(false),
+  isUrgent: z.boolean().default(false),
+  requiresAcknowledgment: z.boolean().default(false),
+  sendEmailNotification: z.boolean().default(false),
+  sendPushNotification: z.boolean().default(false),
+  displayOnHomepage: z.boolean().default(false),
+  displayInDashboard: z.boolean().default(false),
+  visibility: z.enum([
+    "public",
+    "members_only",
+    "premium_only",
+    "chapter_only",
+    "committee_only",
+  ] as const),
+  allowedRoles: z.array(z.string()).default([]),
+  allowedChapters: z.array(z.string()).default([]),
+  allowedCommittees: z.array(z.string()).default([]),
+  commentsEnabled: z.boolean().default(false),
+  sharingEnabled: z.boolean().default(true),
+  downloadEnabled: z.boolean().default(false),
+  isFeatured: z.boolean().default(false),
+});
+
+export const articleFormSchema = z.object({
+  title: z.string().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
+  slug: z.string().optional(),
+  excerpt: z
+    .string()
+    .min(10, "Excerpt must be at least 10 characters")
+    .max(500, "Excerpt must be less than 500 characters"),
+  content: z.string().min(50, "Content must be at least 50 characters"),
+  type: z.enum(ARTICLE_FORM_TYPES),
+  category: z.enum(ARTICLE_FORM_CATEGORIES),
+  format: z.enum(ARTICLE_FORM_FORMATS),
+  difficulty: z.enum(ARTICLE_FORM_DIFFICULTIES),
+  status: z.enum(ARTICLE_FORM_STATUSES),
+  authorId: z.string().min(1, "Author is required"),
+  coAuthorIds: z.array(z.string()).optional(),
+  reviewerId: z.string().optional(),
+  tagIds: z.array(z.string()).default([]),
+  seriesId: z.string().optional(),
+  visibility: z.enum([
+    "public",
+    "members_only",
+    "premium_only",
+    "chapter_only",
+    "committee_only",
+  ] as const),
+  commentsEnabled: z.boolean(),
+  sharingEnabled: z.boolean(),
+  downloadEnabled: z.boolean(),
+  isFeatured: z.boolean(),
+  isPinned: z.boolean(),
+  priority: z.number().min(0).max(10),
+  seo: z.object({
+    title: z
+      .string()
+      .min(1, "SEO title is required")
+      .max(60, "SEO title must be less than 60 characters"),
+    description: z
+      .string()
+      .min(1, "SEO description is required")
+      .max(160, "SEO description must be less than 160 characters"),
+    keywords: z.array(z.string()).default([]),
+    ogImage: z.string().optional(),
+  }),
+});
+
+export const publicationFormSchema = z.object({
+  title: z.string().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
+  slug: z.string().optional(),
+  excerpt: z
+    .string()
+    .min(10, "Excerpt must be at least 10 characters")
+    .max(500, "Excerpt must be less than 500 characters"),
+  content: z.string().min(50, "Content must be at least 50 characters"),
+  type: z.enum(PUBLICATION_FORM_TYPES),
+  category: z.enum(PUBLICATION_FORM_CATEGORIES),
+  status: z.enum(PUBLICATION_FORM_STATUSES),
+  authorId: z.string().min(1, "Author is required"),
+  coAuthorIds: z.array(z.string()).optional(),
+  tagIds: z.array(z.string()).default([]),
+  difficulty: z.enum(["beginner", "intermediate", "advanced"]),
+  visibility: z.enum([
+    "public",
+    "members_only",
+    "premium_only",
+    "chapter_only",
+    "committee_only",
+  ] as const),
+  commentsEnabled: z.boolean(),
+  sharingEnabled: z.boolean(),
+  downloadEnabled: z.boolean(),
+  isFeatured: z.boolean(),
+  isPinned: z.boolean(),
+  priority: z.number().min(0).max(10),
+  seo: z.object({
+    title: z
+      .string()
+      .min(1, "SEO title is required")
+      .max(60, "SEO title must be less than 60 characters"),
+    description: z
+      .string()
+      .min(1, "SEO description is required")
+      .max(160, "SEO description must be less than 160 characters"),
+    keywords: z.array(z.string()).default([]),
+    ogImage: z.string().optional(),
+  }),
+});
+
 // ── List queries ────────────────────────────────────────────────────────────
 
 export const contentListQuerySchema = z.object({
@@ -219,3 +371,9 @@ export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;
 export type ContentListQuery = z.infer<typeof contentListQuerySchema>;
 export type CategoryListQuery = z.infer<typeof categoryListQuerySchema>;
+export type AnnouncementFormInput = z.input<typeof announcementFormSchema>;
+export type AnnouncementFormValues = z.infer<typeof announcementFormSchema>;
+export type ArticleFormInput = z.input<typeof articleFormSchema>;
+export type ArticleFormValues = z.infer<typeof articleFormSchema>;
+export type PublicationFormInput = z.input<typeof publicationFormSchema>;
+export type PublicationFormValues = z.infer<typeof publicationFormSchema>;

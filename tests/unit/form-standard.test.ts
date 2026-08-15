@@ -45,17 +45,7 @@ function relativeToRoot(full: string): string {
 // (a) Route shape ratchet
 // ---------------------------------------------------------------------------
 
-const ALLOWED_CREATE_EDIT_PAGES = [
-  "src/app/dashboard/content/announcements/create/page.tsx",
-  "src/app/dashboard/content/articles/create/page.tsx",
-  "src/app/dashboard/content/publications/create/page.tsx",
-  "src/app/dashboard/events/[id]/edit/page.tsx",
-  "src/app/dashboard/events/create/page.tsx",
-  "src/app/dashboard/jobs/[jobId]/edit/page.tsx",
-  "src/app/dashboard/jobs/create/page.tsx",
-  "src/app/dashboard/learning/admin/[courseId]/edit/page.tsx",
-  "src/app/dashboard/learning/admin/create/page.tsx",
-];
+const ALLOWED_CREATE_EDIT_PAGES: string[] = [];
 
 describe("dashboard CRUD forms stay on list pages", () => {
   test("no create/edit page routes outside the migration allowlist", () => {
@@ -76,19 +66,7 @@ describe("dashboard CRUD forms stay on list pages", () => {
 // (b) Schema location ratchet
 // ---------------------------------------------------------------------------
 
-const ALLOWED_COLOCATED_SCHEMAS = [
-  "src/app/dashboard/learning/admin/_components/course-form/schema.ts",
-  "src/app/dashboard/profile/components/profile-form.tsx",
-  "src/app/dashboard/profile/components/social-links-form/validation.ts",
-  "src/components/chapters/add-chapter-form/schema.ts",
-  "src/components/committees/add-committee-form/schema.ts",
-  "src/components/content/add-announcement-form/schema.ts",
-  "src/components/content/add-article-form/schema.ts",
-  "src/components/content/add-publication-form/schema.ts",
-  "src/components/events/event-check-in/types.ts",
-  "src/components/events/event-filter/types.ts",
-  "src/components/workspaces/add-workspace-form/schema.ts",
-];
+const ALLOWED_COLOCATED_SCHEMAS: string[] = [];
 
 describe("zod schemas live in src/lib/validation", () => {
   test("no z.object in components or dashboard pages outside the allowlist", () => {

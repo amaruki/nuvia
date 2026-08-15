@@ -1,4 +1,5 @@
-import type { CourseLevel, LessonType } from "./schema";
+import type { CourseLessonType } from "@/lib/validation/learning.validation";
+import type { CourseLevel } from "@/types/learning.types";
 
 export const categoryOptions: { value: string; label: string }[] = [
   { value: "Development", label: "Development" },
@@ -14,7 +15,7 @@ export const levelOptions: { value: CourseLevel; label: string }[] = [
   { value: "Advanced", label: "Advanced" },
 ];
 
-export const lessonTypeOptions: { value: LessonType; label: string }[] = [
+export const lessonTypeOptions: { value: CourseLessonType; label: string }[] = [
   { value: "video", label: "Video" },
   { value: "article", label: "Article" },
   { value: "quiz", label: "Quiz" },

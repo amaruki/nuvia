@@ -1,8 +1,14 @@
 import { useFormContext } from "react-hook-form";
-import { Input } from "@/components/ui/input";
+
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import type { JobPostingFormValues } from "@/lib/validation/job.validation";
 
+/**
+ * Compensation keeps the schema's string-backed salary values (NumberField
+ * would coerce them to numbers), so the fields compose the ui/form
+ * primitives directly per the form-kit escape hatch.
+ */
 export function SalarySection() {
   const { control } = useFormContext<JobPostingFormValues>();
 
@@ -15,7 +21,7 @@ export function SalarySection() {
           <FormItem>
             <FormLabel>Salary Min</FormLabel>
             <FormControl>
-              <Input type="number" min="0" step="0.01" placeholder="e.g. 60000" {...field} />
+              <Input type="number" min={0} step={0.01} placeholder="e.g. 60000" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -28,7 +34,7 @@ export function SalarySection() {
           <FormItem>
             <FormLabel>Salary Max</FormLabel>
             <FormControl>
-              <Input type="number" min="0" step="0.01" placeholder="e.g. 80000" {...field} />
+              <Input type="number" min={0} step={0.01} placeholder="e.g. 80000" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -45,7 +51,7 @@ export function SalarySection() {
                 maxLength={3}
                 placeholder="USD"
                 {...field}
-                onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                onChange={(event) => field.onChange(event.target.value.toUpperCase())}
               />
             </FormControl>
             <FormMessage />

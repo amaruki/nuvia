@@ -20,11 +20,13 @@ import { useHeader } from "@/contexts/dashboard-context";
 import { Publication } from "@/types/publication";
 import { PublicationsOverviewCards } from "@/components/content/publications-overview-cards";
 import { PageErrorState, PageLoadingState } from "@/components/dashboard/page-states";
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { ActionBar } from "./_components/action-bar";
 import { AnalyticsTab } from "./_components/analytics-tab";
 import { DraftsTab } from "./_components/drafts-tab";
 import { ImportExportBar } from "./_components/import-export-bar";
 import { OverviewTab } from "./_components/overview-tab";
+import { PublicationFormSheet } from "./_components/publication-form-sheet";
 import { PublicationsTab } from "./_components/publications-tab";
 
 export default function ContentPublications() {
@@ -34,6 +36,7 @@ export default function ContentPublications() {
   const [deleteTarget, setDeleteTarget] = useState<Publication | null>(null);
   const router = useRouter();
   const { setHeader, clearHeader } = useHeader();
+  const sheet = useFormSheet();
 
   const {
     publications,
@@ -41,6 +44,8 @@ export default function ContentPublications() {
     loading,
     error,
     refreshData,
+    addPublication,
+    updatePublication,
     deletePublication,
     duplicatePublication,
     publishPublication,
@@ -72,11 +77,7 @@ export default function ContentPublications() {
   };
 
   const handleEdit = (publication: Publication) => {
-    router.push(`/dashboard/content/publications/edit/${publication.id}`);
-  };
-
-  const handleAdd = () => {
-    router.push(`/dashboard/content/publications/create`);
+    sheet.openEdit(publication.id);
   };
 
   const handleDelete = (publication: Publication) => {
@@ -140,7 +141,7 @@ export default function ContentPublications() {
         publishedCount={statistics?.publishedPublications ?? null}
         selectedPublications={selectedPublications}
         onRefresh={refreshData}
-        onAdd={handleAdd}
+        onAdd={() => sheet.openCreate()}
       />
 
       {/* Main Content Tabs */}
@@ -219,6 +220,13 @@ export default function ContentPublications() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <PublicationFormSheet
+        sheet={sheet}
+        onCreate={addPublication}
+        onUpdate={updatePublication}
+        onSaved={bumpTable}
+      />
     </div>
   );
 }

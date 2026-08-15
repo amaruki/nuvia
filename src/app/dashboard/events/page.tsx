@@ -7,12 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Plus, BarChart3 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { EventList } from "@/components/events";
 import { PageHeader } from "@/components/dashboard/page-header";
+
+import { EventFormSheet } from "./_components/event-form-sheet";
 
 export default function AdminEventsPage() {
   const router = useRouter();
   const { user, isPending } = useSession();
+  const sheet = useFormSheet();
+  // EventList fetches through the useState-based useEvents hook (no
+  // react-query cache to invalidate), so a key bump remounts it and
+  // refetches the rows after a successful create/update.
+  const [listVersion, setListVersion] = React.useState(0);
 
   if (isPending) {
     return <div>Loading...</div>;
@@ -39,7 +47,7 @@ export default function AdminEventsPage() {
           <BarChart3 className="mr-2 h-4 w-4" />
           Analytics
         </Button>
-        <Button onClick={() => router.push("/dashboard/events/create")}>
+        <Button onClick={sheet.openCreate}>
           <Plus className="mr-2 h-4 w-4" />
           Create Event
         </Button>
@@ -47,7 +55,9 @@ export default function AdminEventsPage() {
 
       {/* EventList fetches real rows from GET /api/v1/events (events:read)
           through the useEvents hook — backlog B2. */}
-      <EventList showCreateButton={false} showRegistrationStatus={false} />
+      <EventList key={listVersion} showCreateButton={false} showRegistrationStatus={false} />
+
+      <EventFormSheet sheet={sheet} onSaved={() => setListVersion((value) => value + 1)} />
     </div>
   );
 }

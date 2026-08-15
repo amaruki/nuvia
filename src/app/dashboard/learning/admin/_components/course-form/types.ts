@@ -1,11 +1,9 @@
 import type { UseFormReturn } from "react-hook-form";
 
-import type { Course } from "@/types/learning.types";
-
-import type { CourseFormInput, CourseFormValues } from "./schema";
-
-export interface CourseFormProps {
-  initialData?: Course | null;
-}
+import type { CourseFormInput, CourseFormValues } from "@/lib/validation/learning.validation";
 
 export type CourseFormInstance = UseFormReturn<CourseFormInput, unknown, CourseFormValues>;
+
+export interface CourseFormSectionProps {
+  form: CourseFormInstance;
+}

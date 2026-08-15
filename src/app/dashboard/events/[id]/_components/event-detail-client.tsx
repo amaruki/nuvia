@@ -73,7 +73,7 @@ export function EventDetailClient({ currentUserId }: EventDetailClientProps) {
   };
 
   const handleEdit = (eventId: string) => {
-    router.push(`/events/${eventId}/edit`);
+    router.push(`/dashboard/events?form=${eventId}`);
   };
 
   const handleGoBack = () => {

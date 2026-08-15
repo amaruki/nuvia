@@ -25,7 +25,7 @@ export function CalendarHeaderControls() {
       </TabsList>
       <div className="flex items-center gap-2">
         <Button asChild>
-          <Link href="/dashboard/events/create">
+          <Link href="/dashboard/events?form=new">
             <Plus className="h-4 w-4 mr-2" />
             Add Event
           </Link>

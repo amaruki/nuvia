@@ -52,7 +52,7 @@ export default function EventDashboardPage() {
       icon={<Calendar className="h-8 w-8 text-primary" />}
     >
       <div className="flex justify-end mb-8">
-        <Button onClick={() => (window.location.href = "/events/create")}>
+        <Button onClick={() => (window.location.href = "/dashboard/events?form=new")}>
           <Plus className="h-4 w-4 mr-2" />
           Create Event
         </Button>

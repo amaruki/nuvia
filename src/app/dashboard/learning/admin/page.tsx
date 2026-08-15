@@ -31,8 +31,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useFormSheet } from "@/components/dashboard/form-sheet";
 import { useDeleteCourse, useLearningCoursesPage } from "@/lib/hooks/use-learning-courses";
 import type { Course } from "@/types/learning.types";
+
+import { CourseFormSheet } from "./_components/course-form/course-form-sheet";
 
 export default function CourseManagementPage() {
   const router = useRouter();
@@ -59,6 +62,8 @@ export default function CourseManagementPage() {
   const deleteMutation = useDeleteCourse();
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
   const isDeletingCourse = deleteMutation.isPending;
+
+  const sheet = useFormSheet();
 
   useEffect(() => {
     setHeader({
@@ -142,9 +147,7 @@ export default function CourseManagementPage() {
             >
               <Eye className="mr-2 h-4 w-4" /> View
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => router.push(`/dashboard/learning/admin/${row.original.id}/edit`)}
-            >
+            <DropdownMenuItem onClick={() => sheet.openEdit(row.original.id)}>
               <Edit className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -163,7 +166,7 @@ export default function CourseManagementPage() {
   return (
     <div className="space-y-8 animate-fadeInUp">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <Button onClick={() => router.push("/dashboard/learning/admin/create")}>
+        <Button onClick={sheet.openCreate}>
           <Plus className="h-4 w-4 mr-2" />
           Create New Course
         </Button>
@@ -257,6 +260,8 @@ export default function CourseManagementPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <CourseFormSheet sheet={sheet} />
     </div>
   );
 }

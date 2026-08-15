@@ -41,7 +41,7 @@ export async function ensureDevServer(): Promise<{
   const logFd = openSync(logPath, "w");
   // detached: the child leads its own process group so cleanup can signal
   // the whole tree (bunx → next → bundler workers), not just the wrapper.
-  const server = spawn("bunx", ["next", "dev", "--port", String(PORT), "--hostname", "localhost"], {
+  const server = spawn("bunx", ["next", "dev", "--port", String(PORT), "--hostname", "127.0.0.1"], {
     cwd: REPO_ROOT,
     env: commandEnvironment as NodeJS.ProcessEnv,
     stdio: ["ignore", logFd, logFd],

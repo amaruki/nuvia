@@ -46,13 +46,18 @@ export async function signIn(
     throw new Error("Sign-in response did not include any Set-Cookie headers.");
   }
 
+  const cookieDomain = new URL(baseUrl).hostname;
   const cookies: PlaywrightCookie[] = header.map((raw) => {
     const [nameValue, ...attributes] = raw.split(";").map((part) => part.trim());
     const separator = nameValue.indexOf("=");
     const cookie: PlaywrightCookie = {
       name: nameValue.slice(0, separator),
       value: nameValue.slice(separator + 1),
-      domain: "localhost",
+      // The cookie must live on the same host the context browses (BASE_URL).
+      // Hardcoding a different hostname here silently strands the session:
+      // every dashboard page then 302s to /auth/login and axe would audit
+      // the login page while reporting PASS for the dashboard target.
+      domain: cookieDomain,
       path: "/",
     };
     for (const attribute of attributes) {

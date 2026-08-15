@@ -23,13 +23,17 @@
  */
 
 export const PORT = Number(process.env.A11Y_SMOKE_PORT ?? "3111");
-// Must use the dev server's canonical hostname: Next blocks dev resources
-// (HMR ws, manifests) requested from any other origin, and without that
-// channel the app router client bootstrap silently never hydrates. Shared
-// `bun run dev` servers print `Local: http://localhost:<port>`, so browse
-// via localhost; DATABASE_URL/REDIS_URL below stay on 127.0.0.1 because
-// they are server-side connections, not browser origins.
-export const BASE_URL = `http://localhost:${PORT}`;
+// Pin both the dev-server bind and every URL the gate fetches to the IPv4
+// loopback. Bun's fetch does not do happy-eyeballs: on hosts where
+// /etc/hosts resolves `localhost` to ::1 first, fetch("http://localhost:…")
+// dies instantly against an IPv4-only listener even though curl succeeds —
+// the readiness loop then burns its whole 240s budget for nothing. Next
+// blocks dev resources (HMR ws, manifests) requested from any origin other
+// than the server's own hostname, so the spawn flag and BASE_URL must stay
+// identical; 127.0.0.1 satisfies that and is loopback on every platform.
+// DATABASE_URL/REDIS_URL below already stay on 127.0.0.1 because they are
+// server-side connections, not browser origins.
+export const BASE_URL = `http://127.0.0.1:${PORT}`;
 export const ADMIN_EMAIL = "admin@nuvia.com";
 
 // This module lives in scripts/a11y-smoke/, one directory deeper than the

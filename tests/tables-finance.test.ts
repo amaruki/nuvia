@@ -99,7 +99,9 @@ describe("date cells carry title tooltips (absolute date + relative text)", () =
 
 describe("donations table: emoji-free lucide icons with accessible labels (UI-13)", () => {
   const BANNED_EMOJI = ["👤", "🏢", "🎭", "💵", "🔄", "🤝"];
-  const TYPE_ICONS = ["User", "Building2", "Incognito", "Banknote", "Repeat", "Handshake"];
+  // Plan D3 names Incognito for the anonymous donor; lucide-react 1.27.0 has
+  // no Incognito export, so VenetianMask stands in for it.
+  const TYPE_ICONS = ["User", "Building2", "VenetianMask", "Banknote", "Repeat", "Handshake"];
 
   test("donor-type and donation-type emoji glyphs are gone", () => {
     const src = readSrc(DONATIONS_TABLE);
@@ -108,7 +110,7 @@ describe("donations table: emoji-free lucide icons with accessible labels (UI-13
     }
   });
 
-  test("donor and donation types map to lucide icons (User/Building2/Incognito, Banknote/Repeat/Handshake)", () => {
+  test("donor and donation types map to lucide icons (User/Building2/VenetianMask, Banknote/Repeat/Handshake)", () => {
     const src = readSrc(DONATIONS_TABLE);
     for (const icon of TYPE_ICONS) {
       expect(src).toMatch(new RegExp(`\\b${icon}\\b`));

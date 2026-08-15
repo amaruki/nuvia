@@ -9,13 +9,13 @@ import {
   Clock,
   CreditCard,
   Eye,
-  EyeOff,
   HandHeart,
   Handshake,
   Mail,
   MoreHorizontal,
   Repeat,
   User,
+  VenetianMask,
   XCircle,
 } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -73,7 +73,7 @@ const STATUS_BADGES: Record<
 const DONOR_TYPE_ICONS: Record<Donation["donorType"], { icon: typeof User; label: string }> = {
   individual: { icon: User, label: "Individual donor" },
   organization: { icon: Building2, label: "Organization donor" },
-  anonymous: { icon: EyeOff, label: "Anonymous donor" },
+  anonymous: { icon: VenetianMask, label: "Anonymous donor" },
 };
 
 const DONATION_TYPE_ICONS: Record<

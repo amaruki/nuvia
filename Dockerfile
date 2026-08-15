@@ -26,11 +26,19 @@ FROM oven/bun:1.3.14 AS builder
 
 WORKDIR /app
 
+# Skip lifecycle scripts during image installs. The root `prepare` script
+# runs `lefthook install` (git hooks for local development); inside a
+# build image there is no git repository and the runner image does not
+# even carry lefthook (a devDependency), so both install stages failed
+# until scripts were skipped (caught by the CI docker job). Dependency
+# lifecycle scripts are already blocked by Bun's default policy
+# (docs/supply-chain.md §3), so nothing else is affected.
+
 # Install everything (dev deps are needed for the build: TypeScript,
 # Tailwind's PostCSS plugin, drizzle-kit is NOT needed at build time but
 # the frozen lockfile keeps this deterministic).
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile --ignore-scripts
 
 COPY . .
 
@@ -57,9 +65,11 @@ RUN mkdir -p /app && chown -R bun:bun /app
 USER bun
 
 # Production dependencies only, from the same frozen lockfile — same
-# resolution the builder used, minus everything dev-only.
+# resolution the builder used, minus everything dev-only. Scripts are
+# skipped for the same reason as in the builder stage (lefthook is a
+# devDependency and does not exist here).
 COPY --chown=bun:bun package.json bun.lock ./
-RUN bun install --frozen-lockfile --production
+RUN bun install --frozen-lockfile --production --ignore-scripts
 
 # The deployable unit (same paths as release.yml's signed tarball).
 COPY --chown=bun:bun --from=builder /app/.next ./.next

@@ -20,7 +20,7 @@ import { DueActionsMenu } from "./due-actions-menu";
 import { DueStatusBadge } from "./due-badges";
 import { formatCurrencyExact, isOverdue, validatePaymentAmount } from "./helpers";
 import { PaymentDialog } from "./payment-dialog";
-import type { DuesTableState, DuesTableProps } from "./types";
+import type { DuesTableProps } from "./types";
 
 export function DuesTable({
   dues,
@@ -173,6 +173,12 @@ export function DuesTable({
 
   return (
     <>
+      {/*
+       * The report endpoint takes only status/page/limit — no search or sort
+       * params — so the `?q=` search and the column sort toggles apply
+       * client-side to the loaded page (stated, not silent). Pagination
+       * stays server-driven via the report meta.
+       */}
       <DataTable
         columns={columns}
         data={dues}
@@ -180,14 +186,13 @@ export function DuesTable({
         error={error}
         onRetry={onRefresh}
         getRowId={(row) => row.id}
-        manualSorting
+        onRowClick={handleViewDetails}
         sorting={tableState.state.sorting}
         onSortingChange={(updater) =>
           tableState.setSorting(
             typeof updater === "function" ? updater(tableState.state.sorting) : updater,
           )
         }
-        manualFiltering
         globalFilter={tableState.state.globalFilter}
         onGlobalFilterChange={(updater) =>
           tableState.setGlobalFilter(

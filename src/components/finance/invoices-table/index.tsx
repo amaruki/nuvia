@@ -164,6 +164,12 @@ export function InvoicesTable({
 
   return (
     <>
+      {/*
+       * The report endpoint takes only status/page/limit — no search or sort
+       * params — so the `?q=` search and the column sort toggles apply
+       * client-side to the loaded page (stated, not silent). Pagination
+       * stays server-driven via the report meta.
+       */}
       <DataTable
         columns={columns}
         data={invoices}
@@ -171,14 +177,13 @@ export function InvoicesTable({
         error={error}
         onRetry={onRefresh}
         getRowId={(row) => row.id}
-        manualSorting
+        onRowClick={handleViewDetails}
         sorting={tableState.state.sorting}
         onSortingChange={(updater) =>
           tableState.setSorting(
             typeof updater === "function" ? updater(tableState.state.sorting) : updater,
           )
         }
-        manualFiltering
         globalFilter={tableState.state.globalFilter}
         onGlobalFilterChange={(updater) =>
           tableState.setGlobalFilter(

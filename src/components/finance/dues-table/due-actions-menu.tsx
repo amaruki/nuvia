@@ -33,6 +33,7 @@ export function DueActionsMenu({
           variant="ghost"
           className="h-8 w-8 p-0"
           aria-label={`Actions for ${due.memberName}'s due`}
+          onClick={(event) => event.stopPropagation()}
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>

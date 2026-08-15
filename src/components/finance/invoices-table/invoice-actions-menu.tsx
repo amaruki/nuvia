@@ -32,6 +32,7 @@ export function InvoiceActionsMenu({
           variant="ghost"
           size="icon"
           aria-label={`Actions for invoice ${invoice.invoiceNumber}`}
+          onClick={(event) => event.stopPropagation()}
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>

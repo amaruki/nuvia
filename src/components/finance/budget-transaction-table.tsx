@@ -70,7 +70,7 @@ export function BudgetTransactionTable({
       ? transactions.filter(
           (transaction) =>
             transaction.description.toLowerCase().includes(query) ||
-            transaction.categoryId.toLowerCase().includes(query) ||
+            transaction.type.toLowerCase().includes(query) ||
             (transaction.vendor ?? "").toLowerCase().includes(query),
         )
       : transactions;
@@ -81,8 +81,8 @@ export function BudgetTransactionTable({
         switch (id) {
           case "description":
             return transaction.description.toLowerCase();
-          case "categoryId":
-            return transaction.categoryId.toLowerCase();
+          case "type":
+            return transaction.type;
           case "amount":
             return transaction.amount;
           case "status":
@@ -143,20 +143,13 @@ export function BudgetTransactionTable({
         ),
       },
       {
-        id: "categoryId",
-        accessorKey: "categoryId",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Category" />,
+        id: "type",
+        accessorKey: "type",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs">
-              {row.original.categoryId}
-            </Badge>
-            {row.original.subcategoryId && (
-              <Badge variant="secondary" className="text-xs">
-                {row.original.subcategoryId}
-              </Badge>
-            )}
-          </div>
+          <span className={`font-medium capitalize ${TYPE_COLORS[row.original.type] ?? ""}`}>
+            {row.original.type}
+          </span>
         ),
       },
       {

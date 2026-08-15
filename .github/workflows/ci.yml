@@ -93,8 +93,9 @@ jobs:
     # the production route-boot smoke against `next start`. The a11y gate is
     # self-contained (it raises its own compose stack on the runner); the
     # route smoke and the production build need the service containers below
-    # (the build prerenders session-aware pages like /forums against the DB,
-    # so its migrations are applied first, exactly like the heavy job's runner).
+    # (session-aware pages like /forums are force-dynamic now, but the
+    # service containers keep the build environment identical to the heavy
+    # job's runner).
     name: Playwright a11y gate + route smoke
     runs-on: ubuntu-latest
     needs: fast
@@ -151,3 +152,77 @@ jobs:
             /tmp/nuvia-a11y-smoke-*/summary.json
             /tmp/nuvia-a11y-smoke-*/next-dev.log
           if-no-files-found: ignore
+
+  docker:
+    # The production image is a deploy artifact like any other code path —
+    # if it stops building or stops booting, that must fail CI, not surface
+    # at the next real deploy. Builds the Dockerfile (needs no database:
+    # the public DB-backed pages are force-dynamic), boots it against real
+    # Postgres + Redis, and asserts the two deploy-critical behaviors:
+    # migrations apply at container start, and /api/v1/health answers 200.
+    name: Docker image build + boot + health probe
+    runs-on: ubuntu-latest
+    needs: fast
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nuvia
+          POSTGRES_PASSWORD: nuvia
+          POSTGRES_DB: nuvia
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://nuvia:nuvia@localhost:5432/nuvia
+      REDIS_URL: redis://localhost:6379
+      BETTER_AUTH_SECRET: ci-only-secret-not-for-production-use-0000000000
+      APP_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the production image
+        run: docker build --tag nuvia:ci .
+      - name: Boot the container (migrations apply on start)
+        run: |
+          docker run --detach --name nuvia \
+            --network host \
+            --env DATABASE_URL="$DATABASE_URL" \
+            --env REDIS_URL="$REDIS_URL" \
+            --env BETTER_AUTH_SECRET="$BETTER_AUTH_SECRET" \
+            --env APP_URL="$APP_URL" \
+            --env NODE_ENV=production \
+            nuvia:ci
+      - name: Wait for the health probe
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:3000/api/v1/health > /tmp/health.json; then
+              cat /tmp/health.json
+              echo
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "health probe never became healthy; container logs follow"
+          docker logs nuvia
+          exit 1
+      - name: Assert the probe body reports both dependencies reachable
+        run: |
+          grep -q '"status":"ok"' /tmp/health.json
+          grep -q '"database":{"reachable":true}' /tmp/health.json
+          grep -q '"redis":{"reachable":true}' /tmp/health.json
+      - name: Container logs on failure
+        if: failure()
+        run: docker logs nuvia

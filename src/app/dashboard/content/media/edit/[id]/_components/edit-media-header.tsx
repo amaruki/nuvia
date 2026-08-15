@@ -14,7 +14,11 @@ interface EditMediaHeaderProps {
   onDelete: () => void;
 }
 
-/** Page header: back link, media icon and file name, preview/delete actions. */
+/**
+ * Page toolbar: back link, media icon and file name, preview/delete actions.
+ * The page title lives in the dashboard shell header (PageHeader), so this
+ * renders no heading of its own.
+ */
 export function EditMediaHeader({ media, onGoBack, onPreview, onDelete }: EditMediaHeaderProps) {
   const Icon = getMediaIcon(media.type);
 
@@ -27,13 +31,10 @@ export function EditMediaHeader({ media, onGoBack, onPreview, onDelete }: EditMe
         </Button>
 
         <div className="flex items-center gap-2">
-          <div className="text-blue-600">
+          <div className="text-primary">
             <Icon className="h-5 w-5" />
           </div>
-          <div>
-            <h1 className="text-xl font-semibold">Edit Media</h1>
-            <p className="text-sm text-gray-600">{media.metadata.fileName}</p>
-          </div>
+          <p className="text-sm text-muted-foreground">{media.metadata.fileName}</p>
         </div>
       </div>
 

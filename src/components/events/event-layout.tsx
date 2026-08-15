@@ -26,6 +26,13 @@ interface EventLayoutProps {
   onShare?: (eventId: string) => void;
   onEdit?: (eventId: string) => void;
   showActions?: boolean;
+  /**
+   * Render inside the dashboard shell, which already provides the page
+   * background, container, and h1 (via PageHeader). Strips the standalone
+   * chrome — min-h-screen wrapper and inner max-w containers — and demotes
+   * the title to h2 so each page keeps a single h1.
+   */
+  embedded?: boolean;
   className?: string;
   children?: React.ReactNode;
 }
@@ -37,6 +44,7 @@ export function EventLayout({
   onShare,
   onEdit,
   showActions = true,
+  embedded = false,
   className,
   children,
 }: EventLayoutProps) {
@@ -55,11 +63,13 @@ export function EventLayout({
     event.registrationWindow ?? (event.status === EventStatus.PUBLISHED ? "open" : "closed");
   const canRegister = registrationWindow === "open" && !isRegistered;
 
+  const Heading = embedded ? "h2" : "h1";
+
   return (
-    <div className={cn("min-h-screen bg-background", className)}>
+    <div className={cn(!embedded && "min-h-screen bg-background", className)}>
       {/* Event Header */}
-      <div className="relative bg-background border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className={cn("relative border-b", !embedded && "bg-background")}>
+        <div className={cn("py-6", !embedded && "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8")}>
           <div className="flex items-center mb-6">
             <Button variant="ghost" onClick={goBack} className="mr-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -78,7 +88,7 @@ export function EventLayout({
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-foreground mb-2">{event.title}</h1>
+              <Heading className="mb-2 text-3xl font-bold text-foreground">{event.title}</Heading>
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-foreground/60 mb-4">
                 <div className="flex items-center">
@@ -142,8 +152,10 @@ export function EventLayout({
       </div>
 
       {/* Event Content */}
-      <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</div>
+      <main className={cn(!embedded && "flex-1")}>
+        <div className={cn("py-8", !embedded && "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8")}>
+          {children}
+        </div>
       </main>
     </div>
   );

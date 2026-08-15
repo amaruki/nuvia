@@ -16,6 +16,7 @@ import { getCurrentUser } from "@/lib/auth/utils/session";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { LinkGoogleButton } from "./_components/link-google-button";
 
 // Reads the session user and their linked accounts at request time.
@@ -47,7 +48,7 @@ export default async function SettingsOAuthPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">OAuth settings</h1>
+      <PageHeader title="OAuth settings" />
 
       <Card>
         <CardHeader>

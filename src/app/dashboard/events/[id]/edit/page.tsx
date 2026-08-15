@@ -2,8 +2,9 @@
 
 import { useParams } from "next/navigation";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { EventLayout } from "@/components/events/event-layout";
+import { PageHeader } from "@/components/dashboard/page-header";
 
 import { BasicInfoSection } from "./_components/basic-info-section";
 import { CapacitySection } from "./_components/capacity-section";
@@ -45,44 +46,44 @@ export default function EditEventPage() {
   }
 
   return (
-    <EventLayout event={event} showActions={false}>
-      <div className="max-w-3xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Edit Event</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <BasicInfoSection
-                formData={formData}
-                onInputChange={handleInputChange}
-                onSelectChange={handleSelectChange}
-              />
+    <>
+      <PageHeader title="Edit Event" />
+      <EventLayout embedded event={event} showActions={false}>
+        <div className="max-w-3xl mx-auto">
+          <Card>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <BasicInfoSection
+                  formData={formData}
+                  onInputChange={handleInputChange}
+                  onSelectChange={handleSelectChange}
+                />
 
-              <DateTimeSection formData={formData} onInputChange={handleInputChange} />
+                <DateTimeSection formData={formData} onInputChange={handleInputChange} />
 
-              <LocationSection
-                formData={formData}
-                onInputChange={handleInputChange}
-                onCheckboxChange={handleCheckboxChange}
-              />
+                <LocationSection
+                  formData={formData}
+                  onInputChange={handleInputChange}
+                  onCheckboxChange={handleCheckboxChange}
+                />
 
-              <CapacitySection formData={formData} onInputChange={handleInputChange} />
+                <CapacitySection formData={formData} onInputChange={handleInputChange} />
 
-              <TagsSection
-                tags={tags}
-                tagInput={tagInput}
-                onTagInputChange={setTagInput}
-                onAddTag={handleAddTag}
-                onRemoveTag={handleRemoveTag}
-                onTagKeyPress={handleTagKeyPress}
-              />
+                <TagsSection
+                  tags={tags}
+                  tagInput={tagInput}
+                  onTagInputChange={setTagInput}
+                  onAddTag={handleAddTag}
+                  onRemoveTag={handleRemoveTag}
+                  onTagKeyPress={handleTagKeyPress}
+                />
 
-              <FormActions isSubmitting={isSubmitting} onCancel={handleGoBack} />
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </EventLayout>
+                <FormActions isSubmitting={isSubmitting} onCancel={handleGoBack} />
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </EventLayout>
+    </>
   );
 }

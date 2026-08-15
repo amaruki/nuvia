@@ -13,6 +13,7 @@ import { CalendarClock, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 import { getCurrentUser } from "@/lib/rbac";
 import {
@@ -50,9 +51,7 @@ export default async function MembershipsRenewalsPage() {
   if (!isRoleAllowedForPath(PATH, currentUser.role)) {
     return (
       <div className="space-y-6">
-        <header>
-          <h1 className="text-2xl font-semibold tracking-tight">Membership Renewals</h1>
-        </header>
+        <PageHeader title="Membership Renewals" />
         <Card>
           <EmptyState
             icon={<ShieldCheck className="size-8 text-muted-foreground" aria-hidden="true" />}
@@ -68,13 +67,10 @@ export default async function MembershipsRenewalsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Membership Renewals</h1>
-        <p className="text-muted-foreground text-sm">
-          Subscriptions needing attention — renewing within {queue.windowDays} days, past due,
-          lapsed, or canceled. Built from live subscription rows.
-        </p>
-      </header>
+      <PageHeader
+        title="Membership Renewals"
+        description={`Subscriptions needing attention — renewing within ${queue.windowDays} days, past due, lapsed, or canceled. Built from live subscription rows.`}
+      />
 
       <div className="flex flex-wrap gap-2">
         {BUCKET_ORDER.map((bucket) => (

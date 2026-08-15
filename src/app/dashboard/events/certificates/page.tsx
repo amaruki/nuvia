@@ -13,6 +13,7 @@ import { Award, ExternalLink, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 import { getCurrentUser } from "@/lib/rbac";
 import { listCertificatesForStudent } from "@/lib/services/learning/certificate-queries";
@@ -28,9 +29,7 @@ export default async function EventsCertificatesPage() {
   if (!isRoleAllowedForPath(PATH, currentUser.role)) {
     return (
       <div className="space-y-6">
-        <header>
-          <h1 className="text-2xl font-semibold tracking-tight">Event Certificates</h1>
-        </header>
+        <PageHeader title="Event Certificates" />
         <Card>
           <EmptyState
             icon={<ShieldCheck className="size-8 text-muted-foreground" aria-hidden="true" />}
@@ -46,13 +45,10 @@ export default async function EventsCertificatesPage() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Event Certificates</h1>
-        <p className="text-muted-foreground text-sm">
-          Active certificates issued to {currentUser.email}. Each one links to its public
-          verification page.
-        </p>
-      </header>
+      <PageHeader
+        title="Event Certificates"
+        description={`Active certificates issued to ${currentUser.email}. Each one links to its public verification page.`}
+      />
 
       {certificates.length === 0 ? (
         <Card>

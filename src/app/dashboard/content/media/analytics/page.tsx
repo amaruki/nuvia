@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { ArrowLeft, BarChart3 } from "lucide-react";
+import { PageHeader } from "@/components/dashboard/page-header";
+import { PageErrorState } from "@/components/dashboard/page-states";
 import Link from "next/link";
 
 export default function MediaAnalyticsPage() {
@@ -19,22 +21,19 @@ export default function MediaAnalyticsPage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        title="Media Analytics"
+        description="Comprehensive insights into your media performance and usage patterns"
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard/content/media">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Media Library
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Media Analytics</h1>
-            <p className="text-muted-foreground">
-              Comprehensive insights into your media performance and usage patterns
-            </p>
-          </div>
-        </div>
+        <Link href="/dashboard/content/media">
+          <Button variant="outline" size="sm">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Media Library
+          </Button>
+        </Link>
 
         <div className="flex items-center gap-2">
           <BarChart3 className="h-5 w-5 text-muted-foreground" />
@@ -44,22 +43,7 @@ export default function MediaAnalyticsPage() {
         </div>
       </div>
 
-      {/* Error State */}
-      {error && (
-        <Card className="border-destructive/30 bg-destructive/10">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-full bg-destructive/20 flex items-center justify-center">
-                <BarChart3 className="h-4 w-4 text-destructive" />
-              </div>
-              <div>
-                <h3 className="font-medium text-foreground">Failed to load analytics</h3>
-                <p className="text-sm text-destructive">{error}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {error && <PageErrorState error={error} />}
 
       {/* Analytics Content */}
       <MediaAnalytics

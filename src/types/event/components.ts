@@ -35,6 +35,8 @@ export interface EventLayoutProps {
   onShare?: (eventId: string) => void;
   onEdit?: (eventId: string) => void;
   showActions?: boolean;
+  /** True when rendered inside the dashboard shell (see event-layout.tsx). */
+  embedded?: boolean;
   className?: string;
   children?: React.ReactNode;
 }

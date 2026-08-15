@@ -2,6 +2,7 @@ import { CalendarDays } from "lucide-react";
 
 import { AnalyticsGateNotice, BreakdownChart, StatCard, TrendChart } from "@/components/analytics";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getEventAnalytics } from "@/lib/services/analytics-events";
 import { requireAnalyticsAccess } from "../_lib/access";
@@ -21,13 +22,10 @@ export default async function AnalyticsEventsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Event Analytics</h1>
-        <p className="text-sm text-muted-foreground">
-          Scheduled events over the last 12 months; registration and check-in figures cover the full
-          registrations ledger.
-        </p>
-      </div>
+      <PageHeader
+        title="Event Analytics"
+        description="Scheduled events over the last 12 months; registration and check-in figures cover the full registrations ledger."
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard

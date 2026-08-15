@@ -2,6 +2,7 @@ import { FileText } from "lucide-react";
 
 import { AnalyticsGateNotice, BarListChart, StatCard, TrendChart } from "@/components/analytics";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getContentAnalytics } from "@/lib/services/analytics-content";
 import { requireAnalyticsAccess } from "../_lib/access";
@@ -23,7 +24,10 @@ export default async function AnalyticsContentPage() {
   if (stats.total === 0) {
     return (
       <div className="space-y-6">
-        <PageHeader />
+        <PageHeader
+          title="Content Analytics"
+          description="Volume, cadence, and category usage across the content library."
+        />
         <Card>
           <CardContent className="pt-6">
             <EmptyState
@@ -39,7 +43,10 @@ export default async function AnalyticsContentPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader />
+      <PageHeader
+        title="Content Analytics"
+        description="Volume, cadence, and category usage across the content library."
+      />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Total items" value={stats.total.toLocaleString()} />
@@ -117,17 +124,6 @@ export default async function AnalyticsContentPage() {
           )}
         </CardContent>
       </Card>
-    </div>
-  );
-}
-
-function PageHeader() {
-  return (
-    <div>
-      <h1 className="text-2xl font-semibold tracking-tight">Content Analytics</h1>
-      <p className="text-sm text-muted-foreground">
-        Volume, cadence, and category usage across the content library.
-      </p>
     </div>
   );
 }

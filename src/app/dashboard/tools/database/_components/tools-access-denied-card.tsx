@@ -2,6 +2,7 @@ import { ShieldCheck } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/dashboard/page-header";
 
 /**
  * Shown to any signed-in user who reaches the URL without the superadmin
@@ -12,9 +13,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 export function ToolsAccessDeniedCard() {
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Database</h1>
-      </header>
+      <PageHeader title="Database" />
       <Card>
         <EmptyState
           icon={<ShieldCheck className="size-8 text-muted-foreground" aria-hidden="true" />}

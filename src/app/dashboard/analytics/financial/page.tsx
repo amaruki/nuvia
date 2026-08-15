@@ -4,6 +4,7 @@ import { HandCoins } from "lucide-react";
 import { AnalyticsGateNotice, BreakdownChart, StatCard, TrendChart } from "@/components/analytics";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getFinancialAnalytics } from "@/lib/services/analytics-financial";
 import { utcMonthLabel } from "@/lib/services/analytics-range";
@@ -29,13 +30,10 @@ export default async function AnalyticsFinancialPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Financial Analytics</h1>
-        <p className="text-sm text-muted-foreground">
-          Revenue, receivables, and invoice health. Money totals reuse the finance-report
-          aggregates, so this page and the finance reports always agree.
-        </p>
-      </div>
+      <PageHeader
+        title="Financial Analytics"
+        description="Revenue, receivables, and invoice health. Money totals reuse the finance-report aggregates, so this page and the finance reports always agree."
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard

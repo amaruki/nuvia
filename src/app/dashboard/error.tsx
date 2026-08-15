@@ -25,7 +25,7 @@ export default function DashboardError({ reset }: SegmentErrorProps) {
       <Card className="w-full max-w-md">
         <CardContent className="text-center space-y-4">
           <AlertTriangle className="h-10 w-10 mx-auto text-muted-foreground" aria-hidden="true" />
-          <h1 className="text-2xl font-bold">Something went wrong</h1>
+          <h2 className="text-2xl font-bold">Something went wrong</h2>
           <p className="text-muted-foreground">
             We couldn&apos;t load this part of the dashboard. Please try again.
           </p>

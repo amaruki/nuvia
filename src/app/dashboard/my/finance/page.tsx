@@ -32,7 +32,7 @@ import {
   selectPayTrack,
   type MemberInvoiceDto,
 } from "@/lib/services/finance";
-import { FinanceHeader } from "./_components/finance-header";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { PayNowButton } from "./_components/pay-now-button";
 import { formatDate, formatMoney } from "./_components/format";
 
@@ -62,7 +62,7 @@ export default async function MyFinancePage() {
 
   return (
     <div className="max-w-5xl animate-fadeInUp space-y-6">
-      <FinanceHeader />
+      <PageHeader title="My Finance" description="Your dues, invoices and payments." />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>

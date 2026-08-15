@@ -16,7 +16,7 @@ import { getCurrentUser } from "@/lib/auth/utils/session";
 import { listOpenAwardPrograms, listOwnNominations } from "@/lib/services/award";
 import { formatDate } from "@/lib/utils/date-utils";
 import { NominationForm } from "./_components/nomination-form";
-import { NominatePageHeader } from "./_components/page-header";
+import { PageHeader } from "@/components/dashboard/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +50,10 @@ export default async function NominatePage() {
 
   return (
     <div className="space-y-8 animate-fadeInUp max-w-3xl">
-      <NominatePageHeader />
+      <PageHeader
+        title="Award Nominations"
+        description="Nominate a deserving member for an open award program."
+      />
 
       {openPrograms.length === 0 ? (
         <div className="text-center py-16 border rounded-lg bg-card">

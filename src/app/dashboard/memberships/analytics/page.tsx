@@ -12,6 +12,7 @@ import { redirect } from "next/navigation";
 import { ShieldCheck, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 import { getCurrentUser } from "@/lib/rbac";
 import { getMembershipAnalytics } from "@/lib/services/membership-analytics-read";
@@ -41,9 +42,7 @@ export default async function MembershipsAnalyticsPage() {
   if (!isRoleAllowedForPath(PATH, currentUser.role)) {
     return (
       <div className="space-y-6">
-        <header>
-          <h1 className="text-2xl font-semibold tracking-tight">Membership Analytics</h1>
-        </header>
+        <PageHeader title="Membership Analytics" />
         <Card>
           <EmptyState
             icon={<ShieldCheck className="size-8 text-muted-foreground" aria-hidden="true" />}
@@ -73,13 +72,10 @@ export default async function MembershipsAnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Membership Analytics</h1>
-        <p className="text-muted-foreground text-sm">
-          Member status is derived from each account's latest subscription — the same derivation the
-          member directory uses.
-        </p>
-      </header>
+      <PageHeader
+        title="Membership Analytics"
+        description="Member status is derived from each account's latest subscription — the same derivation the member directory uses."
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (

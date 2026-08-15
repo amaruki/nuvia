@@ -13,6 +13,7 @@
 import { redirect } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 import { getCurrentUser } from "@/lib/rbac";
 import { getLogsSystemStatus } from "@/lib/services/system-logs.service";
@@ -44,15 +45,14 @@ export default async function ToolsLogsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">Logs</h1>
-          <Badge variant="outline">Read-only</Badge>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          Where this application&apos;s logs actually go, and the one persisted audit trail.
-        </p>
-      </header>
+      <PageHeader
+        title="Logs"
+        description="Where this application's logs actually go, and the one persisted audit trail."
+      />
+
+      <div>
+        <Badge variant="outline">Read-only</Badge>
+      </div>
 
       <DemoSandboxNotice />
       <LogsStatusPanel status={status} />

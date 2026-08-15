@@ -133,9 +133,9 @@ export default function PublicationPageForm({
             <ChevronLeft className="w-4 h-4 mr-1" />
             Back to Publications
           </Button>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h2 className="text-2xl font-semibold tracking-tight">
             {isEditing ? "Edit Publication" : "Create New Publication"}
-          </h1>
+          </h2>
           <p className="text-muted-foreground">
             {isEditing
               ? "Update the details and metadata for your existing publication."

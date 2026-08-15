@@ -9,8 +9,8 @@
  *  - Every icon-only button owned by UI-08 carries an aria-label (asserted
  *    alongside the icon component so the label stays glued to the control).
  *  - Search inputs are labeled; check-in toggles expose aria-pressed.
- *  - Settings sub-pages each have a real <h1> with no duplicate from the
- *    settings layout.
+ *  - Settings sub-pages set the shell header via the PageHeader island and
+ *    carry no inline h1 of their own.
  *  - Dashboard header contains no inert search/command-menu affordances:
  *    there is no dashboard search route and no command menu, so the dead
  *    controls were removed rather than kept as fake UI.
@@ -140,9 +140,11 @@ describe("UI-08: settings tabs have a real h1 without duplicates", () => {
     "src/app/dashboard/settings/security/page.tsx",
   ];
 
-  test("every settings sub-page (incl. general) renders an h1", () => {
+  test("every settings sub-page (incl. general) sets the shell header and has no inline h1", () => {
     for (const rel of [...subPages, "src/app/dashboard/settings/general/page.tsx"]) {
-      expect(read(rel)).toMatch(/<h1\b/);
+      const src = read(rel);
+      expect(src).toContain("<PageHeader");
+      expect(src).not.toMatch(/<h1\b/);
     }
   });
 

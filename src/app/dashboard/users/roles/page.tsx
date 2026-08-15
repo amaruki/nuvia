@@ -9,12 +9,12 @@
 
 import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, BarChart, Plus, Settings, Users } from "lucide-react";
+import { BarChart, Plus, Settings, Users } from "lucide-react";
 
 // Import components
 import { RoleManagementTable } from "@/components/roles/role-management-table";
 import { PermissionMatrix } from "@/components/roles/permission-matrix";
+import { PageErrorState } from "@/components/dashboard/page-states";
 
 // Import types and services
 import { Role } from "@/types/role";
@@ -23,7 +23,7 @@ import { useHeader } from "@/contexts/dashboard-context";
 // Import local components
 import { CustomRolesTab } from "./_components/custom-roles-tab";
 import { OverviewTab } from "./_components/overview-tab";
-import { RolesPageHeader } from "./_components/roles-page-header";
+import { RolesActionBar } from "./_components/roles-action-bar";
 import { useRolesData } from "./_components/use-roles-data";
 
 export default function UserRoles() {
@@ -57,16 +57,10 @@ export default function UserRoles() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <RolesPageHeader currentUserRole={currentUserRole} loading={loading} onRefresh={loadData} />
+      {/* Header actions — title/description live in the shell header */}
+      <RolesActionBar currentUserRole={currentUserRole} loading={loading} onRefresh={loadData} />
 
-      {/* Error Alert */}
-      {error && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+      {error && <PageErrorState error={error} onRetry={loadData} />}
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

@@ -109,7 +109,7 @@ export default function EditArticlePage() {
     return (
       <div className="max-w-5xl text-center">
         <div className="space-y-4">
-          <h1 className="text-2xl font-bold text-destructive">Error</h1>
+          <h2 className="text-2xl font-bold text-destructive">Error</h2>
           <p className="text-muted-foreground">{error}</p>
           <button
             onClick={() => router.back()}
@@ -126,7 +126,7 @@ export default function EditArticlePage() {
     return (
       <div className="max-w-5xl text-center">
         <div className="space-y-4">
-          <h1 className="text-2xl font-bold">Article not found</h1>
+          <h2 className="text-2xl font-bold">Article not found</h2>
           <p className="text-muted-foreground">The article you're trying to edit doesn't exist.</p>
           <button
             onClick={() => router.back()}

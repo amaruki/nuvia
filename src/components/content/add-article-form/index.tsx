@@ -49,9 +49,9 @@ export default function ArticlePageForm({
             <ChevronLeft className="w-4 h-4 mr-1" />
             Back to Articles
           </Button>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h2 className="text-2xl font-semibold tracking-tight">
             {isEditing ? "Edit Article" : "Create New Article"}
-          </h1>
+          </h2>
           <p className="text-muted-foreground">
             {isEditing
               ? "Update details and metadata for your existing article."

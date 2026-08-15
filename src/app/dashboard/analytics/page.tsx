@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays, FileText, SlidersHorizontal, Users, Wallet } from "lucide-react";
 
 import { AnalyticsGateNotice, StatCard } from "@/components/analytics";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency, getOrganization } from "@/lib/services/organization.service";
 import { getContentAnalytics } from "@/lib/services/analytics-content";
@@ -61,12 +62,10 @@ export default async function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Analytics &amp; Reports</h1>
-        <p className="text-sm text-muted-foreground">
-          Live aggregates computed from the membership database — no prebaked numbers.
-        </p>
-      </div>
+      <PageHeader
+        title="Analytics & Reports"
+        description="Live aggregates computed from the membership database — no prebaked numbers."
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard

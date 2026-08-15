@@ -12,6 +12,7 @@
 import { redirect } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 import { getCurrentUser } from "@/lib/rbac";
 import { getCacheSystemStatus } from "@/lib/services/system-cache.service";
@@ -43,16 +44,14 @@ export default async function ToolsCachePage() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">Cache</h1>
-          <Badge variant="outline">Read-only</Badge>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          Live status of the session cache and its Redis backend. Values are probed when this page
-          loads — nothing here is stored or invented.
-        </p>
-      </header>
+      <PageHeader
+        title="Cache"
+        description="Live status of the session cache and its Redis backend. Values are probed when this page loads — nothing here is stored or invented."
+      />
+
+      <div>
+        <Badge variant="outline">Read-only</Badge>
+      </div>
 
       <DemoSandboxNotice />
       <CacheStatusPanel status={status} />

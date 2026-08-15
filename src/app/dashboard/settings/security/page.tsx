@@ -17,6 +17,7 @@ import { ArrowRight, KeyRound, MonitorSmartphone, ScrollText, TriangleAlert } fr
 import { getCurrentUser } from "@/lib/auth/utils/session";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { ChangePasswordForm } from "./_components/change-password-form";
 import { DeleteAccountDialog } from "./_components/delete-account-dialog";
 
@@ -47,7 +48,7 @@ export default async function SettingsSecurityPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">Security settings</h1>
+      <PageHeader title="Security settings" />
 
       <Card>
         <CardHeader>

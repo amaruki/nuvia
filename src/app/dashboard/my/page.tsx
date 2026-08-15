@@ -9,6 +9,7 @@
 
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/utils/session";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { MemberHome } from "./_components/member-home";
 
 export const dynamic = "force-dynamic";
@@ -21,13 +22,10 @@ export default async function MyPage() {
 
   return (
     <div className="space-y-8 animate-fadeInUp">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">My home</h1>
-        <p className="text-sm text-muted-foreground">
-          Your membership, event registrations, job applications, forum activity, and the latest
-          announcements.
-        </p>
-      </header>
+      <PageHeader
+        title="My home"
+        description="Your membership, event registrations, job applications, forum activity, and the latest announcements."
+      />
       <MemberHome userId={user.id} />
     </div>
   );

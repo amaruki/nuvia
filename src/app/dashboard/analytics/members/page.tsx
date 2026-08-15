@@ -2,6 +2,7 @@ import { Users } from "lucide-react";
 
 import { AnalyticsGateNotice, BreakdownChart, StatCard, TrendChart } from "@/components/analytics";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getMemberAnalytics } from "@/lib/services/analytics-members";
 import { requireAnalyticsAccess } from "../_lib/access";
@@ -22,7 +23,10 @@ export default async function AnalyticsMembersPage() {
   if (stats.totalMembers === 0) {
     return (
       <div className="space-y-6">
-        <PageHeader />
+        <PageHeader
+          title="Member Analytics"
+          description="Growth, role mix, and a login-activity proxy: aggregates only, no member-level detail."
+        />
         <Card>
           <CardContent className="pt-6">
             <EmptyState
@@ -38,7 +42,10 @@ export default async function AnalyticsMembersPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader />
+      <PageHeader
+        title="Member Analytics"
+        description="Growth, role mix, and a login-activity proxy: aggregates only, no member-level detail."
+      />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Total members" value={stats.totalMembers.toLocaleString()} />
@@ -79,7 +86,7 @@ export default async function AnalyticsMembersPage() {
         <Card>
           <CardHeader>
             <CardTitle>Role distribution</CardTitle>
-            <CardDescription>Aggregate counts per role — never individual members.</CardDescription>
+            <CardDescription>Aggregate counts per role, never individual members.</CardDescription>
           </CardHeader>
           <CardContent>
             <BreakdownChart
@@ -97,7 +104,8 @@ export default async function AnalyticsMembersPage() {
         <CardHeader>
           <CardTitle>Login activity by month</CardTitle>
           <CardDescription>
-            Recorded login attempts per month — the deployment's closest proxy for member activity.
+            Recorded login attempts per month, the deployment&apos;s closest proxy for member
+            activity.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -118,17 +126,6 @@ export default async function AnalyticsMembersPage() {
           )}
         </CardContent>
       </Card>
-    </div>
-  );
-}
-
-function PageHeader() {
-  return (
-    <div>
-      <h1 className="text-2xl font-semibold tracking-tight">Member Analytics</h1>
-      <p className="text-sm text-muted-foreground">
-        Growth, role mix, and a login-activity proxy — aggregates only, no member-level detail.
-      </p>
     </div>
   );
 }

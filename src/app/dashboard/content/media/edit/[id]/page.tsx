@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/dashboard/page-header";
 
 import { ActionsCard } from "./_components/actions-card";
 import { BasicInfoCard } from "./_components/basic-info-card";
@@ -52,6 +53,7 @@ export default function EditMediaPage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader title="Edit Media" />
       <EditMediaHeader
         media={currentMedia}
         onGoBack={handleGoBack}

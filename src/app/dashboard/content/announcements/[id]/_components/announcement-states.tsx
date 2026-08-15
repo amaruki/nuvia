@@ -24,7 +24,7 @@ export function AnnouncementError({ error, onBack }: AnnouncementErrorProps) {
   return (
     <div className="max-w-5xl text-center">
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold text-destructive">Error</h1>
+        <h2 className="text-2xl font-bold text-destructive">Error</h2>
         <p className="text-muted-foreground">{error}</p>
         <Button onClick={onBack} variant="outline">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -43,7 +43,7 @@ export function AnnouncementNotFound({ onBack }: AnnouncementNotFoundProps) {
   return (
     <div className="max-w-5xl text-center">
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">Announcement not found</h1>
+        <h2 className="text-2xl font-bold">Announcement not found</h2>
         <p className="text-muted-foreground">
           The announcement you&apos;re looking for doesn&apos;t exist.
         </p>

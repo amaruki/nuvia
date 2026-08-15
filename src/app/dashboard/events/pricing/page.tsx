@@ -12,6 +12,7 @@ import { redirect } from "next/navigation";
 import { ShieldCheck, Tag } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 import { getCurrentUser } from "@/lib/rbac";
 import { getEventPricingOverview } from "@/lib/services/event-pricing-read";
@@ -31,9 +32,7 @@ export default async function EventsPricingPage() {
   if (!isRoleAllowedForPath(PATH, currentUser.role)) {
     return (
       <div className="space-y-6">
-        <header>
-          <h1 className="text-2xl font-semibold tracking-tight">Event Pricing</h1>
-        </header>
+        <PageHeader title="Event Pricing" />
         <Card>
           <EmptyState
             icon={<ShieldCheck className="size-8 text-muted-foreground" aria-hidden="true" />}
@@ -61,17 +60,16 @@ export default async function EventsPricingPage() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Event Pricing</h1>
-        <p className="text-muted-foreground text-sm">
-          Free vs paid events, observed price points, and membership tier pricing.
-          {overview.upcomingFree + overview.upcomingPaid > 0
+      <PageHeader
+        title="Event Pricing"
+        description={`Free vs paid events, observed price points, and membership tier pricing.${
+          overview.upcomingFree + overview.upcomingPaid > 0
             ? ` ${formatNumber(overview.upcomingFree)} upcoming free and ${formatNumber(
                 overview.upcomingPaid,
               )} upcoming paid events.`
-            : ""}
-        </p>
-      </header>
+            : ""
+        }`}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (

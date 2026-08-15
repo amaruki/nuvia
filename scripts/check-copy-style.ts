@@ -73,7 +73,6 @@ export const BASELINE: Record<string, number> = {
   "src/app/auth/error.tsx": 1,
   "src/app/dashboard/analytics/events/page.tsx": 2,
   "src/app/dashboard/analytics/financial/page.tsx": 1,
-  "src/app/dashboard/analytics/members/page.tsx": 3,
   "src/app/dashboard/analytics/page.tsx": 1,
   "src/app/dashboard/announcements/page.tsx": 4,
   "src/app/dashboard/awards/nominate/_components/nomination-form.tsx": 1,

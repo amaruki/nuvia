@@ -20,7 +20,7 @@ import { Megaphone } from "lucide-react";
 
 import { getCurrentUser } from "@/lib/auth/utils/session";
 import { listMemberAnnouncements } from "@/lib/services/content/member-announcements";
-import { InboxHeader } from "./_components/inbox-header";
+import { PageHeader } from "@/components/dashboard/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +51,10 @@ export default async function MemberAnnouncementsPage({
 
   return (
     <div className="space-y-6 animate-fadeInUp max-w-3xl">
-      <InboxHeader />
+      <PageHeader
+        title="Announcements"
+        description="Published announcements for members, newest first."
+      />
 
       <p className="text-sm text-muted-foreground">
         {total} announcement{total === 1 ? "" : "s"}

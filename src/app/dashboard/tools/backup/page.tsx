@@ -14,6 +14,7 @@
 import { redirect } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 import { getCurrentUser } from "@/lib/rbac";
 import { getBackupSystemStatus } from "@/lib/services/system-backup.service";
@@ -45,16 +46,14 @@ export default async function ToolsBackupPage() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">Backup</h1>
-          <Badge variant="outline">Operator-managed</Badge>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          Backups in this codebase are operator-managed — there is no backup system to show a status
-          for. Below is what actually exists.
-        </p>
-      </header>
+      <PageHeader
+        title="Backup"
+        description="Backups in this codebase are operator-managed — there is no backup system to show a status for. Below is what actually exists."
+      />
+
+      <div>
+        <Badge variant="outline">Operator-managed</Badge>
+      </div>
 
       <DemoSandboxNotice />
       <BackupStatusPanel status={status} />

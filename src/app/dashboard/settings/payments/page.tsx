@@ -19,6 +19,7 @@ import { describeConfiguredGateway } from "@/lib/services/finance-report";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { formatDate, formatMoney } from "./_components/format";
 
 // Reads the session user, their invoices, and the gateway at request time.
@@ -36,7 +37,7 @@ export default async function SettingsPaymentsPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">Payments settings</h1>
+      <PageHeader title="Payments settings" />
 
       <Card>
         <CardHeader>

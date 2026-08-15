@@ -31,7 +31,7 @@ export default function DashboardNotFound() {
 
       {/* Error Message */}
       <div className="text-center space-y-2">
-        <h1 className="text-6xl font-bold text-muted-foreground">404</h1>
+        <p className="text-6xl font-bold text-muted-foreground">404</p>
         <h2 className="text-2xl font-semibold">Page Not Found</h2>
         <p className="text-muted-foreground max-w-md mx-auto">
           The dashboard page you're looking for doesn't exist or has been moved.

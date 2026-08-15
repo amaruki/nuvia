@@ -22,7 +22,7 @@ interface EventNotFoundStateProps {
 export function EventNotFoundState({ onGoBack }: EventNotFoundStateProps) {
   return (
     <div className="text-center py-12">
-      <h1 className="text-2xl font-bold text-foreground/90 mb-2">Event Not Found</h1>
+      <h2 className="text-2xl font-bold text-foreground/90 mb-2">Event Not Found</h2>
       <p className="text-foreground/60 mb-6">
         The event you're trying to edit doesn't exist or has been removed.
       </p>

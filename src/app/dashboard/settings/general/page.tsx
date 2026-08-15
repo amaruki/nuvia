@@ -1,5 +1,6 @@
 import { hasPermission } from "@/lib/rbac";
 import { getOrganization } from "@/lib/services/organization.service";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { OrganizationSettingsForm } from "./organization-settings-form";
 
 // The organization row is read from the database at request time; opting out
@@ -14,7 +15,7 @@ export default async function SettingsGeneralPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">General settings</h1>
+      <PageHeader title="General settings" />
       <div>
         <h2 className="text-lg font-semibold">Organization</h2>
         <p className="text-sm text-muted-foreground">

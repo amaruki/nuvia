@@ -15,6 +15,7 @@ import { getOrganization } from "@/lib/services/organization.service";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { PageHeader } from "@/components/dashboard/page-header";
 
 // Reads the organization at request time; opting out of static
 // prerendering keeps `next build` from needing a live database.
@@ -67,7 +68,7 @@ export default async function SettingsEmailPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">Email settings</h1>
+      <PageHeader title="Email settings" />
 
       <Card>
         <CardHeader>

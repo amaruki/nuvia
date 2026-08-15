@@ -11,6 +11,7 @@
 import { redirect } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 import { getCurrentUser } from "@/lib/rbac";
 import { getDatabaseHealth } from "@/lib/services/system-database.service";
@@ -42,16 +43,14 @@ export default async function ToolsDatabasePage() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">Database</h1>
-          <Badge variant="outline">Read-only</Badge>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          Live health of the Postgres database: server version, core-table row counts, and migration
-          state. Every query on this page is a SELECT.
-        </p>
-      </header>
+      <PageHeader
+        title="Database"
+        description="Live health of the Postgres database: server version, core-table row counts, and migration state. Every query on this page is a SELECT."
+      />
+
+      <div>
+        <Badge variant="outline">Read-only</Badge>
+      </div>
 
       <DemoSandboxNotice />
       <DatabaseHealthPanel health={health} />

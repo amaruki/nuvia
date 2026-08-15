@@ -1,5 +1,6 @@
 import { AnalyticsGateNotice, RangeFilter, StatCard, TrendChart } from "@/components/analytics";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getContentAnalytics } from "@/lib/services/analytics-content";
 import { getEventAnalytics } from "@/lib/services/analytics-events";
@@ -57,13 +58,12 @@ export default async function AnalyticsCustomPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Custom Reports</h1>
-          <p className="text-sm text-muted-foreground">
-            Every analytics aggregate recomputed over the {caption}.
-          </p>
-        </div>
+      <PageHeader
+        title="Custom Reports"
+        description={`Every analytics aggregate recomputed over the ${caption}.`}
+      />
+
+      <div className="flex justify-end">
         <RangeFilter basePath={PAGE_PATH} active={days} />
       </div>
 

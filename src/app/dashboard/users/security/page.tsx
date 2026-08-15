@@ -22,6 +22,7 @@ import {
 import { hasPermission } from "@/lib/rbac";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/dashboard/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +59,7 @@ export default async function UsersSecurityPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">User security</h1>
+      <PageHeader title="User security" />
 
       {!canManageUsers && (
         <Card className="border-destructive/40">

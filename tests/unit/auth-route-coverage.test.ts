@@ -119,6 +119,12 @@ const DELEGATED_AUTH: Record<string, string> = {
 //     account, limited by RATE_LIMITS.demoLogin, and authenticated by
 //     forwarding credentials to better-auth's own sign-in handler
 //     (auth.api.signInEmail is avoided on purpose: it mints no cookies).
+//   - health: a deployment probe for orchestrators (Docker HEALTHCHECK,
+//     load balancers) that have no credentials. Listed in proxy.ts's
+//     public endpoints for the same reason. Returns dependency
+//     reachability booleans only — no versions, configuration, or error
+//     details (health.service.ts's honesty contract), so exposing it
+//     anonymously leaks nothing actionable.
 //
 // Each entry asserts hasAuthCall === false below, so the moment one of these
 // routes gains a real session/permission call the test fails loudly and the
@@ -126,6 +132,7 @@ const DELEGATED_AUTH: Record<string, string> = {
 const KNOWN_EXCEPTIONS: Record<string, true> = {
   "webhooks/stripe/route.ts": true,
   "demo/login/route.ts": true,
+  "health/route.ts": true,
 };
 
 describe("every /api/v1/** route calls an authorization/session-check helper", () => {

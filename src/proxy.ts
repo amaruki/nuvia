@@ -117,6 +117,10 @@ function isPublicEndpoint(pathname: string): boolean {
     // verification could run (UI-41). Exact path only: no wildcard over
     // /api/v1/webhooks.
     "/api/v1/webhooks/stripe",
+    // Deployment probe: orchestrators (Docker HEALTHCHECK, load balancers)
+    // poll it without credentials. Returns reachability booleans only —
+    // no versions, configuration, or error details (health.service.ts).
+    "/api/v1/health",
   ];
 
   return publicEndpoints.some((endpoint) => pathname.startsWith(endpoint));

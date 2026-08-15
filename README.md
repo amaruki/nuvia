@@ -95,6 +95,26 @@ The integration test command starts isolated PostgreSQL and Redis containers. It
 3. Enter the authorized redirect URI. Use `http://localhost:3000/api/auth/callback/google` in development, and your production domain's equivalent in production. Do not add a trailing slash or extra parameters. A mismatch here is the most common cause of OAuth setup failure.
 4. Copy the Client ID and Secret into `.env.local`.
 
+## Production deployment
+
+A Docker image and a compose stack ship in the repository:
+
+```bash
+cp .env.prod.example .env   # fill in the required values — the app
+                            # refuses to boot on missing/malformed config
+docker compose -f compose.prod.yml up -d --build
+```
+
+- The image builds without a database (the public DB-backed pages are
+  force-dynamic), applies pending migrations at container start, and
+  exposes `/api/v1/health` for orchestrator probes.
+- The compose stack keeps Postgres and Redis on an internal network and
+  binds the app to `127.0.0.1:3000` for a TLS-terminating reverse proxy.
+- `scripts/backup.sh` / `scripts/restore.sh` are the backup procedure.
+- [`docs/DEPLOYMENT_PLAN.md`](docs/DEPLOYMENT_PLAN.md) is the operating
+  document: environment variables, health checks, backup/restore, and the
+  honest list of what is not yet prod-hardened. Read it before you deploy.
+
 ## Development
 
 ### Scripts

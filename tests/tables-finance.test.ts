@@ -58,6 +58,7 @@ describe("five finance tables run on the shared DataTable layer", () => {
       expect(src).not.toBe("");
       expect(src).toContain('from "@/components/data-table"');
       expect(src).toContain("<DataTable");
+      expect(src).toContain("DataTablePagination");
     });
 
     test(`${table.name}: no raw @/components/ui/table import remains`, () => {
@@ -134,6 +135,22 @@ describe("honest affordances in the five tables", () => {
       expect(readSrc(table.path)).not.toContain("Export");
     }
   });
+
+  test("donation details modal actions expose no Download Receipt", () => {
+    expect(readSrc("src/components/finance/donation-details-modal/actions.tsx")).not.toContain(
+      "Download Receipt",
+    );
+  });
+
+  test("dues action bar exposes no Export affordance", () => {
+    expect(readSrc("src/app/dashboard/finance/dues/_components/dues-action-bar.tsx")).not.toContain(
+      "Export",
+    );
+  });
+
+  test("invoices table exposes no download affordance at all", () => {
+    expect(readSrc(INVOICES_TABLE).toLowerCase()).not.toContain("download");
+  });
 });
 
 describe("invoice + due hooks interpolate page=/limit= (no silent caps)", () => {
@@ -166,6 +183,10 @@ describe("window caps are documented constants with stating comments", () => {
       const src = readSrc(entry.path);
       expect(src).toContain("STATISTICS_WINDOW_LIMIT = 100");
       expect(src).toContain("PAYMENTS_RECENT_LIMIT = 100");
+    });
+
+    test(`${entry.name}: the superseded PAGE_LIMIT constant is gone`, () => {
+      expect(readSrc(entry.path)).not.toContain("PAGE_LIMIT");
     });
 
     test(`${entry.name}: aggregate-window comment states the cap`, () => {

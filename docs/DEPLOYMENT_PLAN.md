@@ -95,6 +95,32 @@ existing database that already has the value, 0003's statement errors as
 Fresh-install order: start Postgres → `bun run db:migrate` →
 `bun run db:seed` → boot the app.
 
+### Backup and restore
+
+The database holds the only irreplaceable state in the stack (uploads are
+files on a volume; Redis holds recreatable windows and cache). Two scripts
+make the procedure concrete:
+
+- **`scripts/backup.sh`** — `pg_dump` in custom format, verified with
+  `pg_restore --list` before the run counts as successful, retention
+  pruning via `BACKUP_RETENTION_DAYS` (default 14). Designed for cron;
+  exits non-zero on any failure so a broken backup is visible, not silent.
+- **`scripts/restore.sh`** — wipe-and-reload drill with an explicit
+  confirmation. Run it against a scratch database regularly: a backup that
+  has never been restored is a hope, not a backup.
+
+```sh
+# cron: nightly backup
+0 3 * * * DATABASE_URL=... BACKUP_DIR=/var/backups/nuvia scripts/backup.sh
+
+# monthly restore drill (scratch database, app writes stopped)
+DATABASE_URL=...-scratch scripts/restore.sh /var/backups/nuvia/<latest>.dump
+```
+
+Restore with the application down or scaled to zero, then run the
+migration applier before reopening if any migration landed after the
+backup was taken. There are no down-migrations (`docs/release.md`).
+
 ## Redis
 
 Required in production. Uses:

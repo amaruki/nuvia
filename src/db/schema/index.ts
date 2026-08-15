@@ -10,6 +10,7 @@ export * from "./organization";
 export * from "./users";
 export * from "./auth";
 export * from "./membership";
+export * from "./donations";
 export * from "./events";
 export * from "./forum";
 export * from "./content";

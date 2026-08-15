@@ -12,7 +12,18 @@ export default function PaymentHistorySection({
 }: PaymentHistorySectionProps) {
   const donationPayments = payments.filter((payment) => payment.donationId === donationId);
 
-  if (donationPayments.length === 0) return null;
+  // No donation payments store exists yet — the page passes [] and this
+  // section says so honestly instead of hiding the gap.
+  if (donationPayments.length === 0) {
+    return (
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold">Payment History</h3>
+        <p className="text-sm text-muted-foreground">
+          No payments are recorded against this donation yet.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

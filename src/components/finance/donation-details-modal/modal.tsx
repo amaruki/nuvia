@@ -20,8 +20,6 @@ export function DonationDetailsModal({
   payments,
   open,
   onOpenChange,
-  onRecordPayment,
-  onSendReceipt,
   onUpdateStatus,
 }: DonationDetailsModalProps) {
   if (!donation) return null;
@@ -52,8 +50,6 @@ export function DonationDetailsModal({
 
           <DonationActions
             donation={donation}
-            onRecordPayment={onRecordPayment}
-            onSendReceipt={onSendReceipt}
             onUpdateStatus={onUpdateStatus}
             onOpenChange={onOpenChange}
           />

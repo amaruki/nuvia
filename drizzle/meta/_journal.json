@@ -85,6 +85,13 @@
       "when": 1786260177099,
       "tag": "0011_course_enrollments",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1786790379622,
+      "tag": "0012_donations",
+      "breakpoints": true
     }
   ]
 }

@@ -52,6 +52,8 @@ export interface DonationStatistics {
   completedAmount: number;
   pendingAmount: number;
   pledgedAmount: number;
+  /** Completed donations dated in the current calendar month. */
+  thisMonthAmount: number;
   averageDonation: number;
   donorCount: number;
   recurringDonorCount: number;

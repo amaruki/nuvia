@@ -115,6 +115,34 @@ optional `paymentMethod` (1–100; the UI offers `STRIPE`, `BANK_TRANSFER`,
 Payments against non-ISSUED invoices and overpayments are rejected by the
 service.
 
+## Donations
+
+Donations live in `donations` (schema in `src/db/schema/donations.ts`,
+validation in `src/lib/validation/donation.validation.ts`, service in
+`src/lib/services/donation.service.ts`). Amounts are `numeric(10,2)` money
+strings, same as invoices. There is no donation payments store yet.
+
+| Method + Path                          | Permission       | Request                                                                      | Success                   |
+| -------------------------------------- | ---------------- | ---------------------------------------------------------------------------- | ------------------------- |
+| GET `/api/v1/finance/donations`        | `finance:read`   | `status`, `page`, `limit` (≤100)                                             | 200 `{ donations, meta }` |
+| POST `/api/v1/finance/donations`       | `finance:create` | `donationCreateSchema`                                                       | 201 `{ donation }`        |
+| GET `/api/v1/finance/donations/{id}`   | `finance:read`   | —                                                                            | 200 `{ donation }`; 404   |
+| PATCH `/api/v1/finance/donations/{id}` | `finance:update` | `donationUpdateSchema` (status/notes/receiptSent/campaign; empty body → 422) | 200 `{ donation }`; 404   |
+
+`donationCreateSchema`: required `donorName` (1–200), `donorEmail`, `amount`
+(strictly positive money string); optional `donorType` (`individual` default
+\| `organization` \| `anonymous`), `donationType` (`one_time` default \|
+`recurring` \| `pledge`), `campaign` (≤200), `currency` (3-letter ISO code,
+`USD` default), `status` (`pending` default \| `completed` \| `failed` \|
+`refunded` \| `pledged`), `paymentMethod` (≤100), `transactionId` (≤200),
+`donationDate` (ISO 8601 date or datetime, defaults to now), `receiptSent`
+(`false` default), `notes` (≤2000).
+
+PATCH moves only `status`, `notes`, `receiptSent`, and `campaign`
+(`notes`/`campaign` accept `null` to clear). Donor identity, amount,
+currency, and date are immutable after recording, and there is no DELETE:
+corrections are new rows (a `refunded` donation), not rewritten history.
+
 ## Reports
 
 All require `finance:read`. These serve the finance dashboard; everything is

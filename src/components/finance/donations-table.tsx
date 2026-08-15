@@ -7,12 +7,11 @@ import {
   Building2,
   CheckCircle,
   Clock,
-  CreditCard,
   Eye,
   HandHeart,
   Handshake,
-  Mail,
   MoreHorizontal,
+  Pencil,
   Repeat,
   User,
   VenetianMask,
@@ -20,6 +19,7 @@ import {
 } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { format, formatDistanceToNow } from "date-fns";
+import type { ColumnFiltersState, SortingState } from "@tanstack/react-table";
 
 import {
   DataTable,
@@ -28,7 +28,7 @@ import {
   DataTableSearch,
   DataTableViewOptions,
 } from "@/components/data-table";
-import { useDataTableState } from "@/hooks/use-data-table-state";
+import type { DataTableUrlState } from "@/hooks/use-data-table-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,12 +41,32 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Donation } from "@/types/finance";
 
-interface DonationsTableProps {
+/** URL-synced table state owned by the donations page. */
+export interface DonationsTableState {
+  state: DataTableUrlState;
+  setSorting: (sorting: SortingState) => void;
+  setGlobalFilter: (value: string) => void;
+  setColumnFilters: (filters: ColumnFiltersState) => void;
+  setPage: (page: number) => void;
+  setPageSize: (pageSize: number) => void;
+}
+
+export interface DonationsTableProps {
+  /** One server-paginated page of donations. */
   donations: Donation[];
+  /** Total rows across all pages (from the list meta). */
+  total: number;
+  /** Total pages (from the list meta). */
+  totalPages: number;
+  /** True while a page fetch/refetch is in flight (skeleton rows). */
+  loading?: boolean;
+  error?: string | null;
   onViewDetails?: (donation: Donation) => void;
-  onRecordPayment?: (donationId: string, amount: number, paymentMethod: string) => void;
-  onSendReceipt?: (donationId: string) => void;
+  onEdit?: (donation: Donation) => void;
   onUpdateStatus?: (donationId: string, status: Donation["status"]) => void;
+  onRefresh?: () => void;
+  /** URL-synced table state owned by the donations page. */
+  tableState: DonationsTableState;
 }
 
 const formatCurrency = (amount: number) => {
@@ -87,58 +107,16 @@ const DONATION_TYPE_ICONS: Record<
 
 export function DonationsTable({
   donations,
+  total,
+  totalPages,
+  loading,
+  error,
   onViewDetails,
-  onRecordPayment,
-  onSendReceipt,
+  onEdit,
   onUpdateStatus,
+  onRefresh,
+  tableState,
 }: DonationsTableProps) {
-  const tableState = useDataTableState({ defaultPageSize: 20 });
-  const { page, pageSize, globalFilter, sorting } = tableState.state;
-
-  // Client-mode table: filter and sort in memory, then slice the page.
-  const filtered = useMemo(() => {
-    const query = globalFilter.trim().toLowerCase();
-    const searched = query
-      ? donations.filter(
-          (donation) =>
-            donation.donorName.toLowerCase().includes(query) ||
-            donation.donorEmail.toLowerCase().includes(query) ||
-            (donation.campaign ?? "").toLowerCase().includes(query),
-        )
-      : donations;
-
-    const [{ id, desc } = { id: "donationDate", desc: true }] = sorting;
-    const sorted = [...searched].sort((a, b) => {
-      const valueOf = (donation: Donation): number | string => {
-        switch (id) {
-          case "donorName":
-            return donation.donorName.toLowerCase();
-          case "campaign":
-            return (donation.campaign ?? "").toLowerCase();
-          case "amount":
-            return donation.amount;
-          case "status":
-            return donation.status;
-          default:
-            return new Date(donation.donationDate).getTime();
-        }
-      };
-      const left = valueOf(a);
-      const right = valueOf(b);
-      const compared = left < right ? -1 : left > right ? 1 : 0;
-      return desc ? -compared : compared;
-    });
-
-    return sorted;
-  }, [donations, globalFilter, sorting]);
-
-  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const clampedPage = Math.min(page, pageCount);
-  const pageRows = useMemo(
-    () => filtered.slice((clampedPage - 1) * pageSize, clampedPage * pageSize),
-    [filtered, clampedPage, pageSize],
-  );
-
   const columns = useMemo<ColumnDef<Donation>[]>(
     () => [
       {
@@ -263,6 +241,7 @@ export function DonationsTable({
                   variant="ghost"
                   className="h-8 w-8 p-0"
                   aria-label={`Actions for donation by ${row.original.donorName}`}
+                  onClick={(event) => event.stopPropagation()}
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
@@ -273,23 +252,10 @@ export function DonationsTable({
                   <Eye className="mr-2 h-4 w-4" />
                   View Details
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {row.original.status !== "completed" && (
-                  <DropdownMenuItem
-                    onClick={() =>
-                      onRecordPayment?.(row.original.id, row.original.amount, "Credit Card")
-                    }
-                  >
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Record Payment
-                  </DropdownMenuItem>
-                )}
-                {!row.original.receiptSent && (
-                  <DropdownMenuItem onClick={() => onSendReceipt?.(row.original.id)}>
-                    <Mail className="mr-2 h-4 w-4" />
-                    Send Receipt
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuItem onClick={() => onEdit?.(row.original)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit Donation
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Update Status</DropdownMenuLabel>
                 {row.original.status !== "completed" && (
@@ -316,31 +282,46 @@ export function DonationsTable({
         ),
       },
     ],
-    [onViewDetails, onRecordPayment, onSendReceipt, onUpdateStatus],
+    [onViewDetails, onEdit, onUpdateStatus],
   );
 
   return (
+    /*
+     * The list endpoint takes only status/page/limit — no search or sort
+     * params — so the `?q=` search and the column sort toggles apply
+     * client-side to the loaded page (stated, not silent). Pagination
+     * stays server-driven via the list meta.
+     */
     <DataTable
       columns={columns}
-      data={pageRows}
+      data={donations}
+      loading={loading}
+      error={error}
+      onRetry={onRefresh}
       getRowId={(row) => row.id}
-      manualSorting
+      onRowClick={(donation) => onViewDetails?.(donation)}
       sorting={tableState.state.sorting}
       onSortingChange={(updater) =>
         tableState.setSorting(
           typeof updater === "function" ? updater(tableState.state.sorting) : updater,
         )
       }
-      manualFiltering
       globalFilter={tableState.state.globalFilter}
       onGlobalFilterChange={(updater) =>
         tableState.setGlobalFilter(
           typeof updater === "function" ? updater(tableState.state.globalFilter) : updater,
         )
       }
+      columnFilters={tableState.state.columnFilters}
+      onColumnFiltersChange={(updater) =>
+        tableState.setColumnFilters(
+          typeof updater === "function" ? updater(tableState.state.columnFilters) : updater,
+        )
+      }
       caption="Donations"
       emptyTitle="No donations found"
       emptyDescription="Adjust the search or record the first donation."
+      emptyIcon={<HandHeart className="h-8 w-8" />}
       toolbar={(table) => (
         <>
           <DataTableSearch
@@ -353,10 +334,11 @@ export function DonationsTable({
       )}
       pagination={
         <DataTablePagination
-          page={clampedPage}
-          pageCount={pageCount}
-          total={filtered.length}
-          pageSize={pageSize}
+          page={tableState.state.page}
+          pageCount={totalPages}
+          total={total}
+          pageSize={tableState.state.pageSize}
+          loading={loading}
           onPageChange={tableState.setPage}
           onPageSizeChange={tableState.setPageSize}
         />

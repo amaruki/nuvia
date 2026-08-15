@@ -23,13 +23,13 @@ export const organizationSection: readonly NavItemData[] = [
       },
       {
         id: "committee-workspaces",
-        title: "Committee Workspaces",
+        title: "Workspaces",
         path: "/dashboard/organization/workspaces",
         roles: ["admin", "superadmin", "committee_chair", "member", "member_professional"],
       },
       {
         id: "committee-budgets",
-        title: "Committee Budgets",
+        title: "Budgets",
         path: "/dashboard/organization/budget",
         roles: ["admin", "superadmin", "treasurer", "committee_chair"],
       },

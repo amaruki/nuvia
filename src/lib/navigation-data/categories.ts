@@ -1,5 +1,5 @@
 export const navigationCategories = {
-  main: "Main Navigation",
-  personal: "Personal Settings",
-  admin: "Administration",
+  main: "Workspace",
+  personal: "Personal",
+  admin: "Admin",
 } as const;

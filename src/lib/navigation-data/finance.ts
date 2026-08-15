@@ -11,37 +11,37 @@ export const financeSection: readonly NavItemData[] = [
     subItems: [
       {
         id: "budget-management",
-        title: "Budget Management",
+        title: "Budgets",
         path: "/dashboard/finance/budget",
         roles: ["admin", "superadmin", "treasurer", "chapter_president", "committee_chair"],
       },
       {
         id: "dues-management",
-        title: "Member Dues",
+        title: "Dues",
         path: "/dashboard/finance/dues",
         roles: ["admin", "superadmin", "treasurer", "staff"],
       },
       {
         id: "invoices-billing",
-        title: "Invoices & Billing",
+        title: "Invoices",
         path: "/dashboard/finance/invoices",
         roles: ["admin", "superadmin", "treasurer", "staff"],
       },
       {
         id: "donations-grants",
-        title: "Donations & Grants",
+        title: "Donations",
         path: "/dashboard/finance/donations",
         roles: ["admin", "superadmin", "treasurer", "staff"],
       },
       {
         id: "financial-reports",
-        title: "Financial Reports",
+        title: "Reports",
         path: "/dashboard/finance/reports",
         roles: ["admin", "superadmin", "treasurer"],
       },
       {
         id: "payment-gateways",
-        title: "Payment Gateways",
+        title: "Gateways",
         path: "/dashboard/finance/gateways",
         roles: ["admin", "superadmin", "treasurer"],
       },

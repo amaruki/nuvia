@@ -4,7 +4,7 @@ export const personalSettingsSection: readonly NavItemData[] = [
   // Personal Settings Section
   {
     id: "personal-settings",
-    title: "Personal Settings",
+    title: "Settings",
     path: "/dashboard/profile",
     category: "personal",
     roles: [

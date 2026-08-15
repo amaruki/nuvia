@@ -11,7 +11,7 @@ export const membershipSection: readonly NavItemData[] = [
     subItems: [
       {
         id: "member-directory",
-        title: "Member Directory",
+        title: "Directory",
         path: "/dashboard/memberships/directory",
         roles: [
           "admin",
@@ -27,7 +27,7 @@ export const membershipSection: readonly NavItemData[] = [
       },
       {
         id: "membership-tiers",
-        title: "Membership Tiers",
+        title: "Tiers",
         path: "/dashboard/memberships/tiers",
         roles: ["admin", "superadmin", "staff"],
       },
@@ -50,7 +50,7 @@ export const membershipSection: readonly NavItemData[] = [
         // navigation-config keyed icons and group dedupe by id, so the
         // memberships copy gets its own id. Path stays stable.
         id: "membership-analytics",
-        title: "Member Analytics",
+        title: "Analytics",
         path: "/dashboard/memberships/analytics",
         roles: ["admin", "superadmin", "staff", "chapter_admin", "chapter_president"],
       },

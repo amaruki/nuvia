@@ -489,9 +489,9 @@ describe("sidebar shell render (UI-22.3 / UI-22.4)", () => {
     expect(html).toContain('aria-busy="true"');
     // The real nav — including its group labels — must not flash before
     // the session lands.
-    expect(html).not.toContain("Main Navigation");
-    expect(html).not.toContain("Personal Settings");
-    expect(html).not.toContain("Administration");
+    expect(html).not.toContain("Workspace");
+    expect(html).not.toContain("Personal");
+    expect(html).not.toContain("Admin");
   });
 
   test("member shell shows gated parents and the personal group, not admin groups", () => {
@@ -499,30 +499,30 @@ describe("sidebar shell render (UI-22.3 / UI-22.4)", () => {
     sessionState.isPending = false;
 
     const html = renderSidebarHtml();
-    expect(html).toContain("Main Navigation");
-    expect(html).toContain("Personal Settings");
+    expect(html).toContain("Workspace");
+    expect(html).toContain("Personal");
     // Parents kept alive purely by reachable children (UI-22.1).
     expect(html).toContain("Events");
     expect(html).toContain("Memberships");
     expect(html).toContain("Organization");
-    // Admin-only sections and the whole Administration group stay hidden.
-    expect(html).not.toContain("Administration");
-    expect(html).not.toContain("User Management");
-    expect(html).not.toContain("System Settings");
+    // Admin-only sections and the whole Admin group stay hidden.
+    expect(html).not.toContain("Admin");
+    expect(html).not.toContain("Users");
+    expect(html).not.toContain("Tools");
     expect(html).not.toContain("Finance");
     expect(html).not.toContain("Analytics");
   });
 
-  test("admin shell renders every category including Administration", () => {
+  test("admin shell renders every category including Admin", () => {
     sessionState.user = { role: "admin" };
     sessionState.isPending = false;
 
     const html = renderSidebarHtml();
-    expect(html).toContain("Main Navigation");
-    expect(html).toContain("Personal Settings");
-    expect(html).toContain("Administration");
-    expect(html).toContain("User Management");
-    expect(html).toContain("System Settings");
+    expect(html).toContain("Workspace");
+    expect(html).toContain("Personal");
+    expect(html).toContain("Admin");
+    expect(html).toContain("Users");
+    expect(html).toContain("Tools");
   });
 
   test("NavigationRenderer renders the personal category (previously discarded)", () => {
@@ -541,7 +541,7 @@ describe("sidebar shell render (UI-22.3 / UI-22.4)", () => {
       ),
     );
     expect(html).toContain('data-slot="sidebar-group"');
-    expect(html).toContain("Personal Settings");
+    expect(html).toContain("Personal");
   });
 
   test("nav item ids are unique across every section (member-analytics dedupe)", () => {

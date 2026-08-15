@@ -4,7 +4,7 @@ export const forumSection: readonly NavItemData[] = [
   // Forums & Discussions Section
   {
     id: "forums",
-    title: "Forums & Discussions",
+    title: "Forums",
     path: "/dashboard/forums",
     category: "main",
     roles: [
@@ -31,7 +31,7 @@ export const forumSection: readonly NavItemData[] = [
         // keep pointing at the moderation queue. The (public)/forums pages
         // enforce their own audience gate server-side.
         id: "forum-community",
-        title: "Community Forums",
+        title: "Community",
         path: "/forums",
         roles: [
           "user",
@@ -53,19 +53,19 @@ export const forumSection: readonly NavItemData[] = [
       },
       {
         id: "forum-categories",
-        title: "Forum Categories",
+        title: "Categories",
         path: "/dashboard/forums/categories",
         roles: ["admin", "superadmin", "staff", "moderator"],
       },
       {
         id: "forum-moderation",
-        title: "Content Moderation",
+        title: "Moderation",
         path: "/dashboard/forums/moderation",
         roles: ["admin", "superadmin", "staff", "moderator"],
       },
       {
         id: "user-reports",
-        title: "User Reports",
+        title: "Reports",
         path: "/dashboard/forums/reports",
         roles: ["admin", "superadmin", "staff", "moderator"],
       },

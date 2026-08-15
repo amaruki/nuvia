@@ -17,7 +17,7 @@ export const communicationsSection: readonly NavItemData[] = [
       },
       {
         id: "notification-system",
-        title: "Notification System",
+        title: "Notifications",
         path: "/dashboard/communications/notifications",
         roles: ["admin", "superadmin", "staff"],
         // UI-01: hardcoded "5" badge removed; no client badge-fetch infra exists,
@@ -25,7 +25,7 @@ export const communicationsSection: readonly NavItemData[] = [
       },
       {
         id: "calendar-integration",
-        title: "Calendar Integration",
+        title: "Calendar Sync",
         path: "/dashboard/communications/calendar",
         roles: ["admin", "superadmin", "staff"],
       },

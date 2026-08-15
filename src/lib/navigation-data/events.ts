@@ -22,7 +22,7 @@ export const eventSection: readonly NavItemData[] = [
     subItems: [
       {
         id: "event-calendar",
-        title: "Event Calendar",
+        title: "Calendar",
         path: "/dashboard/events/calendar",
         roles: [
           "user",

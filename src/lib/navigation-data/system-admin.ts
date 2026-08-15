@@ -4,38 +4,38 @@ export const systemAdminSections: readonly NavItemData[] = [
   // System Settings & Administration
   {
     id: "system-settings",
-    title: "System Settings",
+    title: "Settings",
     path: "/dashboard/settings/system",
     category: "admin",
     roles: ["admin", "superadmin"],
     subItems: [
       {
         id: "general-settings",
-        title: "General Settings",
+        title: "General",
         path: "/dashboard/settings/general",
         roles: ["admin", "superadmin"],
       },
       {
         id: "security-settings",
-        title: "Security Configuration",
+        title: "Security",
         path: "/dashboard/settings/security",
         roles: ["admin", "superadmin"],
       },
       {
         id: "oauth-settings",
-        title: "OAuth Configuration",
+        title: "OAuth",
         path: "/dashboard/settings/oauth",
         roles: ["admin", "superadmin"],
       },
       {
         id: "payment-settings",
-        title: "Payment Gateway Settings",
+        title: "Payments",
         path: "/dashboard/settings/payments",
         roles: ["admin", "treasurer", "superadmin"],
       },
       {
         id: "email-settings",
-        title: "Email Configuration",
+        title: "Email",
         path: "/dashboard/settings/email",
         roles: ["admin", "superadmin"],
       },
@@ -43,32 +43,32 @@ export const systemAdminSections: readonly NavItemData[] = [
   },
   {
     id: "system-tools",
-    title: "System Tools",
+    title: "Tools",
     path: "/dashboard/tools",
     category: "admin",
     roles: ["admin", "superadmin"],
     subItems: [
       {
         id: "database-tools",
-        title: "Database Tools",
+        title: "Database",
         path: "/dashboard/tools/database",
         roles: ["admin", "superadmin"],
       },
       {
         id: "cache-management",
-        title: "Cache Management",
+        title: "Cache",
         path: "/dashboard/tools/cache",
         roles: ["admin", "superadmin"],
       },
       {
         id: "system-logs",
-        title: "System Logs",
+        title: "Logs",
         path: "/dashboard/tools/logs",
         roles: ["admin", "superadmin"],
       },
       {
         id: "backup-restore",
-        title: "Backup & Restore",
+        title: "Backups",
         path: "/dashboard/tools/backup",
         roles: ["admin", "superadmin"],
       },

@@ -4,7 +4,7 @@ export const learningSection: readonly NavItemData[] = [
   // Learning & Development Section
   {
     id: "learning",
-    title: "Learning & Development",
+    title: "Learning",
     path: "/dashboard/learning",
     category: "main",
     roles: [
@@ -77,13 +77,13 @@ export const learningSection: readonly NavItemData[] = [
       },
       {
         id: "course-management",
-        title: "Course Management",
+        title: "Manage Courses",
         path: "/dashboard/learning/admin",
         roles: ["admin", "superadmin", "staff"],
       },
       {
         id: "certificate-management",
-        title: "Certificate Management",
+        title: "Manage Certificates",
         path: "/dashboard/learning/certificate-management",
         roles: ["admin", "superadmin", "staff"],
       },

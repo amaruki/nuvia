@@ -4,7 +4,7 @@ export const awardsSection: readonly NavItemData[] = [
   // Awards & Recognition Section
   {
     id: "awards",
-    title: "Awards & Recognition",
+    title: "Awards",
     path: "/dashboard/awards",
     category: "main",
     roles: [
@@ -21,7 +21,7 @@ export const awardsSection: readonly NavItemData[] = [
     subItems: [
       {
         id: "award-programs",
-        title: "Award Programs",
+        title: "Programs",
         path: "/dashboard/awards/programs",
         roles: ["admin", "superadmin", "staff", "committee_chair"],
       },
@@ -30,7 +30,7 @@ export const awardsSection: readonly NavItemData[] = [
         // see this child, but the page behind it requires awards:read and
         // bounced them. Members get the nomination surface below instead.
         id: "award-nominations",
-        title: "Review Nominations",
+        title: "Nominations",
         path: "/dashboard/awards/nominations",
         roles: ["admin", "superadmin", "staff", "committee_chair"],
       },

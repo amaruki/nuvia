@@ -17,7 +17,11 @@ export default function UserDetailModalHeader({ user }: UserDetailModalHeaderPro
       <div className="flex items-center gap-4">
         <Avatar className="size-16 ring-2 ring-background shadow-md">
           <AvatarImage src={user.avatar} alt={`${user.firstName} ${user.lastName}`} />
-          <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-primary font-semibold text-lg">
+          {/* Same contrast fix as member-card: the gradient tint +
+              text-primary was ~1.9:1 on light backgrounds (axe
+              color-contrast); solid primary + primary-foreground is ~11:1
+              in both themes. */}
+          <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-lg">
             {getInitials(user.firstName || "", user.lastName || "")}
           </AvatarFallback>
         </Avatar>

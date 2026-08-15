@@ -99,7 +99,12 @@ export function BackupStatusPanel({ status }: { status: BackupSystemStatus }) {
           {status.exampleCommands.map((entry) => (
             <div key={entry.label} className="space-y-1">
               <p className="text-muted-foreground">{entry.label}</p>
-              <pre className="overflow-x-auto rounded bg-muted p-3 font-mono text-xs">
+              <pre
+                tabIndex={0}
+                role="region"
+                aria-label={`${entry.label} command`}
+                className="overflow-x-auto rounded bg-muted p-3 font-mono text-xs focus-visible:outline-2 focus-visible:outline-ring"
+              >
                 {entry.command}
               </pre>
             </div>

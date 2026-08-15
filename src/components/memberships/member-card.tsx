@@ -78,7 +78,11 @@ function MemberAvatar({ member, className }: { member: MembershipProfile; classN
     <div className="relative shrink-0">
       <Avatar className={className}>
         <AvatarImage src={member.avatar} alt={`${member.firstName} ${member.lastName}`} />
-        <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
+        {/* Solid primary + primary-foreground pair: the previous
+            bg-primary/10 + text-primary tint read at ~1.9:1 on light card
+            (WCAG AA needs 4.5:1; axe color-contrast). The solid pair is
+            ~11:1 in both themes. */}
+        <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
           {getInitials(member.firstName || "", member.lastName || "")}
         </AvatarFallback>
       </Avatar>

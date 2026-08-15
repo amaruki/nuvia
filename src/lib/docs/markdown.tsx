@@ -159,7 +159,14 @@ export function buildComponents(sourceRepoPath: string | undefined): Components 
       return (
         <pre
           {...props}
-          className="my-6 overflow-x-auto rounded-lg border border-border bg-muted p-4"
+          // Keyboard access for the horizontally-scrolling block: WCAG 2.1.1
+          // (axe scrollable-region-focusable). role=region + aria-label make
+          // it a named landmark AND satisfy the no-noninteractive-tabindex
+          // rule (allowed role, see .oxlintrc.json).
+          tabIndex={0}
+          role="region"
+          aria-label="Code block"
+          className="my-6 overflow-x-auto rounded-lg border border-border bg-muted p-4 focus-visible:outline-2 focus-visible:outline-ring"
         >
           {children}
         </pre>
@@ -185,8 +192,16 @@ export function buildComponents(sourceRepoPath: string | undefined): Components 
       );
     },
     table({ node: _node, children, ...props }) {
+      // Keyboard access for the scrollable wrapper: WCAG 2.1.1
+      // (axe scrollable-region-focusable) when a table overflows
+      // horizontally. role=region + aria-label = named landmark.
       return (
-        <div className="my-6 w-full overflow-x-auto rounded-lg border border-border">
+        <div
+          tabIndex={0}
+          role="region"
+          aria-label="Table"
+          className="my-6 w-full overflow-x-auto rounded-lg border border-border focus-visible:outline-2 focus-visible:outline-ring"
+        >
           <table {...props} className="w-full border-collapse text-sm">
             {children}
           </table>

@@ -153,10 +153,32 @@ Operational consequences, stated plainly:
 - **Audit trail in the database:** `auth_logs` (auth + role events),
   `role_change_history`, `user_login_activities`, `active_devices`; finance
   writes carry an `ActorContext` with IP address.
-- **Health/readiness:** none built in yet — the process failing to boot on
-  bad env is the strongest existing signal. Add platform-level probes.
+- **Health/readiness:** `GET /api/v1/health` (`src/lib/services/health.service.ts`)
+  probes Postgres (`select 1`) and Redis (`PING`) with a 3s timeout each and
+  answers 200 only when both are reachable, 503 otherwise. Anonymous by
+  design (listed in `proxy.ts`'s public endpoints) so orchestrators without
+  credentials can poll it; it returns reachability booleans only — no
+  versions, configuration, or error details. Docker's `HEALTHCHECK`
+  (Dockerfile) and any load balancer should use it.
 - **Error tracking:** not wired (no env-schema support for `SENTRY_DSN`
   despite `.env.example` listing it).
+
+### Health checks
+
+`/api/v1/health` is the single probe surface:
+
+```json
+{ "status": "ok", "checks": { "database": { "reachable": true }, "redis": { "reachable": true } } }
+```
+
+- `status` is `ok` only when every check is reachable; otherwise
+  `degraded` with HTTP 503. Both states carry the same JSON body.
+- The probe never claims healthy without a round-trip, and never reports
+  the underlying error (an orchestrator needs the boolean; an attacker
+  probing the endpoint does not need the connection error).
+- It is deliberately lighter than the dashboard's tools pages
+  (row counts, migration state): something polled every five seconds must
+  not run aggregate queries.
 
 ## Build, release, verification
 
@@ -206,8 +228,10 @@ tarball to staging and production (promote-once model, `docs/release.md`).
   production; there is no in-process fallback by design (ADR-0003).
 - Uploads are single-node until a shared volume or object storage replaces
   the local-disk media service.
-- No built-in health endpoint, no APM/error-tracking integration, no
-  down-migrations.
+- No APM/error-tracking integration, no down-migrations.
+- Run a single app replica: migrations apply at container start with no
+  advisory lock yet, so two replicas racing a first boot could both run
+  the same migration. Scale up only after that story exists.
 - `/api/debug` and `/api/debug/oauth` exist and answer 404 in production;
   their removal is tracked in the security ADR backlog.
 - The forums API double-wraps success envelopes (body `{}`); see

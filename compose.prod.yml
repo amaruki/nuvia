@@ -1,0 +1,83 @@
+# Nuvia production stack — app + PostgreSQL + Redis.
+#
+# This is the DEPLOYMENT compose file. compose.yml (dev stack, tmpfs
+# Postgres on 127.0.0.1:15433) stays untouched for local development.
+#
+# Before first run:
+#   1. cp .env.prod.example .env  and fill in the required values.
+#   2. docker compose -f compose.prod.yml up -d --build
+#   3. Seed the admin account ONCE against the container database:
+#        docker compose -f compose.prod.yml exec app \
+#          bun run scripts/seed.ts   # with SEED_ADMIN_PASSWORD set in .env
+#
+# Topology choices (and why):
+#   - Postgres and Redis are NOT published to the host: only the app
+#     container can reach them, over the compose network.
+#   - The app binds 127.0.0.1:3000 on the host so a TLS-terminating
+#     reverse proxy (Caddy, nginx) fronts it. Adjust ports: for a direct
+#     exposure (not recommended without TLS in front).
+#   - Migrations apply on app start (Dockerfile CMD). Run a single app
+#     replica until a migration-locking story exists; scale up only after.
+
+name: nuvia-prod
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        # Inlined into the client bundle at build time (see Dockerfile).
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-}
+        NEXT_PUBLIC_ENABLE_REDIS_CACHE: ${NEXT_PUBLIC_ENABLE_REDIS_CACHE:-}
+    env_file:
+      - .env
+    environment:
+      # Inside the compose network the services are reachable by name.
+      # These override any host-oriented values the .env may carry.
+      DATABASE_URL: postgresql://nuvia:${POSTGRES_PASSWORD:***@postgres:5432/nuvia
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+    # HEALTHCHECK is defined in the image (polls /api/v1/health).
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: nuvia
+      POSTGRES_USER: nuvia
+      POSTGRES_PASSWORD: ${POST…?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - nuvia_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nuvia -d nuvia"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    # Deliberately no ports: section — reachable only from the app.
+
+  redis:
+    image: redis:7-alpine
+    # Rate-limit windows and the session cache are recreatable, but
+    # persistence costs almost nothing and smooths restarts.
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - nuvia_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+    # Deliberately no ports: section — reachable only from the app.
+
+volumes:
+  nuvia_pgdata:
+  nuvia_redisdata:

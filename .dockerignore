@@ -1,0 +1,30 @@
+# Keep the build context small AND keep secrets out of the image layers.
+# `COPY . .` in the Dockerfile respects this file — without it, .env*,
+# .git, and node_modules would all be baked into the builder stage.
+
+# VCS and editor state
+.git
+.gitignore
+.github
+
+# Local environment and secrets — never into any layer, ever
+.env
+.env.*
+!.env.example
+
+# Dependency and build output (regenerated in the image)
+node_modules
+.next
+
+# Local test/dev artifacts
+coverage
+*.log
+tests
+test-results
+playwright-report
+
+# Documentation (not needed at runtime)
+docs
+
+# Local compose (dev stack only; production compose is separate)
+compose.yml

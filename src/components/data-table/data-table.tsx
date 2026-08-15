@@ -207,15 +207,27 @@ export function DataTable<TData, TValue>({
   const tableRef = useRef(table);
   tableRef.current = table;
 
+  // Latest-callback ref: pages often pass an inline arrow for
+  // onSelectionChange, whose fresh identity per render would re-fire the
+  // notify effect every render and loop (callback -> parent setState ->
+  // rerender -> new callback -> effect -> ...). Track the latest callback
+  // in a ref and trigger only on real selection changes.
+  const onSelectionChangeRef = useRef(onSelectionChange);
   useEffect(() => {
-    if (!onSelectionChange) {
+    onSelectionChangeRef.current = onSelectionChange;
+  });
+
+  useEffect(() => {
+    if (!onSelectionChangeRef.current) {
       return;
     }
-    onSelectionChange(tableRef.current.getSelectedRowModel().rows.map((row) => row.original));
+    onSelectionChangeRef.current(
+      tableRef.current.getSelectedRowModel().rows.map((row) => row.original),
+    );
     // Fires only when the selection state itself changes. Do not add `data`
     // or `table` here: pages pass a fresh array slice per render, and
     // reacting to that would loop (setState -> rerender -> effect -> setState).
-  }, [rowSelection, onSelectionChange]);
+  }, [rowSelection]);
 
   const visibleLeafColumns = table.getVisibleLeafColumns();
   const showSkeleton = loading;

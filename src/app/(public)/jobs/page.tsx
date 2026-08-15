@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
+// Public DB-backed listing — see the matching comment in
+// (public)/forums/page.tsx: the build must never query the database
+// during prerender.
+export const dynamic = "force-dynamic";
+
 export default async function PublicJobBoardPage({
   searchParams,
 }: {

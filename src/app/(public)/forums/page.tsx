@@ -9,6 +9,13 @@ import {
 } from "@/lib/services/forum";
 import { Card, CardContent } from "@/components/ui/card";
 
+// Same shape as the other public DB-backed pages (chapters, members):
+// getCurrentUser swallows the dynamic-server bail-out and continues as an
+// anonymous reader, so without this export the build-time prerender runs
+// the category query against whatever database is (or is not) reachable —
+// a deploy build must never depend on that.
+export const dynamic = "force-dynamic";
+
 /**
  * Public forum category index (UI-27).
  *

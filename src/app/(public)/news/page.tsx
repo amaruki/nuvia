@@ -4,6 +4,11 @@ import { listPublicNews, NEWS_TYPES, type NewsType } from "@/lib/services/conten
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
+// Public DB-backed listing — see the matching comment in
+// (public)/forums/page.tsx: the build must never query the database
+// during prerender.
+export const dynamic = "force-dynamic";
+
 const TYPE_LABELS: Record<NewsType, string> = {
   ARTICLE: "Articles",
   ANNOUNCEMENT: "Announcements",

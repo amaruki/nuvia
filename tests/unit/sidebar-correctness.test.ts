@@ -554,6 +554,24 @@ describe("sidebar shell render (UI-22.3 / UI-22.4)", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Icon-rail centering — collapsed buttons must center in the 3rem rail.
+// Geometry: rail 3rem; the collapsed button is forced to size-8 (2rem).
+// mx-auto only centers when the containing box is >= the button width
+// (auto margins degenerate to 0 for overflowing blocks), so groups drop
+// to px-2 in icon mode, giving a 2rem box that matches the header/footer
+// p-2 boxes. Pin both halves; either one alone leaves icons off-center.
+// ---------------------------------------------------------------------------
+
+describe("icon-rail centering", () => {
+  test("collapsed buttons center via mx-auto + 2rem group box", () => {
+    const menu = readRepoFile("src/components/ui/sidebar/sidebar-menu.tsx");
+    const group = readRepoFile("src/components/ui/sidebar/sidebar-group.tsx");
+    expect(menu).toContain("group-data-[collapsible=icon]:mx-auto");
+    expect(group).toContain("group-data-[collapsible=icon]:px-2");
+  });
+});
+
+// ---------------------------------------------------------------------------
 // UI-22.5 — one sidebar-state source (cookie), dead slices deleted
 // ---------------------------------------------------------------------------
 

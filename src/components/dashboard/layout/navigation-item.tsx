@@ -70,8 +70,8 @@ function CollapsibleSubItemsPopover({
             tooltip={item.title}
             isActive={isItemActive || hasActiveSubItem}
             className={cn(
-              // The base button forces size-8/p-2 in icon-rail mode; keep the
-              // standard footprint instead of dead size overrides.
+              // Icon-rail footprint (size-8, centered) comes from the button
+              // variants; the old h-15/w-15 overrides here never applied.
               "relative flex items-center justify-center",
               "transition-colors duration-200",
             )}

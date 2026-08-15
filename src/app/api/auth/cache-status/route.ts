@@ -3,6 +3,11 @@ import { requirePermission } from "@/lib/rbac";
 import { problemResponse, problems, successResponse } from "@/lib/http";
 import { logger } from "@/lib/logger";
 
+// Per-request diagnostics — and without this Next.js collects the
+// handler-less route statically at build time, evaluating env.ts before
+// any request exists.
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/auth/cache-status — session-cache diagnostics.
  *

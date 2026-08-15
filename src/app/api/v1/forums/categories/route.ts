@@ -8,6 +8,10 @@ import {
   listCategories,
 } from "@/lib/services/forum";
 
+// Per-request by design (session-scoped reads/writes) — and without this
+// Next.js collects the handler-less route statically at build time.
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/forums/categories - List forum categories with post stats
  * Requires: forum:read permission

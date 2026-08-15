@@ -12,6 +12,10 @@ import { requirePermission } from "@/lib/rbac";
 import { describeConfiguredGateway } from "@/lib/services/finance-report.service";
 import { problemFromFinanceError } from "../_lib/helpers";
 
+// Per-request by design (reads deployment config + session) — and without
+// this Next.js collects the handler-less route statically at build time.
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const auth = await requirePermission("finance:read");

@@ -5,6 +5,11 @@ import { logger } from "@/lib/logger";
 import { organizationUpdateSchema } from "@/lib/validation/organization.validation";
 import { getOrganization, updateOrganization } from "@/lib/services/organization.service";
 
+// Per-request by design (session-scoped singleton reads/writes) — and
+// without this Next.js collects the handler-less route statically at
+// build time.
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/v1/organization - Get the organization singleton
  * Requires: organization:read permission

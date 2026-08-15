@@ -43,9 +43,12 @@ RUN bun install --frozen-lockfile --ignore-scripts
 COPY . .
 
 # NEXT_PUBLIC_* values are inlined into the client bundle at build time —
-# pass them as build args when they differ from the localhost defaults.
-ARG NEXT_PUBLIC_APP_URL
-ARG NEXT_PUBLIC_ENABLE_REDIS_CACHE
+# pass them as build args when they differ from the defaults. The defaults
+# matter: an ARG without a default yields an EMPTY string, and env.ts
+# rejects an empty NEXT_PUBLIC_APP_URL ("Invalid URL") — zod defaults only
+# apply when the variable is absent, not when it is set to "".
+ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
+ARG NEXT_PUBLIC_ENABLE_REDIS_CACHE=false
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_ENABLE_REDIS_CACHE=$NEXT_PUBLIC_ENABLE_REDIS_CACHE
 

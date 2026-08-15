@@ -115,6 +115,46 @@ optional `paymentMethod` (1–100; the UI offers `STRIPE`, `BANK_TRANSFER`,
 Payments against non-ISSUED invoices and overpayments are rejected by the
 service.
 
+## Budgets
+
+Budget categories and their transactions live in `budget_categories` /
+`budget_transactions` (schema in `src/db/schema/budgets.ts`, validation in
+`src/lib/validation/budget.validation.ts`, service in
+`src/lib/services/budget.service.ts`). Category spend is derived, never
+stored: it is the exact sum of the category's **approved expense**
+transactions (refunds and income never offset it).
+
+| Method + Path                                    | Permission       | Request                                                                 | Success                      |
+| ------------------------------------------------ | ---------------- | ----------------------------------------------------------------------- | ---------------------------- |
+| GET `/api/v1/finance/budgets`                    | `finance:read`   | `page`, `limit` (≤100)                                                  | 200 `{ categories, meta }`   |
+| POST `/api/v1/finance/budgets`                   | `finance:create` | `budgetCategoryCreateSchema`                                            | 201 `{ category }`           |
+| GET `/api/v1/finance/budget-transactions`        | `finance:read`   | `type`, `status`, `categoryId`, `page`, `limit` (≤100)                  | 200 `{ transactions, meta }` |
+| POST `/api/v1/finance/budget-transactions`       | `finance:create` | `budgetTransactionCreateSchema`                                         | 201 `{ transaction }`        |
+| GET `/api/v1/finance/budget-transactions/{id}`   | `finance:read`   | —                                                                       | 200 `{ transaction }`; 404   |
+| PATCH `/api/v1/finance/budget-transactions/{id}` | `finance:update` | `budgetTransactionUpdateSchema` (status and/or notes; empty body → 422) | 200 `{ transaction }`; 404   |
+
+`budgetCategoryCreateSchema`: required `name` (1–100), `color` (1–50),
+`allocatedAmount` (money string); optional `description` (≤500). Every
+category row returns computed `spentAmount`, `remainingAmount`, and
+`percentageUsed` (one decimal, unbounded above 100; when the allocation is
+zero it reports 100 if spend exists and 0 otherwise — clients that need the
+over-budget verdict compare `spentAmount` against `allocatedAmount`
+directly, since no finite percentage expresses overspend on a zero
+allocation).
+
+`budgetTransactionCreateSchema`: required `categoryId`, `description`
+(1–500), `amount` (strictly positive money string), `type` (`expense` \|
+`income` \| `refund`); optional `status` (`pending` default \| `approved` \|
+`rejected` — recording `approved` attributes the approval to the caller),
+`date` (coerced, defaults to now), `vendor` (≤200), `receiptUrl` (URL ≤2048),
+`notes` (≤2000). Empty strings on the optional text fields are treated as
+omitted.
+
+PATCH moves the status and/or notes. Approving stamps `approvedBy` (the
+acting user) and `approvedAt`; moving back to `pending`/`rejected` clears
+both. Money fields are immutable after recording. There is no DELETE: the
+rejection status is the honest negative path.
+
 ## Donations
 
 Donations live in `donations` (schema in `src/db/schema/donations.ts`,

@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { Edit, Eye, MoreHorizontal, Receipt, Trash2 } from "lucide-react";
+import { Edit, MoreHorizontal, Receipt, Wallet } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnFiltersState, SortingState } from "@tanstack/react-table";
 import { format, formatDistanceToNow } from "date-fns";
 
 import {
@@ -12,7 +13,7 @@ import {
   DataTableSearch,
   DataTableViewOptions,
 } from "@/components/data-table";
-import { useDataTableState } from "@/hooks/use-data-table-state";
+import type { DataTableUrlState } from "@/hooks/use-data-table-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,11 +24,30 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BudgetTransaction } from "@/types/finance";
 
+/** URL-synced table state owned by the budget page. */
+export interface BudgetTransactionsTableState {
+  state: DataTableUrlState;
+  setSorting: (sorting: SortingState) => void;
+  setGlobalFilter: (value: string) => void;
+  setColumnFilters: (filters: ColumnFiltersState) => void;
+  setPage: (page: number) => void;
+  setPageSize: (pageSize: number) => void;
+}
+
 interface BudgetTransactionTableProps {
+  /** One server-paginated page of transactions. */
   transactions: BudgetTransaction[];
-  onView?: (transaction: BudgetTransaction) => void;
+  /** Total rows across all pages (from the endpoint meta). */
+  total: number;
+  /** Total pages (from the endpoint meta). */
+  totalPages: number;
+  /** True while a page fetch/refetch is in flight (skeleton rows). */
+  loading?: boolean;
+  error?: string | null;
   onEdit?: (transaction: BudgetTransaction) => void;
-  onDelete?: (transaction: BudgetTransaction) => void;
+  onRefresh?: () => void;
+  /** URL-synced table state owned by the budget page. */
+  tableState: BudgetTransactionsTableState;
 }
 
 const formatCurrency = (amount: number) => {
@@ -56,57 +76,14 @@ const STATUS_BADGES: Record<
 
 export function BudgetTransactionTable({
   transactions,
-  onView,
+  total,
+  totalPages,
+  loading,
+  error,
   onEdit,
-  onDelete,
+  onRefresh,
+  tableState,
 }: BudgetTransactionTableProps) {
-  const tableState = useDataTableState({ defaultPageSize: 20 });
-  const { page, pageSize, globalFilter, sorting } = tableState.state;
-
-  // Client-mode table: filter and sort in memory, then slice the page.
-  const filtered = useMemo(() => {
-    const query = globalFilter.trim().toLowerCase();
-    const searched = query
-      ? transactions.filter(
-          (transaction) =>
-            transaction.description.toLowerCase().includes(query) ||
-            transaction.type.toLowerCase().includes(query) ||
-            (transaction.vendor ?? "").toLowerCase().includes(query),
-        )
-      : transactions;
-
-    const [{ id, desc } = { id: "date", desc: true }] = sorting;
-    const sorted = [...searched].sort((a, b) => {
-      const valueOf = (transaction: BudgetTransaction): number | string => {
-        switch (id) {
-          case "description":
-            return transaction.description.toLowerCase();
-          case "type":
-            return transaction.type;
-          case "amount":
-            return transaction.amount;
-          case "status":
-            return transaction.status;
-          default:
-            return transaction.date.getTime();
-        }
-      };
-      const left = valueOf(a);
-      const right = valueOf(b);
-      const compared = left < right ? -1 : left > right ? 1 : 0;
-      return desc ? -compared : compared;
-    });
-
-    return sorted;
-  }, [transactions, globalFilter, sorting]);
-
-  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const clampedPage = Math.min(page, pageCount);
-  const pageRows = useMemo(
-    () => filtered.slice((clampedPage - 1) * pageSize, clampedPage * pageSize),
-    [filtered, clampedPage, pageSize],
-  );
-
   const columns = useMemo<ColumnDef<BudgetTransaction>[]>(
     () => [
       {
@@ -205,12 +182,6 @@ export function BudgetTransactionTable({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {onView && (
-                  <DropdownMenuItem onClick={() => onView(row.original)}>
-                    <Eye className="mr-2 h-4 w-4" />
-                    View Details
-                  </DropdownMenuItem>
-                )}
                 {row.original.receiptUrl && (
                   <DropdownMenuItem asChild>
                     <a href={row.original.receiptUrl} target="_blank" rel="noopener noreferrer">
@@ -225,46 +196,51 @@ export function BudgetTransactionTable({
                     Edit
                   </DropdownMenuItem>
                 )}
-                {onDelete && (
-                  <DropdownMenuItem
-                    onClick={() => onDelete(row.original)}
-                    className="text-destructive"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         ),
       },
     ],
-    [onView, onEdit, onDelete],
+    [onEdit],
   );
 
   return (
+    /*
+     * The transactions endpoint takes only type/status/categoryId plus
+     * page/limit, no search or sort params, so the `?q=` search and the
+     * column sort toggles apply client-side to the loaded page (stated, not
+     * silent). Pagination stays server-driven via the endpoint meta.
+     */
     <DataTable
       columns={columns}
-      data={pageRows}
+      data={transactions}
+      loading={loading}
+      error={error}
+      onRetry={onRefresh}
       getRowId={(row) => row.id}
-      manualSorting
       sorting={tableState.state.sorting}
       onSortingChange={(updater) =>
         tableState.setSorting(
           typeof updater === "function" ? updater(tableState.state.sorting) : updater,
         )
       }
-      manualFiltering
       globalFilter={tableState.state.globalFilter}
       onGlobalFilterChange={(updater) =>
         tableState.setGlobalFilter(
           typeof updater === "function" ? updater(tableState.state.globalFilter) : updater,
         )
       }
+      columnFilters={tableState.state.columnFilters}
+      onColumnFiltersChange={(updater) =>
+        tableState.setColumnFilters(
+          typeof updater === "function" ? updater(tableState.state.columnFilters) : updater,
+        )
+      }
       caption="Budget transactions"
       emptyTitle="No transactions found"
       emptyDescription="Adjust the search or record the first transaction."
+      emptyIcon={<Wallet className="h-8 w-8" />}
       toolbar={(table) => (
         <>
           <DataTableSearch
@@ -277,10 +253,11 @@ export function BudgetTransactionTable({
       )}
       pagination={
         <DataTablePagination
-          page={clampedPage}
-          pageCount={pageCount}
-          total={filtered.length}
-          pageSize={pageSize}
+          page={tableState.state.page}
+          pageCount={totalPages}
+          total={total}
+          pageSize={tableState.state.pageSize}
+          loading={loading}
           onPageChange={tableState.setPage}
           onPageSizeChange={tableState.setPageSize}
         />
@@ -288,3 +265,5 @@ export function BudgetTransactionTable({
     />
   );
 }
+
+export default BudgetTransactionTable;

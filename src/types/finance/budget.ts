@@ -63,19 +63,6 @@ export interface BudgetOverview {
   recentTransactions: BudgetTransaction[];
 }
 
-export interface BudgetFormData {
-  categoryId?: string;
-  name: string;
-  description?: string;
-  allocatedAmount: number;
-  period: string;
-  color: string;
-  subcategories?: Array<{
-    name: string;
-    allocatedAmount: number;
-  }>;
-}
-
 export interface BudgetFilterOptions {
   period: string;
   category: string;

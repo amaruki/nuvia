@@ -4,7 +4,6 @@ export type {
   BudgetPeriod,
   BudgetTransaction,
   BudgetOverview,
-  BudgetFormData,
   BudgetFilterOptions,
   BudgetAnalytics,
 } from "./budget";

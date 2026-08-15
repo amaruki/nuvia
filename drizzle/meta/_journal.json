@@ -92,6 +92,13 @@
       "when": 1786790379622,
       "tag": "0012_donations",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1786790534798,
+      "tag": "0013_budget_categories_and_transactions",
+      "breakpoints": true
     }
   ]
 }

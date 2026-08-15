@@ -19,12 +19,12 @@ import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Publication } from "@/types/publication";
 import { PublicationsOverviewCards } from "@/components/content/publications-overview-cards";
+import { PageErrorState, PageLoadingState } from "@/components/dashboard/page-states";
 import { ActionBar } from "./_components/action-bar";
 import { AnalyticsTab } from "./_components/analytics-tab";
 import { DraftsTab } from "./_components/drafts-tab";
 import { ImportExportBar } from "./_components/import-export-bar";
 import { OverviewTab } from "./_components/overview-tab";
-import { ErrorState, LoadingState } from "./_components/page-states";
 import { PublicationsTab } from "./_components/publications-tab";
 
 export default function ContentPublications() {
@@ -122,11 +122,11 @@ export default function ContentPublications() {
   };
 
   if (loading) {
-    return <LoadingState />;
+    return <PageLoadingState />;
   }
 
   if (error) {
-    return <ErrorState error={error} onRetry={refreshData} />;
+    return <PageErrorState error={error} onRetry={refreshData} />;
   }
 
   return (

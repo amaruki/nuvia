@@ -6,11 +6,11 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { PageLoadingState } from "@/components/dashboard/page-states";
 import { useHeader } from "@/contexts/dashboard-context";
 import { logger } from "@/lib/logger";
 
 import { ActionBar } from "./_components/action-bar";
-import { LoadingState } from "./_components/page-states";
 import { StatsOverview } from "./_components/stats-overview";
 import { TierCard } from "./_components/tier-card";
 import { TierEditDialog } from "./_components/tier-edit-dialog";
@@ -81,13 +81,13 @@ export default function MembershipTiers() {
   };
 
   if (isLoading) {
-    return <LoadingState />;
+    return <PageLoadingState cards={3} className="lg:grid-cols-3" />;
   }
 
   const activeTiers = tiers.filter((tier) => tier.isActive).length;
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
+    <div className="space-y-6">
       {/* Statistics Overview — real counts from the finance API */}
       <StatsOverview totalActiveMembers={totalActiveMembers} activeTiers={activeTiers} />
 

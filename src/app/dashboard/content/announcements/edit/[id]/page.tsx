@@ -99,7 +99,7 @@ export default function EditAnnouncementPage() {
 
   if (loading) {
     return (
-      <div className="container max-w-5xl py-6 mx-auto">
+      <div className="max-w-5xl">
         <div className="space-y-4">
           <Skeleton className="h-8 w-1/3" />
           <Skeleton className="h-4 w-1/2" />
@@ -111,7 +111,7 @@ export default function EditAnnouncementPage() {
 
   if (error) {
     return (
-      <div className="container max-w-5xl py-6 mx-auto text-center">
+      <div className="max-w-5xl text-center">
         <div className="space-y-4">
           <h1 className="text-2xl font-bold text-destructive">Error</h1>
           <p className="text-muted-foreground">{error}</p>
@@ -128,7 +128,7 @@ export default function EditAnnouncementPage() {
 
   if (!announcement) {
     return (
-      <div className="container max-w-5xl py-6 mx-auto text-center">
+      <div className="max-w-5xl text-center">
         <div className="space-y-4">
           <h1 className="text-2xl font-bold">Announcement not found</h1>
           <p className="text-muted-foreground">

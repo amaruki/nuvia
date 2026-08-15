@@ -19,15 +19,14 @@ import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
 import { Media } from "@/types/media";
 import { MediaUpload } from "@/components/content/media-upload";
+import { PageErrorState, PageLoadingState } from "@/components/dashboard/page-states";
 import { ActionBar } from "./_components/action-bar";
 import { AnalyticsTab } from "./_components/analytics-tab";
-import { FolderNav } from "./_components/folder-nav";
 import { FoldersTab } from "./_components/folders-tab";
 import { ImportExportBar } from "./_components/import-export-bar";
 import { LibraryTab } from "./_components/library-tab";
 import { MediaDetailsSection } from "./_components/media-details-section";
 import { OverviewTab } from "./_components/overview-tab";
-import { ErrorState, LoadingState } from "./_components/page-states";
 import { StatsOverview } from "./_components/stats-overview";
 
 export default function ContentMedia() {
@@ -125,11 +124,11 @@ export default function ContentMedia() {
   };
 
   if (loading) {
-    return <LoadingState />;
+    return <PageLoadingState />;
   }
 
   if (error) {
-    return <ErrorState error={error} onRetry={refreshData} />;
+    return <PageErrorState error={error} onRetry={refreshData} />;
   }
 
   return (

@@ -98,7 +98,7 @@ export default function InstructorSettingsPage() {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto p-6 space-y-8 animate-fadeIn">
+    <div className="max-w-4xl space-y-6">
       <div className="grid gap-8 md:grid-cols-[1fr_250px]">
         <div className="space-y-6">
           <Card>

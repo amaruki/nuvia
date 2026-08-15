@@ -8,10 +8,10 @@ import { useDataTableState } from "@/hooks/use-data-table-state";
 import { useHeader } from "@/contexts/dashboard-context";
 import { InvoicesOverviewCards } from "@/components/finance/invoices-overview-cards";
 import { InvoicesTable } from "@/components/finance/invoices-table";
+import { PageErrorState, PageLoadingState } from "@/components/dashboard/page-states";
 import { ActionBar } from "./_components/action-bar";
 import { AnalyticsTab } from "./_components/analytics-tab";
 import { OverviewTab } from "./_components/overview-tab";
-import { ErrorState, LoadingState } from "./_components/page-states";
 import { PaymentsTab } from "./_components/payments-tab";
 
 export default function FinanceInvoices() {
@@ -59,11 +59,11 @@ export default function FinanceInvoices() {
   }, [totalPages, tableState.state.page, tableState]);
 
   if (loading) {
-    return <LoadingState />;
+    return <PageLoadingState />;
   }
 
   if (error) {
-    return <ErrorState error={error} onRetry={refreshData} />;
+    return <PageErrorState error={error} onRetry={refreshData} />;
   }
 
   return (

@@ -2,6 +2,8 @@
 
 import React, { useEffect } from "react";
 import { Search, Award } from "lucide-react";
+import { PageErrorState, PageLoadingState } from "@/components/dashboard/page-states";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { CertificateCard } from "./_components/certificate-card";
@@ -29,7 +31,7 @@ export default function CertificationsPage() {
   );
 
   return (
-    <div className="container mx-auto p-6 space-y-8 animate-fadeIn">
+    <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="relative w-full md:w-72">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -45,27 +47,30 @@ export default function CertificationsPage() {
       <Separator />
 
       {loading ? (
-        <div className="text-center py-24 text-sm text-muted-foreground">Loading certificates…</div>
+        <PageLoadingState cards={3} className="lg:grid-cols-3" />
       ) : error ? (
-        <div className="text-center py-24 text-sm text-destructive">{error}</div>
+        <PageErrorState error={error} />
       ) : filteredCertificates.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredCertificates.map((cert) => (
             <CertificateCard key={cert.id} certificate={cert} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-24 bg-muted/5 rounded-lg border-2 border-dashed border-border">
-          <div className="mx-auto h-24 w-24 rounded-full bg-muted flex items-center justify-center mb-4">
-            <Award className="h-10 w-10 text-muted-foreground opacity-50" />
-          </div>
-          <h3 className="text-xl font-semibold">No certificates found</h3>
-          <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
-            {searchTerm
+        <EmptyState
+          className="border-2 border-dashed border-border py-24"
+          icon={
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-muted">
+              <Award className="h-10 w-10 text-muted-foreground opacity-50" />
+            </div>
+          }
+          title="No certificates found"
+          description={
+            searchTerm
               ? "Try adjusting your search terms."
-              : "Complete courses to earn certifications."}
-          </p>
-        </div>
+              : "Complete courses to earn certifications."
+          }
+        />
       )}
     </div>
   );

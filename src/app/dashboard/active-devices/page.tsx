@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { Laptop, Loader2, LogOut, ShieldCheck, Smartphone, Tablet } from "lucide-react";
@@ -8,6 +8,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useHeader } from "@/contexts/dashboard-context";
 import { useSession } from "@/lib/client";
 import { logger } from "@/lib/logger";
 import { formatDate } from "@/lib/utils/date-utils";
@@ -98,6 +99,18 @@ export default function ActiveDevicesPage() {
 
   const hasOtherDevices = devices.some((device) => device.token !== currentToken);
 
+  const { setHeader, clearHeader } = useHeader();
+
+  useEffect(() => {
+    setHeader({
+      title: "Active Devices",
+      description: "Manage the devices currently signed in to your account.",
+    });
+    return () => {
+      clearHeader();
+    };
+  }, [setHeader, clearHeader]);
+
   const columns: ColumnDef<ActiveDevice>[] = [
     {
       id: "device",
@@ -168,14 +181,8 @@ export default function ActiveDevicesPage() {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Active Devices</h1>
-          <p className="text-foreground/70 mt-2">
-            Manage the devices currently signed in to your account.
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div className="flex justify-end">
         <Button
           variant="outline"
           disabled={!hasOtherDevices || revokingOthers || revokeDevice.isPending}

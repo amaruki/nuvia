@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 
 import { AddChapterForm } from "@/components/chapters/add-chapter-form";
 import { ChaptersOverviewCards } from "@/components/chapters/chapters-overview-cards";
+import { PageErrorState, PageLoadingState } from "@/components/dashboard/page-states";
 import { useChapters } from "@/lib/hooks/use-chapters";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
@@ -26,7 +27,6 @@ import { AnalyticsTab } from "./_components/analytics-tab";
 import { ChaptersTab } from "./_components/chapters-tab";
 import { LeadershipTab } from "./_components/leadership-tab";
 import { OverviewTab } from "./_components/overview-tab";
-import { ErrorState, LoadingState } from "./_components/page-states";
 
 export default function OrganizationChapters() {
   const router = useRouter();
@@ -130,11 +130,11 @@ export default function OrganizationChapters() {
   };
 
   if (loading) {
-    return <LoadingState />;
+    return <PageLoadingState />;
   }
 
   if (error) {
-    return <ErrorState error={error} onRetry={refreshData} />;
+    return <PageErrorState error={error} onRetry={refreshData} />;
   }
 
   return (

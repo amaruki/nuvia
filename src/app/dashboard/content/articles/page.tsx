@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { ArticlesOverviewCards } from "@/components/content/articles-overview-cards";
+import { PageErrorState, PageLoadingState } from "@/components/dashboard/page-states";
 import { useArticles } from "@/lib/hooks/use-articles";
 import { logger } from "@/lib/logger";
 import { useHeader } from "@/contexts/dashboard-context";
@@ -25,7 +26,6 @@ import { ArticlesTab } from "./_components/articles-tab";
 import { DraftsTab } from "./_components/drafts-tab";
 import { ImportExportBar } from "./_components/import-export-bar";
 import { OverviewTab } from "./_components/overview-tab";
-import { ErrorState, LoadingState } from "./_components/page-states";
 
 export default function ContentArticles() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -114,11 +114,11 @@ export default function ContentArticles() {
   };
 
   if (loading) {
-    return <LoadingState />;
+    return <PageLoadingState />;
   }
 
   if (error) {
-    return <ErrorState error={error} onRetry={refreshData} />;
+    return <PageErrorState error={error} onRetry={refreshData} />;
   }
 
   return (

@@ -11,9 +11,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { AlertTriangle, CheckCircle2, Inbox, RefreshCw, XCircle } from "lucide-react";
+import { CheckCircle2, Inbox, RefreshCw, XCircle } from "lucide-react";
 import { toast } from "sonner";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PageErrorState } from "@/components/dashboard/page-states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -129,7 +129,7 @@ export default function MembershipApplications() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <Select
           value={statusFilter}
@@ -153,12 +153,7 @@ export default function MembershipApplications() {
         </Button>
       </div>
 
-      {loadError && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{loadError}</AlertDescription>
-        </Alert>
-      )}
+      {loadError && <PageErrorState error={loadError} />}
 
       <Card>
         <CardContent className="pt-6">

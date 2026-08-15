@@ -1,5 +1,6 @@
 "use client";
 
+import { PageErrorState } from "@/components/dashboard/page-states";
 import { MembershipFilter } from "@/components/memberships/membership-filter";
 import { MembershipList } from "@/components/memberships/membership-list";
 import { useHeader } from "@/contexts/dashboard-context";
@@ -44,25 +45,15 @@ export default function MembershipDirectory() {
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6">
-          <h2 className="text-destructive font-semibold mb-2">Error Loading Members</h2>
-          <p className="text-destructive/90 mb-4">
-            {error.message || "Failed to load membership directory. Please try again later."}
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
+      <PageErrorState
+        error={error.message || "Failed to load membership directory. Please try again later."}
+        onRetry={() => window.location.reload()}
+      />
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
+    <div className="space-y-6">
       {/* Filters */}
       <MembershipFilter filters={filters} onFiltersChange={updateFilters} isLoading={isFetching} />
 

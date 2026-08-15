@@ -27,7 +27,7 @@ export default async function EventsCertificatesPage() {
 
   if (!isRoleAllowedForPath(PATH, currentUser.role)) {
     return (
-      <div className="space-y-6 p-6 md:p-8">
+      <div className="space-y-6">
         <header>
           <h1 className="text-2xl font-semibold tracking-tight">Event Certificates</h1>
         </header>
@@ -45,7 +45,7 @@ export default async function EventsCertificatesPage() {
   const certificates = await listCertificatesForStudent(currentUser.email);
 
   return (
-    <div className="space-y-6 p-6 md:p-8">
+    <div className="space-y-6">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Event Certificates</h1>
         <p className="text-muted-foreground text-sm">

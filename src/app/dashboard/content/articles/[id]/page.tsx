@@ -89,7 +89,7 @@ export default function ArticleDetailsPage() {
   }
 
   return (
-    <div className="container max-w-5xl py-6 mx-auto space-y-6">
+    <div className="max-w-5xl space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button

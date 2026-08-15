@@ -289,14 +289,14 @@ describe("badge maps carry no raw palette pairs", () => {
     }
   });
 
-  test("directory error state uses destructive tokens and keeps the copy", () => {
+  test("directory error state delegates to the shared token-based PageErrorState", () => {
     const source = src(BADGE_MAP_FILES[4]);
-    expect(source).toContain("bg-destructive/10");
-    expect(source).toContain("border-destructive/30");
+    // The hand-rolled destructive box was replaced by the shared state
+    // component, which renders Alert variant="destructive" (token-based).
+    expect(source).toContain("PageErrorState");
     expect(source).not.toMatch(/red-50\b/);
     expect(source).not.toMatch(/red-200\b/);
-    expect(source).toContain("Error Loading Members");
-    expect(source).toContain("Try Again");
+    expect(source).toContain("Failed to load membership directory. Please try again later.");
   });
 });
 

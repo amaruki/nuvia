@@ -131,7 +131,7 @@ export default function AnnouncementViewPage() {
   }
 
   return (
-    <div className="container max-w-5xl py-6 mx-auto space-y-6">
+    <div className="max-w-5xl space-y-6">
       <AnnouncementHeader
         onBack={() => router.back()}
         onEdit={handleEdit}

@@ -11,7 +11,7 @@ import { EmptyState } from "@/components/ui/empty-state";
  */
 export function ToolsAccessDeniedCard() {
   return (
-    <div className="space-y-6 p-6 md:p-8">
+    <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Database</h1>
       </header>

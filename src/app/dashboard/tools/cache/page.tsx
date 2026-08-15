@@ -42,7 +42,7 @@ export default async function ToolsCachePage() {
   const status = await getCacheSystemStatus();
 
   return (
-    <div className="space-y-6 p-6 md:p-8">
+    <div className="space-y-6">
       <header className="space-y-1">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-semibold tracking-tight">Cache</h1>

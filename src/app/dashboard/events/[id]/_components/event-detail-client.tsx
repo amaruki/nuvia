@@ -85,24 +85,20 @@ export function EventDetailClient({ currentUserId }: EventDetailClientProps) {
       error={error}
       onRetry={refetch}
       loadingComponent={
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-center items-center h-64">
-            <LoadingSpinner size="lg" />
-          </div>
+        <div className="flex h-64 items-center justify-center">
+          <LoadingSpinner size="lg" />
         </div>
       }
       errorComponent={
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-foreground/90 mb-2">Event Not Found</h1>
-            <p className="text-foreground/60 mb-6">
-              {error || "The event you're looking for doesn't exist or has been removed."}
-            </p>
-            <Button onClick={handleGoBack}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Events
-            </Button>
-          </div>
+        <div className="py-12 text-center">
+          <h2 className="mb-2 text-2xl font-bold text-foreground/90">Event Not Found</h2>
+          <p className="mb-6 text-foreground/60">
+            {error || "The event you're looking for doesn't exist or has been removed."}
+          </p>
+          <Button onClick={handleGoBack}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Events
+          </Button>
         </div>
       }
     >

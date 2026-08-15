@@ -40,7 +40,7 @@ export default async function MembershipsAnalyticsPage() {
 
   if (!isRoleAllowedForPath(PATH, currentUser.role)) {
     return (
-      <div className="space-y-6 p-6 md:p-8">
+      <div className="space-y-6">
         <header>
           <h1 className="text-2xl font-semibold tracking-tight">Membership Analytics</h1>
         </header>
@@ -72,7 +72,7 @@ export default async function MembershipsAnalyticsPage() {
   ];
 
   return (
-    <div className="space-y-6 p-6 md:p-8">
+    <div className="space-y-6">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Membership Analytics</h1>
         <p className="text-muted-foreground text-sm">

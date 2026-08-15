@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, DataTablePagination, useDataTableState } from "@/components/data-table";
 import { getActivityIcon } from "@/lib/utils/activity-icons";
 import { formatDate } from "@/lib/utils/date-utils";
 import { cn } from "@/lib/utils";
+import { useHeader } from "@/contexts/dashboard-context";
 import type { LoginActivity, LoginActivitiesResponse } from "./_components/types";
 
 function getDeviceName(userAgent: string) {
@@ -100,15 +102,20 @@ export default function LoginActivitiesPage() {
 
   const totalPages = Math.max(1, data?.pagination.pages ?? 1);
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Login Activity</h1>
-        <p className="text-foreground/70 mt-2">
-          View your recent login attempts and account access history.
-        </p>
-      </div>
+  const { setHeader, clearHeader } = useHeader();
 
+  useEffect(() => {
+    setHeader({
+      title: "Login Activity",
+      description: "View your recent login attempts and account access history.",
+    });
+    return () => {
+      clearHeader();
+    };
+  }, [setHeader, clearHeader]);
+
+  return (
+    <div className="space-y-6">
       <DataTable
         columns={activityColumns}
         data={data?.activities ?? []}

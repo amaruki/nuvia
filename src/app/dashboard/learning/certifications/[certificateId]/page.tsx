@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Download, Printer, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CertificateView } from "../_components/certificate-view";
 import { useCertificate } from "@/lib/hooks/use-learning-certificates";
+import { useHeader } from "@/contexts/dashboard-context";
 import { toast } from "sonner";
 
 export default function CertificateDetailPage() {
@@ -15,6 +16,15 @@ export default function CertificateDetailPage() {
   const certificateId = params.certificateId as string;
 
   const { data: certificate, isPending } = useCertificate(certificateId);
+
+  const { setHeader, clearHeader } = useHeader();
+
+  useEffect(() => {
+    setHeader({ title: "My Certificate" });
+    return () => {
+      clearHeader();
+    };
+  }, [setHeader, clearHeader]);
 
   if (isPending) {
     return (
@@ -48,7 +58,7 @@ export default function CertificateDetailPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-8 animate-fadeIn">
+    <div className="space-y-6">
       <div className="flex items-center justify-between no-print">
         <Button
           variant="ghost"

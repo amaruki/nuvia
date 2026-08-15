@@ -1,16 +1,16 @@
 /**
- * Layout for event details pages
+ * Event detail pages render inside the dashboard shell, which already owns
+ * the page container and background — this layout intentionally adds no
+ * wrapper of its own (the previous `min-h-screen bg-background` div was
+ * redundant inside the shell).
  */
 
 import { ReactNode } from "react";
 
 interface EventDetailsLayoutProps {
   children: ReactNode;
-  params: Promise<{ id: string }>;
 }
 
-export default async function EventDetailsLayout({ children, params }: EventDetailsLayoutProps) {
-  const { id } = await params;
-
-  return <div className="min-h-screen bg-background">{children}</div>;
+export default function EventDetailsLayout({ children }: EventDetailsLayoutProps) {
+  return children;
 }

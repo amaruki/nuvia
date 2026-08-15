@@ -208,7 +208,7 @@ export default function AdminCertificationsPage() {
   ];
 
   return (
-    <div className="p-6 space-y-6 animate-fadeIn">
+    <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageErrorState, PageLoadingState } from "@/components/dashboard/page-states";
 
 import { useAnnouncements } from "@/lib/hooks/use-announcements";
 import { logger } from "@/lib/logger";
@@ -26,7 +27,6 @@ import { AnnouncementsTab } from "./_components/announcements-tab";
 import { DraftsTab } from "./_components/drafts-tab";
 import { ImportExportBar } from "./_components/import-export-bar";
 import { OverviewTab } from "./_components/overview-tab";
-import { ErrorState, LoadingState } from "./_components/page-states";
 
 export default function ContentAnnouncements() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -131,11 +131,11 @@ export default function ContentAnnouncements() {
   };
 
   if (loading) {
-    return <LoadingState />;
+    return <PageLoadingState />;
   }
 
   if (error) {
-    return <ErrorState error={error} onRetry={refreshData} />;
+    return <PageErrorState error={error} onRetry={refreshData} />;
   }
 
   if (showAddForm) {

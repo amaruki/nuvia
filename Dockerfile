@@ -1,12 +1,23 @@
 # Nuvia production image.
 #
-# Two stages:
-#   builder  — install all deps, run `next build` (needs no database; the
-#              public DB-backed pages are force-dynamic, so prerendering
-#              never queries one).
-#   runner   — production deps only + build output. No devDependencies,
-#              no sources, no build toolchain (hardening-docker-containers
-#              convention: ship the minimum that runs the app).
+# Runtime split (deliberate, discovered by the CI docker job):
+#   Bun is the package manager (ADR-0015) — bun install resolves the
+#   frozen bun.lock in every stage. But Bun 1.3.14 segfaults with SIGILL
+#   at process teardown in containerized CI (deterministic bun.report
+#   signature on the runner's AVX-512 CPU), right after `next build`
+#   completes. The same crash would break any short-lived Bun process
+#   at runtime (the migration step, the healthcheck). So the image runs
+#   next build / next start and the migrator under Node — the platform
+#   Next.js tests most — while Bun keeps its lockfile role. Local
+#   development stays 100% Bun (`bun dev`, `bun run build`).
+#
+# Stages:
+#   builder   — all deps, `next build` under Node (needs no database; the
+#               DB-backed routes/pages are force-dynamic, so prerendering
+#               never queries one), migrator compiled to plain JS.
+#   prod-deps — production deps only, resolved from the same lockfile.
+#   runner    — Node 22 slim + prod deps + build output. No devDeps, no
+#               sources, no build toolchain, no Bun binary at runtime.
 #
 # Alignment with docs/release.md: the deployable unit is the same set of
 # paths release.yml packages into the signed tarball (.next, public,
@@ -19,20 +30,26 @@
 #   - DATABASE_URL and BETTER_AUTH_SECRET are required; src/lib/env.ts
 #     fails the boot on missing/malformed values.
 #   - REDIS_URL is required in production (rate limiting, session cache).
-#   - Migrations apply at container start via scripts/db-migrate.ts
+#   - Migrations apply at container start via the compiled migrator
 #     (drizzle-orm runtime migrator — no drizzle-kit needed in the image).
 
 FROM oven/bun:1.3.14 AS builder
 
 WORKDIR /app
 
+# Node for the build itself (see the runtime-split note at the top).
+# Debian trixie ships Node 22; Next.js 16 requires >= 20.9.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
 # Skip lifecycle scripts during image installs. The root `prepare` script
 # runs `lefthook install` (git hooks for local development); inside a
-# build image there is no git repository and the runner image does not
-# even carry lefthook (a devDependency), so both install stages failed
-# until scripts were skipped (caught by the CI docker job). Dependency
-# lifecycle scripts are already blocked by Bun's default policy
-# (docs/supply-chain.md §3), so nothing else is affected.
+# build image there is no git repository and the prod stage does not even
+# carry lefthook (a devDependency), so installs fail unless scripts are
+# skipped (caught by the CI docker job). Dependency lifecycle scripts are
+# already blocked by Bun's default policy (docs/supply-chain.md §3), so
+# nothing else is affected.
 
 # Install everything (dev deps are needed for the build: TypeScript,
 # Tailwind's PostCSS plugin, drizzle-kit is NOT needed at build time but
@@ -63,38 +80,49 @@ ENV BETTER_AUTH_SECRET=build-time-placeholder-not-a-real-secret-0000000
 ENV DATABASE_URL=postgresql://build-time-placeholder
 ENV REDIS_URL=redis://build-time-placeholder
 
-RUN bun run build
+RUN node node_modules/next/dist/bin/next build
+
+# Compile the runtime migrator to plain JS so the Node-only runner can
+# execute it without TypeScript support or Bun.
+RUN bun build scripts/db-migrate.ts --target=node --outfile=dist/db-migrate.mjs
 
 # ---------------------------------------------------------------------------
 
-FROM oven/bun:1.3.14-slim AS runner
+FROM oven/bun:1.3.14 AS prod-deps
+
+WORKDIR /app
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --production --ignore-scripts
+
+# ---------------------------------------------------------------------------
+
+FROM node:22-slim AS runner
 
 ENV NODE_ENV=production
 
 WORKDIR /app
 
-# Non-root runtime user (hardening convention). Bun images ship a `bun`
+# Non-root runtime user (hardening convention). node:slim ships a `node`
 # user; give it the app directory.
-RUN mkdir -p /app && chown -R bun:bun /app
-USER bun
+RUN mkdir -p /app && chown -R node:node /app
+USER node
 
-# Production dependencies only, from the same frozen lockfile — same
-# resolution the builder used, minus everything dev-only. Scripts are
-# skipped for the same reason as in the builder stage (lefthook is a
-# devDependency and does not exist here).
-COPY --chown=bun:bun package.json bun.lock ./
-RUN bun install --frozen-lockfile --production --ignore-scripts
+# Production dependencies resolved by the prod-deps stage from the same
+# frozen lockfile — same resolution the builder used, minus everything
+# dev-only.
+COPY --chown=node:node package.json bun.lock ./
+COPY --chown=node:node --from=prod-deps /app/node_modules ./node_modules
 
 # The deployable unit (same paths as release.yml's signed tarball).
-COPY --chown=bun:bun --from=builder /app/.next ./.next
-COPY --chown=bun:bun --from=builder /app/public ./public
-COPY --chown=bun:bun --from=builder /app/drizzle ./drizzle
-COPY --chown=bun:bun --from=builder /app/scripts/db-migrate.ts ./scripts/db-migrate.ts
+COPY --chown=node:node --from=builder /app/.next ./.next
+COPY --chown=node:node --from=builder /app/public ./public
+COPY --chown=node:node --from=builder /app/drizzle ./drizzle
+COPY --chown=node:node --from=builder /app/dist/db-migrate.mjs ./dist/db-migrate.mjs
 # next.config.ts is loaded again by `next start` — without it the
 # security headers configured there would silently not apply.
 # tsconfig.json keeps path aliases resolvable for any runtime tooling.
-COPY --chown=bun:bun --from=builder /app/next.config.ts ./next.config.ts
-COPY --chown=bun:bun --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --chown=node:node --from=builder /app/next.config.ts ./next.config.ts
+COPY --chown=node:node --from=builder /app/tsconfig.json ./tsconfig.json
 
 EXPOSE 3000
 
@@ -103,13 +131,12 @@ ENV HOSTNAME=0.0.0.0
 
 # Orchestrator probe (Docker HEALTHCHECK polls it; load balancers can
 # too). /api/v1/health returns 200 only when Postgres AND Redis answer.
-# Uses bun's own fetch — wget/curl are not in the slim base image.
 # --start-period covers migration + cold start on first boot.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
-  CMD bun -e "fetch('http://127.0.0.1:3000/api/v1/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+  CMD node -e "fetch('http://127.0.0.1:3000/api/v1/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
 
 # Apply pending migrations, then serve. The migrate step is idempotent
 # (drizzle's ledger table) and refuses to run without DATABASE_URL, which
 # also surfaces a misconfigured deploy immediately instead of serving a
 # half-broken app.
-CMD ["sh", "-c", "bun run scripts/db-migrate.ts && bun run start"]
+CMD ["sh", "-c", "node dist/db-migrate.mjs && node node_modules/next/dist/bin/next start"]

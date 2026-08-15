@@ -69,12 +69,13 @@ export function MembershipList({
       {members.length > 0 ? (
         <div
           className={cn(
-            "gap-5",
-            isGridView ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "flex flex-col",
+            isGridView
+              ? "grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              : "flex flex-col gap-3",
           )}
         >
           {members.map((member) => (
-            <MemberCard key={member.id} member={member} className={cn(!isGridView)} />
+            <MemberCard key={member.id} member={member} variant={isGridView ? "grid" : "list"} />
           ))}
         </div>
       ) : (

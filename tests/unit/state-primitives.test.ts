@@ -113,7 +113,6 @@ describe("no hand-rolled spinner divs", () => {
 describe("animate-pulse routes through the Skeleton primitive", () => {
   const ALLOWLIST = new Set([
     "src/components/ui/skeleton.tsx", // the primitive itself
-    "src/components/memberships/member-card.tsx", // live membership-status dot
     "src/components/ui/full-calendar/time-table.tsx", // live current-time indicator
   ]);
 

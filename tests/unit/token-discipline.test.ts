@@ -530,17 +530,18 @@ describe("wave-3 tier map and email templates migrated off raw palette", () => {
     });
   }
 
-  test("member-card keeps every tier/status/accent key on token classes", () => {
+  test("member-card keeps every tier/status key on token classes", () => {
     const source = src(BADGE_MAP_FILES_WAVE3[0]);
+    // The directory-card redesign replaced the switch color maps with Record
+    // lookups and retired the border-l tier accent (the avatar status dot and
+    // the badges carry tier/status semantics now), so keys are asserted in
+    // computed-record form instead of `case MembershipTier.X:` lines.
     for (const tier of ["BASIC", "STUDENT", "PROFESSIONAL", "CORPORATE", "PREMIUM", "VIP"]) {
-      expect(source, `member-card tier ${tier}`).toMatch(new RegExp(`MembershipTier\\.${tier}:`));
+      expect(source, `member-card tier ${tier}`).toContain(`[MembershipTier.${tier}]`);
     }
     for (const status of ["ACTIVE", "EXPIRED", "PENDING", "SUSPENDED", "CANCELLED"]) {
-      expect(source, `member-card status ${status}`).toMatch(
-        new RegExp(`MembershipStatus\\.${status}:`),
-      );
+      expect(source, `member-card status ${status}`).toContain(`[MembershipStatus.${status}]`);
     }
-    expect(source).toContain("getTierAccent");
     expect(source).toContain("bg-success");
     expect(source).toContain("text-info");
     expect(source).toContain("bg-warning/15");

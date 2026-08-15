@@ -14,6 +14,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { ApiClientError } from "@/lib/api-client";
+
 import type { CategoryFilters, CategoryStatistics } from "@/types/category.types";
 
 import { applyCategoryFilters } from "./category-filters";
@@ -23,6 +25,13 @@ import { useCategoriesQuery } from "./use-categories-query";
 import { useCategoryMutations } from "./use-category-mutations";
 import { useCategoryUtilities } from "./use-category-utilities";
 
+/** API problems surface their own detail; anything unexpected gets a generic message. */
+function queryErrorToMessage(error: unknown): string | null {
+  if (!error) return null;
+  if (error instanceof ApiClientError) return error.message;
+  return "Failed to load categories.";
+}
+
 export function useCategories() {
   const queryClient = useQueryClient();
   const [statistics, setStatistics] = useState<CategoryStatistics | null>(null);
@@ -30,7 +39,7 @@ export function useCategories() {
   const [filters, setFilters] = useState<CategoryFilters>(DEFAULT_FILTERS);
   const [mutating, setMutating] = useState(false);
 
-  const { data: categories = [], isLoading, refetch } = useCategoriesQuery();
+  const { data: categories = [], isLoading, refetch, error: queryError } = useCategoriesQuery();
 
   // Filter and sort categories
   const filteredCategories = useMemo(
@@ -71,7 +80,7 @@ export function useCategories() {
     categories: filteredCategories,
     statistics,
     loading: isLoading || mutating,
-    error,
+    error: error ?? queryErrorToMessage(queryError),
     filters,
 
     // CRUD operations

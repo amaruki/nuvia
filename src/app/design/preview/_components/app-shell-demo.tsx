@@ -101,7 +101,7 @@ function DemoShell() {
           collapsed ? "w-(--sidebar-width-icon)" : "w-(--sidebar-width)",
         )}
       >
-        <SidebarHeader className="p-3">
+        <SidebarHeader className="p-2">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" tooltip="Nuvia backoffice">
@@ -136,7 +136,7 @@ function DemoShell() {
           ))}
         </SidebarContent>
 
-        <SidebarFooter className="p-3">
+        <SidebarFooter className="p-2">
           <SidebarUser user={{ name: "Demo admin", email: "admin@example.com" }} />
         </SidebarFooter>
       </aside>

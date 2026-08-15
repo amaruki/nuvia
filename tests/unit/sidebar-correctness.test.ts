@@ -569,6 +569,14 @@ describe("icon-rail centering", () => {
     expect(menu).toContain("group-data-[collapsible=icon]:mx-auto");
     expect(group).toContain("group-data-[collapsible=icon]:px-2");
   });
+
+  test("collapsed loading skeleton squares up and hides the text bar", () => {
+    const extras = readRepoFile("src/components/ui/sidebar/sidebar-menu-extras.tsx");
+    expect(extras).toContain(
+      "group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:justify-center",
+    );
+    expect(extras).toContain("flex-1 group-data-[collapsible=icon]:hidden");
+  });
 });
 
 // ---------------------------------------------------------------------------

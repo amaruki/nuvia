@@ -40,6 +40,12 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Next.js blocks dev resources (HMR, on-demand chunks) requested from an
+  // origin that differs from the bound hostname, serving 403s that leave the
+  // page stuck on its SSR shell — e.g. browsing via http://127.0.0.1:3000
+  // while the dev server is bound to localhost. Allow the usual local
+  // spellings so any of them hydrate. Dev-only: ignored in production.
+  allowedDevOrigins: ["localhost", "127.0.0.1", "*.localhost", "192.168.*.*"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

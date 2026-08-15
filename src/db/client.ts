@@ -15,21 +15,35 @@
  * `import { db } from '@/db/client'`.
  */
 
-import { drizzle } from "drizzle-orm/postgres-js";
+import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "./schema";
 import { env } from "@/lib/env";
 
+type DbInstance = PostgresJsDatabase<typeof schema>;
 const globalForDb = globalThis as unknown as {
-  db: ReturnType<typeof drizzle<typeof schema>> | undefined;
+  dbCache: { key: string; db: DbInstance } | undefined;
 };
 
-export const db =
-  globalForDb.db ??
-  drizzle(env.DATABASE_URL, {
+// The cache key includes the schema's export names. Adding a table mid dev
+// session re-exports ./schema but used to keep serving the instance whose
+// relational `query` map was built from the pre-addition snapshot, so
+// `db.query.<newTable>` stayed undefined until a manual server restart.
+const schemaKey = Object.keys(schema).sort().join(",");
+
+function createDb(): DbInstance {
+  const instance = drizzle(env.DATABASE_URL, {
     schema,
     casing: "snake_case",
   });
+  if (env.NODE_ENV !== "production") {
+    globalForDb.dbCache = { key: schemaKey, db: instance };
+  }
+  return instance;
+}
 
-if (env.NODE_ENV !== "production") globalForDb.db = db;
+export const db =
+  globalForDb.dbCache && globalForDb.dbCache.key === schemaKey
+    ? globalForDb.dbCache.db
+    : createDb();
 
 export { schema };

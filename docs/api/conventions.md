@@ -75,10 +75,19 @@ standard rather than something to reinvent per route.
 ## The mandatory authorization call
 
 Every `route.ts` handler calls `requirePermission` or `requireRole`
-(ADR-0001) before doing anything privileged. A CI check (`TODO.md` M2)
-greps every `route.ts` for a call to one of these two functions and fails
-if a handler exporting `GET`/`POST`/`PATCH`/`PUT`/`DELETE` doesn't have one
-— today that check would fail on 18 of 23 routes, which is exactly why it
-doesn't exist yet and is tracked as M1/M2 work rather than turned on
-immediately (see the ratchet approach in
-[ADR-0009](../adr/0009-security-hardening-p0.md)).
+(ADR-0001) before doing anything privileged. The sweep that enforces this
+exists today as a unit test — `tests/unit/auth-route-coverage.test.ts` —
+which greps every `route.ts` under `/api/v1/**` for an authorization or
+session-check call and fails the suite on any handler that lacks one.
+
+Three routes are recorded in that test's `KNOWN_EXCEPTIONS`, each with its
+own non-session authentication mechanism documented there:
+
+- `webhooks/stripe` — Stripe-Signature HMAC verification (ADR-0015 §4).
+- `demo/login` — disposable demo-account login, rate-limited, forwarding
+  credentials to better-auth's sign-in handler.
+- `health` — anonymous deployment probe; returns dependency reachability
+  booleans only (see `docs/DEPLOYMENT_PLAN.md` §Health checks).
+
+Each exception entry asserts the route has no auth call, so the moment one
+gains a real check the test fails loudly and the entry must come out.

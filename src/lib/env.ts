@@ -82,10 +82,6 @@ const envSchema = z
     ENABLE_REDIS_CACHE: boolFromString(false),
     REDIS_URL: z.string().optional(),
 
-    // CORS
-    CORS_ORIGIN: z.string().default("http://localhost:3000"),
-    CORS_CREDENTIALS: boolFromString(false),
-
     // API prefix for server-side route code. Client modules must use
     // src/lib/api-prefix.ts instead — they cannot import this file.
     API_PREFIX: z.string().default("/api/v1"),
@@ -116,7 +112,6 @@ const envSchema = z
 
     // Feature flags
     FEATURE_EMAIL_VERIFICATION: boolFromString(true),
-    FEATURE_TWO_FACTOR_AUTH: boolFromString(false),
     FEATURE_SOCIAL_LOGIN: boolFromString(true),
     FEATURE_ACCOUNT_DELETION: boolFromString(true),
     FEATURE_PASSWORD_STRENGTH_METER: boolFromString(true),

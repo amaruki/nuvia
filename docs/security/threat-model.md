@@ -20,16 +20,16 @@ These services are email (Resend/nodemailer), OAuth providers (Google, optionall
 Session tokens are better-auth-issued, `httpOnly`, `SameSite=Lax` (fixed from `None` in `docs/adr/0009-security-hardening-p0.md`). Open: role-level authorization is still missing at the route-group level (`TODO.md` M1). An authenticated low-privilege account can reach high-privilege _pages_, though not (today) privileged _data_, since most of those pages render mock data rather than fetching real records.
 
 **Tampering.**
-Drizzle's typed queries prevent injection by construction. Open: the admin user-creation route stores an unhashed password directly (`TODO.md` M1). This is a data-integrity and confidentiality issue, not injection, but it is tampering-adjacent, since the stored credential material lacks the protection that the rest of the auth system provides.
+Drizzle's typed queries prevent injection by construction. The admin user-creation route hashes passwords with better-auth's `hashPassword` before storing them, so stored credential material carries the same protection as the rest of the auth system.
 
 **Repudiation.**
 The audit log (`authLog` table) exists and logs role changes. Open: the audit log does not yet log most other privileged actions, since most modules are not wired to real data yet (`docs/adr/0008-module-maturity-gate.md`).
 
 **Information Disclosure.**
-Closed: the `SameSite` fix and env validation prevent silent misconfiguration. Open: `delete-account` claims success without deleting anything (`TODO.md` M1). A user who believes the system erased their data remains exposed. This is a disclosure risk against the user's own expectation, not a third party's access. Open: two debug endpoints leak configuration booleans (low severity — `TODO.md` M1).
+Closed: the `SameSite` fix and env validation prevent silent misconfiguration. Closed: `delete-account` now hard-deletes the user through better-auth's `deleteUser` (cascading to sessions and related rows). Open: two debug endpoints leak configuration booleans in development (low severity, 404 in production — `TODO.md` M1).
 
 **Denial of Service.**
-Open: no working rate limiter protects `/api/v1/auth/login` (`docs/adr/0003-single-rate-limiter.md`). An attacker can attempt unlimited password guesses against any known account today.
+Closed: `/api/v1/auth/login` is rate-limited (`rateLimitOrProblem` in `src/app/api/v1/auth/login/route.ts`, single-rate-limiter design in `docs/adr/0003-single-rate-limiter.md`), so unlimited password guesses against a known account are no longer possible.
 
 **Elevation of Privilege.**
 Closed: the audit-trail transaction fix requires a matching log entry for every role change. A role change cannot take effect without one. Open: the missing route-group role check (see Spoofing, above) is also the primary elevation-of-privilege surface. Reachability of a privileged _page_ by an unprivileged account is the first step toward reachability of privileged _data_, once that module's API is built.

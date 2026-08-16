@@ -24,9 +24,9 @@ This is a young, actively-hardening project without a dedicated security team or
 
 This project is transparent about its own security gaps. It does not hide them behind a policy document that implies everything is fine. As of this writing, the open list includes:
 
-- An account-deletion endpoint that does not delete anything
-- Missing rate limiting on the login endpoint
 - Incomplete role-level authorization on dashboard routes
+
+(The account-deletion endpoint now hard-deletes through better-auth's `deleteUser`, and the login endpoint is rate-limited — both were on this list and have been fixed.)
 
 The maintainers know about these issues. These are not undiscovered gaps. The maintainers work to fix them.
 

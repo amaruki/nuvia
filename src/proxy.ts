@@ -17,7 +17,6 @@ import { logger } from "@/lib/logger";
 
 // TODO: Add support for API key authentication for external services
 // TODO: Add support for request logging and analytics
-// TODO: Add support for CORS configuration
 
 /**
  * Dev keeps 'unsafe-inline'/'unsafe-eval' for Next's dev overlay + HMR;

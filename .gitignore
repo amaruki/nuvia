@@ -38,12 +38,10 @@ yarn-error.log*
 .pnpm-debug.log*
 bun-debug.log*
 
-# env files — keep secrets out; .env.example is the template and stays tracked
-.env
-.env.local
-.env.*.local
-.env.production
-.env.development
+# env files — keep secrets out; only *.example templates stay tracked
+.env*
+!.env.example
+!.env.prod.example
 
 # vercel
 .vercel

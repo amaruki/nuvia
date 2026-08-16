@@ -4,10 +4,11 @@
  * and the /api/v1/forums/** routes.
  */
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
   boolean,
+  check,
   index,
   integer,
   jsonb,
@@ -83,6 +84,10 @@ export const forumPost = pgTable(
     index("forum_posts_status_idx").on(table.status),
     index("forum_posts_created_at_idx").on(table.createdAt),
     index("forum_posts_is_sticky_idx").on(table.isSticky),
+    // Issue #28: the counter is maintained incrementally, so the only way
+    // to corrupt it is a stray decrement; a DB-level floor catches that
+    // loudly instead of rendering a negative reply count.
+    check("forum_posts_reply_count_non_negative", sql`${table.replyCount} >= 0`),
   ],
 );
 

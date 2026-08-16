@@ -102,4 +102,31 @@ describe("forum comments", () => {
 
     await expectForumProblem(deleteComment(`missing-${uniqueSuffix()}`, admin), 404);
   });
+
+  test("double delete decrements replyCount exactly once (issue #28)", async () => {
+    const admin = await createActor("admin");
+    const member = await createActor("member");
+
+    const category = await createTestCategory(admin);
+    const post = await createTestPost(admin, category.id);
+    const comment = await createTestComment(member, post.id);
+
+    // Sequential double delete: the second call is a status no-op and must
+    // not decrement again.
+    await deleteComment(comment.id, admin);
+    await deleteComment(comment.id, member);
+    expect((await getPost(post.id)).replyCount).toBe(0);
+
+    // Racy double delete: two concurrent deletions of one published comment
+    // must decrement exactly once (conditional status flip, not a read-then-
+    // write check outside the transaction).
+    const racyPost = await createTestPost(admin, category.id);
+    const racyComment = await createTestComment(member, racyPost.id);
+    await Promise.all([
+      deleteComment(racyComment.id, admin),
+      deleteComment(racyComment.id, member),
+    ]);
+    const reloaded = await getPost(racyPost.id);
+    expect(reloaded.replyCount).toBe(0);
+  });
 });

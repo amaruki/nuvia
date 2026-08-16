@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import { forumComment, forumPost, forumReport, user, type ForumReport } from "@/db/schema";
 import { problems } from "@/lib/http";
 import type { ForumActor } from "./actor";
+import { softDeleteComment } from "./comment-mutations";
 import { ForumServiceError } from "./errors";
 import { createReportSchema, resolveReportSchema } from "./schemas";
 import type { ReportDto } from "./types";
@@ -212,10 +213,12 @@ export async function resolveReport(
         .set({ status: "DELETED" })
         .where(eq(forumPost.id, existing[0].postId));
     } else if (existing[0].commentId) {
-      await db
-        .update(forumComment)
-        .set({ status: "DELETED" })
-        .where(eq(forumComment.id, existing[0].commentId));
+      // Goes through the same conditional-flip helper as the direct delete
+      // route (issue #28): exactly one deleter of a published comment
+      // decrements the reply counter, so the two paths cannot drift.
+      await db.transaction(async (tx) => {
+        await softDeleteComment(tx, existing[0].commentId!);
+      });
     }
   }
 

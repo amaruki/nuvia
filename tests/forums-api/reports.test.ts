@@ -2,6 +2,8 @@ import { describe, expect, test } from "bun:test";
 import {
   createReport,
   createReportSchema,
+  deleteComment,
+  getComment,
   getModerationQueue,
   getPost,
   listReports,
@@ -132,6 +134,47 @@ describe("forum reports", () => {
     await resolveReport(report.id, { action: "RESOLVED", deleteContent: true }, moderator);
     const reloaded = await getPost(post.id);
     expect(reloaded.status).toBe("DELETED");
+  });
+
+  test("resolve with deleteContent on a comment decrements replyCount (issue #28)", async () => {
+    const admin = await createActor("admin");
+    const member = await createActor("member");
+    const moderator = await createActor("moderator");
+
+    const category = await createTestCategory(admin);
+    const post = await createTestPost(admin, category.id);
+    const comment = await createTestComment(member, post.id);
+    expect((await getPost(post.id)).replyCount).toBe(1);
+
+    const report = await createTestReport(member, {
+      targetType: "COMMENT",
+      commentId: comment.id,
+      reason: "Spam",
+    });
+    await resolveReport(report.id, { action: "RESOLVED", deleteContent: true }, moderator);
+
+    const reloadedComment = await getComment(comment.id);
+    expect(reloadedComment.status).toBe("DELETED");
+    // The report path and the direct delete path share the same conditional
+    // decrement, so resolving a report on a published comment keeps the
+    // counter consistent instead of skipping the decrement.
+    const reloadedPost = await getPost(post.id);
+    expect(reloadedPost.replyCount).toBe(0);
+
+    // Cross-path race: a direct delete racing the report-resolution delete
+    // must still decrement exactly once.
+    const racyPost = await createTestPost(admin, category.id);
+    const racyComment = await createTestComment(member, racyPost.id);
+    const racyReport = await createTestReport(member, {
+      targetType: "COMMENT",
+      commentId: racyComment.id,
+      reason: "Spam",
+    });
+    await Promise.all([
+      resolveReport(racyReport.id, { action: "RESOLVED", deleteContent: true }, moderator),
+      deleteComment(racyComment.id, member),
+    ]);
+    expect((await getPost(racyPost.id)).replyCount).toBe(0);
   });
 
   test("queue entries carry pending report counts", async () => {

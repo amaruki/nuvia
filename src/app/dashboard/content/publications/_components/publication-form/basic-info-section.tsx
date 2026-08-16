@@ -1,12 +1,22 @@
 "use client";
 
-import { SelectField, TextareaField, TextField } from "@/components/dashboard/form-sheet";
+import { useFormContext, useWatch } from "react-hook-form";
+
+import {
+  DateField,
+  SelectField,
+  TextareaField,
+  TextField,
+} from "@/components/dashboard/form-sheet";
 
 import { CATEGORY_OPTIONS, DIFFICULTY_OPTIONS, STATUS_OPTIONS, TYPE_OPTIONS } from "./options";
 import type { BasicInfoSectionProps } from "./types";
 
 /** Every control here is data-driven, so the field shorthands cover it. */
 export function BasicInfoSection({ authors }: BasicInfoSectionProps) {
+  const { control } = useFormContext();
+  const status = useWatch({ control, name: "status" });
+
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
@@ -61,6 +71,17 @@ export function BasicInfoSection({ authors }: BasicInfoSectionProps) {
           options={DIFFICULTY_OPTIONS}
         />
       </div>
+
+      {/* Issue #17: scheduled content needs a publish date — the scheduled
+          publisher promotes the row on that date. */}
+      {status === "scheduled" ? (
+        <DateField
+          name="scheduledFor"
+          label="Publish date"
+          required
+          description="The publication goes live automatically on this date."
+        />
+      ) : null}
     </div>
   );
 }

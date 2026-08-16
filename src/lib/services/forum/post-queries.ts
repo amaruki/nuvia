@@ -24,7 +24,6 @@ export const postWithJoins = () =>
       isSticky: forumPost.isSticky,
       isLocked: forumPost.isLocked,
       views: forumPost.views,
-      likeCount: forumPost.likeCount,
       replyCount: forumPost.replyCount,
       lastReplyAt: forumPost.lastReplyAt,
       tags: forumPost.tags,
@@ -51,7 +50,6 @@ interface PostJoinRow {
   isSticky: boolean;
   isLocked: boolean;
   views: number;
-  likeCount: number;
   replyCount: number;
   lastReplyAt: Date | null;
   tags: string[];
@@ -76,7 +74,6 @@ export function toPostDto(row: PostJoinRow): PostDto {
     isSticky: row.isSticky,
     isLocked: row.isLocked,
     views: row.views,
-    likeCount: row.likeCount,
     replyCount: row.replyCount,
     lastReplyAt: row.lastReplyAt,
     tags: row.tags,

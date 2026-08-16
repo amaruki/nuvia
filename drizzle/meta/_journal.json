@@ -120,6 +120,13 @@
       "when": 1786881014284,
       "tag": "0016_forum_reply_count_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1786890662441,
+      "tag": "0017_drop_forum_like_counts",
+      "breakpoints": true
     }
   ]
 }

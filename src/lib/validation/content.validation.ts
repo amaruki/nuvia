@@ -215,133 +215,178 @@ export const categoryFormSchema = z.object({
 // create/update schemas above. Both live here so the form and the route
 // never drift apart.
 
-export const announcementFormSchema = z.object({
-  title: z
-    .string()
-    .min(3, "Title must be at least 3 characters")
-    .max(200, "Title must be less than 200 characters"),
-  excerpt: z
-    .string()
-    .min(10, "Excerpt must be at least 10 characters")
-    .max(500, "Excerpt must be less than 500 characters"),
-  content: z.string().min(50, "Content must be at least 50 characters"),
-  type: z.enum(ANNOUNCEMENT_FORM_TYPES),
-  priority: z.enum(ANNOUNCEMENT_PRIORITIES),
-  targetAudience: z.enum(ANNOUNCEMENT_TARGET_AUDIENCES),
-  status: z.enum(["draft", "published", "scheduled", "review", "archived"]),
-  authorId: z.string().min(1, "Author is required"),
-  tagIds: z.array(z.string()).default([]),
-  featuredImage: z.string().optional(),
-  expiresAt: z.date().optional(),
-  isPinned: z.boolean().default(false),
-  isUrgent: z.boolean().default(false),
-  requiresAcknowledgment: z.boolean().default(false),
-  sendEmailNotification: z.boolean().default(false),
-  sendPushNotification: z.boolean().default(false),
-  displayOnHomepage: z.boolean().default(false),
-  displayInDashboard: z.boolean().default(false),
-  visibility: z.enum([
-    "public",
-    "members_only",
-    "premium_only",
-    "chapter_only",
-    "committee_only",
-  ] as const),
-  allowedRoles: z.array(z.string()).default([]),
-  allowedChapters: z.array(z.string()).default([]),
-  allowedCommittees: z.array(z.string()).default([]),
-  commentsEnabled: z.boolean().default(false),
-  sharingEnabled: z.boolean().default(true),
-  downloadEnabled: z.boolean().default(false),
-  isFeatured: z.boolean().default(false),
-});
-
-export const articleFormSchema = z.object({
-  title: z.string().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
-  slug: z.string().optional(),
-  excerpt: z
-    .string()
-    .min(10, "Excerpt must be at least 10 characters")
-    .max(500, "Excerpt must be less than 500 characters"),
-  content: z.string().min(50, "Content must be at least 50 characters"),
-  type: z.enum(ARTICLE_FORM_TYPES),
-  category: z.enum(ARTICLE_FORM_CATEGORIES),
-  format: z.enum(ARTICLE_FORM_FORMATS),
-  difficulty: z.enum(ARTICLE_FORM_DIFFICULTIES),
-  status: z.enum(ARTICLE_FORM_STATUSES),
-  authorId: z.string().min(1, "Author is required"),
-  coAuthorIds: z.array(z.string()).optional(),
-  reviewerId: z.string().optional(),
-  tagIds: z.array(z.string()).default([]),
-  seriesId: z.string().optional(),
-  visibility: z.enum([
-    "public",
-    "members_only",
-    "premium_only",
-    "chapter_only",
-    "committee_only",
-  ] as const),
-  commentsEnabled: z.boolean(),
-  sharingEnabled: z.boolean(),
-  downloadEnabled: z.boolean(),
-  isFeatured: z.boolean(),
-  isPinned: z.boolean(),
-  priority: z.number().min(0).max(10),
-  seo: z.object({
+export const announcementFormSchema = z
+  .object({
     title: z
       .string()
-      .min(1, "SEO title is required")
-      .max(60, "SEO title must be less than 60 characters"),
-    description: z
+      .min(3, "Title must be at least 3 characters")
+      .max(200, "Title must be less than 200 characters"),
+    excerpt: z
       .string()
-      .min(1, "SEO description is required")
-      .max(160, "SEO description must be less than 160 characters"),
-    keywords: z.array(z.string()).default([]),
-    ogImage: z.string().optional(),
-  }),
-});
+      .min(10, "Excerpt must be at least 10 characters")
+      .max(500, "Excerpt must be less than 500 characters"),
+    content: z.string().min(50, "Content must be at least 50 characters"),
+    type: z.enum(ANNOUNCEMENT_FORM_TYPES),
+    priority: z.enum(ANNOUNCEMENT_PRIORITIES),
+    targetAudience: z.enum(ANNOUNCEMENT_TARGET_AUDIENCES),
+    status: z.enum(["draft", "published", "scheduled", "review", "archived"]),
+    authorId: z.string().min(1, "Author is required"),
+    // Issue #17: the scheduled publisher gates on a publish time, so the
+    // form carries the date the editor picked (YYYY-MM-DD from DateField).
+    scheduledFor: z.string().optional(),
+    tagIds: z.array(z.string()).default([]),
+    featuredImage: z.string().optional(),
+    expiresAt: z.date().optional(),
+    isPinned: z.boolean().default(false),
+    isUrgent: z.boolean().default(false),
+    requiresAcknowledgment: z.boolean().default(false),
+    sendEmailNotification: z.boolean().default(false),
+    sendPushNotification: z.boolean().default(false),
+    displayOnHomepage: z.boolean().default(false),
+    displayInDashboard: z.boolean().default(false),
+    visibility: z.enum([
+      "public",
+      "members_only",
+      "premium_only",
+      "chapter_only",
+      "committee_only",
+    ] as const),
+    allowedRoles: z.array(z.string()).default([]),
+    allowedChapters: z.array(z.string()).default([]),
+    allowedCommittees: z.array(z.string()).default([]),
+    commentsEnabled: z.boolean().default(false),
+    sharingEnabled: z.boolean().default(true),
+    downloadEnabled: z.boolean().default(false),
+    isFeatured: z.boolean().default(false),
+  })
+  // Issue #17: "scheduled" without a publish date is the old dead state;
+  // require the date client-side so the sheet explains the problem inline.
+  .superRefine((values, ctx) => {
+    if (values.status === "scheduled" && !values.scheduledFor) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["scheduledFor"],
+        message: "Scheduled content needs a publish date",
+      });
+    }
+  });
 
-export const publicationFormSchema = z.object({
-  title: z.string().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
-  slug: z.string().optional(),
-  excerpt: z
-    .string()
-    .min(10, "Excerpt must be at least 10 characters")
-    .max(500, "Excerpt must be less than 500 characters"),
-  content: z.string().min(50, "Content must be at least 50 characters"),
-  type: z.enum(PUBLICATION_FORM_TYPES),
-  category: z.enum(PUBLICATION_FORM_CATEGORIES),
-  status: z.enum(PUBLICATION_FORM_STATUSES),
-  authorId: z.string().min(1, "Author is required"),
-  coAuthorIds: z.array(z.string()).optional(),
-  tagIds: z.array(z.string()).default([]),
-  difficulty: z.enum(["beginner", "intermediate", "advanced"]),
-  visibility: z.enum([
-    "public",
-    "members_only",
-    "premium_only",
-    "chapter_only",
-    "committee_only",
-  ] as const),
-  commentsEnabled: z.boolean(),
-  sharingEnabled: z.boolean(),
-  downloadEnabled: z.boolean(),
-  isFeatured: z.boolean(),
-  isPinned: z.boolean(),
-  priority: z.number().min(0).max(10),
-  seo: z.object({
+export const articleFormSchema = z
+  .object({
     title: z
       .string()
-      .min(1, "SEO title is required")
-      .max(60, "SEO title must be less than 60 characters"),
-    description: z
+      .min(1, "Title is required")
+      .max(200, "Title must be less than 200 characters"),
+    slug: z.string().optional(),
+    excerpt: z
       .string()
-      .min(1, "SEO description is required")
-      .max(160, "SEO description must be less than 160 characters"),
-    keywords: z.array(z.string()).default([]),
-    ogImage: z.string().optional(),
-  }),
-});
+      .min(10, "Excerpt must be at least 10 characters")
+      .max(500, "Excerpt must be less than 500 characters"),
+    content: z.string().min(50, "Content must be at least 50 characters"),
+    type: z.enum(ARTICLE_FORM_TYPES),
+    category: z.enum(ARTICLE_FORM_CATEGORIES),
+    format: z.enum(ARTICLE_FORM_FORMATS),
+    difficulty: z.enum(ARTICLE_FORM_DIFFICULTIES),
+    status: z.enum(ARTICLE_FORM_STATUSES),
+    authorId: z.string().min(1, "Author is required"),
+    coAuthorIds: z.array(z.string()).optional(),
+    reviewerId: z.string().optional(),
+    tagIds: z.array(z.string()).default([]),
+    seriesId: z.string().optional(),
+    scheduledFor: z.string().optional(),
+    visibility: z.enum([
+      "public",
+      "members_only",
+      "premium_only",
+      "chapter_only",
+      "committee_only",
+    ] as const),
+    commentsEnabled: z.boolean(),
+    sharingEnabled: z.boolean(),
+    downloadEnabled: z.boolean(),
+    isFeatured: z.boolean(),
+    isPinned: z.boolean(),
+    priority: z.number().min(0).max(10),
+    seo: z.object({
+      title: z
+        .string()
+        .min(1, "SEO title is required")
+        .max(60, "SEO title must be less than 60 characters"),
+      description: z
+        .string()
+        .min(1, "SEO description is required")
+        .max(160, "SEO description must be less than 160 characters"),
+      keywords: z.array(z.string()).default([]),
+      ogImage: z.string().optional(),
+    }),
+  })
+  // Issue #17: "scheduled" without a publish date is the old dead state;
+  // require the date client-side so the sheet explains the problem inline.
+  .superRefine((values, ctx) => {
+    if (values.status === "scheduled" && !values.scheduledFor) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["scheduledFor"],
+        message: "Scheduled content needs a publish date",
+      });
+    }
+  });
+
+export const publicationFormSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, "Title is required")
+      .max(200, "Title must be less than 200 characters"),
+    slug: z.string().optional(),
+    excerpt: z
+      .string()
+      .min(10, "Excerpt must be at least 10 characters")
+      .max(500, "Excerpt must be less than 500 characters"),
+    content: z.string().min(50, "Content must be at least 50 characters"),
+    type: z.enum(PUBLICATION_FORM_TYPES),
+    category: z.enum(PUBLICATION_FORM_CATEGORIES),
+    status: z.enum(PUBLICATION_FORM_STATUSES),
+    authorId: z.string().min(1, "Author is required"),
+    coAuthorIds: z.array(z.string()).optional(),
+    tagIds: z.array(z.string()).default([]),
+    difficulty: z.enum(["beginner", "intermediate", "advanced"]),
+    scheduledFor: z.string().optional(),
+    visibility: z.enum([
+      "public",
+      "members_only",
+      "premium_only",
+      "chapter_only",
+      "committee_only",
+    ] as const),
+    commentsEnabled: z.boolean(),
+    sharingEnabled: z.boolean(),
+    downloadEnabled: z.boolean(),
+    isFeatured: z.boolean(),
+    isPinned: z.boolean(),
+    priority: z.number().min(0).max(10),
+    seo: z.object({
+      title: z
+        .string()
+        .min(1, "SEO title is required")
+        .max(60, "SEO title must be less than 60 characters"),
+      description: z
+        .string()
+        .min(1, "SEO description is required")
+        .max(160, "SEO description must be less than 160 characters"),
+      keywords: z.array(z.string()).default([]),
+      ogImage: z.string().optional(),
+    }),
+  })
+  .superRefine((values, ctx) => {
+    if (values.status === "scheduled" && !values.scheduledFor) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["scheduledFor"],
+        message: "Scheduled content needs a publish date",
+      });
+    }
+  });
 
 // ── List queries ────────────────────────────────────────────────────────────
 

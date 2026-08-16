@@ -25,7 +25,6 @@ export async function listComments(postId: string): Promise<CommentDto[]> {
       parentId: forumComment.parentId,
       content: forumComment.content,
       status: forumComment.status,
-      likeCount: forumComment.likeCount,
       createdAt: forumComment.createdAt,
       updatedAt: forumComment.updatedAt,
       authorId: user.id,
@@ -45,7 +44,6 @@ export async function listComments(postId: string): Promise<CommentDto[]> {
     parentId: row.parentId,
     content: row.content,
     status: row.status,
-    likeCount: row.likeCount,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     author: toAuthor({
@@ -73,7 +71,6 @@ async function listCommentsForIds(ids: string[]): Promise<CommentDto[]> {
       parentId: forumComment.parentId,
       content: forumComment.content,
       status: forumComment.status,
-      likeCount: forumComment.likeCount,
       createdAt: forumComment.createdAt,
       updatedAt: forumComment.updatedAt,
       authorId: user.id,
@@ -92,7 +89,6 @@ async function listCommentsForIds(ids: string[]): Promise<CommentDto[]> {
     parentId: row.parentId,
     content: row.content,
     status: row.status,
-    likeCount: row.likeCount,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     author: toAuthor({

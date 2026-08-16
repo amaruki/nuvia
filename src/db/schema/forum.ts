@@ -67,7 +67,6 @@ export const forumPost = pgTable(
     isSticky: boolean("is_sticky").notNull().default(false),
     isLocked: boolean("is_locked").notNull().default(false),
     views: integer("views").notNull().default(0),
-    likeCount: integer("like_count").notNull().default(0),
     replyCount: integer("reply_count").notNull().default(0),
     lastReplyAt: timestamp("last_reply_at", { withTimezone: true }),
     tags: text("tags").array().notNull().default([]),
@@ -106,7 +105,6 @@ export const forumComment = pgTable(
     content: text("content").notNull(),
     parentId: text("parent_id").references((): AnyPgColumn => forumComment.id),
     status: commentStatusEnum("status").notNull().default("PUBLISHED"),
-    likeCount: integer("like_count").notNull().default(0),
     metadata: jsonb("metadata"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true })

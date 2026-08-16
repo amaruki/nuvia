@@ -77,7 +77,6 @@ export interface PublicForumThreadSummary {
   isSticky: boolean;
   isLocked: boolean;
   views: number;
-  likeCount: number;
   replyCount: number;
   lastReplyAt: Date | null;
   /** Null only if the author row no longer resolves (e.g. hard-deleted). */
@@ -283,7 +282,6 @@ export async function listPublicForumThreads(
         isSticky: forumPost.isSticky,
         isLocked: forumPost.isLocked,
         views: forumPost.views,
-        likeCount: forumPost.likeCount,
         replyCount: forumPost.replyCount,
         lastReplyAt: forumPost.lastReplyAt,
         author_id: user.id,
@@ -308,7 +306,6 @@ export async function listPublicForumThreads(
       isSticky: row.isSticky,
       isLocked: row.isLocked,
       views: row.views,
-      likeCount: row.likeCount,
       replyCount: row.replyCount,
       lastReplyAt: row.lastReplyAt,
       author: toAuthor(row),
@@ -348,7 +345,6 @@ export async function getPublicForumThread(
       isSticky: forumPost.isSticky,
       isLocked: forumPost.isLocked,
       views: forumPost.views,
-      likeCount: forumPost.likeCount,
       replyCount: forumPost.replyCount,
       lastReplyAt: forumPost.lastReplyAt,
       tags: forumPost.tags,
@@ -407,7 +403,6 @@ export async function getPublicForumThread(
       isSticky: row.isSticky,
       isLocked: row.isLocked,
       views: row.views,
-      likeCount: row.likeCount,
       replyCount: row.replyCount,
       lastReplyAt: row.lastReplyAt,
       tags: row.tags,

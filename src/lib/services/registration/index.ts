@@ -18,6 +18,7 @@
 export { RegistrationServiceError } from "./errors";
 export { createRegistrationSchema, listRegistrationsQuerySchema } from "./schemas";
 export type { CreateRegistrationInput, ListRegistrationsQuery } from "./schemas";
+export { REGISTRATION_TRANSITIONS, TERMINAL_REGISTRATION_STATUSES } from "./lifecycle";
 export type {
   CancelRegistrationActor,
   DbRegistrationStatus,
@@ -30,5 +31,6 @@ export {
   cancelRegistration,
   checkInRegistration,
   approveRegistration,
+  markNoShowRegistration,
 } from "./mutations";
 export { listRegistrations } from "./queries";

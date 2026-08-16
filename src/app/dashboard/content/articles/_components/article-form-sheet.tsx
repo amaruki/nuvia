@@ -59,6 +59,13 @@ function slugify(value: string): string {
     .replace(/-+/g, "-");
 }
 
+/** Issue #17: DateField round-trips YYYY-MM-DD strings. */
+function toDateInputValue(date: Date | undefined): string {
+  if (!date) return "";
+  const parsed = new Date(date);
+  return Number.isNaN(parsed.getTime()) ? "" : parsed.toISOString().slice(0, 10);
+}
+
 function toFormState(article: Article | null): ArticleFormValues {
   return {
     title: article?.title ?? "",
@@ -70,6 +77,7 @@ function toFormState(article: Article | null): ArticleFormValues {
     format: article?.format ?? "standard",
     difficulty: article?.difficulty ?? "beginner",
     status: article?.status ?? "draft",
+    scheduledFor: toDateInputValue(article?.scheduledFor),
     authorId: article?.author.id ?? "",
     coAuthorIds: article?.coAuthors?.map((author) => author.id) ?? [],
     reviewerId: article?.reviewer?.id ?? "",
@@ -156,6 +164,9 @@ export function ArticleFormSheet({ sheet, onCreate, onUpdate, onSaved }: Article
     const payload: ArticleFormData = {
       ...values,
       slug: values.slug?.trim() || slugify(values.title),
+      // Issue #17: scheduled writes carry the editor's publish date; the
+      // publisher gates on it. Dates travel as ISO strings over JSON.
+      scheduledFor: values.scheduledFor ? new Date(values.scheduledFor) : undefined,
       featuredImage,
       gallery,
       attachments: [],

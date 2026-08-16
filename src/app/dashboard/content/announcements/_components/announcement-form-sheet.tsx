@@ -51,6 +51,10 @@ function toFormState(announcement: Announcement | null): AnnouncementFormValues 
     priority: announcement?.priority ?? "medium",
     targetAudience: announcement?.targetAudience ?? "all_members",
     status: announcement?.status ?? "draft",
+    // Issue #17: DateField round-trips YYYY-MM-DD strings.
+    scheduledFor: announcement?.scheduledFor
+      ? new Date(announcement.scheduledFor).toISOString().slice(0, 10)
+      : "",
     authorId: announcement?.author.id ?? "",
     tagIds: announcement?.tags.map((tag) => tag.id) ?? [],
     featuredImage: announcement?.featuredImage,
@@ -143,6 +147,9 @@ export function AnnouncementFormSheet({
     const payload: AnnouncementFormData = {
       ...values,
       category: "announcements", // Always announcements
+      // Issue #17: scheduled writes carry the editor's publish date; the
+      // publisher gates on it. Dates travel as ISO strings over JSON.
+      scheduledFor: values.scheduledFor ? new Date(values.scheduledFor) : undefined,
       attachments:
         attachments.length > 0
           ? attachments.map((attachment) => ({

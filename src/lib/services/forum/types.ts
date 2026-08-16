@@ -26,7 +26,6 @@ export interface PostDto {
   isSticky: boolean;
   isLocked: boolean;
   views: number;
-  likeCount: number;
   replyCount: number;
   lastReplyAt: Date | null;
   tags: string[];
@@ -54,7 +53,6 @@ export interface CommentDto {
   parentId: string | null;
   content: string;
   status: string;
-  likeCount: number;
   createdAt: Date;
   updatedAt: Date;
   author: AuthorDto;

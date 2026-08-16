@@ -58,3 +58,72 @@ export function assertTransition(action: LifecycleAction, status: SubscriptionSt
     );
   }
 }
+
+/** Every status in membership_status_enum, for graph completeness checks. */
+export const SUBSCRIPTION_STATUSES: readonly SubscriptionStatus[] = [
+  "ACTIVE",
+  "TRIALING",
+  "CANCELED",
+  "PAST_DUE",
+  "UNPAID",
+  "PAUSED",
+  "PENDING_PAYMENT",
+];
+
+/** Target for every action except expire (which branches per from-status). */
+const ACTION_TARGET: Partial<Record<LifecycleAction, SubscriptionStatus>> = {
+  renew: "ACTIVE",
+  cancel: "CANCELED",
+  pause: "PAUSED",
+  resume: "ACTIVE",
+  activate: "ACTIVE",
+  "mark-past-due": "PAST_DUE",
+};
+
+/** expire's target depends on the from-status (see expireSubscription). */
+const EXPIRE_TARGET: Partial<Record<SubscriptionStatus, SubscriptionStatus>> = {
+  ACTIVE: "CANCELED",
+  TRIALING: "CANCELED",
+  CANCELED: "CANCELED",
+  PAST_DUE: "UNPAID",
+  PENDING_PAYMENT: "CANCELED",
+};
+
+/**
+ * Derived status graph: from-status -> statuses the lifecycle can move it
+ * to. Two intentional exclusions:
+ * - `cancel-at-period-end` is not an edge: it keeps the current status and
+ *   only schedules the future cancel.
+ * - Self-loops are dropped (expire on CANCELED cuts the grace period short
+ *   but never changes the status), so terminal statuses stay honest.
+ * Issue #17's status-graph regression test asserts no status is a dead end
+ * here.
+ */
+export const SUBSCRIPTION_TRANSITIONS: Record<SubscriptionStatus, readonly SubscriptionStatus[]> =
+  (() => {
+    const graph = new Map<SubscriptionStatus, Set<SubscriptionStatus>>(
+      SUBSCRIPTION_STATUSES.map((status) => [status, new Set<SubscriptionStatus>()]),
+    );
+    for (const [action, sources] of Object.entries(LEGAL_FROM_STATES) as Array<
+      [LifecycleAction, readonly SubscriptionStatus[]]
+    >) {
+      if (action === "cancel-at-period-end") continue;
+      for (const from of sources) {
+        const to = action === "expire" ? EXPIRE_TARGET[from] : ACTION_TARGET[action];
+        if (to && to !== from) graph.get(from)!.add(to);
+      }
+    }
+    const record = {} as Record<SubscriptionStatus, readonly SubscriptionStatus[]>;
+    for (const status of SUBSCRIPTION_STATUSES) {
+      record[status] = [...graph.get(status)!];
+    }
+    return record;
+  })();
+
+/**
+ * Same-row terminal statuses. CANCELED ends the row's own lifecycle;
+ * re-subscribing is the membership-join funnel creating a NEW row, never a
+ * transition out of CANCELED (renew is legal from TRIALING/ACTIVE/PAST_DUE
+ * only).
+ */
+export const TERMINAL_SUBSCRIPTION_STATUSES: readonly SubscriptionStatus[] = ["CANCELED"];

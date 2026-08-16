@@ -35,6 +35,29 @@ import {
   type UiVisibility,
 } from "./types";
 
+/**
+ * Issue #17: resolve and validate the publish time a "scheduled" write
+ * carries. The forms name the field `scheduledFor`; `publishedAt` is
+ * accepted too since that is the column the publisher gates on. Throws a
+ * clear 400 when the time is missing or not in the future, so callers can
+ * never land in the old dead state (scheduled-but-never-publishes).
+ */
+function requireFutureScheduledTime(input: ContentInput, now: Date, fallback?: Date | null): Date {
+  const candidate =
+    toDate(input.scheduledFor) ?? toDate(input.publishedAt) ?? fallback ?? undefined;
+  if (!candidate) {
+    throw ContentApiError.badRequest(
+      "Scheduling content requires a future publish time (send scheduledFor or publishedAt)",
+    );
+  }
+  if (candidate.getTime() <= now.getTime()) {
+    throw ContentApiError.badRequest(
+      'Scheduled publish time must be in the future; publish immediately with status "published" instead',
+    );
+  }
+  return candidate;
+}
+
 async function insertContent(
   collection: ContentCollection,
   input: ContentInput,
@@ -63,8 +86,21 @@ async function insertContent(
   const categoryId = await resolveCategoryId(input.category);
 
   const now = new Date();
-  const publishedAt =
-    status === "published" ? (toDate(input.publishedAt) ?? now) : toDate(input.publishedAt);
+  // Issue #17: "scheduled" must carry a future publish time, and that time
+  // is stored in the `publishedAt` column — the gate both the scheduled
+  // publisher and every audience read path trust (`lte(publishedAt, now)`).
+  // A scheduled row without it either publishes immediately (past/null) or
+  // is never promoted (NULL never satisfies `<=`). The dashboard forms do
+  // not yet send a date, so the API refuses the half-built state with a
+  // clear error instead of silently creating invisible content.
+  let publishedAt: Date | undefined;
+  if (status === "published") {
+    publishedAt = toDate(input.publishedAt) ?? now;
+  } else if (status === "scheduled") {
+    publishedAt = requireFutureScheduledTime(input, now);
+  } else {
+    publishedAt = toDate(input.publishedAt) ?? undefined;
+  }
 
   // Issue #25: reviewedAt is service-owned. It is stamped when a publisher
   // approves content, never supplied by the client and never stamped on
@@ -239,15 +275,21 @@ async function patchContent(
     (previousUi.visibility as UiVisibility | undefined) ??
     "public";
 
-  // publishedAt: preserve, accept override, or stamp on publish
+  // publishedAt: preserve, accept override, or stamp on publish.
+  // Issue #17: a PATCH into "scheduled" must land on a future publish time
+  // (same rule as create). The time is read from scheduledFor/publishedAt,
+  // falling back to the existing column so re-saving a scheduled item
+  // without repeating the date keeps working. The old literal no-op block
+  // that acknowledged the missing scheduledFor handling is gone — the
+  // scheduled publisher (scheduler.ts) now actually promotes due rows.
   let publishedAt = existing.publishedAt ?? undefined;
-  if (input.publishedAt !== undefined) {
+  if (nextStatus === "scheduled") {
+    publishedAt = requireFutureScheduledTime(input, new Date(), existing.publishedAt);
+    mergedUi.scheduledFor = publishedAt.toISOString();
+  } else if (input.publishedAt !== undefined) {
     publishedAt = toDate(input.publishedAt);
   } else if (nextStatus === "published" && !publishedAt) {
     publishedAt = new Date();
-  }
-  if (input.status === "scheduled" && !incomingUi.scheduledFor) {
-    // keep prior scheduledFor if present
   }
 
   // Version bump

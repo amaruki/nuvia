@@ -25,5 +25,10 @@ export type {
   RegistrationListResult,
   RegistrationUserDto,
 } from "./types";
-export { createRegistration, cancelRegistration, checkInRegistration } from "./mutations";
+export {
+  createRegistration,
+  cancelRegistration,
+  checkInRegistration,
+  approveRegistration,
+} from "./mutations";
 export { listRegistrations } from "./queries";

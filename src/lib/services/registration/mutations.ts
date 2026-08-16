@@ -12,3 +12,4 @@
 export { createRegistration } from "./mutations-create";
 export { cancelRegistration } from "./mutations-cancel";
 export { checkInRegistration } from "./mutations-check-in";
+export { approveRegistration } from "./mutations-approve";

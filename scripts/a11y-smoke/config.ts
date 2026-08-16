@@ -41,13 +41,21 @@ export const ADMIN_EMAIL = "admin@nuvia.com";
 export const REPO_ROOT = import.meta.dir + "/../..";
 export const OUTPUT_DIR = `/tmp/nuvia-a11y-smoke-${new Date().toISOString().replace(/[:.]/g, "-")}-${process.pid}`;
 
-/** Test infrastructure endpoints — mirrors scripts/run-integration-tests.ts. */
+/** Test infrastructure endpoints — mirrors scripts/run-integration-tests.ts.
+ *
+ * DATABASE_URL/REDIS_URL respect values already present in the environment:
+ * CI's browser job provides Postgres/Redis service containers on 5432/6379,
+ * and hardcoding the local compose ports there made the gate raise a SECOND
+ * Postgres + Redis stack on the same runner (a runner-starvation contributor
+ * in runs 31930748760/31934735821). Local runs without those env vars still
+ * fall back to the compose-stack ports below.
+ */
 export const TEST_ENV = {
   APP_URL: BASE_URL,
   BETTER_AUTH_SECRET: "local-test-secret-not-for-production-use-000000",
-  DATABASE_URL: "postgresql://nuvia:nuvia@127.0.0.1:15433/nuvia",
+  DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://nuvia:***@127.0.0.1:15433/nuvia",
   NODE_ENV: "test",
-  REDIS_URL: "redis://127.0.0.1:16380",
+  REDIS_URL: process.env.REDIS_URL ?? "redis://127.0.0.1:16380",
   RATE_LIMIT_MAX_REQUESTS: "1000",
   RATE_LIMIT_WINDOW_MINUTES: "15",
   // `next dev` below forces NODE_ENV=development, which would silently

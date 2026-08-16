@@ -10,8 +10,8 @@ import type { PageReport } from "./audit";
 import { DYNAMIC_PAGES, OUTPUT_DIR, PAGES, THEMES, THEME_STORAGE_KEY } from "./config";
 import type { PageTarget } from "./config";
 import { ensureDemoContent, resolveDynamicPaths } from "./demo-content";
-import { ensureDevServer, stopDevServer } from "./dev-server";
 import { log } from "./helpers";
+import { ensureServer, stopServer } from "./server";
 import { ensureTestStack, flushRateLimitState, seedAdmin } from "./infrastructure";
 
 export async function main(): Promise<void> {
@@ -25,7 +25,7 @@ export async function main(): Promise<void> {
   await seedAdmin(password);
   await ensureDemoContent();
 
-  const { server, logFd, baseUrl } = await ensureDevServer();
+  const { server, logFd, baseUrl } = await ensureServer();
   let browser: Browser | null = null;
 
   try {
@@ -145,8 +145,8 @@ export async function main(): Promise<void> {
   } finally {
     if (browser) await browser.close();
     if (server) {
-      log("Stopping dev server…");
-      await stopDevServer(server);
+      log("Stopping audited server…");
+      await stopServer(server);
     }
     if (logFd !== null) closeSync(logFd);
   }

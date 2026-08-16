@@ -153,12 +153,15 @@ jobs:
         with:
           bun-version: "1.3.14"
       - run: bun install --frozen-lockfile
-      - name: WCAG 2.2 AA smoke (axe via Playwright, light + dark)
-        run: bun run test:a11y
-      - name: Apply database migrations
-        run: bun run db:migrate
+      # Build first: the a11y gate audits the production build via
+      # `next start` (see scripts/a11y-smoke/server.ts), which is cheaper
+      # on the runner than JIT-compiling 94 page loads under `next dev`.
       - name: Production build
         run: bun run build
+      - name: Apply database migrations
+        run: bun run db:migrate
+      - name: WCAG 2.2 AA smoke (axe via Playwright, light + dark)
+        run: bun run test:a11y
       - name: Route boot smoke (next start)
         run: bun run test:smoke
       - name: Upload a11y audit artifacts
@@ -169,6 +172,7 @@ jobs:
           path: |
             /tmp/nuvia-a11y-smoke-*/summary.json
             /tmp/nuvia-a11y-smoke-*/next-dev.log
+            /tmp/nuvia-a11y-smoke-*/next-start.log
           if-no-files-found: ignore
 
   docker:

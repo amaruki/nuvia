@@ -95,18 +95,20 @@ jobs:
       - run: bun run test:integration
       - run: bunx drizzle-kit check
       - run: bun run build
-      - run: bun audit --prod
-        continue-on-error: true # see docs/supply-chain.md — triage by reachability, not a hard gate yet
+      # Hard supply-chain gate (issue #4): fails on any high/critical
+      # production advisory not covered by an active SECURITY-WAIVERS.md
+      # entry — see docs/supply-chain.md.
+      - run: bun run audit:gate
 
   browser:
     # Playwright gates that cannot run under `bun test`: the axe-core WCAG
-    # 2.2 AA audit over a real signed-in browser session (light + dark), and
-    # the production route-boot smoke against `next start`. The a11y gate is
-    # self-contained (it raises its own compose stack on the runner); the
-    # route smoke and the production build need the service containers below
-    # (session-aware pages like /forums are force-dynamic now, but the
-    # service containers keep the build environment identical to the heavy
-    # job's runner).
+    # 2.2 AA accessibility audit over a real signed-in browser session
+    # (light + dark), and the production route-boot smoke against `next
+    # start). Both reuse the job's service containers (Postgres/Redis) and
+    # the runner's preinstalled Chrome — see scripts/a11y-smoke/server.ts.
+    # The service containers keep the build environment identical to the
+    # heavy job's runner (session-aware pages like /forums are force-dynamic
+    # now, but the services are still needed at build/start time).
     #
     # No `playwright install` step: the gate drives the Chrome build that
     # ships preinstalled on GitHub-hosted ubuntu runners (channel: "chrome"

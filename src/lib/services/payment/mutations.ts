@@ -5,9 +5,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { membershipInvoice, membershipPayment, membershipTransaction } from "@/db/schema";
-import { BusinessLogicError } from "@/lib/errors";
+import { BusinessLogicError, NotFoundError } from "@/lib/errors";
 import { toAmountString, toMinorUnits } from "@/lib/payments/gateway";
-import { getInvoice } from "@/lib/services/invoice.service";
 import type { ActorContext } from "@/lib/services/subscription.service";
 import type { RecordPaymentInput } from "@/lib/validation/finance.validation";
 import { writeAudit } from "./audit";
@@ -16,44 +15,56 @@ import type { RecordedPayment } from "./types";
 /**
  * Record a manual (treasurer) payment against an ISSUED invoice.
  *
- * One db.transaction writes the membership_transactions ledger row, the
- * membership_payments row, the invoice's paidAmount/status update, and the
- * audit entry — either everything lands or nothing does. Overpayment and
- * payments against PAID/VOID invoices are rejected before any write.
+ * One db.transaction locks the invoice row (SELECT … FOR UPDATE), re-validates
+ * status and outstanding balance INSIDE the transaction, then writes the
+ * membership_transactions ledger row, the membership_payments row, the
+ * invoice's paidAmount/status update, and the audit entry — either everything
+ * lands or nothing does. Validation happens against the locked row, not a
+ * stale pre-transaction read, so two concurrent recordings cannot both pass
+ * and overpay the invoice (or resurrect a VOID one) (issue #26).
  */
 export async function recordPayment(
   input: RecordPaymentInput,
   actor: ActorContext,
 ): Promise<RecordedPayment> {
-  const invoice = await getInvoice(input.invoiceId);
-
-  if (invoice.status !== "ISSUED") {
-    throw new BusinessLogicError(
-      `Invoice ${invoice.invoiceNumber} is ${invoice.status}; only ISSUED invoices accept payments`,
-      "INVOICE_NOT_PAYABLE",
-    );
-  }
-
   const amountMinor = toMinorUnits(input.amount);
   if (amountMinor <= 0) {
     throw new BusinessLogicError("Payment amount must be greater than zero", "INVALID_AMOUNT");
-  }
-
-  const totalMinor = toMinorUnits(invoice.totalAmount);
-  const paidMinor = toMinorUnits(invoice.paidAmount);
-  const outstandingMinor = totalMinor - paidMinor;
-
-  if (amountMinor > outstandingMinor) {
-    throw new BusinessLogicError(
-      `Payment of ${input.amount} exceeds the outstanding ${toAmountString(outstandingMinor)} on invoice ${invoice.invoiceNumber}`,
-      "OVERPAYMENT_NOT_ALLOWED",
-    );
   }
 
   const providerTxId = `manual_${crypto.randomUUID()}`;
   const paymentMethod = input.paymentMethod ?? "manual";
 
   const result = await db.transaction(async (tx) => {
+    // Lock the invoice row so concurrent recordings serialize here.
+    const [invoice] = await tx
+      .select()
+      .from(membershipInvoice)
+      .where(eq(membershipInvoice.id, input.invoiceId))
+      .for("update");
+
+    if (!invoice) {
+      throw new NotFoundError("Invoice", input.invoiceId);
+    }
+
+    if (invoice.status !== "ISSUED") {
+      throw new BusinessLogicError(
+        `Invoice ${invoice.invoiceNumber} is ${invoice.status}; only ISSUED invoices accept payments`,
+        "INVOICE_NOT_PAYABLE",
+      );
+    }
+
+    const totalMinor = toMinorUnits(invoice.totalAmount);
+    const paidMinor = toMinorUnits(invoice.paidAmount);
+    const outstandingMinor = totalMinor - paidMinor;
+
+    if (amountMinor > outstandingMinor) {
+      throw new BusinessLogicError(
+        `Payment of ${input.amount} exceeds the outstanding ${toAmountString(outstandingMinor)} on invoice ${invoice.invoiceNumber}`,
+        "OVERPAYMENT_NOT_ALLOWED",
+      );
+    }
+
     const [transaction] = await tx
       .insert(membershipTransaction)
       .values({

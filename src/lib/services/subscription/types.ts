@@ -24,6 +24,16 @@ export interface LifecycleResult {
   member: MemberStatusSyncResult;
 }
 
+/**
+ * Renewal outcome. `applied` is false when the source row had ALREADY been
+ * renewed (webhook fan-out duplicate) and no new row or entitlement was
+ * created — callers must not settle fresh revenue for such an event
+ * (issues #20/#24).
+ */
+export interface RenewalResult extends LifecycleResult {
+  applied: boolean;
+}
+
 export interface SubscriptionFilters {
   userId?: string;
   status?: SubscriptionStatus;

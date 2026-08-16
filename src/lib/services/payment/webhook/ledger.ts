@@ -5,7 +5,7 @@
  * PRINCIPLES.md "Fast vs. auditable").
  */
 
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { membershipInvoice, membershipPayment, membershipTransaction } from "@/db/schema";
 import type { MembershipSubscription } from "@/db/schema";
@@ -72,6 +72,28 @@ export async function settleWebhookLedger(
   const amount = toAmountString(amountMinor);
 
   return db.transaction(async (tx) => {
+    // Ledger idempotency (issue #24): the settlement carries the webhook
+    // event id in its metadata. If this event already settled a transaction
+    // (e.g. the lifecycle committed but settlement failed afterwards,
+    // releasing the claim so the provider retries), return the existing
+    // settlement instead of writing a second revenue row for one charge.
+    const [existing] = await tx
+      .select()
+      .from(membershipTransaction)
+      .where(sql`${membershipTransaction.metadata}->>'webhookEventId' = ${context.eventId}`)
+      .limit(1);
+    if (existing) {
+      const [existingPayment] = await tx
+        .select({ invoiceId: membershipPayment.invoiceId })
+        .from(membershipPayment)
+        .where(eq(membershipPayment.transactionId, existing.id))
+        .limit(1);
+      return {
+        transactionId: existing.id,
+        appliedInvoiceId: existingPayment?.invoiceId ?? null,
+      };
+    }
+
     const [transaction] = await tx
       .insert(membershipTransaction)
       .values({
@@ -85,6 +107,7 @@ export async function settleWebhookLedger(
         paymentProvider: gateway.provider,
         providerTxId: event.providerTxId,
         description: `Webhook ${context.eventType}`,
+        metadata: { webhookEventId: context.eventId },
       })
       .returning();
 

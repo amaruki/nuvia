@@ -38,6 +38,15 @@ const LEGAL_FROM_STATES: Record<LifecycleAction, readonly SubscriptionStatus[]> 
   expire: ["ACTIVE", "TRIALING", "CANCELED", "PAST_DUE"],
 };
 
+/**
+ * Statuses from which a renewal is legal. Exported so callers that gate a
+ * renewal checkout (membership-join) refuse the SAME set the state machine
+ * enforces — a PAUSED or CANCELED subscription must never open a checkout
+ * whose success webhook would then be refused and settle money it cannot
+ * apply (issue #21).
+ */
+export const RENEWABLE_STATUSES: readonly SubscriptionStatus[] = LEGAL_FROM_STATES.renew;
+
 export function assertTransition(action: LifecycleAction, status: SubscriptionStatus): void {
   if (!LEGAL_FROM_STATES[action].includes(status)) {
     throw new BusinessLogicError(

@@ -4,7 +4,7 @@
  * runs the A3 member-status sync so the user's role tracks immediately.
  */
 
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { membershipSubscription, membershipTier, user } from "@/db/schema";
 import { BusinessLogicError, NotFoundError } from "@/lib/errors";
@@ -14,7 +14,7 @@ import { writeAudit } from "./audit";
 import { LIVE_STATUSES, MS_PER_DAY, periodEndFor } from "./helpers";
 import { getSubscription } from "./queries";
 import { assertTransition } from "./state-machine";
-import type { ActorContext, LifecycleResult, SubscriptionStatus } from "./types";
+import type { ActorContext, LifecycleResult, RenewalResult, SubscriptionStatus } from "./types";
 
 /**
  * Create a subscription on an active tier. Starts TRIALING when a trial is
@@ -102,7 +102,7 @@ export async function createSubscription(
 export async function renewSubscription(
   subscriptionId: string,
   actor: ActorContext,
-): Promise<LifecycleResult> {
+): Promise<RenewalResult> {
   const current = await getSubscription(subscriptionId);
   assertTransition("renew", current.status);
 
@@ -119,7 +119,31 @@ export async function renewSubscription(
       : current.currentPeriodEnd;
   const start = anchor !== null && anchor.getTime() > now.getTime() ? anchor : now;
 
-  const subscription = await db.transaction(async (tx) => {
+  const outcome = await db.transaction(async (tx) => {
+    // Serialize renewals of THIS source row so the read-then-insert below is
+    // race-free. Two concurrent renewals of the same source (webhook fan-out
+    // firing checkout.session.completed + payment_intent.succeeded +
+    // charge.succeeded for ONE charge, or a double-clicked admin renew)
+    // queue on this lock.
+    await tx
+      .select({ id: membershipSubscription.id })
+      .from(membershipSubscription)
+      .where(eq(membershipSubscription.id, current.id))
+      .for("update");
+
+    // Idempotency guard (issue #24/#20): a source row may produce AT MOST one
+    // renewal row. If this source already has one, the event is a duplicate —
+    // return the existing renewal and signal `applied: false` so callers do
+    // not settle fresh revenue for a charge that already bought its period.
+    const [existing] = await tx
+      .select()
+      .from(membershipSubscription)
+      .where(sql`${membershipSubscription.metadata}->>'renewedFrom' = ${current.id}`)
+      .limit(1);
+    if (existing) {
+      return { row: existing, applied: false };
+    }
+
     const [row] = await tx
       .insert(membershipSubscription)
       .values({
@@ -147,11 +171,14 @@ export async function renewSubscription(
       actor,
     });
 
-    return row;
+    return { row, applied: true };
   });
 
+  // A3 member-status sync is idempotent (pure derivation of the newest row),
+  // so running it for duplicate events is harmless; the `applied` flag tells
+  // callers whether fresh entitlement/revenue landed.
   const memberSync = await syncMemberStatusFromSubscription(current.userId);
-  return { subscription, member: memberSync };
+  return { subscription: outcome.row, member: memberSync, applied: outcome.applied };
 }
 
 /**

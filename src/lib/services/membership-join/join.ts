@@ -27,7 +27,7 @@ import {
   getSubscription,
   type ActorContext,
 } from "@/lib/services/subscription.service";
-import { LIVE_STATUSES } from "@/lib/services/subscription/helpers";
+import { RENEWABLE_STATUSES } from "@/lib/services/subscription/state-machine";
 import { getTier } from "@/lib/services/membership-tier.service";
 import { getPublicTier, type PublicMembershipTier } from "./catalog";
 
@@ -168,7 +168,11 @@ export async function renewMembershipCheckout(
   // before any track decision so a dead row is refused honestly everywhere.
   const subscription = await getSubscription(input.subscriptionId);
   // Never confirm to a different member that someone else's row exists.
-  if (subscription.userId !== input.userId || !LIVE_STATUSES.includes(subscription.status)) {
+  // Gate on RENEWABLE_STATUSES — the exact set the state machine accepts a
+  // renewal from — not LIVE_STATUSES: a PAUSED row is live but renewing it
+  // would open a checkout whose success webhook is refused, settling money
+  // the lifecycle cannot apply (issue #21).
+  if (subscription.userId !== input.userId || !RENEWABLE_STATUSES.includes(subscription.status)) {
     throw new GatewayError(
       "This subscription cannot be renewed through checkout",
       "RENEWAL_NOT_AVAILABLE",

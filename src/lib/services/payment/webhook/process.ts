@@ -26,6 +26,16 @@ import { settleWebhookLedger } from "./ledger";
 import { amountMinorFromRaw, currencyFromRaw } from "./payload";
 
 /**
+ * Event types that may renew a subscription and settle the ledger for a
+ * COMPLETED charge. Anything else carrying a success state (the Stripe
+ * fan-out siblings of a checkout payment) is audited and skipped (issue #24).
+ */
+const SETTLEMENT_EVENT_TYPES: ReadonlySet<string> = new Set([
+  "checkout.session.completed",
+  "checkout.session.async_payment_succeeded",
+]);
+
+/**
  * Process a claimed, verified event:
  *
  *  1. resolve the live subscription behind the event (orphaned events are
@@ -80,8 +90,38 @@ export async function processVerifiedEvent(
     return { ...base, action: "none", subscriptionId: event.subscriptionId };
   }
 
+  // Narrowed non-null subscription for use inside closures (TS does not
+  // carry `let` narrowing across an async closure boundary).
+  const liveSubscription: MembershipSubscription = subscription;
+
   const txStatus = gateway.toTransactionStatus(event.providerState);
   const subStatus = gateway.toSubscriptionStatus(event.providerState);
+
+  // Settlement-event filter (issue #24): ONE Stripe checkout payment fans out
+  // as checkout.session.completed + payment_intent.succeeded +
+  // charge.succeeded — all mapping to COMPLETED. Only the session-completed
+  // event may renew the subscription and settle the ledger; the sibling
+  // success events are audited as informational duplicates so one charge can
+  // never buy two periods or count as revenue twice.
+  if (txStatus === "COMPLETED" && !SETTLEMENT_EVENT_TYPES.has(context.eventType)) {
+    await db.transaction(async (tx) => {
+      await writeAudit(tx, {
+        userId: liveSubscription.userId,
+        eventType: "WEBHOOK_INFORMATIONAL_DUPLICATE",
+        message: `Ignored non-settlement success event ${context.eventType} (${context.eventId}); charge ${event.providerTxId} settles via checkout.session.completed only`,
+        severity: "INFO",
+        metadata: {
+          provider: gateway.provider,
+          eventId: context.eventId,
+          eventType: context.eventType,
+          providerTxId: event.providerTxId,
+          subscriptionId: liveSubscription.id,
+        },
+        actor,
+      });
+    });
+    return { ...base, action: "none", subscriptionId: subscription.id };
+  }
 
   // Renewal swaps in a NEW subscription row (ADR-0014), but invoices were
   // issued against the row the member held when billed — reconciliation
@@ -92,12 +132,17 @@ export async function processVerifiedEvent(
   // touch membership_subscriptions directly (audit + A3 sync live there).
   let action: WebhookProcessingResult["action"] = "recorded";
   let lifecycleNote: string | null = null;
+  // Renewal idempotency (issue #24): renewSubscription applies at most ONE
+  // renewal per source row and reports `applied` — false on the retry path
+  // where the entitlement already landed.
+  let applied = true;
 
   try {
     if (txStatus === "COMPLETED") {
       const result = await renewSubscription(subscription.id, actor);
       subscription = result.subscription;
-      action = "renewed";
+      applied = result.applied;
+      action = applied ? "renewed" : "recorded";
     } else if (txStatus === "FAILED") {
       const result = await markSubscriptionPastDue(subscription.id, actor);
       subscription = result.subscription;

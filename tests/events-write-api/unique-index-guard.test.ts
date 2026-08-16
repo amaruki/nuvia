@@ -12,7 +12,7 @@ import { and, eq } from "drizzle-orm";
 import { POST as createPosting } from "@/app/api/v1/jobs/route";
 import { db } from "@/db/client";
 import { eventRegistration, jobApplication, jobPosting } from "@/db/schema";
-import { createApplication, JobServiceError } from "@/lib/services/job";
+import { createApplication, updateApplicationStatus, JobServiceError } from "@/lib/services/job";
 import { createRegistration } from "@/lib/services/registration.service";
 import { createJobsApiFixtures } from "../jobs-api/helpers";
 import {
@@ -54,6 +54,58 @@ describe("issue #14 — true unique indexes", () => {
     expect(rows).toHaveLength(1);
     trackRegistration(rows[0].id);
     expect(await fetchEventCounters(dto.id)).toEqual({ registeredCount: 1, waitlistCount: 0 });
+  });
+
+  test("approval-gated events still enforce capacity (no unbounded PENDING)", async () => {
+    // Adversarial round 4: requiresApproval short-circuited to PENDING
+    // BEFORE the capacity check, so approval-gated events oversubscribed
+    // unboundedly. PENDING holds a seat, so capacity must apply.
+    const organizerId = await createUser("organizer");
+    const category = await createCategory("uq-cap");
+
+    // Full event without waitlist: an approval request must be rejected.
+    const full = await seedEvent(organizerId, category.name, {
+      capacity: 1,
+      allowWaitlist: false,
+      requiresApproval: true,
+    });
+    const first = await createUser("cap-1");
+    const second = await createUser("cap-2");
+
+    const r1 = await createRegistration(full.id, first, {});
+    expect(r1.registration.status).toBe("PENDING");
+    trackRegistration(r1.registration.id);
+
+    let rejected = false;
+    try {
+      await createRegistration(full.id, second, {});
+    } catch (error) {
+      rejected = true;
+      expect(problemStatus(error)).toBe(400);
+    }
+    expect(rejected).toBe(true);
+    expect(await fetchEventCounters(full.id)).toEqual({ registeredCount: 1, waitlistCount: 0 });
+
+    // Full event WITH waitlist: the overflow goes to the waitlist, not PENDING.
+    const waitlisted = await seedEvent(organizerId, category.name, {
+      capacity: 1,
+      allowWaitlist: true,
+      requiresApproval: true,
+    });
+    const w1 = await createUser("wl-1");
+    const w2 = await createUser("wl-2");
+
+    const a = await createRegistration(waitlisted.id, w1, {});
+    expect(a.registration.status).toBe("PENDING");
+    trackRegistration(a.registration.id);
+
+    const b = await createRegistration(waitlisted.id, w2, {});
+    expect(b.registration.status).toBe("WAITLISTED");
+    trackRegistration(b.registration.id);
+    expect(await fetchEventCounters(waitlisted.id)).toEqual({
+      registeredCount: 1,
+      waitlistCount: 1,
+    });
   });
 });
 
@@ -131,5 +183,39 @@ describe("issue #14 — job applications under concurrency", () => {
       rejected = true;
     }
     expect(rejected).toBe(true);
+  });
+
+  test("re-apply after WITHDRAWN succeeds (row revived, not 409)", async () => {
+    // Adversarial round 4: the partial unique index excludes WITHDRAWN, so a
+    // withdrawn applicant must be able to re-apply. Before the fix the
+    // service-layer existing-row check 409'd on the WITHDRAWN row itself.
+    const [current] = await db
+      .select({ id: jobApplication.id })
+      .from(jobApplication)
+      .where(
+        and(eq(jobApplication.jobId, state.postingId), eq(jobApplication.userId, applicant.userId)),
+      )
+      .limit(1);
+    expect(current).toBeDefined();
+
+    const withdrawn = await updateApplicationStatus(
+      current.id,
+      { status: "WITHDRAWN" },
+      { id: applicant.userId, privileged: false },
+    );
+    expect(withdrawn.status).toBe("WITHDRAWN");
+
+    const reapply = await createApplication(state.postingId, applicant.userId, {});
+    expect(reapply.status).toBe("PENDING");
+    // Revived in place — still exactly one row for (job, user).
+    expect(reapply.id).toBe(current.id);
+
+    const rows = await db
+      .select()
+      .from(jobApplication)
+      .where(
+        and(eq(jobApplication.jobId, state.postingId), eq(jobApplication.userId, applicant.userId)),
+      );
+    expect(rows).toHaveLength(1);
   });
 });

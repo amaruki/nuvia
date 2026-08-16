@@ -71,9 +71,29 @@ export async function createRegistration(
       }
 
       let status: DbRegistrationStatus;
+      const hasFreeSeat =
+        eventRow.capacity === null || eventRow.registeredCount < eventRow.capacity;
       if (eventRow.requiresApproval) {
-        status = "PENDING";
-      } else if (eventRow.capacity === null || eventRow.registeredCount < eventRow.capacity) {
+        // Approval holds a seat from the moment it is requested, so the
+        // capacity check applies here too — otherwise approval-gated
+        // events oversubscribe unboundedly (adversarial round 4).
+        if (!hasFreeSeat) {
+          if (eventRow.allowWaitlist) {
+            status = "WAITLISTED";
+          } else {
+            throw new RegistrationServiceError(
+              problem(
+                "business-logic-error",
+                400,
+                "Business logic error",
+                "Event is at full capacity and the waitlist is disabled",
+              ),
+            );
+          }
+        } else {
+          status = "PENDING";
+        }
+      } else if (hasFreeSeat) {
         status = "CONFIRMED";
       } else if (eventRow.allowWaitlist) {
         status = "WAITLISTED";

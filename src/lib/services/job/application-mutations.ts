@@ -44,29 +44,50 @@ export async function createApplication(
   const created = await db
     .transaction(async (tx) => {
       const existing = await tx
-        .select({ id: jobApplication.id })
+        .select()
         .from(jobApplication)
         .where(and(eq(jobApplication.jobId, jobId), eq(jobApplication.userId, userId)))
         .limit(1);
-      if (existing.length > 0) {
+      const existingRow = existing[0];
+      if (existingRow && existingRow.status !== "WITHDRAWN") {
         throw new JobServiceError(
           problem("conflict", 409, "Conflict", "You have already applied to this job"),
         );
       }
 
-      const [application] = await tx
-        .insert(jobApplication)
-        .values({
-          jobId,
-          userId,
-          coverLetter: input.coverLetter,
-          portfolioUrl: input.portfolioUrl,
-          salaryExpectation:
-            input.salaryExpectation !== undefined ? String(input.salaryExpectation) : null,
-          availability: input.availability,
-        })
-        .returning();
+      const applicationValues = {
+        status: "PENDING" as const,
+        coverLetter: input.coverLetter,
+        portfolioUrl: input.portfolioUrl,
+        salaryExpectation:
+          input.salaryExpectation !== undefined ? String(input.salaryExpectation) : null,
+        availability: input.availability,
+        appliedAt: new Date(),
+      };
 
+      const application =
+        existingRow !== undefined
+          ? // Re-apply after withdrawal (issue #14 follow-up): revive the
+            // WITHDRAWN row in place. The partial unique index excludes
+            // WITHDRAWN rows, so this is the only shape that can coexist
+            // with the index.
+            (
+              await tx
+                .update(jobApplication)
+                .set(applicationValues)
+                .where(eq(jobApplication.id, existingRow.id))
+                .returning()
+            )[0]
+          : (
+              await tx
+                .insert(jobApplication)
+                .values({ ...applicationValues, jobId, userId })
+                .returning()
+            )[0];
+
+      // applicationCount is a lifetime total: withdrawals never decrement
+      // it (there is no decrement path), so both first-time applications
+      // and re-applications bump it.
       await tx
         .update(jobPosting)
         .set({ applicationCount: sql`${jobPosting.applicationCount} + 1` })

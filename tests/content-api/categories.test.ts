@@ -23,6 +23,7 @@ const {
   setup,
   cleanupRows,
   teardown,
+  actor,
 } = createContentApiFixtures();
 
 let actorId = "";
@@ -77,7 +78,7 @@ describe("categories round-trip", () => {
 
     await expectApiError(() => deleteCategoryItem(category.id as string), 409, "conflict");
 
-    await deleteContentItem("articles", article.id as string);
+    await deleteContentItem("articles", article.id as string, actor);
     await deleteCategoryItem(category.id as string);
     createdCategoryIds.splice(createdCategoryIds.indexOf(category.id as string), 1);
     await expectApiError(() => getCategoryItem(category.id as string), 404, "not-found");

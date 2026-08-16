@@ -70,11 +70,25 @@ export async function moderatePost(
   actor: ForumActor,
 ): Promise<PostDto> {
   const existing = await db
-    .select({ id: forumPost.id, metadata: forumPost.metadata })
+    .select({ id: forumPost.id, status: forumPost.status, metadata: forumPost.metadata })
     .from(forumPost)
     .where(eq(forumPost.id, postId))
     .limit(1);
   if (existing.length === 0) throw new ForumServiceError(problems.notFound("Post not found"));
+
+  // Issue #25: moderation only applies to posts still in the moderation
+  // lifecycle. DELETED posts can never be resurrected through the moderation
+  // endpoint (moderator B with a stale queue view or a guessed id), and
+  // PUBLISHED posts are moderated through hide instead of re-approval.
+  const currentStatus = existing[0].status;
+  if (currentStatus === "DELETED") {
+    throw new ForumServiceError(problems.conflict("Deleted posts cannot be moderated"));
+  }
+  if (action.action === "approve" && currentStatus === "PUBLISHED") {
+    throw new ForumServiceError(
+      problems.conflict("Post is already published; hide it to remove it"),
+    );
+  }
 
   const status = action.action === "approve" ? "PUBLISHED" : "HIDDEN";
   const moderation: Record<string, unknown> = {

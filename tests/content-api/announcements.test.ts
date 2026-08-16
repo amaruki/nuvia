@@ -8,7 +8,8 @@ import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test
 import { updateContentItem } from "@/lib/services/content";
 import { createContentApiFixtures } from "./helpers";
 
-const { uniqueSuffix, trackCreate, setup, cleanupRows, teardown } = createContentApiFixtures();
+const { uniqueSuffix, trackCreate, setup, cleanupRows, teardown, actor } =
+  createContentApiFixtures();
 
 let actorId = "";
 
@@ -57,7 +58,7 @@ describe("announcements round-trip", () => {
       "announcements",
       announcement.id as string,
       { isUrgent: false, acknowledgmentCount: 5 },
-      actorId,
+      actor,
     );
     expect(updated.isUrgent).toBe(false);
     expect(updated.acknowledgmentCount).toBe(5);

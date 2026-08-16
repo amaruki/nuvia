@@ -15,6 +15,11 @@ export interface ForumActor {
   permissions?: readonly Permission[];
 }
 
+/** True when the actor holds moderation power (forum:moderate or superadmin). */
+export function actorCanModerate(actor: ForumActor): boolean {
+  return actor.role === "superadmin" || (actor.permissions ?? []).includes("forum:moderate");
+}
+
 /**
  * The per-category role gate. forum_categories.required_role holds the
  * minimum role name; actors below that level may not post or comment in

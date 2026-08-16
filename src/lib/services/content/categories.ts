@@ -1,4 +1,4 @@
-import { asc, count, eq, ilike } from "drizzle-orm";
+import { and, asc, count, eq, ilike, ne } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { content, contentCategory } from "@/db/schema";
@@ -70,6 +70,8 @@ async function categoryContentCounts(): Promise<Map<string, number>> {
   const rows = await db
     .select({ categoryId: content.categoryId, value: count() })
     .from(content)
+    // Issue #25: soft-deleted rows no longer count toward category totals.
+    .where(ne(content.status, "DELETED"))
     .groupBy(content.categoryId);
   const map = new Map<string, number>();
   for (const row of rows) {
@@ -113,12 +115,13 @@ export async function getCategoryItem(id: string): Promise<CategoryUi> {
   const row = rows[0];
   if (!row) throw ContentApiError.notFound("Category");
   // A single-category read must not pay for the whole-table GROUP BY that
-  // categoryContentCounts() performs; mirror that aggregation exactly (no
-  // status/deletion filters) so single-item and list views agree.
+  // categoryContentCounts() performs; mirror that aggregation exactly
+  // (excluding soft-deleted rows, issue #25) so single-item and list views
+  // agree.
   const countRows = await db
     .select({ value: count() })
     .from(content)
-    .where(eq(content.categoryId, id));
+    .where(and(eq(content.categoryId, id), ne(content.status, "DELETED")));
   return categoryRowToUi(row, countRows[0]?.value ?? 0);
 }
 
@@ -230,6 +233,11 @@ export async function deleteCategoryItem(id: string): Promise<void> {
     .limit(1);
   if (rows.length === 0) throw ContentApiError.notFound("Category");
   try {
+    // Issue #25: content deletion is now soft, so live content still holds
+    // FK references to this category. Rows already soft-deleted carry no
+    // live references worth protecting — drop them so the category can go;
+    // categories with live content still fail the FK check below (409).
+    await db.delete(content).where(and(eq(content.categoryId, id), eq(content.status, "DELETED")));
     await db.delete(contentCategory).where(eq(contentCategory.id, id));
   } catch (error) {
     if (pgErrorCode(error) === "23503") {

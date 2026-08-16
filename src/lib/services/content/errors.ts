@@ -35,6 +35,10 @@ export class ContentApiError extends Error {
     return new ContentApiError(message, 400, "bad-request", "Bad request");
   }
 
+  static forbidden(message: string): ContentApiError {
+    return new ContentApiError(message, 403, "insufficient-permission", "Insufficient permission");
+  }
+
   static internal(): ContentApiError {
     return new ContentApiError(
       "An unexpected error occurred",

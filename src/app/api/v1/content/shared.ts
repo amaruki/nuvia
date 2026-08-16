@@ -130,7 +130,7 @@ export async function handleContentCreate(collection: ContentCollection, request
     const parsed = CREATE_SCHEMAS[collection].safeParse(body);
     if (!parsed.success) return problemResponse(validationProblem(parsed.error));
 
-    const item = await createContentItem(collection, parsed.data, auth.user!.id);
+    const item = await createContentItem(collection, parsed.data, auth.user!);
     return successResponse(item);
   } catch (error) {
     return problemResponse(toProblem(error));
@@ -174,7 +174,7 @@ export async function handleContentUpdate(
     const parsed = UPDATE_SCHEMAS[collection].safeParse(body);
     if (!parsed.success) return problemResponse(validationProblem(parsed.error));
 
-    const item = await updateContentItem(collection, id, parsed.data, auth.user!.id);
+    const item = await updateContentItem(collection, id, parsed.data, auth.user!);
     return successResponse(item);
   } catch (error) {
     return problemResponse(toProblem(error));
@@ -186,7 +186,7 @@ export async function handleContentDelete(collection: ContentCollection, id: str
     const auth = await requirePermission("content:delete");
     if (!auth.success) return problemResponse(auth.error!);
 
-    await deleteContentItem(collection, id);
+    await deleteContentItem(collection, id, auth.user!);
     return successResponse({ deleted: true });
   } catch (error) {
     return problemResponse(toProblem(error));

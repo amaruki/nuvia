@@ -25,10 +25,27 @@ import { db } from "@/db/client";
 import { content, contentCategory, user } from "@/db/schema";
 import {
   ContentApiError,
+  type ContentActor,
   createCategoryItem,
   createContentItem,
   type ContentCollection,
 } from "@/lib/services/content";
+import type { Permission } from "@/types/role";
+
+/**
+ * Issue #25: content writes now carry the actor's permissions, and the
+ * lifecycle gates require content:publish / content:manage for editorial
+ * moves. The shared fixture actor models an editorial caller (like every
+ * content:create role in production) so round-trip tests keep working.
+ */
+const EDITORIAL_PERMISSIONS: Permission[] = [
+  "content:create",
+  "content:read",
+  "content:update",
+  "content:delete",
+  "content:publish",
+  "content:manage",
+];
 
 export function createContentApiFixtures() {
   const createdContentIds: string[] = [];
@@ -36,6 +53,11 @@ export function createContentApiFixtures() {
   const createdUserIds: string[] = [];
 
   let actorId = "";
+  const actor: ContentActor = {
+    id: "",
+    role: "content_manager",
+    permissions: EDITORIAL_PERMISSIONS,
+  };
 
   function uniqueSuffix(): string {
     return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -64,7 +86,7 @@ export function createContentApiFixtures() {
     const item = await createContentItem(
       collection,
       input as Parameters<typeof createContentItem>[1],
-      actorId,
+      actor,
     );
     createdContentIds.push(item.id as string);
     return item;
@@ -103,13 +125,42 @@ export function createContentApiFixtures() {
       })
       .returning({ id: user.id });
     actorId = row.id;
+    actor.id = row.id;
     createdUserIds.push(actorId);
     return actorId;
+  }
+
+  /**
+   * Issue #25: create a non-editorial author (content:create/update without
+   * content:publish/manage), modeled on the committee_chair / organizer roles
+   * the lifecycle gates are meant to constrain.
+   */
+  async function createAuthorActor(): Promise<ContentActor> {
+    const suffix = uniqueSuffix();
+    const [row] = await db
+      .insert(user)
+      .values({
+        username: `content-author-${suffix}`,
+        email: `content-author-${suffix}@example.test`,
+        name: "Content Author Actor",
+        role: "organizer",
+        emailVerified: false,
+      })
+      .returning({ id: user.id });
+    createdUserIds.push(row.id);
+    return {
+      id: row.id,
+      role: "organizer",
+      permissions: ["content:create", "content:read", "content:update"],
+    };
   }
 
   /** Per-test cleanup in FK-safe order: content, then content_categories. */
   async function cleanupRows(): Promise<void> {
     if (createdContentIds.length > 0) {
+      // Issue #25: content deletion is soft, so test rows deleted mid-test
+      // still hold author FK references — purge them (any status) before the
+      // actor users are torn down.
       await db.delete(content).where(inArray(content.id, createdContentIds));
       createdContentIds.length = 0;
     }
@@ -128,6 +179,7 @@ export function createContentApiFixtures() {
   }
 
   return {
+    actor,
     createdContentIds,
     createdCategoryIds,
     uniqueSuffix,
@@ -135,6 +187,7 @@ export function createContentApiFixtures() {
     trackCreate,
     makeCategory,
     setup,
+    createAuthorActor,
     cleanupRows,
     teardown,
   };

@@ -15,8 +15,16 @@ import {
 } from "@/lib/services/content";
 import { createContentApiFixtures } from "./helpers";
 
-const { uniqueSuffix, expectApiError, trackCreate, makeCategory, setup, cleanupRows, teardown } =
-  createContentApiFixtures();
+const {
+  uniqueSuffix,
+  expectApiError,
+  trackCreate,
+  makeCategory,
+  setup,
+  cleanupRows,
+  teardown,
+  actor,
+} = createContentApiFixtures();
 
 let actorId = "";
 
@@ -74,7 +82,7 @@ describe("articles round-trip", () => {
       "articles",
       article.id as string,
       { title: `Renamed Article ${suffix}`, status: "published", excerpt: "Updated excerpt" },
-      actorId,
+      actor,
     );
     expect(updated.title).toBe(`Renamed Article ${suffix}`);
     expect(updated.status).toBe("published");
@@ -93,7 +101,7 @@ describe("articles round-trip", () => {
     );
     expect(listed.items.some((item) => item.id === article.id)).toBe(true);
 
-    await deleteContentItem("articles", article.id as string);
+    await deleteContentItem("articles", article.id as string, actor);
     await expectApiError(() => getContentItem("articles", article.id as string), 404, "not-found");
   });
 

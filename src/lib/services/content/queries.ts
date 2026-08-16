@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, getTableColumns, ilike, inArray, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, getTableColumns, ilike, inArray, ne, or } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { content, contentCategory, user } from "@/db/schema";
@@ -54,7 +54,11 @@ export async function listContent(
   limit: number;
   totalPages: number;
 }> {
-  const conditions = [eq(content.type, COLLECTION_DB_TYPE[collection])];
+  // Issue #25: soft-deleted rows never appear in listings.
+  const conditions = [
+    eq(content.type, COLLECTION_DB_TYPE[collection]),
+    ne(content.status, "DELETED"),
+  ];
   if (query.status && query.status.length > 0) {
     const requested = query.status.map((s) => UI_STATUS_TO_DB[s]);
     if (scope.canSeeUnpublished) {
@@ -125,6 +129,8 @@ export async function getContentItem(
 ): Promise<Record<string, unknown>> {
   const row = await selectContentRow(id);
   if (!row || row.type !== COLLECTION_DB_TYPE[collection]) throw ContentApiError.notFound();
+  // Issue #25: soft-deleted rows are invisible to every read path.
+  if (row.status === "DELETED") throw ContentApiError.notFound();
   // Issue #8: non-elevated callers cannot fetch unpublished content by id,
   // except items they authored themselves. 404 (not 403) so a probe does not
   // reveal that someone else's draft exists.

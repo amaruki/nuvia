@@ -12,7 +12,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test
 import { updateContentItem } from "@/lib/services/content";
 import { createContentApiFixtures } from "./helpers";
 
-const { uniqueSuffix, expectApiError, trackCreate, setup, cleanupRows, teardown } =
+const { uniqueSuffix, expectApiError, trackCreate, setup, cleanupRows, teardown, actor } =
   createContentApiFixtures();
 
 let actorId = "";
@@ -69,7 +69,7 @@ describe("content write path rejects HTML (stored-XSS guard)", () => {
           "announcements",
           announcement.id as string,
           { content: "<svg onload=alert(1)>" },
-          actorId,
+          actor,
         ),
       400,
       "bad-request",
@@ -80,7 +80,7 @@ describe("content write path rejects HTML (stored-XSS guard)", () => {
       "announcements",
       announcement.id as string,
       { isUrgent: true },
-      actorId,
+      actor,
     );
     expect(updated.isUrgent).toBe(true);
     expect(updated.content).toBe("Plain text body for the update guard test.");

@@ -62,7 +62,7 @@ import {
 import { isDemoMode } from "@/lib/env";
 import { createChapter } from "@/lib/services/chapter";
 import { createCommittee } from "@/lib/services/committee";
-import { createContentItem } from "@/lib/services/content";
+import { createContentItem, type ContentActor } from "@/lib/services/content";
 import { createEvent } from "@/lib/services/event-write";
 import { createPost, type ForumActor } from "@/lib/services/forum";
 import { createJobPosting } from "@/lib/services/job";
@@ -400,7 +400,7 @@ async function seedJobs(actorId: string): Promise<void> {
   }
 }
 
-async function seedContent(actorId: string): Promise<void> {
+async function seedContent(actor: ContentActor): Promise<void> {
   await createContentItem(
     "articles",
     {
@@ -412,7 +412,7 @@ async function seedContent(actorId: string): Promise<void> {
       status: "published",
       visibility: "public",
     },
-    actorId,
+    actor,
   );
   await createContentItem(
     "articles",
@@ -426,7 +426,7 @@ async function seedContent(actorId: string): Promise<void> {
       status: "published",
       visibility: "public",
     },
-    actorId,
+    actor,
   );
   await createContentItem(
     "announcements",
@@ -438,7 +438,7 @@ async function seedContent(actorId: string): Promise<void> {
       status: "published",
       visibility: "public",
     },
-    actorId,
+    actor,
   );
 }
 
@@ -616,11 +616,21 @@ export async function seedDemo(): Promise<DemoSeedResult> {
     permissions: ["forum:moderate", "forum:read"],
   };
 
+  // Issue #25: seeding publishes audience-facing content through the real
+  // services, and the publish gate now requires content:publish. The seed is
+  // a trusted bootstrap, so it models aria with the editorial permissions a
+  // publisher holds — without this, demo content could never go live.
+  const ariaContentActor: ContentActor = {
+    id: ariaId,
+    role: "staff",
+    permissions: ["content:create", "content:read", "content:update", "content:publish"],
+  };
+
   await seedOrganization(ariaId);
   await seedTiers();
   await seedEvents(ariaId);
   await seedJobs(ariaId);
-  await seedContent(ariaId);
+  await seedContent(ariaContentActor);
   await seedForums(ariaActor);
   await seedChaptersAndCommittees(ariaId);
   await seedLearning(ariaId, ARIA_EMAIL, BRUNO_EMAIL);

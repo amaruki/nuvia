@@ -20,11 +20,26 @@ import { ContentApiError } from "./errors";
  */
 const DANGEROUS_TAG = /<(script|iframe|object|embed|svg|math|form|meta|link|base)\b/i;
 
-/** Any other markup-like token: an opening tag `<tag` or a closing tag `</tag`. */
-const ANY_TAG = /<\/?[a-z][a-z0-9]*[\s>/]/i;
+/** Any other markup-like token: an opening tag `<tag`, a closing tag `</tag`,
+ *  or a bare tag name at end of input (`... <div`). The tag-name char class
+ *  also covers namespaced (`<x:script>`) and custom (`<my-comp>`) elements. */
+const ANY_TAG = /<\/?[a-z][a-z0-9:-]*(?:[\s>/]|$)/i;
 
-/** Inline event handlers and javascript: URLs anywhere in the text. */
-const EVENT_OR_JS_URL = /\bon[a-z]+\s*=|javascript\s*:/i;
+/** Inline event handlers and javascript: URLs anywhere in the text.
+ *  Tolerates a tiny non-word gap between the handler name and `=` so
+ *  attribute-splitting payloads like `onclick/=alert(1)` cannot sneak past. */
+const EVENT_OR_JS_URL = /\bon[a-z]+\s*\/?\s*=|javascript\s*:/i;
+
+/**
+ * C0 control characters (NUL, BEL, ESC, etc.) other than the whitespace the
+ * authoring model legitimately needs (\t \n \r). These have no place in
+ * prose, and smugglers use them to split keywords across regex boundaries -
+ * e.g. `javasc\u0000ript:` evades the literal `javascript:` match above.
+ * Rejecting them outright closes that class of bypass with no false-positive
+ * risk: legitimate content never contains raw control bytes.
+ */
+// eslint-disable-next-line no-control-regex
+const CONTROL_CHAR = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/;
 
 /**
  * Throw a 400 when `content` contains HTML markup. Plain text - including
@@ -35,6 +50,11 @@ const EVENT_OR_JS_URL = /\bon[a-z]+\s*=|javascript\s*:/i;
  * separately).
  */
 export function assertPlainTextContent(content: string, field = "content"): void {
+  if (CONTROL_CHAR.test(content)) {
+    throw ContentApiError.badRequest(
+      `${field} must be plain text - control characters are not allowed`,
+    );
+  }
   if (DANGEROUS_TAG.test(content)) {
     throw ContentApiError.badRequest(
       `${field} must be plain text - HTML markup (scripts, iframes, SVG, etc.) is not allowed`,

@@ -83,6 +83,25 @@ describe("assertPlainTextContent (write-time guard)", () => {
     expect(threw).toBe(true);
   });
 
+  test("rejects control-character smuggling of dangerous keywords (adversarial round 1)", () => {
+    // Raw control bytes are used to split keywords across regex boundaries;
+    // the guard rejects them outright (whitespace \t \n \r stays allowed).
+    expect(() => assertPlainTextContent("javasc\u0000ript:alert(1)")).toThrow(ContentApiError);
+    expect(() => assertPlainTextContent("<scr\u0001ipt>alert(1)</script>")).toThrow(
+      ContentApiError,
+    );
+    expect(() => assertPlainTextContent("a\tb\nc\rd")).not.toThrow();
+  });
+
+  test("rejects namespaced, custom, and bare-EOF tags (adversarial round 1)", () => {
+    expect(() => assertPlainTextContent("<x:script>alert(1)</x:script>")).toThrow(ContentApiError);
+    expect(() => assertPlainTextContent("<my-comp onclick=alert(1)>")).toThrow(ContentApiError);
+    expect(() => assertPlainTextContent("hello <div")).toThrow(ContentApiError);
+    expect(() => assertPlainTextContent("<x-foo onclick/=alert(1)>click</x-foo>")).toThrow(
+      ContentApiError,
+    );
+  });
+
   test("rejects inline event handlers and javascript: URLs in text", () => {
     let handlersThrew = false;
     try {

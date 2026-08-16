@@ -10,12 +10,46 @@ import { NextResponse } from "next/server";
 import { createAuthMiddleware } from "@/lib/auth/middleware";
 
 import { AuthResponseFactory } from "@/lib/auth/common";
+import { buildCsp, CSP_HEADER, generateCspNonce } from "@/lib/csp";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 import { logger } from "@/lib/logger";
 
 // TODO: Add support for API key authentication for external services
 // TODO: Add support for request logging and analytics
 // TODO: Add support for CORS configuration
+
+/**
+ * Dev keeps 'unsafe-inline'/'unsafe-eval' for Next's dev overlay + HMR;
+ * production is nonce-only (issue #2, src/lib/csp.ts).
+ */
+const isDev = process.env.NODE_ENV === "development";
+
+/**
+ * Continue to the page renderer with the per-request CSP wired in (issue #2).
+ *
+ * The policy goes on BOTH sides:
+ *  - request headers: Next's app renderer reads the incoming
+ *    content-security-policy header (getScriptNonceFromHeader) and tags every
+ *    script it injects — hydration bootstrap, RSC flight payload — with this
+ *    request's nonce;
+ *  - response headers: what the browser actually enforces.
+ *
+ * report-uri is built from the request origin so the policy stays correct
+ * under any APP_URL without reading env here.
+ */
+function continueWithCsp(request: NextRequest): NextResponse {
+  const nonce = generateCspNonce();
+  const csp = buildCsp({
+    nonce,
+    dev: isDev,
+    reportUri: new URL("/api/v1/csp-report", request.nextUrl.origin).href,
+  });
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set(CSP_HEADER, csp);
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set(CSP_HEADER, csp);
+  return response;
+}
 
 /**
  * Create middleware with authentication and rate limiting
@@ -50,7 +84,7 @@ export async function proxy(request: NextRequest) {
       }
 
       // Continue to dashboard page if authenticated and authorized
-      return NextResponse.next();
+      return continueWithCsp(request);
     }
 
     // Apply authentication middleware to API routes
@@ -66,8 +100,10 @@ export async function proxy(request: NextRequest) {
       }
     }
 
-    // Continue to the route handler
-    return NextResponse.next();
+    // Continue to the route handler — HTML pages get the per-request CSP
+    // (issue #2); /api/** above already returned without it, which is fine:
+    // JSON responses carry no script-execution surface.
+    return continueWithCsp(request);
   } catch (error) {
     logger.error("Middleware error", error);
     return AuthResponseFactory.internalError("Internal server error");
@@ -121,6 +157,10 @@ function isPublicEndpoint(pathname: string): boolean {
     // poll it without credentials. Returns reachability booleans only —
     // no versions, configuration, or error details (health.service.ts).
     "/api/v1/health",
+    // CSP violation reports (issue #2 report-uri): the browser fires these
+    // unauthenticated from the violating page; the route rate-limits by IP
+    // and logs — no session check (proxy.ts).
+    "/api/v1/csp-report",
   ];
 
   return publicEndpoints.some((endpoint) => pathname.startsWith(endpoint));

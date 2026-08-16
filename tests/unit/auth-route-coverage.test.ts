@@ -125,6 +125,11 @@ const DELEGATED_AUTH: Record<string, string> = {
 //     reachability booleans only — no versions, configuration, or error
 //     details (health.service.ts's honesty contract), so exposing it
 //     anonymously leaks nothing actionable.
+//   - csp-report: the browser fires CSP violation reports unauthenticated
+//     from the violating page (issue #2's report-uri). Listed in proxy.ts's
+//     public endpoints; IP-rate-limited (RATE_LIMITS.cspReport) and the
+//     handler clips every field before logging, so it is a bounded
+//     write-only log sink that leaks nothing.
 //
 // Each entry asserts hasAuthCall === false below, so the moment one of these
 // routes gains a real session/permission call the test fails loudly and the
@@ -133,6 +138,7 @@ const KNOWN_EXCEPTIONS: Record<string, true> = {
   "webhooks/stripe/route.ts": true,
   "demo/login/route.ts": true,
   "health/route.ts": true,
+  "csp-report/route.ts": true,
 };
 
 describe("every /api/v1/** route calls an authorization/session-check helper", () => {

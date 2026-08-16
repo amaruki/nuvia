@@ -50,6 +50,11 @@ export const RATE_LIMITS = {
   // 100 / 15 minutes — the generic /api/** backstop proxy.ts applies to
   // everything else (matches the pre-migration API config).
   api: { windowSeconds: 15 * 60, max: 100 },
+  // 30 / 15 minutes — CSP violation reports (issue #2 report-uri). Browsers
+  // fire one report per violation, so a page with N broken scripts produces
+  // N requests; the bucket is permissive enough for real debugging but caps
+  // a flooded reporter.
+  cspReport: { windowSeconds: 15 * 60, max: 30 },
 } as const satisfies Record<string, RateLimitConfig>;
 
 let client: Redis | null = null;

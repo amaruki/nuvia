@@ -1,25 +1,12 @@
 import type { NextConfig } from "next";
 
-const isProduction = process.env.NODE_ENV === "production";
-
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  // Next.js's dev overlay and hydration bootstrap need 'unsafe-eval' only in
-  // development; production builds don't.
-  `script-src 'self'${isProduction ? "" : " 'unsafe-eval'"} 'unsafe-inline'`,
-  // Radix/shadcn components set inline style attributes at runtime.
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https:",
-  "font-src 'self' data:",
-  "connect-src 'self'",
-  "frame-ancestors 'none'",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-].join("; ");
-
+// Issue #2: Content-Security-Policy moved out of this static config. A nonce
+// policy has to be built per request (src/proxy.ts generates the nonce and
+// sets both the request header Next reads and the response header the
+// browser enforces — see src/lib/csp.ts), and keeping the old static
+// 'unsafe-inline' policy here would stack on top and negate it. The other
+// security headers stay static.
 const securityHeaders = [
-  { key: "Content-Security-Policy", value: contentSecurityPolicy },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

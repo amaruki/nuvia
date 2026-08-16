@@ -1,10 +1,19 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { Instrument_Sans, Libre_Baskerville, IBM_Plex_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { getCspNonceFromHeader } from "@/lib/csp";
 import { THEME_IDS } from "@/config/themes";
 import "./globals.css";
+
+// Issue #2 (CSP): every page renders per request. The nonce-based CSP can
+// only be applied to HTML rendered at request time — Next's app renderer
+// reads the incoming CSP header (set by src/proxy.ts) and tags the scripts
+// it injects with that request's nonce. Prerendered HTML baked at build time
+// cannot receive a per-request nonce, so static generation is off app-wide.
+export const dynamic = "force-dynamic";
 
 const fontSans = Instrument_Sans({
   subsets: ["latin"],
@@ -54,11 +63,16 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Issue #2: read back the CSP that src/proxy.ts put on this request and
+  // hand the nonce to next-themes' inline bootstrap script.
+  const requestHeaders = await headers();
+  const nonce = getCspNonceFromHeader(requestHeaders.get("content-security-policy"));
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -84,6 +98,10 @@ export default function RootLayout({
             storageKey="theme"
             disableTransitionOnChange
             themes={THEME_IDS}
+            // Issue #2: next-themes' FOUC-prevention bootstrap is an inline
+            // script; under the production nonce CSP it only executes when
+            // tagged with the per-request nonce (see src/lib/csp.ts).
+            nonce={nonce}
           >
             {children}
             <Toaster position="top-center" closeButton duration={5000} />

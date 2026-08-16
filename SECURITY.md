@@ -30,6 +30,15 @@ This project is transparent about its own security gaps. It does not hide them b
 
 The maintainers know about these issues. These are not undiscovered gaps. The maintainers work to fix them.
 
+## Deployments seeded before the migration must rotate credentials
+
+Between commits `1c51550` and `c688925`, `prisma/seed.ts` shipped a hard-coded superadmin password (`Admin123!@#`) for five privileged accounts. The string remains retrievable from this repository's git history and is now publicly known (CWE-798). **Any deployment that was seeded from that era must rotate the superadmin password (and the other seeded account passwords) immediately.** A history rewrite was deliberately not performed; see issue #5 for the trade-off analysis.
+
+Going forward, two controls prevent a recurrence:
+
+- CI runs a gitleaks scan over the **full git history** on every push and pull request (job `secret-scan` in `.github/workflows/ci.yml`). The gate includes a runtime-generated fixture secret and asserts the scan fires on it, so an over-broad allowlist cannot silently disarm the gate.
+- `lefthook` runs the same scan locally on pre-push for contributors who have the gitleaks binary installed (`bun run scan:secrets`).
+
 ## Scope
 
 In scope: this repository's code, its Drizzle schema, and its default configuration. Out of scope: vulnerabilities in a dependency that do not have a demonstrated, reachable impact on this application specifically. Report those upstream instead. See [`docs/supply-chain.md`](docs/supply-chain.md)'s reachability-based triage policy for why this is out of scope.

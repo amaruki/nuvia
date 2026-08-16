@@ -18,6 +18,8 @@
     "test:a11y": "bun run scripts/a11y-smoke.ts",
     "test:smoke": "bun run scripts/route-smoke/run.ts",
     "audit:gate": "bun run scripts/audit-gate.ts",
+    "scan:secrets": "bun run scripts/secret-scan.ts",
+    "scan:secrets:verify": "bun run scripts/secret-scan.ts --verify",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",

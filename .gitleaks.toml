@@ -1,0 +1,37 @@
+# Gitleaks configuration for nuvia (issue #5).
+#
+# Extends the default ruleset unchanged. The only allowlist entry below
+# suppresses a known false positive; everything else scans with the
+# stock ruleset so real secrets always fail the build.
+#
+# THE FALSE POSITIVE: the phrase "parent/child" in two test-file doc
+# comments (tests/chapters-api/hierarchy.test.ts and
+# tests/committees-api/hierarchy.test.ts, first committed in 5df7e2c and
+# 28b0df9) trips the entropy-based `generic-api-key` rule. The strings are
+# documentation, not credentials. Verified 2026-08-16 against the full
+# 694-commit history with gitleaks 8.28.0.
+#
+# Why this allowlist instead of `.gitleaksignore`: fingerprint-based ignore
+# files did not suppress these findings in gitleaks 8.28.0 (tested both the
+# `<file>:<rule>:<line>` and `<commit>:<file>:<rule>:<line>` forms); a
+# rule-scoped allowlist regex does. Keep this list minimal and justified —
+# never widen the regex to silence real history.
+#
+# The gate is wired in three places:
+#   - CI job "secret-scan" in .github/workflows/ci.yml (full history,
+#     authoritative, fails the build)
+#   - lefthook pre-push job `secret-scan` (committed range, local)
+#   - `bun run scan:secrets` / `bun run scan:secrets:verify`
+#     (local full history + fixture proof that the gate fires)
+
+title = "nuvia"
+
+[extend]
+useDefault = true
+
+# Global allowlist. Gitleaks applies these checks to every finding across
+# every rule, so keep them surgically narrow. `stopwords` match against the
+# matched secret text, which is exactly what we need here.
+[allowlist]
+description = "doc-comment phrase, not a credential (issue #5)"
+stopwords = ["parent/child"]

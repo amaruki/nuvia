@@ -30,3 +30,8 @@ pre-push:
       # Infra-free unit suite (~10s, no docker). The integration suite needs
       # the compose stack and runs in CI; see docs/adr/0010.
       run: bun run test:unit
+    - name: secret-scan
+      # Issue #5: gitleaks over the full local history. CI runs the same gate
+      # with a fixture that proves it fires; locally the scan alone is enough.
+      # Needs the gitleaks binary (see scripts/secret-scan.ts header).
+      run: bun run scan:secrets

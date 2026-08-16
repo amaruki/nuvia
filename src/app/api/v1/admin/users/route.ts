@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { and, count, desc, asc, eq, ilike, or } from "drizzle-orm";
 import { hashPassword } from "better-auth/crypto";
+import { resolveClientIp } from "@/lib/client-ip";
 import { checkRoleAssignable, requirePermission } from "@/lib/rbac";
 import { problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
 import { logger } from "@/lib/logger";
@@ -211,10 +212,8 @@ export async function POST(request: NextRequest) {
       eventType: "USER_CREATED",
       severity: "INFO",
       message: `User created with role ${role}`,
-      ipAddress:
-        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-        request.headers.get("x-real-ip") ||
-        "unknown",
+      // Issue #3: trusted-hop resolution (raw leftmost XFF read was the bug).
+      ipAddress: resolveClientIp(request.headers),
       userAgent: request.headers.get("user-agent") || "unknown",
       metadata: {
         createdBy: auth.user!.id,

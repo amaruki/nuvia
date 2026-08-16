@@ -6,6 +6,7 @@
  */
 
 import type { NextRequest, NextResponse } from "next/server";
+import { resolveClientIpOrUndefined } from "@/lib/client-ip";
 import { BusinessLogicError, NotFoundError } from "@/lib/errors";
 import { problem, problems, problemResponse, type ProblemDetails } from "@/lib/http";
 import { logger } from "@/lib/logger";
@@ -47,8 +48,9 @@ export function actorFromRequest(
   return {
     actorId: userId,
     reason,
-    ipAddress:
-      request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? undefined,
+    // Issue #3: trusted-hop resolution; undefined keeps the column's
+    // previous "absent" semantics for direct calls without headers.
+    ipAddress: resolveClientIpOrUndefined(request.headers),
     userAgent: request.headers.get("user-agent") ?? undefined,
   };
 }

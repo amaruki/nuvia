@@ -45,6 +45,7 @@ misconfigured production deploy does not boot.
 | `NODE_ENV`                                                                                                                                         | `development`                               | `development` \| `test` \| `production`                             |
 | `EMAIL_PORT` / `EMAIL_FROM`                                                                                                                        | `587` / `noreply@example.com`               | SMTP host/user/pass optional; `RESEND_API_KEY` optional alternative |
 | `CORS_ORIGIN` / `CORS_CREDENTIALS`                                                                                                                 | `http://localhost:3000` / `false`           |                                                                     |
+| `TRUSTED_PROXY_HOPS`                                                                                                                               | `1`                                         | Reverse-proxy contract — see below                                  |
 | `API_PREFIX`                                                                                                                                       | `/api/v1`                                   | Server-side route prefix                                            |
 | `PAYMENT_GATEWAY`                                                                                                                                  | `manual`                                    | `manual` \| `stripe`                                                |
 | `ENABLE_REDIS_CACHE`                                                                                                                               | `false`                                     | Session-cache fast path                                             |
@@ -133,6 +134,39 @@ Required in production. Uses:
 
 Any Redis-compatible endpoint works (local, Upstash, Railway, Redis Cloud —
 see `.env.example` notes).
+
+## Reverse proxy & client-IP contract (security issue #3)
+
+The app resolves client IPs with a trusted-hop model (`src/lib/client-ip.ts`),
+keying every rate-limit bucket and audit-log IP on the entry a trusted proxy
+appended — never on the leftmost `X-Forwarded-For` value, which the client
+controls and can rotate to bypass rate limits.
+
+**The proxy must APPEND, not overwrite.** Every proxy hop appends the IP of
+the peer it accepted the connection from, producing a chain like
+`<client-supplied>, <client>, <proxy1>`. Nuvia then reads the entry
+`TRUSTED_PROXY_HOPS` positions from the right.
+
+Set `TRUSTED_PROXY_HOPS` to the number of trusted proxies between the client
+and the app:
+
+- **`1`** (default) — the compose.prod.yml layout: one TLS-terminating proxy
+  (Caddy/nginx/Traefik) in front of the app container.
+- **`2`** — a CDN/load balancer in front of your own proxy.
+- **`0`** — the app is exposed directly with no proxy. XFF is then treated as
+  attacker content and ignored; resolution falls back to `X-Real-IP`, then
+  `unknown`. Put a proxy in front for correct rate limiting.
+
+Example (Caddy, single hop):
+
+```caddy
+nuvia.example.com {
+    reverse_proxy 127.0.0.1:3000
+}
+```
+
+Caddy and nginx both append the real client IP to `X-Forwarded-For` by
+default, which is what `TRUSTED_PROXY_HOPS=1` expects.
 
 ## Uploads storage
 

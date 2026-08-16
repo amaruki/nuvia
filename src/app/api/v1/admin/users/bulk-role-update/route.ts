@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
+import { resolveClientIp } from "@/lib/client-ip";
 import { requirePermission } from "@/lib/rbac";
 import { changeUserRole, getCurrentUser } from "@/lib/rbac";
 import { problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
@@ -56,8 +57,8 @@ export async function POST(request: NextRequest) {
 
     // Get request metadata for audit logging
     const requestHeaders = request.headers;
-    const ipAddress =
-      requestHeaders.get("x-forwarded-for") || requestHeaders.get("x-real-ip") || "unknown";
+    // Issue #3: trusted-hop resolution — raw XFF was client-controlled.
+    const ipAddress = resolveClientIp(requestHeaders);
     const userAgent = requestHeaders.get("user-agent") || "unknown";
 
     // Process bulk role updates sequentially. Each changeUserRole is its

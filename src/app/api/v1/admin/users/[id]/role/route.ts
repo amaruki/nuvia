@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
+import { resolveClientIp } from "@/lib/client-ip";
 import { requirePermission } from "@/lib/rbac";
 import { changeUserRole } from "@/lib/rbac";
 import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
@@ -44,8 +45,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     // Get request metadata for audit logging
     const requestHeaders = request.headers;
-    const ipAddress =
-      requestHeaders.get("x-forwarded-for") || requestHeaders.get("x-real-ip") || "unknown";
+    // Issue #3: trusted-hop resolution — raw XFF was client-controlled.
+    const ipAddress = resolveClientIp(requestHeaders);
     const userAgent = requestHeaders.get("user-agent") || "unknown";
 
     // Change user role

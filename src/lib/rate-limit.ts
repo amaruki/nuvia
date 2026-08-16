@@ -12,6 +12,7 @@
 
 import { Redis } from "ioredis";
 import type { NextResponse } from "next/server";
+import { resolveClientIp } from "@/lib/client-ip";
 import { env } from "@/lib/env";
 import { problemResponse, problems } from "@/lib/http";
 import { logger } from "@/lib/logger";
@@ -120,10 +121,13 @@ export async function checkRateLimit(
   };
 }
 
+/**
+ * Issue #3: resolution goes through resolveClientIp (trusted-hop aware).
+ * Reading the leftmost XFF hop here was the original spoofing bug — do not
+ * reintroduce raw header reads.
+ */
 function clientIp(headers: Headers): string {
-  return (
-    headers.get("x-forwarded-for")?.split(",")[0]?.trim() || headers.get("x-real-ip") || "unknown"
-  );
+  return resolveClientIp(headers);
 }
 
 /**

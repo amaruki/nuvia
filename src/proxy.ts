@@ -10,6 +10,7 @@ import { NextResponse } from "next/server";
 import { createAuthMiddleware } from "@/lib/auth/middleware";
 
 import { AuthResponseFactory } from "@/lib/auth/common";
+import { resolveClientIp } from "@/lib/client-ip";
 import { buildCsp, CSP_HEADER, generateCspNonce } from "@/lib/csp";
 import { isRoleAllowedForPath } from "@/lib/dashboard-access";
 import { logger } from "@/lib/logger";
@@ -25,7 +26,8 @@ import { logger } from "@/lib/logger";
 const isDev = process.env.NODE_ENV === "development";
 
 /**
- * Continue to the page renderer with the per-request CSP wired in (issue #2).
+ * Continue to the page renderer with the per-request CSP wired in (issue #2)
+ * and the forwarded-for chain normalized (issue #3).
  *
  * The policy goes on BOTH sides:
  *  - request headers: Next's app renderer reads the incoming
@@ -34,17 +36,25 @@ const isDev = process.env.NODE_ENV === "development";
  *    request's nonce;
  *  - response headers: what the browser actually enforces.
  *
+ * Issue #3: x-forwarded-for is OVERWRITTEN with the single trusted-resolved
+ * client IP (resolveClientIp). Everything downstream of the proxy — route
+ * handlers, audit-log writers, better-auth's internal rate limiter — then
+ * sees exactly one value the client cannot spoof, instead of the raw chain
+ * whose leftmost entry is attacker-controlled.
+ *
  * report-uri is built from the request origin so the policy stays correct
  * under any APP_URL without reading env here.
  */
 function continueWithCsp(request: NextRequest): NextResponse {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-forwarded-for", resolveClientIp(requestHeaders));
+
   const nonce = generateCspNonce();
   const csp = buildCsp({
     nonce,
     dev: isDev,
     reportUri: new URL("/api/v1/csp-report", request.nextUrl.origin).href,
   });
-  const requestHeaders = new Headers(request.headers);
   requestHeaders.set(CSP_HEADER, csp);
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set(CSP_HEADER, csp);
@@ -89,9 +99,13 @@ export async function proxy(request: NextRequest) {
 
     // Apply authentication middleware to API routes
     if (request.nextUrl.pathname.startsWith("/api/")) {
-      // Skip auth middleware for OAuth callbacks and public endpoints
+      // Skip auth middleware for OAuth callbacks and public endpoints —
+      // they still go through continueWithCsp so their x-forwarded-for is
+      // normalized (issue #3): better-auth's own handler under /api/auth/*
+      // is one of these consumers, and its internal rate limiter needs a
+      // single trustworthy IP instead of a spoofable chain.
       if (isPublicEndpoint(request.nextUrl.pathname)) {
-        return NextResponse.next();
+        return continueWithCsp(request);
       }
 
       const result = await authMiddleware(request);

@@ -12,6 +12,7 @@
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { user, userLoginActivity } from "@/db/schema";
+import { resolveClientIp } from "@/lib/client-ip";
 import { logger } from "@/lib/logger";
 
 /**
@@ -68,10 +69,9 @@ export async function recordLoginAttempt(opts: {
 
     await db.insert(userLoginActivity).values({
       userId: targetUser.id,
-      ipAddress:
-        opts.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-        opts.headers.get("x-real-ip") ||
-        "unknown",
+      // Issue #3: trusted-hop resolution, not the leftmost (client-controlled)
+      // XFF entry.
+      ipAddress: resolveClientIp(opts.headers),
       userAgent: opts.headers.get("user-agent") || null,
       successful: opts.successful,
     });

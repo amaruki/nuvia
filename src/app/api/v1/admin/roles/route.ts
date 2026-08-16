@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
+import { resolveClientIp } from "@/lib/client-ip";
 import { canGrantPermissions, requirePermission } from "@/lib/rbac";
 import { getAllRoles, getRoleStatistics } from "@/lib/rbac";
 import { problem, problemResponse, problems, successResponse, validationProblem } from "@/lib/http";
@@ -144,10 +145,8 @@ export async function POST(request: NextRequest) {
       eventType: "ROLE_CREATED",
       severity: "INFO",
       message: `Custom role "${name}" created with ${permissions.length} permission(s)`,
-      ipAddress:
-        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-        request.headers.get("x-real-ip") ||
-        "unknown",
+      // Issue #3: trusted-hop resolution (raw leftmost XFF read was the bug).
+      ipAddress: resolveClientIp(request.headers),
       userAgent: request.headers.get("user-agent") || "unknown",
       metadata: {
         roleName: name,

@@ -73,6 +73,12 @@ const envSchema = z
     // survive more than one server process)
     RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(5),
     RATE_LIMIT_WINDOW_MINUTES: z.coerce.number().int().positive().default(15),
+    // Issue #3: how many trusted proxies sit between the client and this app.
+    // resolveClientIp (src/lib/client-ip.ts) uses it to pick the rightmost
+    // entry an honest proxy appended instead of the leftmost entry the
+    // client controls. compose.prod.yml's single reverse proxy => 1; 0 means
+    // "directly exposed, XFF is untrustworthy" (see client-ip.ts).
+    TRUSTED_PROXY_HOPS: z.coerce.number().int().min(0).default(1),
     ENABLE_REDIS_CACHE: boolFromString(false),
     REDIS_URL: z.string().optional(),
 

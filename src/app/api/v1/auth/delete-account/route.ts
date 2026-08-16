@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
+import { resolveClientIp } from "@/lib/client-ip";
 import { isLastSuperadmin } from "@/lib/rbac";
 import { logError } from "@/lib/errors";
 import { problem, problemResponse, problems, successResponse } from "@/lib/http";
@@ -55,7 +56,8 @@ export async function DELETE(request: NextRequest) {
     logError(error as Error, {
       endpoint: "/api/v1/auth/delete-account",
       method: "DELETE",
-      ip: request.headers.get("x-forwarded-for") || "unknown",
+      // Issue #3: trusted-hop resolution, not the raw XFF header.
+      ip: resolveClientIp(request.headers),
       userAgent: request.headers.get("user-agent") || "unknown",
     });
 

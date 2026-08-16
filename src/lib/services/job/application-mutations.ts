@@ -8,7 +8,7 @@ import {
   type JobApplicationDto,
 } from "@/types/jobs.types";
 import type { CreateJobApplicationInput, UpdateApplicationStatusInput } from "../job.schemas";
-import { JobServiceError } from "./errors";
+import { JobServiceError, UNIQUE_VIOLATION, pgErrorCode } from "./errors";
 import { getJobApplication } from "./application-queries";
 
 export async function createApplication(
@@ -41,38 +41,50 @@ export async function createApplication(
     );
   }
 
-  const created = await db.transaction(async (tx) => {
-    const existing = await tx
-      .select({ id: jobApplication.id })
-      .from(jobApplication)
-      .where(and(eq(jobApplication.jobId, jobId), eq(jobApplication.userId, userId)))
-      .limit(1);
-    if (existing.length > 0) {
-      throw new JobServiceError(
-        problem("conflict", 409, "Conflict", "You have already applied to this job"),
-      );
-    }
+  const created = await db
+    .transaction(async (tx) => {
+      const existing = await tx
+        .select({ id: jobApplication.id })
+        .from(jobApplication)
+        .where(and(eq(jobApplication.jobId, jobId), eq(jobApplication.userId, userId)))
+        .limit(1);
+      if (existing.length > 0) {
+        throw new JobServiceError(
+          problem("conflict", 409, "Conflict", "You have already applied to this job"),
+        );
+      }
 
-    const [application] = await tx
-      .insert(jobApplication)
-      .values({
-        jobId,
-        userId,
-        coverLetter: input.coverLetter,
-        portfolioUrl: input.portfolioUrl,
-        salaryExpectation:
-          input.salaryExpectation !== undefined ? String(input.salaryExpectation) : null,
-        availability: input.availability,
-      })
-      .returning();
+      const [application] = await tx
+        .insert(jobApplication)
+        .values({
+          jobId,
+          userId,
+          coverLetter: input.coverLetter,
+          portfolioUrl: input.portfolioUrl,
+          salaryExpectation:
+            input.salaryExpectation !== undefined ? String(input.salaryExpectation) : null,
+          availability: input.availability,
+        })
+        .returning();
 
-    await tx
-      .update(jobPosting)
-      .set({ applicationCount: sql`${jobPosting.applicationCount} + 1` })
-      .where(eq(jobPosting.id, jobId));
+      await tx
+        .update(jobPosting)
+        .set({ applicationCount: sql`${jobPosting.applicationCount} + 1` })
+        .where(eq(jobPosting.id, jobId));
 
-    return application!;
-  });
+      return application!;
+    })
+    .catch((error) => {
+      // Last-line defense (issue #14): the partial unique index vetoes a
+      // duplicate that slipped past the in-transaction check; the counter
+      // bump rolls back with it. Surface a clean 409, not a raw 500.
+      if (pgErrorCode(error) === UNIQUE_VIOLATION) {
+        throw new JobServiceError(
+          problem("conflict", 409, "Conflict", "You have already applied to this job"),
+        );
+      }
+      throw error;
+    });
 
   const dto = await getJobApplication(created.id);
   if (!dto) {

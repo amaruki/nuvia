@@ -4,7 +4,7 @@
  * (see TODO.md) — structural translation only.
  */
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -14,6 +14,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import {
   eventFormatEnum,
@@ -121,7 +122,14 @@ export const eventRegistration = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => [index("event_registrations_user_event_unique").on(table.userId, table.eventId)],
+  (table) => [
+    // Real DB-level duplicate guard (issue #14). Partial: a canceled
+    // registration is replaced in place on re-registration (UPDATE), so
+    // only live rows need uniqueness. Must match migration 0015.
+    uniqueIndex("event_registrations_user_event_unique")
+      .on(table.userId, table.eventId)
+      .where(sql`${table.status} <> 'CANCELED'`),
+  ],
 );
 
 export const eventSpeaker = pgTable("event_speakers", {

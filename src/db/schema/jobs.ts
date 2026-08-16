@@ -3,7 +3,7 @@
  * MODELS" section. Not wired to any route/service yet.
  */
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -13,6 +13,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import {
   applicationStatusEnum,
@@ -186,7 +187,14 @@ export const jobApplication = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => [index("job_applications_job_user_unique").on(table.jobId, table.userId)],
+  (table) => [
+    // Real DB-level duplicate guard (issue #14). Partial: withdrawn
+    // applications are replaced in place on re-application (UPDATE), so
+    // only non-withdrawn rows need uniqueness. Must match migration 0015.
+    uniqueIndex("job_applications_job_user_unique")
+      .on(table.jobId, table.userId)
+      .where(sql`${table.status} <> 'WITHDRAWN'`),
+  ],
 );
 
 export const jobCategoryRelations = relations(jobCategory, ({ many }) => ({

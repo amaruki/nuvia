@@ -193,20 +193,6 @@ export const eventRegistrationSchema = z.object({
   notes: z.string().max(500, "Notes must be at most 500 characters").optional(),
 });
 
-// Event check-in schema
-export const eventCheckInSchema = z.object({
-  eventId: z.string().uuid("Invalid event ID"),
-  registrationId: z.string().uuid("Invalid registration ID").optional(),
-  checkInMethod: z.enum(["qr", "manual", "app"], {
-    message: "Invalid check-in method",
-  }),
-  verificationCode: z
-    .string()
-    .min(1, "Verification code is required")
-    .max(50, "Verification code must be at most 50 characters")
-    .optional(),
-});
-
 // Event certificate schema
 export const eventCertificateSchema = z.object({
   eventId: z.string().uuid("Invalid event ID"),
@@ -227,7 +213,6 @@ export type CreateEventInput = z.infer<typeof createEventSchema>;
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 export type EventFilterInput = z.infer<typeof eventFilterSchema>;
 export type EventRegistrationInput = z.infer<typeof eventRegistrationSchema>;
-export type EventCheckInInput = z.infer<typeof eventCheckInSchema>;
 export type EventCertificateInput = z.infer<typeof eventCertificateSchema>;
 export type EventStatisticsQueryInput = z.infer<typeof eventStatisticsQuerySchema>;
 

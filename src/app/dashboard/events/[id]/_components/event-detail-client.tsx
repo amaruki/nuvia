@@ -45,7 +45,9 @@ export function EventDetailClient({ currentUserId }: EventDetailClientProps) {
   };
 
   const handleCheckIn = (eventId: string) => {
-    router.push(`/events/${eventId}/check-in`);
+    // Issue #29: the old /events/[id]/check-in page called an endpoint that
+    // no longer exists; attendees check themselves in via the QR page.
+    router.push(`/events/${eventId}/self-check-in`);
   };
 
   const handleShare = async (_eventId: string) => {

@@ -1,7 +1,7 @@
 // Event server action result types for Nuvia community platform
 
 import { Event } from "./event";
-import { EventRegistrationResponse, EventCheckInResponse } from "./responses";
+import { EventRegistrationResponse } from "./responses";
 
 export interface CreateEventActionResult {
   success: boolean;
@@ -33,13 +33,6 @@ export interface RegisterForEventActionResult {
 export interface CancelEventRegistrationActionResult {
   success: boolean;
   data?: EventRegistrationResponse;
-  message?: string;
-  errors?: Record<string, string[]>;
-}
-
-export interface CheckInToEventActionResult {
-  success: boolean;
-  data?: EventCheckInResponse;
   message?: string;
   errors?: Record<string, string[]>;
 }

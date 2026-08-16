@@ -91,6 +91,19 @@ export function baseEventInput(
   };
 }
 
+/**
+ * Event-time overrides that place the event inside the check-in window
+ * (opens startTime - 1h, closes endTime + 1h). Issue #29 made both check-in
+ * paths enforce that window, so tests that only care about the check-in
+ * status machine should seed an in-window event with these overrides.
+ */
+export function inWindowTimes(now: Date = new Date()): Partial<CreateEventInput> {
+  return {
+    startTime: new Date(now.getTime() - 30 * 60 * 1000),
+    endTime: new Date(now.getTime() + 7 * 60 * 60 * 1000),
+  };
+}
+
 /** Creates an event through the write service and tracks it for cleanup. */
 export async function seedEvent(
   organizerId: string,

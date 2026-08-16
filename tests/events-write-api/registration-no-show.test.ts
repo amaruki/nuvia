@@ -24,6 +24,7 @@ import {
   createUser,
   fetchEventCounters,
   fetchRegistrationStatus,
+  inWindowTimes,
   problemStatus,
   seedEvent,
   trackRegistration,
@@ -107,7 +108,7 @@ describe("markNoShowRegistration — the service core behind POST .../registrati
     const organizerId = await createUser("organizer");
     const attendeeId = await createUser("attendee");
     const category = await createCategory("noshow");
-    const dto = await seedEvent(organizerId, category.name);
+    const dto = await seedEvent(organizerId, category.name, inWindowTimes());
 
     const { registration } = await createRegistration(dto.id, attendeeId);
     trackRegistration(registration.id);

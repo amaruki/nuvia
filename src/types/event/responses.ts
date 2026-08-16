@@ -1,6 +1,6 @@
 // Event API response types for Nuvia community platform
 
-import { Event, EventRegistration, EventCheckIn, EventCertificate } from "./event";
+import { Event, EventRegistration, EventCertificate } from "./event";
 
 export interface EventListResponse {
   events: Event[];
@@ -24,21 +24,6 @@ export interface EventRegistrationResponse {
   data?: {
     registration: EventRegistration;
     event: Event;
-  };
-  errors?: Record<string, string[]>;
-  meta?: {
-    timestamp: Date;
-    version: string;
-  };
-}
-
-export interface EventCheckInResponse {
-  success: boolean;
-  message: string;
-  data?: {
-    checkIn: EventCheckIn;
-    registration: EventRegistration;
-    certificate?: EventCertificate;
   };
   errors?: Record<string, string[]>;
   meta?: {

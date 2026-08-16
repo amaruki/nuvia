@@ -24,6 +24,7 @@ import {
   createCategory,
   createUser,
   fetchEventCounters,
+  inWindowTimes,
   problemStatus,
   seedEvent,
   trackRegistration,
@@ -57,7 +58,10 @@ describe("approveRegistration — the approval path for requiresApproval events"
     const organizerId = await createUser("organizer");
     const attendeeId = await createUser("attendee");
     const category = await createCategory("approve-checkin");
-    const dto = await seedEvent(organizerId, category.name, { requiresApproval: true });
+    const dto = await seedEvent(organizerId, category.name, {
+      requiresApproval: true,
+      ...inWindowTimes(),
+    });
 
     const { registration } = await createRegistration(dto.id, attendeeId, {});
     trackRegistration(registration.id);

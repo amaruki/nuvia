@@ -43,10 +43,3 @@ export interface RegisterForEventRequest {
   eventId: string;
   notes?: string;
 }
-
-export interface CheckInToEventRequest {
-  eventId: string;
-  registrationId?: string;
-  checkInMethod: "qr" | "manual" | "app";
-  verificationCode?: string; // For QR code check-ins
-}

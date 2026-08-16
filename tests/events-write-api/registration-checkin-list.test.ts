@@ -19,6 +19,7 @@ import {
   cleanupTrackedRows,
   createCategory,
   createUser,
+  inWindowTimes,
   problemStatus,
   runSuffix,
   seedEvent,
@@ -32,7 +33,7 @@ describe("checkInRegistration — the service core behind POST .../registrations
     const organizerId = await createUser("organizer");
     const attendeeId = await createUser("attendee");
     const category = await createCategory("checkin");
-    const dto = await seedEvent(organizerId, category.name);
+    const dto = await seedEvent(organizerId, category.name, inWindowTimes());
 
     const { registration } = await createRegistration(dto.id, attendeeId);
     trackRegistration(registration.id);
@@ -46,7 +47,7 @@ describe("checkInRegistration — the service core behind POST .../registrations
     const organizerId = await createUser("organizer");
     const attendeeId = await createUser("attendee");
     const category = await createCategory("checkin");
-    const dto = await seedEvent(organizerId, category.name);
+    const dto = await seedEvent(organizerId, category.name, inWindowTimes());
 
     const { registration } = await createRegistration(dto.id, attendeeId);
     trackRegistration(registration.id);
@@ -62,7 +63,7 @@ describe("checkInRegistration — the service core behind POST .../registrations
     const firstAttendeeId = await createUser("attendee");
     const secondAttendeeId = await createUser("attendee");
     const category = await createCategory("checkin");
-    const dto = await seedEvent(organizerId, category.name, { capacity: 1 });
+    const dto = await seedEvent(organizerId, category.name, { capacity: 1, ...inWindowTimes() });
 
     const { registration: confirmed } = await createRegistration(dto.id, firstAttendeeId);
     const { registration: waitlisted } = await createRegistration(dto.id, secondAttendeeId);

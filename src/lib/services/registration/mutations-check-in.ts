@@ -8,6 +8,7 @@ import { db } from "@/db/client";
 import { event, eventRegistration } from "@/db/schema";
 import { problem, problems } from "@/lib/http";
 import { toEventDto, type EventDto } from "../event-write";
+import { assertEventAllowsCheckIn } from "./check-in-guards";
 import { RegistrationServiceError } from "./errors";
 import { toRegistrationDto } from "./mappers";
 import type { RegistrationDto } from "./types";
@@ -57,6 +58,11 @@ export async function checkInRegistration(
     if (!eventRow) {
       throw new RegistrationServiceError(problems.notFound(`Event ${eventId} not found`));
     }
+
+    // Issue #29: admin check-in now enforces the same event-state and
+    // window rules as member self-check-in (no check-ins on canceled or
+    // long-ended events).
+    assertEventAllowsCheckIn(eventRow);
 
     const [checkedIn] = await tx
       .update(eventRegistration)

@@ -12,4 +12,4 @@ export {
   getEventCategories,
 } from "./queries";
 export { createEvent, updateEvent, deleteEvent, createEventCategory } from "./mutations";
-export { registerForEvent, cancelEventRegistration, checkInToEvent } from "./registrations";
+export { registerForEvent, cancelEventRegistration } from "./registrations";

@@ -102,17 +102,6 @@ describe("UI-08: icon-only buttons carry accessible names", () => {
 });
 
 describe("UI-08: search inputs labeled, toggles pressed", () => {
-  test("registration-search-card: labeled search input, onKeyDown handler", () => {
-    const src = read("src/components/events/event-check-in/registration-search-card.tsx");
-    expect(src).toContain('aria-label="Search registrations"');
-    expect(src).toContain("onKeyDown");
-  });
-
-  test("qr-check-in-card: check-in method toggles expose aria-pressed", () => {
-    const src = read("src/components/events/event-check-in/qr-check-in-card.tsx");
-    expect((src.match(/aria-pressed=/g) ?? []).length).toBeGreaterThanOrEqual(2);
-  });
-
   test("tag-filter: labeled input with Enter handling on onKeyDown", () => {
     const src = read("src/components/events/event-filter/tag-filter.tsx");
     expect(src).toContain('aria-label="Add a custom tag"');

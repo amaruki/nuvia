@@ -1,9 +1,4 @@
-import {
-  RegisterForEventRequest,
-  CheckInToEventRequest,
-  EventRegistrationResponse,
-  EventCheckInResponse,
-} from "@/types/event";
+import { RegisterForEventRequest, EventRegistrationResponse } from "@/types/event";
 import { API_PREFIX } from "@/lib/api-prefix";
 import { type DbRegistrationStatus } from "@/lib/utils/event-utils";
 import { ValidationError, BusinessLogicError } from "@/lib/errors";
@@ -111,32 +106,6 @@ export async function cancelEventRegistration(eventId: string): Promise<EventReg
     };
   } catch (error) {
     logger.error(`Error cancelling registration for event ${eventId}`, error);
-    throw error;
-  }
-}
-
-/**
- * Check in to an event
- */
-export async function checkInToEvent(
-  checkInData: CheckInToEventRequest,
-): Promise<EventCheckInResponse> {
-  if (!checkInData.eventId) {
-    throw new ValidationError([{ field: "eventId", message: "Event ID is required" }]);
-  }
-
-  try {
-    const response = await fetch(`${API_PREFIX}/events/check-in`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(checkInData),
-    });
-
-    return await handleApiResponse<EventCheckInResponse>(response);
-  } catch (error) {
-    logger.error("Error checking in to event", error);
     throw error;
   }
 }

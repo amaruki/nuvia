@@ -28,7 +28,11 @@ import { db } from "@/db/client";
 import { event, eventRegistration } from "@/db/schema";
 import { problem, problems } from "@/lib/http";
 import { RegistrationServiceError } from "@/lib/services/registration/errors";
-import { formatDate, formatTime, type DbRegistrationStatus } from "@/lib/utils/event-utils";
+import {
+  assertCheckInWindowOpen,
+  assertEventNotCanceled,
+} from "@/lib/services/registration/check-in-guards";
+import { type DbRegistrationStatus } from "@/lib/utils/event-utils";
 
 /** Check-in opens this long before the event starts. */
 export const SELF_CHECK_IN_OPEN_MARGIN_MS = 60 * 60 * 1000;
@@ -203,11 +207,8 @@ export async function selfCheckIn(
       throw new RegistrationServiceError(problems.notFound("Event not found."));
     }
 
-    if (eventRow.status === "CANCELED") {
-      throw new RegistrationServiceError(
-        problems.businessLogicError("This event has been canceled; check-in is unavailable."),
-      );
-    }
+    // Issue #29: event-state guards shared with the admin check-in path.
+    assertEventNotCanceled(eventRow);
     if (registration.status === "ATTENDED") {
       throw new RegistrationServiceError(
         problems.conflict("You are already checked in to this event."),
@@ -229,22 +230,8 @@ export async function selfCheckIn(
       );
     }
 
-    const window = getSelfCheckInWindow(eventRow.startTime, eventRow.endTime);
-    const phase = getSelfCheckInWindowPhase(window, now);
-    if (phase === "upcoming") {
-      throw new RegistrationServiceError(
-        problems.businessLogicError(
-          `Check-in has not opened yet. It opens ${formatDate(window.opensAt)} at ${formatTime(window.opensAt)}.`,
-        ),
-      );
-    }
-    if (phase === "ended") {
-      throw new RegistrationServiceError(
-        problems.businessLogicError(
-          `Check-in has closed. It ended ${formatDate(window.closesAt)} at ${formatTime(window.closesAt)}.`,
-        ),
-      );
-    }
+    // Issue #29: schedule-derived window, shared with the admin path.
+    assertCheckInWindowOpen(eventRow, now);
 
     const [updated] = await tx
       .update(eventRegistration)

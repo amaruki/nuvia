@@ -26,6 +26,21 @@ export function assertEventRegisterable(eventRow: EventRow): void {
   }
 
   const now = new Date();
+  // Issue #29 (finding 5): backstop — an event can never accept new
+  // registrations once it has ended, regardless of status or the
+  // registration window. Status changes are fully manual (no scheduler),
+  // so an organizer who forgets to close an event would otherwise keep
+  // collecting registrations after the fact.
+  if (now > eventRow.endTime) {
+    throw new RegistrationServiceError(
+      problem(
+        "business-logic-error",
+        400,
+        "Business logic error",
+        "This event has already ended; registration is closed",
+      ),
+    );
+  }
   if (eventRow.registrationStart && now < eventRow.registrationStart) {
     throw new RegistrationServiceError(
       problem(

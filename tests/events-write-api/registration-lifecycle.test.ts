@@ -22,6 +22,7 @@ import {
   fetchEventCounters,
   fetchRegistrationMetadata,
   fetchRegistrationStatus,
+  inWindowTimes,
   problemStatus,
   runSuffix,
   seedEvent,
@@ -281,7 +282,7 @@ describe("cancelRegistration — the service core behind POST .../registrations/
     const organizerId = await createUser("organizer");
     const attendeeId = await createUser("attendee");
     const category = await createCategory("cancel");
-    const dto = await seedEvent(organizerId, category.name);
+    const dto = await seedEvent(organizerId, category.name, inWindowTimes());
 
     const { registration } = await createRegistration(dto.id, attendeeId);
     trackRegistration(registration.id);

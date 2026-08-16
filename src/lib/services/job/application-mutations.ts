@@ -16,33 +16,43 @@ export async function createApplication(
   userId: string,
   input: CreateJobApplicationInput,
 ): Promise<JobApplicationDto> {
-  const postings = await db.select().from(jobPosting).where(eq(jobPosting.id, jobId)).limit(1);
-  const posting = postings[0];
-  if (!posting)
-    throw new JobServiceError(problem("not-found", 404, "Not found", "Job posting not found"));
-  if (posting.status !== "PUBLISHED") {
-    throw new JobServiceError(
-      problem(
-        "business-logic-error",
-        400,
-        "Business logic error",
-        "This job is not accepting applications",
-      ),
-    );
-  }
-  if (posting.applicationDeadline && posting.applicationDeadline.getTime() < Date.now()) {
-    throw new JobServiceError(
-      problem(
-        "business-logic-error",
-        400,
-        "Business logic error",
-        "The application deadline for this job has passed",
-      ),
-    );
-  }
-
   const created = await db
     .transaction(async (tx) => {
+      // Issue #29: read the posting INSIDE the transaction, row-locked.
+      // Before this fix the status/deadline checks ran against a stale
+      // unlocked snapshot, so an application could slip through while an
+      // admin concurrently closed the posting (TOCTOU). The lock also
+      // serializes the applicationCount bump across concurrent applicants.
+      const postings = await tx
+        .select()
+        .from(jobPosting)
+        .where(eq(jobPosting.id, jobId))
+        .limit(1)
+        .for("update");
+      const posting = postings[0];
+      if (!posting)
+        throw new JobServiceError(problem("not-found", 404, "Not found", "Job posting not found"));
+      if (posting.status !== "PUBLISHED") {
+        throw new JobServiceError(
+          problem(
+            "business-logic-error",
+            400,
+            "Business logic error",
+            "This job is not accepting applications",
+          ),
+        );
+      }
+      if (posting.applicationDeadline && posting.applicationDeadline.getTime() < Date.now()) {
+        throw new JobServiceError(
+          problem(
+            "business-logic-error",
+            400,
+            "Business logic error",
+            "The application deadline for this job has passed",
+          ),
+        );
+      }
+
       const existing = await tx
         .select()
         .from(jobApplication)

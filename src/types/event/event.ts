@@ -58,19 +58,3 @@ export interface EventCertificate {
   createdAt: Date;
   updatedAt: Date;
 }
-
-export interface EventCheckIn {
-  id: string;
-  eventId: string;
-  event?: Event;
-  registrationId: string;
-  registration?: EventRegistration;
-  userId: string;
-  user?: SafeUser;
-  checkedInAt: Date;
-  checkedInBy: string; // User ID of who performed the check-in
-  checkInMethod: "qr" | "manual" | "app";
-  ipAddress?: string;
-  location?: string;
-  createdAt: Date;
-}

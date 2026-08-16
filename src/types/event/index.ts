@@ -1,18 +1,12 @@
 export { EventStatus, EventType, RegistrationStatus } from "./enums";
 export type { EventRegistrationWindow } from "./enums";
-export type { Event, EventRegistration, EventCertificate, EventCheckIn } from "./event";
+export type { Event, EventRegistration, EventCertificate } from "./event";
 export type { EventFilter } from "./filters";
-export type {
-  CreateEventRequest,
-  UpdateEventRequest,
-  RegisterForEventRequest,
-  CheckInToEventRequest,
-} from "./requests";
+export type { CreateEventRequest, UpdateEventRequest, RegisterForEventRequest } from "./requests";
 export type {
   EventListResponse,
   EventDetailsResponse,
   EventRegistrationResponse,
-  EventCheckInResponse,
 } from "./responses";
 export type { EventStatistics, EventDashboardData } from "./statistics";
 export type {
@@ -29,5 +23,4 @@ export type {
   DeleteEventActionResult,
   RegisterForEventActionResult,
   CancelEventRegistrationActionResult,
-  CheckInToEventActionResult,
 } from "./actions";

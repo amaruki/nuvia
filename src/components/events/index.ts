@@ -9,7 +9,6 @@ export { EventRegistrationForm } from "./event-registration-form";
 export { EventListLayout } from "./event-list-layout";
 export { EventCertificateList } from "./event-certificate";
 export { EventDetails } from "./event-details";
-export { EventCheckIn } from "./event-check-in";
 export { EventFilterComponent as EventFilter } from "./event-filter";
 export { EventRegistrationStatus } from "./event-registration-status";
 export { EventCertificate } from "./event-certificate";

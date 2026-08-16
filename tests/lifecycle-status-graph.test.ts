@@ -21,13 +21,23 @@
 
 import { describe, expect, test } from "bun:test";
 
-import { contentStatusEnum, membershipStatusEnum, registrationStatusEnum } from "@/db/schema/enums";
+import {
+  contentStatusEnum,
+  eventStatusEnum,
+  membershipStatusEnum,
+  registrationStatusEnum,
+} from "@/db/schema/enums";
 import {
   CONTENT_TRANSITIONS,
   canPublishContent,
   type ContentActor,
 } from "@/lib/services/content/lifecycle";
 import { DB_STATUS_TO_UI, type UiStatus } from "@/lib/services/content/types";
+import {
+  EVENT_STATUS_TRANSITIONS,
+  TERMINAL_EVENT_STATUSES,
+  type DbEventStatus,
+} from "@/lib/services/event-write/lifecycle";
 import {
   REGISTRATION_TRANSITIONS,
   TERMINAL_REGISTRATION_STATUSES,
@@ -159,6 +169,25 @@ describe("status-graph regression (issue #17)", () => {
       SUBSCRIPTION_TRANSITIONS as Record<string, readonly string[]>,
       TERMINAL_SUBSCRIPTION_STATUSES as readonly string[],
       ["TRIALING", "ACTIVE", "PENDING_PAYMENT"],
+    );
+  });
+
+  test("event: every enum value is reachable and escapable or terminal", () => {
+    // Event status is fully manual (no scheduler): the create path accepts
+    // any enum value (issue #29, finding 5), so every status counts as
+    // reachable via creation. COMPLETED and CANCELED are terminal — the
+    // resurrection scenario the allow-list now rejects.
+    assertNoDeadEnds(
+      "event",
+      eventStatusEnum.enumValues as readonly DbEventStatus[],
+      EVENT_STATUS_TRANSITIONS as Record<string, readonly string[]>,
+      TERMINAL_EVENT_STATUSES as readonly string[],
+      eventStatusEnum.enumValues as readonly string[],
+    );
+
+    // The graph must cover every enum value exactly (no drift either way).
+    expect(Object.keys(EVENT_STATUS_TRANSITIONS).sort()).toEqual(
+      [...eventStatusEnum.enumValues].sort(),
     );
   });
 });

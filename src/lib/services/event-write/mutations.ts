@@ -9,6 +9,7 @@ import { event } from "@/db/schema";
 import { problem, problems } from "@/lib/http";
 import { EventWriteError, isUniqueViolation } from "./errors";
 import { generateUniqueSlug, resolveCategory } from "./helpers";
+import { EVENT_STATUS_TRANSITIONS } from "./lifecycle";
 import { toEventDto } from "./mappers";
 import type { CreateEventInput, UpdateEventInput } from "./schemas";
 import type { EventDto } from "./types";
@@ -89,6 +90,43 @@ export async function updateEvent(id: string, input: UpdateEventInput): Promise<
   const [existing] = await db.select().from(event).where(eq(event.id, id)).limit(1);
   if (!existing) {
     throw new EventWriteError(problems.notFound(`Event ${id} not found`));
+  }
+
+  // Issue #29 (finding 5): status changes follow the lifecycle table.
+  // Setting the same status again is a no-op (forms resend the whole
+  // payload); anything else must be a legal transition.
+  if (input.status !== undefined && input.status !== existing.status) {
+    const allowed = EVENT_STATUS_TRANSITIONS[existing.status];
+    if (!allowed.includes(input.status)) {
+      throw new EventWriteError(
+        problem(
+          "conflict",
+          409,
+          "Conflict",
+          `Cannot transition event from ${existing.status} to ${input.status}`,
+        ),
+      );
+    }
+  }
+
+  // Issue #29 (finding 6): capacity can never drop below the number of
+  // confirmed registrations — the excess would be silently overbooked with
+  // no way to tell who is over the limit.
+  if (
+    input.capacity !== undefined &&
+    input.capacity !== null &&
+    input.capacity < existing.registeredCount
+  ) {
+    throw new EventWriteError(
+      problem("validation-error", 422, "Validation failed", undefined, {
+        errors: [
+          {
+            field: "capacity",
+            message: `Capacity cannot be lower than the current registration count (${existing.registeredCount})`,
+          },
+        ],
+      }),
+    );
   }
 
   let categoryId = existing.categoryId;

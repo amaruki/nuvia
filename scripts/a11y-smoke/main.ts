@@ -41,7 +41,13 @@ export async function main(): Promise<void> {
       })),
     ];
 
-    browser = await chromium.launch();
+    // Use the Chrome build that ships preinstalled on GitHub-hosted
+    // ubuntu runners (channel: "chrome") instead of a Playwright-managed
+    // browser download: no `playwright install` step, no download budget,
+    // and one less moving part to starve the runner (the job previously
+    // died mid-audit from exactly that). Locally this means the gate
+    // needs a Chrome/Chromium on PATH, matching what CI exercises.
+    browser = await chromium.launch({ channel: "chrome" });
     const reports: PageReport[] = [];
 
     // One full pass per theme (UI-10): a fresh context per pass seeds

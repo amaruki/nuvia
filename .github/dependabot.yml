@@ -1,0 +1,28 @@
+# Dependabot: automated dependency updates.
+#
+# Two ecosystems matter for this repo:
+#   - npm: package.json + bun.lock (bun installs from the same lockfile)
+#   - github-actions: workflows pin actions to full SHAs (issue #11), and
+#     Dependabot opens PRs to bump those pins as upstream actions release.
+#
+# Weekly cadence with a modest PR cap keeps the queue reviewable; grouping
+# is left off because the a11y/security gates need to be attributable to a
+# single dependency bump when something regresses.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "ci"

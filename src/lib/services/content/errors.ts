@@ -31,6 +31,10 @@ export class ContentApiError extends Error {
     return new ContentApiError(message, 409, "conflict", "Conflict");
   }
 
+  static badRequest(message: string): ContentApiError {
+    return new ContentApiError(message, 400, "bad-request", "Bad request");
+  }
+
   static internal(): ContentApiError {
     return new ContentApiError(
       "An unexpected error occurred",

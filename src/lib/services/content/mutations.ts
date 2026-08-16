@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import { content } from "@/db/schema";
 
 import { ContentApiError, pgErrorCode } from "./errors";
+import { assertPlainTextContent } from "./content-safety";
 import {
   buildUiPayload,
   randomSuffix,
@@ -32,6 +33,7 @@ async function insertContent(
   actorId: string,
 ): Promise<Record<string, unknown>> {
   const dbType = COLLECTION_DB_TYPE[collection];
+  assertPlainTextContent(input.content ?? "");
   const ui = buildUiPayload(input);
   const status = (input.status ?? "draft") as UiStatus;
   const visibility = (input.visibility ?? "public") as UiVisibility;
@@ -100,6 +102,11 @@ async function patchContent(
   const existing = await selectContentRow(id);
   if (!existing || existing.type !== COLLECTION_DB_TYPE[collection]) {
     throw ContentApiError.notFound();
+  }
+  // Only re-validate when the caller actually supplies new content; legacy
+  // rows that predate this guard stay updatable on other fields.
+  if (input.content !== undefined) {
+    assertPlainTextContent(input.content);
   }
 
   const metadata = (existing.metadata ?? {}) as { ui?: Record<string, unknown> };

@@ -36,9 +36,17 @@ export function AnnouncementContentCard({ announcement }: AnnouncementContentCar
       </CardHeader>
       <CardContent>
         <p className="text-muted-foreground mb-4">{announcement.excerpt}</p>
-        <div className="prose max-w-none">
-          <div dangerouslySetInnerHTML={{ __html: announcement.content }} />
-        </div>
+        {/*
+         * Rendered as escaped plain text, never as HTML (security issue #1).
+         * This matches every other announcement surface - the public news page,
+         * the member inbox and the moderation widget all render `content` as
+         * text - and the authoring editor is a plain textarea, so no legitimate
+         * HTML exists. `dangerouslySetInnerHTML` here previously allowed a
+         * stored-XSS privilege-escalation vector.
+         */}
+        <p className="whitespace-pre-wrap leading-relaxed text-foreground/90">
+          {announcement.content}
+        </p>
       </CardContent>
     </Card>
   );

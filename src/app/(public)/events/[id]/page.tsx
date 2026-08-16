@@ -42,7 +42,12 @@ export default async function EventDetailsPage({ params }: EventDetailsPageProps
   // Resolved only when the event detail itself resolved, so a missing or
   // audience-gated event cannot leak its banners.
   const announcements = detail
-    ? await listEventAnnouncements(id, { authenticated: user !== null })
+    ? await listEventAnnouncements(id, {
+        authenticated: user !== null,
+        // Issue #23: MEMBERS_ONLY banners require an entitled member status,
+        // not merely a session.
+        userId: user?.id ?? null,
+      })
     : [];
 
   return (

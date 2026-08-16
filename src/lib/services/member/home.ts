@@ -41,7 +41,12 @@ import type {
   ForumPost,
   MembershipSubscription,
 } from "@/db/schema";
-import { deriveMemberStatus, type MemberStatus } from "@/lib/services/membership-status.service";
+import {
+  deriveMemberStatus,
+  getDerivedMemberStatus,
+  isEntitled,
+  type MemberStatus,
+} from "@/lib/services/membership-status.service";
 import { listApplicationsForUser } from "@/lib/services/job";
 import type { JobApplicationDto } from "@/types/jobs.types";
 
@@ -238,8 +243,14 @@ export interface LatestAnnouncementData {
 }
 
 export async function getLatestAnnouncement(
+  viewerUserId: string | null | undefined = null,
   now: Date = new Date(),
 ): Promise<LatestAnnouncementData | null> {
+  // Issue #23: MEMBERS_ONLY rows are reserved for entitled members. A
+  // signed-in user without an entitled derived status only sees PUBLIC rows.
+  const entitled = isEntitled(await getDerivedMemberStatus(viewerUserId, now));
+  const visibilities: Content["visibility"][] = entitled ? ["PUBLIC", "MEMBERS_ONLY"] : ["PUBLIC"];
+
   const rows = await db
     .select({
       id: content.id,
@@ -256,7 +267,7 @@ export async function getLatestAnnouncement(
       and(
         eq(content.type, "ANNOUNCEMENT"),
         eq(content.status, "PUBLISHED"),
-        inArray(content.visibility, ["PUBLIC", "MEMBERS_ONLY"]),
+        inArray(content.visibility, visibilities),
         lte(content.publishedAt, now),
       ),
     )

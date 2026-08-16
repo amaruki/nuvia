@@ -55,8 +55,33 @@ export const PAST_DUE_GRACE_DAYS = 7;
 const MS_PER_DAY = 86_400_000;
 
 /** Statuses that confer membership and so keep member-tier roles in place. */
-function isEntitled(status: MemberStatus): boolean {
+export function isEntitled(status: MemberStatus): boolean {
   return status === "active" || status === "trialing" || status === "in_grace";
+}
+
+/**
+ * Read-side derivation for one user (issue #23): loads the newest
+ * subscription row (ADR-0014 governs-by-newest) and derives the member
+ * status. Read paths that gate members-only content use this instead of
+ * trusting authentication alone.
+ */
+export async function getDerivedMemberStatus(
+  userId: string | null | undefined,
+  now: Date = new Date(),
+): Promise<MemberStatus> {
+  if (!userId) return "none";
+  const [latest] = await db
+    .select({
+      status: membershipSubscription.status,
+      currentPeriodEnd: membershipSubscription.currentPeriodEnd,
+      trialEnd: membershipSubscription.trialEnd,
+    })
+    .from(membershipSubscription)
+    .where(eq(membershipSubscription.userId, userId))
+    .orderBy(desc(membershipSubscription.createdAt), desc(membershipSubscription.id))
+    .limit(1);
+  if (!latest) return "none";
+  return deriveMemberStatus(latest, now);
 }
 
 /**

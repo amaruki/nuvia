@@ -35,7 +35,7 @@ export async function MemberHome({ userId }: MemberHomeProps) {
     listMyJobApplications(userId),
     listMyForumPosts(userId),
     listMyForumComments(userId),
-    getLatestAnnouncement(),
+    getLatestAnnouncement(userId),
   ]);
 
   return (

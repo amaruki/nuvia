@@ -35,12 +35,13 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { inArray, like } from "drizzle-orm";
 import { db } from "@/db/client";
-import { content, user } from "@/db/schema";
+import { content, membershipSubscription, membershipTier, user } from "@/db/schema";
 import {
   listEventAnnouncements,
   listMemberAnnouncements,
   type MemberAnnouncement,
 } from "@/lib/services/content/member-announcements";
+import { getLatestAnnouncement } from "@/lib/services/member/home";
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -73,8 +74,15 @@ function createFixtures() {
 
   const userIds: string[] = [];
   const contentIds: string[] = [];
+  const tierIds: string[] = [];
   const authors: Record<string, { id: string; name: string; email: string }> = {};
   const rows: Record<string, typeof content.$inferSelect> = {};
+  /**
+   * Issue #23 viewer: a user with an ACTIVE subscription — the only viewer
+   * entitled to MEMBERS_ONLY rows. Deleting the user cascades the
+   * subscription row.
+   */
+  let memberViewerId: string | null = null;
 
   async function seedAuthor(label: string) {
     const name = `UI-32 Author ${label} ${RUN_ID}`;
@@ -123,11 +131,68 @@ function createFixtures() {
     }
     await db.delete(content).where(like(content.slug, `%${RUN_ID}%`));
     if (userIds.length > 0) {
+      // Deleting the viewer user cascades their subscription row.
       await db.delete(user).where(inArray(user.id, userIds));
+    }
+    if (tierIds.length > 0) {
+      await db.delete(membershipTier).where(inArray(membershipTier.id, tierIds));
     }
   }
 
-  return { RUN_ID, authors, rows, seedAuthor, seedContent, cleanup };
+  return {
+    RUN_ID,
+    authors,
+    rows,
+    seedAuthor,
+    seedContent,
+    cleanup,
+    seedMemberViewer,
+    getMemberViewerId,
+  };
+
+  /** Seeds the entitled viewer: user + tier + ACTIVE subscription. */
+  async function seedMemberViewer(): Promise<string> {
+    const name = `UI-32 Member Viewer ${RUN_ID}`;
+    const [viewer] = await db
+      .insert(user)
+      .values({
+        username: `ui32-viewer-${RUN_ID}`,
+        email: `ui32-viewer-${RUN_ID}@example.test`,
+        name,
+        role: "member",
+      })
+      .returning();
+    userIds.push(viewer.id);
+
+    const [tier] = await db
+      .insert(membershipTier)
+      .values({
+        name: `ui32-tier-${RUN_ID}`,
+        displayName: `UI-32 Tier ${RUN_ID}`,
+        description: "Viewer tier for the issue #23 gate test",
+        price: "10.00",
+        billingCycle: "monthly",
+        features: {},
+        benefits: {},
+        permissions: {},
+      })
+      .returning();
+    tierIds.push(tier.id);
+
+    await db.insert(membershipSubscription).values({
+      userId: viewer.id,
+      tierId: tier.id,
+      status: "ACTIVE",
+      currentPeriodStart: new Date(Date.now() - DAY),
+      currentPeriodEnd: new Date(Date.now() + 30 * DAY),
+    });
+    memberViewerId = viewer.id;
+    return viewer.id;
+  }
+
+  function getMemberViewerId(): string | null {
+    return memberViewerId;
+  }
 }
 
 const fixtures = createFixtures();
@@ -143,6 +208,9 @@ beforeAll(async () => {
 
   await fixtures.seedAuthor("main");
   await fixtures.seedAuthor("secondary");
+  // Issue #23: MEMBERS_ONLY rows now require an entitled viewer, so every
+  // read path in this suite passes the ACTIVE-subscription member viewer.
+  await fixtures.seedMemberViewer();
 
   // ── Inbox-visible: PUBLISHED + (PUBLIC | MEMBERS_ONLY) + publishedAt past ──
   await fixtures.seedContent("inbox-public", {
@@ -250,11 +318,87 @@ afterAll(async () => {
   await fixtures.cleanup();
 });
 
+describe("issue #23 — MEMBERS_ONLY requires an entitled member, not just a session", () => {
+  test("inbox: a signed-in user with no subscription sees only PUBLIC rows", async () => {
+    // authors.main is a signed-in-style user with NO subscription — derived
+    // status `none`, not entitled. MEMBERS_ONLY rows must be hidden.
+    const nonMemberId = fixtures.authors.main.id;
+    const result = await listMemberAnnouncements({
+      page: 1,
+      limit: 100,
+      viewerUserId: nonMemberId,
+    });
+    const ids = new Set(result.items.map((item) => item.id));
+
+    expect(ids.has(fixtures.rows["inbox-public"].id)).toBe(true);
+    expect(ids.has(fixtures.rows["inbox-members-only"].id)).toBe(false);
+  });
+
+  test("widget: a non-member only ever gets a PUBLIC latest announcement", async () => {
+    // authors.main has no subscription — derived status `none`, not
+    // entitled. Rather than asserting a specific fixture id (the widget
+    // scans the whole content table), compare against the ground-truth
+    // inbox read path for the same viewer: the widget's row must be
+    // PUBLIC and must never be any MEMBERS_ONLY fixture row.
+    const nonMemberId = fixtures.authors.main.id;
+    const latest = await getLatestAnnouncement(nonMemberId);
+    expect(latest).not.toBeNull();
+    expect(latest!.visibility).toBe("PUBLIC");
+
+    const truth = await listMemberAnnouncements({
+      page: 1,
+      limit: 1,
+      viewerUserId: nonMemberId,
+    });
+    if (truth.items.length > 0) {
+      expect(latest!.id).toBe(truth.items[0].id);
+    }
+    expect(latest!.id).not.toBe(fixtures.rows["inbox-members-only"].id);
+    expect(latest!.id).not.toBe(fixtures.rows["banner-targeted-members"].id);
+  });
+
+  test("widget: an entitled member's latest announcement matches the member-visible ground truth", async () => {
+    const viewerId = fixtures.getMemberViewerId();
+    const latest = await getLatestAnnouncement(viewerId);
+    expect(latest).not.toBeNull();
+
+    const truth = await listMemberAnnouncements({
+      page: 1,
+      limit: 1,
+      viewerUserId: viewerId,
+    });
+    if (truth.items.length > 0) {
+      // Issue #23: MEMBERS_ONLY rows are included for entitled viewers, so
+      // the widget and the member inbox must agree on the single newest
+      // audience-ready row — whatever its visibility.
+      expect(latest!.id).toBe(truth.items[0].id);
+    }
+  });
+
+  test("banner: an authenticated non-member gets only PUBLIC banners", async () => {
+    const nonMemberId = fixtures.authors.main.id;
+    const items = await listEventAnnouncements(EVENT_A, {
+      authenticated: true,
+      userId: nonMemberId,
+    });
+    const ids = items.map((item) => item.id);
+    expect(ids).toContain(fixtures.rows["banner-targeted-public"].id);
+    // The MEMBERS_ONLY banner is reserved for entitled members. The DTO
+    // deliberately omits `visibility` (member-safe allow-list), so the
+    // absence assertion above is the gate proof.
+    expect(ids).not.toContain(fixtures.rows["banner-targeted-members"].id);
+  });
+});
+
 // ── Suites ──────────────────────────────────────────────────────────────────
 
 describe("member announcement inbox read path (UI-32)", () => {
   test("returns only PUBLISHED announcements at member visibility with a passed publish date", async () => {
-    const first = await listMemberAnnouncements({ page: 1, limit: 100 });
+    const first = await listMemberAnnouncements({
+      page: 1,
+      limit: 100,
+      viewerUserId: fixtures.getMemberViewerId(),
+    });
     const ids = new Set(first.items.map((item) => item.id));
 
     for (const id of inboxVisibleIds) expect(ids.has(id)).toBe(true);
@@ -262,7 +406,11 @@ describe("member announcement inbox read path (UI-32)", () => {
   });
 
   test("list projection is an exact member-safe allow-list", async () => {
-    const first = await listMemberAnnouncements({ page: 1, limit: 100 });
+    const first = await listMemberAnnouncements({
+      page: 1,
+      limit: 100,
+      viewerUserId: fixtures.getMemberViewerId(),
+    });
     const ours = first.items.filter((item) => inboxVisibleIds.includes(item.id));
     expect(ours.length).toBe(inboxVisibleIds.length);
 
@@ -301,7 +449,11 @@ describe("member announcement inbox read path (UI-32)", () => {
   });
 
   test("items are ordered newest first", async () => {
-    const first = await listMemberAnnouncements({ page: 1, limit: 100 });
+    const first = await listMemberAnnouncements({
+      page: 1,
+      limit: 100,
+      viewerUserId: fixtures.getMemberViewerId(),
+    });
     const ours = first.items.filter((item) => inboxVisibleIds.includes(item.id));
     for (let i = 1; i < ours.length; i += 1) {
       expect(ours[i - 1].publishedAt.getTime()).toBeGreaterThanOrEqual(
@@ -313,7 +465,11 @@ describe("member announcement inbox read path (UI-32)", () => {
 
   test("pagination: page/limit/total envelope, disjoint coverage, clamped inputs", async () => {
     const limit = 3;
-    const first = await listMemberAnnouncements({ page: 1, limit });
+    const first = await listMemberAnnouncements({
+      page: 1,
+      limit,
+      viewerUserId: fixtures.getMemberViewerId(),
+    });
 
     expect(first.page).toBe(1);
     expect(first.limit).toBe(limit);
@@ -324,7 +480,11 @@ describe("member announcement inbox read path (UI-32)", () => {
     // Walk every page: ids are disjoint and coverage matches the total.
     const seen: string[] = [];
     for (let page = 1; page <= first.totalPages; page += 1) {
-      const result = await listMemberAnnouncements({ page, limit });
+      const result = await listMemberAnnouncements({
+        page,
+        limit,
+        viewerUserId: fixtures.getMemberViewerId(),
+      });
       expect(result.page).toBe(page);
       seen.push(...result.items.map((item) => item.id));
     }
@@ -335,7 +495,11 @@ describe("member announcement inbox read path (UI-32)", () => {
     }
 
     // Inputs are clamped, never trusted raw.
-    const clamped = await listMemberAnnouncements({ page: 0, limit: 500 });
+    const clamped = await listMemberAnnouncements({
+      page: 0,
+      limit: 500,
+      viewerUserId: fixtures.getMemberViewerId(),
+    });
     expect(clamped.page).toBe(1);
     expect(clamped.limit).toBeLessThanOrEqual(100);
   });
@@ -343,7 +507,10 @@ describe("member announcement inbox read path (UI-32)", () => {
 
 describe("event announcement banner read path (UI-32)", () => {
   test("member viewer: targeted, audience-ready, unexpired announcements for the event", async () => {
-    const items = await listEventAnnouncements(EVENT_A, { authenticated: true });
+    const items = await listEventAnnouncements(EVENT_A, {
+      authenticated: true,
+      userId: fixtures.getMemberViewerId(),
+    });
     const ids = items.map((item) => item.id);
 
     expect(ids).toContain(fixtures.rows["banner-targeted-public"].id);
@@ -377,7 +544,10 @@ describe("event announcement banner read path (UI-32)", () => {
   });
 
   test("banner projection is an exact member-safe allow-list, ordered newest first", async () => {
-    const items = await listEventAnnouncements(EVENT_A, { authenticated: true });
+    const items = await listEventAnnouncements(EVENT_A, {
+      authenticated: true,
+      userId: fixtures.getMemberViewerId(),
+    });
     expect(items.length).toBeGreaterThan(0);
     for (const item of items) {
       expect(Object.keys(item).sort()).toEqual(["excerpt", "id", "publishedAt", "title"]);

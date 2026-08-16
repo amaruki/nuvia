@@ -108,6 +108,61 @@ describe("money integrity — webhook fan-out and renewal idempotency", () => {
     expect(ledgerRows[0].status).toBe("COMPLETED");
   });
 
+  test("adversarial round 4: a FAILED attempt never suppresses the later COMPLETED settlement of the same charge", async () => {
+    // Adversarial probe 1: a failed payment attempt writes an informational
+    // FAILED ledger row for the intent; the retry then succeeds with the
+    // SAME providerTxId. The charge-level dedupe is scoped to prior
+    // COMPLETED rows, so the COMPLETED settlement must still land.
+    const tierId = await createTestTier("mi-failed-then-success", "MI Retry Tier");
+    const { subscriptionId } = await createTestSubscription(tierId);
+    const charge = `pi_retry_${suffix()}`;
+
+    // 1) payment_intent.payment_failed — FAILED ledger row only.
+    const evtFailed = `evt_failed_${suffix()}`;
+    trackWebhookEvent("stripe", evtFailed);
+    const failedResult = await processGatewayWebhook(
+      { providerTxId: charge, providerState: "failed", subscriptionId, raw: { amount: 1200 } },
+      { eventId: evtFailed, eventType: "payment_intent.payment_failed" },
+      actor,
+      mockedStripe,
+    );
+    expect(failedResult.action).toBe("past-due");
+
+    // 2) checkout.session.completed on the SAME charge — must settle COMPLETED.
+    const evtSettle = `evt_settle_retry_${suffix()}`;
+    trackWebhookEvent("stripe", evtSettle);
+    const settleResult = await processGatewayWebhook(
+      { providerTxId: charge, providerState: "complete", subscriptionId, raw: { amount: 1200 } },
+      { eventId: evtSettle, eventType: "checkout.session.completed" },
+      actor,
+      mockedStripe,
+    );
+    expect(settleResult.action).toBe("renewed");
+    expect(settleResult.transactionId).toBeDefined();
+
+    // 3) A second COMPLETED replay of the same charge is refused BEFORE the
+    //    lifecycle by the charge-level settlement guard (issue #19/#24).
+    const dupesBefore = await auditCount("WEBHOOK_CHARGE_ALREADY_SETTLED");
+    const evtReplay = `evt_settle_replay_${suffix()}`;
+    trackWebhookEvent("stripe", evtReplay);
+    const replayResult = await processGatewayWebhook(
+      { providerTxId: charge, providerState: "complete", subscriptionId, raw: { amount: 1200 } },
+      { eventId: evtReplay, eventType: "checkout.session.completed" },
+      actor,
+      mockedStripe,
+    );
+    expect(replayResult.action).toBe("none");
+    expect(await auditCount("WEBHOOK_CHARGE_ALREADY_SETTLED")).toBe(dupesBefore + 1);
+
+    const ledgerRows = await db
+      .select()
+      .from(membershipTransaction)
+      .where(eq(membershipTransaction.providerTxId, charge));
+    const completed = ledgerRows.filter((r) => r.status === "COMPLETED");
+    expect(completed).toHaveLength(1);
+    expect(completed[0].metadata).toMatchObject({ webhookEventId: evtSettle });
+  });
+
   test("#20 renewSubscription twice for one source: second call is a no-op (applied=false)", async () => {
     const tierId = await createTestTier("mi-idempotent", "MI Idempotent Tier");
     const { subscriptionId } = await createTestSubscription(tierId);

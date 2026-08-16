@@ -717,7 +717,7 @@ describe("listMyJobApplications (UI-31 my job applications)", () => {
 
 describe("getLatestAnnouncement (UI-32 widget)", () => {
   test("returns the newest audience-ready announcement", async () => {
-    const latest = await getLatestAnnouncement();
+    const latest = await getLatestAnnouncement(memberA.id);
     expect(latest).not.toBeNull();
     expect(latest!.id).toBe(seeds.announcementNew!.id);
     expect(latest!.title).toBe(seeds.announcementNew!.title);
@@ -727,7 +727,7 @@ describe("getLatestAnnouncement (UI-32 widget)", () => {
   });
 
   test("respects the injected clock: a now before every publish date yields null", async () => {
-    const none = await getLatestAnnouncement(new Date(NOW.getTime() - 30 * DAY));
+    const none = await getLatestAnnouncement(memberA.id, new Date(NOW.getTime() - 30 * DAY));
     expect(none).toBeNull();
   });
 });

@@ -47,7 +47,13 @@ export default async function MemberAnnouncementsPage({
   const sp = await searchParams;
   const page = parsePage(sp.page);
 
-  const { items, total, totalPages } = await listMemberAnnouncements({ page, limit: 10 });
+  const { items, total, totalPages } = await listMemberAnnouncements({
+    page,
+    limit: 10,
+    // Issue #23: MEMBERS_ONLY rows are reserved for entitled members; a
+    // signed-in non-member only sees PUBLIC announcements here.
+    viewerUserId: user.id,
+  });
 
   return (
     <div className="space-y-6 animate-fadeInUp max-w-3xl">

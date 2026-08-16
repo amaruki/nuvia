@@ -80,11 +80,13 @@ export async function settleWebhookLedger(
     // 2. Same provider charge (provider + provider_tx_id) — the adversarial
     //    path: a provider (or a replay) can deliver TWO distinct event ids
     //    crediting ONE charge. Deduping by event id alone would settle both.
-    //    Scoped to COMPLETED only: failed/pending events legitimately repeat
-    //    (payment retries) and carry informational ledger rows; and completed
-    //    events must never be suppressed by an earlier failed row for the
-    //    same intent. Manual recordPayment rows are unreachable here because
-    //    they carry a different payment_provider or no provider id at all.
+    //    Scoped to prior COMPLETED rows only: failed/pending events
+    //    legitimately repeat (payment retries) and carry informational
+    //    ledger rows; a COMPLETED settlement must never be suppressed by an
+    //    earlier FAILED row for the same intent (adversarial probe: failed
+    //    attempt then success on the same charge). Manual recordPayment
+    //    rows are unreachable here because they carry a different
+    //    payment_provider or no provider id at all.
     const dedupeByEvent = sql`${membershipTransaction.metadata}->>'webhookEventId' = ${context.eventId}`;
     const dedupeConditions =
       txStatus === "COMPLETED" && event.providerTxId
@@ -93,6 +95,7 @@ export async function settleWebhookLedger(
             and(
               eq(membershipTransaction.paymentProvider, gateway.provider),
               eq(membershipTransaction.providerTxId, event.providerTxId),
+              eq(membershipTransaction.status, "COMPLETED"),
             ),
           ]
         : [dedupeByEvent];

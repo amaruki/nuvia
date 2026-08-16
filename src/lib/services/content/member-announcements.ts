@@ -34,21 +34,24 @@
 import { and, count, desc, eq, gt, inArray, isNull, lte, or, sql, type SQL } from "drizzle-orm";
 import { db } from "@/db/client";
 import { content, user } from "@/db/schema";
+import { getDerivedMemberStatus, isEntitled } from "@/lib/services/membership-status.service";
 
 // ── Filters ─────────────────────────────────────────────────────────────────
 
 /**
  * Audience-ready conditions shared by both read paths. "Member visibility"
- * means PUBLIC or MEMBERS_ONLY per the planning matrix; for anonymous
- * viewers only PUBLIC qualifies. PREMIUM_MEMBERS is deliberately excluded —
- * the inbox spec is "MEMBERS_ONLY or wider" — and a premium member simply
- * sees the same member feed (narrower rows stay backoffice-only).
+ * means PUBLIC or MEMBERS_ONLY per the planning matrix — but MEMBERS_ONLY is
+ * reserved for viewers whose DERIVED member status is entitled (issue #23):
+ * authentication alone is not membership. Viewers without an entitled status
+ * only qualify for PUBLIC. PREMIUM_MEMBERS is deliberately excluded — the
+ * inbox spec is "MEMBERS_ONLY or wider" — and a premium member simply sees
+ * the same member feed (narrower rows stay backoffice-only).
  */
-function audienceReadyConditions(viewerIsAuthenticated: boolean): SQL[] {
+function audienceReadyConditions(viewerIsEntitled: boolean): SQL[] {
   return [
     eq(content.type, "ANNOUNCEMENT"),
     eq(content.status, "PUBLISHED"),
-    inArray(content.visibility, viewerIsAuthenticated ? ["PUBLIC", "MEMBERS_ONLY"] : ["PUBLIC"]),
+    inArray(content.visibility, viewerIsEntitled ? ["PUBLIC", "MEMBERS_ONLY"] : ["PUBLIC"]),
     lte(content.publishedAt, new Date()),
   ];
 }
@@ -180,6 +183,10 @@ function toEventAnnouncement(row: BannerRow): EventAnnouncement {
  * strictly on status PUBLISHED + publishedAt passed + member visibility —
  * per the UI-32 contract — and projects only the member-safe allow-list.
  *
+ * Issue #23: MEMBERS_ONLY rows are reserved for viewers whose derived
+ * member status is entitled (active/trialing/in_grace). A signed-in user
+ * who never paid — or whose entitlement expired — only sees PUBLIC rows.
+ *
  * Note: metadata.ui.expiresAt is deliberately NOT a filter here. The inbox
  * is the announcement archive (past notifications stay readable); expiry
  * retires event banners only.
@@ -187,9 +194,12 @@ function toEventAnnouncement(row: BannerRow): EventAnnouncement {
 export async function listMemberAnnouncements(filters: {
   page?: number;
   limit?: number;
+  /** Viewer whose derived member status gates MEMBERS_ONLY rows. */
+  viewerUserId?: string | null;
 }): Promise<PaginatedMemberAnnouncements> {
   const { page, limit, offset } = paginate(filters.page, filters.limit);
-  const where = and(...audienceReadyConditions(true));
+  const entitled = isEntitled(await getDerivedMemberStatus(filters.viewerUserId));
+  const where = and(...audienceReadyConditions(entitled));
 
   const [rows, totalResult] = await Promise.all([
     db
@@ -226,21 +236,25 @@ export async function listMemberAnnouncements(filters: {
 /**
  * Announcements targeting a specific event, for the event-page banner.
  *
- * viewer.authenticated narrows visibility: public event pages are readable
- * anonymously, so anonymous viewers get PUBLIC rows only; signed-in viewers
- * additionally get MEMBERS_ONLY rows. Expired rows (metadata.ui.expiresAt in
- * the past) are retired even while they stay PUBLISHED. Rows are ordered
- * newest first and capped at 5 so a mis-seeded stack cannot overwhelm the
- * event detail — the cap is announced here, not silent.
+ * viewer.userId narrows visibility: public event pages are readable
+ * anonymously, so viewers without an entitled member status (issue #23 —
+ * including anonymous visitors and signed-in non-members) get PUBLIC rows
+ * only; entitled viewers additionally get MEMBERS_ONLY rows. Expired rows
+ * (metadata.ui.expiresAt in the past) are retired even while they stay
+ * PUBLISHED. Rows are ordered newest first and capped at 5 so a mis-seeded
+ * stack cannot overwhelm the event detail — the cap is announced here, not
+ * silent.
  */
 export async function listEventAnnouncements(
   eventId: string,
-  viewer: { authenticated: boolean },
+  viewer: { authenticated: boolean; userId?: string | null },
 ): Promise<EventAnnouncement[]> {
   if (!eventId) return [];
 
+  const entitled = viewer.authenticated && isEntitled(await getDerivedMemberStatus(viewer.userId));
+
   const where = and(
-    ...audienceReadyConditions(viewer.authenticated),
+    ...audienceReadyConditions(entitled),
     eq(targetEventId, eventId),
     or(isNull(bannerExpiresAt), gt(bannerExpiresAt, new Date().toISOString())),
   );

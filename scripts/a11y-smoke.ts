@@ -8,9 +8,11 @@
  *   1. Boots the test Postgres/Redis stack (compose.test.yml) if not up,
  *      applies the migrations (drizzle-kit migrate) and seeds the admin
  *      accounts with a fresh per-run password (SEED_ADMIN_PASSWORD).
- *   2. Spawns `next dev` on a dedicated port (default 3111, override with
- *      A11Y_SMOKE_PORT) unless something already answers there — a server it
- *      spawned is killed on exit; a pre-existing one is left alone.
+ *   2. Boots the audited server on a dedicated port (default 3111, override
+ *      with A11Y_SMOKE_PORT) unless something already answers there — in CI
+ *      that is `next start` against the production build (no JIT compiler
+ *      workers to saturate the runner); locally it is `next dev`. A server
+ *      the gate spawned is killed on exit; a pre-existing one is left alone.
  *   3. Signs in as the seeded superadmin via the better-auth email endpoint
  *      (session cookie lands in the Playwright context automatically).
  *   4. Runs @axe-core/playwright against ONE representative authenticated

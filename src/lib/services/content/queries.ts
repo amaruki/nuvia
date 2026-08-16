@@ -15,9 +15,38 @@ import {
 
 // ── Public API: content collections ─────────────────────────────────────────
 
+/**
+ * Issue #8: `listContent` applies NO status filter unless the caller passes
+ * one, so every `content:read` holder (all member tiers) could list drafts
+ * and scheduled content. The route layer now resolves a read scope per
+ * caller: elevated callers (`content:manage`, `content:publish`, superadmin)
+ * keep the full editorial view; everyone else is scoped to PUBLISHED plus
+ * items they authored themselves, with author emails (PII) stripped.
+ *
+ * The author clause keeps the authoring workflow intact for roles that hold
+ * `content:create`/`content:update` without `content:publish` (committee
+ * chairs, organizers): they can still read back their own drafts.
+ */
+export interface ContentReadScope {
+  /** Elevated callers may see drafts/scheduled/archived. Default false. */
+  canSeeUnpublished?: boolean;
+  /** Elevated callers may see author emails (PII). Default false. */
+  includeAuthorEmail?: boolean;
+  /** Non-elevated callers may always see items they authored. */
+  authorUserId?: string;
+}
+
+/** Rows visible to a non-elevated caller: published, or authored by them. */
+function memberStatusVisibility(scope: ContentReadScope) {
+  return scope.authorUserId
+    ? or(eq(content.status, "PUBLISHED"), eq(content.authorId, scope.authorUserId))!
+    : eq(content.status, "PUBLISHED");
+}
+
 export async function listContent(
   collection: ContentCollection,
   query: ContentListQuery,
+  scope: ContentReadScope = {},
 ): Promise<{
   items: Record<string, unknown>[];
   total: number;
@@ -27,12 +56,17 @@ export async function listContent(
 }> {
   const conditions = [eq(content.type, COLLECTION_DB_TYPE[collection])];
   if (query.status && query.status.length > 0) {
-    conditions.push(
-      inArray(
-        content.status,
-        query.status.map((s) => UI_STATUS_TO_DB[s]),
-      ),
-    );
+    const requested = query.status.map((s) => UI_STATUS_TO_DB[s]);
+    if (scope.canSeeUnpublished) {
+      conditions.push(inArray(content.status, requested));
+    } else {
+      // Non-elevated callers only ever see the published slice of whatever
+      // they asked for, plus their own items (issue #8). Intersect rather
+      // than trust the request.
+      conditions.push(and(inArray(content.status, requested), memberStatusVisibility(scope))!);
+    }
+  } else if (!scope.canSeeUnpublished) {
+    conditions.push(memberStatusVisibility(scope));
   }
   if (query.search) {
     const needle = `%${query.search}%`;
@@ -72,7 +106,11 @@ export async function listContent(
     .offset((query.page - 1) * query.limit);
 
   return {
-    items: rows.map((row) => rowToItem(row as ContentRow, collection)),
+    items: rows.map((row) =>
+      rowToItem(row as ContentRow, collection, {
+        includeAuthorEmail: scope.includeAuthorEmail,
+      }),
+    ),
     total,
     page: query.page,
     limit: query.limit,
@@ -83,8 +121,16 @@ export async function listContent(
 export async function getContentItem(
   collection: ContentCollection,
   id: string,
+  scope: ContentReadScope = {},
 ): Promise<Record<string, unknown>> {
   const row = await selectContentRow(id);
   if (!row || row.type !== COLLECTION_DB_TYPE[collection]) throw ContentApiError.notFound();
-  return rowToItem(row, collection);
+  // Issue #8: non-elevated callers cannot fetch unpublished content by id,
+  // except items they authored themselves. 404 (not 403) so a probe does not
+  // reveal that someone else's draft exists.
+  const isOwn = scope.authorUserId !== undefined && row.authorId === scope.authorUserId;
+  if (!scope.canSeeUnpublished && row.status !== "PUBLISHED" && !isOwn) {
+    throw ContentApiError.notFound();
+  }
+  return rowToItem(row, collection, { includeAuthorEmail: scope.includeAuthorEmail });
 }

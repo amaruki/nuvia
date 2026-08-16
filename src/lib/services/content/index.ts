@@ -9,7 +9,7 @@
 
 export { ContentApiError } from "./errors";
 export type { ContentCollection } from "./types";
-export { getContentItem, listContent } from "./queries";
+export { getContentItem, listContent, type ContentReadScope } from "./queries";
 export { createContentItem, deleteContentItem, updateContentItem } from "./mutations";
 export {
   createCategoryItem,

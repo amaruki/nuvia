@@ -18,6 +18,7 @@ import { problem, problemResponse, successResponse, validationProblem } from "@/
 import {
   ContentApiError,
   type ContentCollection,
+  type ContentReadScope,
   createCategoryItem,
   createContentItem,
   deleteCategoryItem,
@@ -71,7 +72,7 @@ export async function handleContentList(collection: ContentCollection, request: 
     const parsed = contentListQuerySchema.safeParse(parseListParams(request));
     if (!parsed.success) return problemResponse(validationProblem(parsed.error));
 
-    const result = await listContent(collection, parsed.data);
+    const result = await listContent(collection, parsed.data, editorialScope(auth.user!));
     return successResponse(result.items, {
       page: result.page,
       limit: result.limit,
@@ -81,6 +82,31 @@ export async function handleContentList(collection: ContentCollection, request: 
   } catch (error) {
     return problemResponse(toProblem(error));
   }
+}
+
+/**
+ * Issue #8: members hold content:read but must not see drafts/scheduled
+ * content authored by others, or any author emails. Editorial callers
+ * (content publishers/managers, superadmin) get the full view. Everyone
+ * else is scoped to published content plus items they authored themselves
+ * (committee chairs and organizers hold content:create/update without
+ * content:publish, so their own drafts must stay readable), with PII
+ * stripped.
+ */
+function editorialScope(user: {
+  id: string;
+  role: string;
+  permissions?: string[];
+}): ContentReadScope {
+  const elevated =
+    user.role === "superadmin" ||
+    (user.permissions?.includes("content:publish") ?? false) ||
+    (user.permissions?.includes("content:manage") ?? false);
+  return {
+    canSeeUnpublished: elevated,
+    includeAuthorEmail: elevated,
+    authorUserId: user.id,
+  };
 }
 
 export async function handleContentCreate(collection: ContentCollection, request: NextRequest) {
@@ -116,7 +142,7 @@ export async function handleContentRead(collection: ContentCollection, id: strin
     const auth = await requirePermission("content:read");
     if (!auth.success) return problemResponse(auth.error!);
 
-    const item = await getContentItem(collection, id);
+    const item = await getContentItem(collection, id, editorialScope(auth.user!));
     return successResponse(item);
   } catch (error) {
     return problemResponse(toProblem(error));

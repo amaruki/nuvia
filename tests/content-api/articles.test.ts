@@ -7,6 +7,7 @@
 
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test";
 import {
+  type ContentReadScope,
   deleteContentItem,
   getContentItem,
   listContent,
@@ -18,6 +19,15 @@ const { uniqueSuffix, expectApiError, trackCreate, makeCategory, setup, cleanupR
   createContentApiFixtures();
 
 let actorId = "";
+
+/**
+ * Issue #8: the shared actor is a content_manager (an elevated caller, like
+ * every content:create role), so round-trip tests pass the same scope the
+ * route layer resolves for editorial users. The dedicated "read scope"
+ * describe block below exercises the non-elevated (member-tier) side.
+ */
+const EDITORIAL_SCOPE: ContentReadScope = { canSeeUnpublished: true, includeAuthorEmail: true };
+const MEMBER_SCOPE: ContentReadScope = {};
 
 beforeAll(async () => {
   actorId = await setup();
@@ -56,7 +66,7 @@ describe("articles round-trip", () => {
     expect((article.wordCount as number) ?? 0).toBeGreaterThan(0);
     expect((article.readTime as number) ?? 0).toBeGreaterThanOrEqual(1);
 
-    const fetched = await getContentItem("articles", article.id as string);
+    const fetched = await getContentItem("articles", article.id as string, EDITORIAL_SCOPE);
     expect(fetched.title).toBe(`Test Article ${suffix}`);
     expect(fetched.visibility).toBe("members_only");
 
@@ -70,13 +80,17 @@ describe("articles round-trip", () => {
     expect(updated.status).toBe("published");
     expect(updated.publishedAt).toBeTruthy();
 
-    const listed = await listContent("articles", {
-      page: 1,
-      limit: 10,
-      search: `Renamed Article ${suffix}`,
-      sortBy: "createdAt",
-      sortOrder: "desc",
-    });
+    const listed = await listContent(
+      "articles",
+      {
+        page: 1,
+        limit: 10,
+        search: `Renamed Article ${suffix}`,
+        sortBy: "createdAt",
+        sortOrder: "desc",
+      },
+      EDITORIAL_SCOPE,
+    );
     expect(listed.items.some((item) => item.id === article.id)).toBe(true);
 
     await deleteContentItem("articles", article.id as string);
@@ -94,20 +108,24 @@ describe("articles round-trip", () => {
       content: "Body",
     });
 
-    const publications = await listContent("publications", {
-      page: 1,
-      limit: 100,
-      search: suffix,
-      sortBy: "createdAt",
-      sortOrder: "desc",
-    });
+    const publications = await listContent(
+      "publications",
+      {
+        page: 1,
+        limit: 100,
+        search: suffix,
+        sortBy: "createdAt",
+        sortOrder: "desc",
+      },
+      EDITORIAL_SCOPE,
+    );
     const ids = publications.items.map((item) => item.id);
     expect(ids).toContain(publication.id);
     expect(ids).not.toContain(article.id);
 
     // Cross-collection lookups miss: the item exists but under another type.
     await expectApiError(
-      () => getContentItem("publications", article.id as string),
+      () => getContentItem("publications", article.id as string, EDITORIAL_SCOPE),
       404,
       "not-found",
     );
@@ -151,15 +169,151 @@ describe("articles round-trip", () => {
       });
     }
 
-    const page = await listContent("articles", {
-      page: 1,
-      limit: 2,
-      search: batch,
-      sortBy: "createdAt",
-      sortOrder: "desc",
-    });
+    const page = await listContent(
+      "articles",
+      {
+        page: 1,
+        limit: 2,
+        search: batch,
+        sortBy: "createdAt",
+        sortOrder: "desc",
+      },
+      EDITORIAL_SCOPE,
+    );
     expect(page.items.length).toBeLessThanOrEqual(2);
     expect(page.total).toBeGreaterThanOrEqual(3);
     expect(page.totalPages).toBeGreaterThanOrEqual(2);
+  });
+});
+
+/**
+ * Issue #8 regression guard: members hold content:read but must not see
+ * drafts/scheduled content or author emails. These tests exercise the
+ * non-elevated (member-tier) scope directly against the service layer.
+ */
+describe("articles read scope (issue #8)", () => {
+  test("member scope hides drafts from list", async () => {
+    const suffix = uniqueSuffix();
+    const draft = await trackCreate("articles", {
+      title: `Scope Draft ${suffix}`,
+      content: "Body",
+      status: "draft",
+      authorId: actorId,
+    });
+
+    // Non-elevated listing never surfaces the draft...
+    const memberList = await listContent(
+      "articles",
+      { page: 1, limit: 10, sortBy: "createdAt", sortOrder: "desc" },
+      MEMBER_SCOPE,
+    );
+    expect(memberList.items.some((item) => item.id === draft.id)).toBe(false);
+
+    // ...even when the caller explicitly asks for drafts (intersection).
+    const memberDraftQuery = await listContent(
+      "articles",
+      { page: 1, limit: 10, status: ["draft"], sortBy: "createdAt", sortOrder: "desc" },
+      MEMBER_SCOPE,
+    );
+    expect(memberDraftQuery.items.some((item) => item.id === draft.id)).toBe(false);
+
+    // Elevated callers still see the draft.
+    const editorialList = await listContent(
+      "articles",
+      {
+        page: 1,
+        limit: 10,
+        search: `Scope Draft ${suffix}`,
+        sortBy: "createdAt",
+        sortOrder: "desc",
+      },
+      EDITORIAL_SCOPE,
+    );
+    expect(editorialList.items.some((item) => item.id === draft.id)).toBe(true);
+  });
+
+  test("member scope 404s unpublished reads by id", async () => {
+    const suffix = uniqueSuffix();
+    const draft = await trackCreate("articles", {
+      title: `Scope Probe ${suffix}`,
+      content: "Body",
+      status: "draft",
+      authorId: actorId,
+    });
+
+    // 404 (not 403): the probe must not reveal that the draft exists.
+    await expectApiError(
+      () => getContentItem("articles", draft.id as string, MEMBER_SCOPE),
+      404,
+      "not-found",
+    );
+
+    // Same row is readable with the editorial scope.
+    const fetched = await getContentItem("articles", draft.id as string, EDITORIAL_SCOPE);
+    expect(fetched.id).toBe(draft.id);
+  });
+
+  test("member scope lists published items but strips author email", async () => {
+    const suffix = uniqueSuffix();
+    const published = await trackCreate("articles", {
+      title: `Scope Published ${suffix}`,
+      content: "Body",
+      status: "published",
+      authorId: actorId,
+    });
+
+    const list = await listContent(
+      "articles",
+      {
+        page: 1,
+        limit: 10,
+        search: `Scope Published ${suffix}`,
+        sortBy: "createdAt",
+        sortOrder: "desc",
+      },
+      MEMBER_SCOPE,
+    );
+    const item = list.items.find((entry) => entry.id === published.id);
+    expect(item).toBeTruthy();
+
+    // Published content is visible; the author email is not.
+    const author = item!.author as { email?: string };
+    expect(author.email).toBe("");
+
+    // Elevated callers get the email back.
+    const editorial = await getContentItem("articles", published.id as string, EDITORIAL_SCOPE);
+    expect(((editorial.author as { email?: string }).email ?? "").length).toBeGreaterThan(0);
+  });
+
+  test("authors can still read their own drafts (chair/organizer workflow)", async () => {
+    const suffix = uniqueSuffix();
+    const draft = await trackCreate("articles", {
+      title: `Scope Own Draft ${suffix}`,
+      content: "Body",
+      status: "draft",
+      authorId: actorId,
+    });
+
+    // Roles like committee_chair hold content:create/update without
+    // content:publish: they stay non-elevated but must see their own work.
+    const authorScope: ContentReadScope = { authorUserId: actorId };
+
+    const list = await listContent(
+      "articles",
+      {
+        page: 1,
+        limit: 10,
+        search: `Scope Own Draft ${suffix}`,
+        sortBy: "createdAt",
+        sortOrder: "desc",
+      },
+      authorScope,
+    );
+    expect(list.items.some((item) => item.id === draft.id)).toBe(true);
+
+    const fetched = await getContentItem("articles", draft.id as string, authorScope);
+    expect(fetched.id).toBe(draft.id);
+    // Authorship still does not grant other authors' emails.
+    expect((fetched.author as { email?: string }).email ?? "").toBe("");
   });
 });

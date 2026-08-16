@@ -132,13 +132,19 @@ export function buildUiPayload(input: ContentInput): Record<string, unknown> {
   });
 }
 
-function buildAuthor(row: AuthorFragment, uiAuthorId?: string): Record<string, unknown> {
+function buildAuthor(
+  row: AuthorFragment,
+  uiAuthorId?: string,
+  includeEmail?: boolean,
+): Record<string, unknown> {
   const name = row.author_name ?? row.author_email ?? "Unknown Author";
   return {
     id: uiAuthorId ?? "",
     name,
     username: name.toLowerCase().replace(/\s+/g, "."),
-    email: row.author_email ?? "",
+    // Issue #8: author emails are PII; only editorial callers (content
+    // publishers/managers) receive them. Member-tier readers get none.
+    email: includeEmail ? (row.author_email ?? "") : "",
     avatarUrl: row.author_image ?? row.author_profile_photo ?? undefined,
     role: row.author_role ?? undefined,
   };
@@ -157,7 +163,11 @@ const zeroMetrics = {
 };
 
 /** Map a joined content row into the UI item shape (plain JSON-safe dates). */
-export function rowToItem(row: ContentRow, collection: ContentCollection): Record<string, unknown> {
+export function rowToItem(
+  row: ContentRow,
+  collection: ContentCollection,
+  options: { includeAuthorEmail?: boolean } = {},
+): Record<string, unknown> {
   const metadata = (row.metadata ?? {}) as { ui?: Record<string, unknown> };
   const ui = metadata.ui ?? {};
   const uiStatus = (ui.status as UiStatus | undefined) ?? DB_STATUS_TO_UI[row.status] ?? "draft";
@@ -177,7 +187,7 @@ export function rowToItem(row: ContentRow, collection: ContentCollection): Recor
     visibility: uiVisibility,
     type: ui.type ?? COLLECTION_DEFAULT_UI_TYPE[collection],
     category: ui.category ?? row.category_name ?? COLLECTION_DEFAULT_CATEGORY[collection],
-    author: buildAuthor(row, row.authorId ?? undefined),
+    author: buildAuthor(row, row.authorId ?? undefined, options.includeAuthorEmail),
     tags: Array.isArray(row.tags)
       ? row.tags.map((name) => ({ id: name, name, color: "#6B7280", count: 0 }))
       : [],

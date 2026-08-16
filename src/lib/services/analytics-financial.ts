@@ -13,7 +13,7 @@
 import { and, eq, gte } from "drizzle-orm";
 import { db } from "@/db/client";
 import { membershipInvoice, membershipTransaction } from "@/db/schema";
-import { toAmountString, toMinorUnits } from "@/lib/payments/gateway";
+import { BASE_CURRENCY, toAmountString, toMinorUnits } from "@/lib/payments/gateway";
 import { getDonationCapability, type DonationCapability } from "./finance";
 import {
   getOutstandingSummary,
@@ -68,7 +68,7 @@ export async function getFinancialAnalytics(opts?: {
       .from(membershipInvoice)
       .limit(INVOICE_SCAN_ROWS),
     db
-      .select({ amount: membershipTransaction.amount })
+      .select({ amount: membershipTransaction.amount, currency: membershipTransaction.currency })
       .from(membershipTransaction)
       .where(
         and(
@@ -87,9 +87,12 @@ export async function getFinancialAnalytics(opts?: {
     .map(([status, count]) => ({ status, count }))
     .sort((a, b) => b.count - a.count);
 
+  // Issue #27 (finding 2): dues total is BASE_CURRENCY only; foreign rows
+  // are never mixed face-value into the headline.
   let duesMinor = 0;
   for (const tx of completedTransactions) {
-    duesMinor += toMinorUnits(tx.amount);
+    if ((tx.currency ?? BASE_CURRENCY).toUpperCase() !== BASE_CURRENCY) continue;
+    duesMinor += toMinorUnits(tx.amount, tx.currency);
   }
 
   return {

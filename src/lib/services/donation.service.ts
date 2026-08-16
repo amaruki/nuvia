@@ -11,12 +11,25 @@
 import { count, desc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { donation, type Donation } from "@/db/schema";
-import { NotFoundError } from "@/lib/errors";
+import { BusinessLogicError, NotFoundError } from "@/lib/errors";
+import { assertDonationTransition } from "@/lib/services/donation/lifecycle";
 import type {
   DonationCreateInput,
   DonationListQuery,
   DonationUpdateInput,
 } from "@/lib/validation/donation.validation";
+
+/** True when the driver error carries the postgres unique_violation code.
+ * Drizzle wraps the postgres.js error, so the code can live several cause
+ * levels down — walk the chain instead of reading the top level only. */
+function isUniqueViolation(error: unknown): boolean {
+  let current: unknown = error;
+  for (let depth = 0; depth < 5 && current !== null && typeof current === "object"; depth += 1) {
+    if ((current as { code?: unknown }).code === "23505") return true;
+    current = (current as { cause?: unknown }).cause;
+  }
+  return false;
+}
 
 /** Filtered, newest-first page with the total for pagination meta. */
 export async function listDonations(
@@ -50,36 +63,57 @@ export async function getDonation(id: string): Promise<Donation> {
 /**
  * Record a donation. `donationDate` omitted means "now" via the column
  * default; an empty-string campaign never reaches the DB as "".
+ *
+ * Issue #27 (finding 3): the partial unique index on transaction_id is the
+ * last line of defense against double-recording one payment; a collision is
+ * a business conflict, not an unexpected error.
  */
 export async function createDonation(input: DonationCreateInput): Promise<Donation> {
-  const [row] = await db
-    .insert(donation)
-    .values({
-      donorName: input.donorName,
-      donorEmail: input.donorEmail,
-      donorType: input.donorType,
-      donationType: input.donationType,
-      campaign: input.campaign || null,
-      amount: input.amount,
-      currency: input.currency,
-      status: input.status,
-      paymentMethod: input.paymentMethod || null,
-      transactionId: input.transactionId || null,
-      donationDate: input.donationDate ? new Date(input.donationDate) : undefined,
-      receiptSent: input.receiptSent,
-      notes: input.notes || null,
-    })
-    .returning();
-  return row;
+  try {
+    const [row] = await db
+      .insert(donation)
+      .values({
+        donorName: input.donorName,
+        donorEmail: input.donorEmail,
+        donorType: input.donorType,
+        donationType: input.donationType,
+        campaign: input.campaign || null,
+        amount: input.amount,
+        currency: input.currency,
+        status: input.status,
+        paymentMethod: input.paymentMethod || null,
+        transactionId: input.transactionId || null,
+        donationDate: input.donationDate ? new Date(input.donationDate) : undefined,
+        receiptSent: input.receiptSent,
+        notes: input.notes || null,
+      })
+      .returning();
+    return row;
+  } catch (error) {
+    if (isUniqueViolation(error)) {
+      throw new BusinessLogicError(
+        `A donation with transaction ID '${input.transactionId}' is already recorded`,
+        "DONATION_DUPLICATE_TRANSACTION",
+      );
+    }
+    throw error;
+  }
 }
 
 /**
  * Update the mutable fields only (status/notes/receiptSent/campaign — the
  * zod update schema refuses everything else). Undefined keys are skipped
  * by drizzle's .set(); explicit nulls clear `notes`/`campaign`.
+ *
+ * Issue #27 (finding 3): status changes follow the lifecycle table in
+ * src/lib/services/donation/lifecycle.ts — no resurrecting refunded gifts.
  */
 export async function updateDonation(id: string, input: DonationUpdateInput): Promise<Donation> {
-  await getDonation(id);
+  const existing = await getDonation(id);
+
+  if (input.status !== undefined) {
+    assertDonationTransition(existing.status, input.status);
+  }
 
   const [row] = await db
     .update(donation)

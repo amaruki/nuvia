@@ -10,7 +10,16 @@
  * Amounts are numeric(10,2) string mode end to end, like the rest of the
  * finance schema (ADR-0015 §5).
  */
-import { boolean, numeric, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  numeric,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 /** Who gives: a person, an organization, or an unnamed donor. */
 export const donorTypeEnum = pgEnum("DonorType", ["individual", "organization", "anonymous"]);
@@ -31,29 +40,44 @@ export const donationStatusEnum = pgEnum("DonationStatus", [
   "pledged",
 ]);
 
-export const donation = pgTable("donations", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  donorName: text("donor_name").notNull(),
-  donorEmail: text("donor_email").notNull(),
-  donorType: donorTypeEnum("donor_type").notNull().default("individual"),
-  donationType: donationTypeEnum("donation_type").notNull().default("one_time"),
-  /** Free-text campaign label; no campaigns table yet. */
-  campaign: text("campaign"),
-  amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
-  currency: text("currency").notNull().default("USD"),
-  status: donationStatusEnum("status").notNull().default("pending"),
-  paymentMethod: text("payment_method"),
-  transactionId: text("transaction_id"),
-  donationDate: timestamp("donation_date", { withTimezone: true }).notNull().defaultNow(),
-  receiptSent: boolean("receipt_sent").notNull().default(false),
-  notes: text("notes"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-});
+export const donation = pgTable(
+  "donations",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    donorName: text("donor_name").notNull(),
+    donorEmail: text("donor_email").notNull(),
+    donorType: donorTypeEnum("donor_type").notNull().default("individual"),
+    donationType: donationTypeEnum("donation_type").notNull().default("one_time"),
+    /** Free-text campaign label; no campaigns table yet. */
+    campaign: text("campaign"),
+    amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+    currency: text("currency").notNull().default("USD"),
+    status: donationStatusEnum("status").notNull().default("pending"),
+    paymentMethod: text("payment_method"),
+    transactionId: text("transaction_id"),
+    donationDate: timestamp("donation_date", { withTimezone: true }).notNull().defaultNow(),
+    receiptSent: boolean("receipt_sent").notNull().default(false),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    // Issue #27 (finding 3): a recorded payment is the source of truth, and
+    // the backoffice can submit the same transaction twice (double-click or
+    // two treasurers). Partial: rows without a transaction ID stay unique-
+    // unconstrained. Must match migration 0018.
+    uniqueIndex("donations_transaction_id_unique")
+      .on(table.transactionId)
+      .where(sql`${table.transactionId} IS NOT NULL`),
+  ],
+);
 
 export type Donation = typeof donation.$inferSelect;
+
+/** Typed donation statuses, derived from the enum. */
+export type DonationStatus = (typeof donationStatusEnum.enumValues)[number];

@@ -24,8 +24,10 @@ export interface FinanceReportSummary {
   generatedAt: string;
   months: number;
   totals: {
+    currency: string;
     revenue: string;
     completedTransactionCount: number;
+    excludedForeignTransactionCount: number;
   };
   revenueByPeriod: { period: string; revenue: string; transactionCount: number }[];
   revenueByTier: { tierId: string; tierName: string; revenue: string; transactionCount: number }[];

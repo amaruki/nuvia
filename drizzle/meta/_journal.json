@@ -127,6 +127,13 @@
       "when": 1786890662441,
       "tag": "0017_drop_forum_like_counts",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1786903647946,
+      "tag": "0018_donation_dedupe_and_status_graph",
+      "breakpoints": true
     }
   ]
 }

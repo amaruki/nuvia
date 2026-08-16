@@ -128,30 +128,85 @@ export interface PaymentGateway {
 }
 
 /**
- * Convert a numeric(10,2) string-mode amount to minor units at the adapter
- * boundary. Exact integer arithmetic — never float math on money.
+ * ISO 4217 minor-unit exponents. Most currencies use 2 decimals; a few are
+ * zero-decimal (the minor unit IS the unit) and a handful use 3. Issue #27
+ * (finding 2): `toMinorUnits`/`toAmountString` hardcoded ×100, which would
+ * over-charge a zero-decimal tier 100× (¥10,000 -> ¥1,000,000).
  */
-export function toMinorUnits(amount: string): number {
-  const match = /^(\d{1,8})(?:\.(\d{1,2}))?$/.exec(amount);
+const ZERO_DECIMAL_CURRENCIES = new Set([
+  "BIF",
+  "CLP",
+  "DJF",
+  "GNF",
+  "ISK",
+  "JPY",
+  "KMF",
+  "KRW",
+  "PYG",
+  "RWF",
+  "UGX",
+  "VND",
+  "VUV",
+  "XAF",
+  "XOF",
+  "XPF",
+]);
+const THREE_DECIMAL_CURRENCIES = new Set(["BHD", "IQD", "JOD", "KWD", "LYD", "OMR", "TND"]);
+
+/**
+ * The platform's reporting currency. Every money column defaults to USD and
+ * no UI mints other currencies today; aggregates use this as the headline
+ * currency and EXCLUDE (never silently mix) rows in any other currency
+ * (issue #27, finding 2).
+ */
+export const BASE_CURRENCY = "USD";
+
+/** Number of minor-unit digits for an ISO 4217 currency (defaults to 2). */
+export function currencyExponent(currency: string): number {
+  const code = currency.toUpperCase();
+  if (ZERO_DECIMAL_CURRENCIES.has(code)) return 0;
+  if (THREE_DECIMAL_CURRENCIES.has(code)) return 3;
+  return 2;
+}
+
+/**
+ * Convert a numeric(10,2) string-mode amount to minor units at the adapter
+ * boundary. Exact integer arithmetic — never float math on money. The
+ * exponent is currency-aware (default USD = 2 decimals) so zero-decimal
+ * currencies convert 1:1 instead of being inflated ×100.
+ */
+export function toMinorUnits(amount: string, currency: string = "USD"): number {
+  const exponent = currencyExponent(currency);
+  const match = /^(\d{1,8})(?:\.(\d+))?$/.exec(amount);
   if (!match) {
     throw new GatewayError(
       `"${amount}" is not a valid numeric(10,2) amount string`,
       "INVALID_AMOUNT",
     );
   }
-  const fraction = (match[2] ?? "").padEnd(2, "0");
-  return Number(match[1]) * 100 + Number(fraction);
+  const fraction = match[2] ?? "";
+  if (fraction.length > exponent) {
+    throw new GatewayError(
+      `"${amount}" has more than ${exponent} decimal place(s) for ${currency.toUpperCase()}`,
+      "INVALID_AMOUNT",
+    );
+  }
+  return Number(match[1]) * 10 ** exponent + Number(fraction.padEnd(exponent, "0") || "0");
 }
 
 /** Convert minor units back to a numeric(10,2) string-mode amount. */
-export function toAmountString(minorUnits: number): string {
+export function toAmountString(minorUnits: number, currency: string = "USD"): string {
   if (!Number.isInteger(minorUnits) || minorUnits < 0) {
     throw new GatewayError(
       `Minor units must be a non-negative integer, got ${minorUnits}`,
       "INVALID_AMOUNT",
     );
   }
-  return `${Math.floor(minorUnits / 100)}.${String(minorUnits % 100).padStart(2, "0")}`;
+  const exponent = currencyExponent(currency);
+  const divisor = 10 ** exponent;
+  const whole = Math.floor(minorUnits / divisor);
+  const fraction = String(minorUnits % divisor).padStart(exponent, "0");
+  return exponent === 0 ? `${whole}` : `${whole}.${fraction}`;
 }
 
 import { ManualGateway } from "./manual";

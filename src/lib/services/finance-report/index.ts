@@ -34,6 +34,7 @@ export type {
   RevenuePeriodRow,
 } from "./types";
 export {
+  countExcludedForeignTransactions,
   getFinanceReportSummary,
   getOutstandingSummary,
   getRevenueByPeriod,

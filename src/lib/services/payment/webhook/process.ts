@@ -9,6 +9,7 @@ import { membershipTransaction, type MembershipSubscription } from "@/db/schema"
 import { and, eq } from "drizzle-orm";
 import { BusinessLogicError, NotFoundError } from "@/lib/errors";
 import {
+  BASE_CURRENCY,
   toMinorUnits,
   type PaymentGateway,
   type VerifiedWebhookEvent,
@@ -25,7 +26,7 @@ import {
 import { writeAudit } from "../audit";
 import type { WebhookEventContext, WebhookProcessingResult } from "../types";
 import { settleWebhookLedger } from "./ledger";
-import { amountMinorFromRaw, currencyFromRaw } from "./payload";
+import { amountMinorFromRaw, currencyFromRaw, refundAmountFromRaw } from "./payload";
 
 /**
  * Event types that may renew a subscription and settle the ledger for a
@@ -218,10 +219,17 @@ export async function processVerifiedEvent(
   }
 
   // Amount/currency: prefer the provider's truth, fall back to the tier
-  // price (events without amounts still settle the subscribed tier).
+  // price (events without amounts still settle the subscribed tier). The
+  // currency fallback is the platform base currency; when the provider's
+  // currency differs from the invoiced currency, settleWebhookLedger skips
+  // reconciliation and raises a WEBHOOK_CURRENCY_MISMATCH audit instead of
+  // applying foreign money face-value (issue #27, finding 2).
   const tier = await getTier(subscription.tierId);
-  const amountMinor = amountMinorFromRaw(event.raw) ?? toMinorUnits(tier.price);
-  const currency = currencyFromRaw(event.raw) ?? "USD";
+  const amountMinor = amountMinorFromRaw(event.raw) ?? toMinorUnits(tier.price, BASE_CURRENCY);
+  const currency = currencyFromRaw(event.raw) ?? BASE_CURRENCY;
+  // Issue #27 (finding 1): for refund events, the provider's cumulative
+  // refunded figure drives the reversal (see ledger.applyRefundReversal).
+  const refundAmountMinor = refundAmountFromRaw(event.raw);
 
   const { transactionId } = await settleWebhookLedger({
     subscription,
@@ -230,6 +238,7 @@ export async function processVerifiedEvent(
     subStatus,
     amountMinor,
     currency,
+    refundAmountMinor,
     gateway,
     event,
     context,

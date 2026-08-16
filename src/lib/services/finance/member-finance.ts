@@ -16,6 +16,14 @@
  */
 
 import { and, count, desc, eq, inArray } from "drizzle-orm";
+
+/**
+ * Issue #27 (finding 4): how long a minted pay-now checkout may be reused
+ * before pay-now mints a fresh one. Stripe sessions live far longer; the
+ * short TTL bounds how stale the balance snapshot inside `openCheckout`
+ * can get when an invoice's outstanding amount changes.
+ */
+const OPEN_CHECKOUT_TTL_MS = 15 * 60 * 1000;
 import { db } from "@/db/client";
 import { membershipInvoice, membershipTier } from "@/db/schema";
 import type { MembershipInvoice } from "@/db/schema";
@@ -228,32 +236,97 @@ export async function payMemberInvoice(
     };
   }
 
-  const tier = await getTier(invoice.tierId);
-  const checkout = await gateway.createCheckout({
-    userId: input.userId,
-    subscriptionId: invoice.subscriptionId,
-    tierId: invoice.tierId,
-    tierName: tier.displayName,
-    amountMinor: due,
-    currency: invoice.currency,
-    description: `Payment for invoice ${invoice.invoiceNumber}`,
-    returnUrl: input.returnUrl,
-    metadata: {
-      invoiceId: invoice.id,
-      subscriptionId: invoice.subscriptionId,
-      tierId: invoice.tierId,
-    },
+  // Issue #27 (finding 4) — single-flight guard: pay-now must not mint an
+  // unbounded fan of independently payable sessions for one invoice. A
+  // click-storm (or two tabs) would otherwise produce N full-balance
+  // sessions; each can complete, and only the first settles the invoice —
+  // the rest charge against an already-PAID invoice. Serialize pay-now on
+  // the invoice row and reuse an open checkout for the SAME balance while
+  // it is inside the TTL window.
+  return db.transaction(async (tx) => {
+    const [locked] = await tx
+      .select()
+      .from(membershipInvoice)
+      .where(eq(membershipInvoice.id, invoice.id))
+      .for("update")
+      .limit(1);
+    if (!locked) {
+      throw new NotFoundError("Invoice", input.invoiceId);
+    }
+    // Re-validate under the lock: a concurrent webhook or admin recordPayment
+    // may have settled the invoice while this request was waiting.
+    const lockedDue = toMinorUnits(locked.totalAmount) - toMinorUnits(locked.paidAmount);
+    if (locked.status !== "ISSUED" || lockedDue <= 0) {
+      throw new BusinessLogicError(
+        `Invoice ${locked.invoiceNumber} is ${locked.status}; only ISSUED invoices with an outstanding balance can be paid`,
+        "INVOICE_NOT_PAYABLE",
+      );
+    }
+
+    const meta = (locked.metadata ?? {}) as Record<string, unknown>;
+    const openCheckout = meta.openCheckout as
+      | { amountMinor: number; checkoutUrl: string; providerTxId: string | null; mintedAt: string }
+      | undefined;
+    if (
+      openCheckout &&
+      openCheckout.amountMinor === lockedDue &&
+      typeof openCheckout.checkoutUrl === "string" &&
+      Date.now() - Date.parse(openCheckout.mintedAt) < OPEN_CHECKOUT_TTL_MS
+    ) {
+      return {
+        track: "stripe",
+        paymentStatus: "pending",
+        invoiceId: locked.id,
+        checkoutUrl: openCheckout.checkoutUrl,
+        providerTxId: openCheckout.providerTxId ?? null,
+      };
+    }
+
+    const tier = await getTier(locked.tierId);
+    const checkout = await gateway.createCheckout({
+      userId: input.userId,
+      subscriptionId: locked.subscriptionId,
+      tierId: locked.tierId,
+      tierName: tier.displayName,
+      amountMinor: lockedDue,
+      currency: locked.currency,
+      description: `Payment for invoice ${locked.invoiceNumber}`,
+      returnUrl: input.returnUrl,
+      metadata: {
+        invoiceId: locked.id,
+        subscriptionId: locked.subscriptionId,
+        tierId: locked.tierId,
+      },
+    });
+
+    if (!checkout.checkoutUrl) {
+      throw new GatewayError("The gateway produced no hosted checkout URL", "CHECKOUT_FAILED");
+    }
+
+    // Record the open checkout so concurrent/repeat calls reuse it. The
+    // webhook settlement clears nothing here; the TTL + balance check make
+    // stale entries harmless (a settled invoice never reaches this branch).
+    await tx
+      .update(membershipInvoice)
+      .set({
+        metadata: {
+          ...meta,
+          openCheckout: {
+            amountMinor: lockedDue,
+            checkoutUrl: checkout.checkoutUrl,
+            providerTxId: checkout.providerTxId ?? null,
+            mintedAt: new Date().toISOString(),
+          },
+        },
+      })
+      .where(eq(membershipInvoice.id, locked.id));
+
+    return {
+      track: "stripe",
+      paymentStatus: "pending",
+      invoiceId: locked.id,
+      checkoutUrl: checkout.checkoutUrl,
+      providerTxId: checkout.providerTxId,
+    };
   });
-
-  if (!checkout.checkoutUrl) {
-    throw new GatewayError("The gateway produced no hosted checkout URL", "CHECKOUT_FAILED");
-  }
-
-  return {
-    track: "stripe",
-    paymentStatus: "pending",
-    invoiceId: invoice.id,
-    checkoutUrl: checkout.checkoutUrl,
-    providerTxId: checkout.providerTxId,
-  };
 }

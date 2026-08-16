@@ -24,6 +24,8 @@ const CONFLICT_CODES: Record<string, true> = {
   INVOICE_NOT_PAYABLE: true,
   INVOICE_NOT_VOIDABLE: true,
   OVERPAYMENT_NOT_ALLOWED: true,
+  // Issue #27: same payment recorded twice is a conflict, not a 500
+  DONATION_DUPLICATE_TRANSACTION: true,
 };
 
 export function problemFromFinanceError(error: unknown, context: string): ProblemDetails {

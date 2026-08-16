@@ -39,8 +39,17 @@ export interface FinanceReportSummary {
   /** Window (in months) the revenue aggregates cover. */
   months: number;
   totals: {
+    /** ISO 4217 code of the headline revenue figure (the base currency). */
+    currency: string;
     revenue: string;
     completedTransactionCount: number;
+    /**
+     * COMPLETED transactions in a currency other than the base currency that
+     * are EXCLUDED from every aggregate above (issue #27, finding 2): mixing
+     * €100 into a USD total would silently misreport, so foreign rows are
+     * counted here for manual reconciliation instead.
+     */
+    excludedForeignTransactionCount: number;
   };
   revenueByPeriod: RevenuePeriodRow[];
   revenueByTier: RevenueByTierRow[];

@@ -50,7 +50,12 @@ export const donationCreateSchema = z.object({
   donationType: donationTypeSchema.default("one_time"),
   campaign: z.string().trim().max(200, "Campaign must be at most 200 characters").optional(),
   amount: donationAmountSchema,
-  currency: z.string().trim().length(3, "Currency must be a 3-letter ISO code").default("USD"),
+  currency: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z]{3}$/, "Currency must be a 3-letter ISO code")
+    .default("USD"),
   status: donationStatusSchema.default("pending"),
   paymentMethod: z
     .string()

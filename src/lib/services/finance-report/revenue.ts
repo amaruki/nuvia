@@ -3,10 +3,10 @@
  * outstanding receivables, and the combined dashboard summary call.
  */
 
-import { asc, eq } from "drizzle-orm";
+import { and, asc, count, eq, gte, ne } from "drizzle-orm";
 import { db } from "@/db/client";
 import { membershipInvoice, membershipTier, membershipTransaction } from "@/db/schema";
-import { toAmountString, toMinorUnits } from "@/lib/payments/gateway";
+import { BASE_CURRENCY, toAmountString, toMinorUnits } from "@/lib/payments/gateway";
 import { MAX_AGGREGATE_ROWS } from "./helpers";
 import type {
   FinanceReportSummary,
@@ -40,6 +40,7 @@ export async function getRevenueByPeriod(opts?: {
   const transactions = await db
     .select({
       amount: membershipTransaction.amount,
+      currency: membershipTransaction.currency,
       createdAt: membershipTransaction.createdAt,
     })
     .from(membershipTransaction)
@@ -47,12 +48,16 @@ export async function getRevenueByPeriod(opts?: {
     .orderBy(asc(membershipTransaction.createdAt))
     .limit(MAX_AGGREGATE_ROWS);
 
+  // Issue #27 (finding 2): the headline is BASE_CURRENCY only. Foreign rows
+  // are excluded (never mixed face-value) and surfaced via
+  // countExcludedForeignTransactions for manual reconciliation.
   const totalsByPeriod = new Map<string, { minor: number; count: number }>();
   for (const tx of transactions) {
     if (tx.createdAt.getTime() < since.getTime()) continue;
+    if ((tx.currency ?? BASE_CURRENCY).toUpperCase() !== BASE_CURRENCY) continue;
     const key = periodKey(tx.createdAt);
     const bucket = totalsByPeriod.get(key) ?? { minor: 0, count: 0 };
-    bucket.minor += toMinorUnits(tx.amount);
+    bucket.minor += toMinorUnits(tx.amount, tx.currency);
     bucket.count += 1;
     totalsByPeriod.set(key, bucket);
   }
@@ -89,6 +94,7 @@ export async function getRevenueByTier(opts?: {
   const transactions = await db
     .select({
       amount: membershipTransaction.amount,
+      currency: membershipTransaction.currency,
       createdAt: membershipTransaction.createdAt,
       tierId: membershipTransaction.tierId,
     })
@@ -104,9 +110,11 @@ export async function getRevenueByTier(opts?: {
   const totalsByTier = new Map<string, { minor: number; count: number }>();
   for (const tx of transactions) {
     if (tx.createdAt.getTime() < since.getTime()) continue;
+    // Issue #27 (finding 2): foreign-currency rows never mix into a tier total.
+    if ((tx.currency ?? BASE_CURRENCY).toUpperCase() !== BASE_CURRENCY) continue;
     const key = tx.tierId ?? "__unassigned__";
     const bucket = totalsByTier.get(key) ?? { minor: 0, count: 0 };
-    bucket.minor += toMinorUnits(tx.amount);
+    bucket.minor += toMinorUnits(tx.amount, tx.currency);
     bucket.count += 1;
     totalsByTier.set(key, bucket);
   }
@@ -119,7 +127,9 @@ export async function getRevenueByTier(opts?: {
       revenue: toAmountString(bucket.minor),
       transactionCount: bucket.count,
     }))
-    .sort((a, b) => toMinorUnits(b.revenue) - toMinorUnits(a.revenue));
+    .sort(
+      (a, b) => toMinorUnits(b.revenue, BASE_CURRENCY) - toMinorUnits(a.revenue, BASE_CURRENCY),
+    );
 }
 
 /** Receivables still open on ISSUED invoices, with overdue split. */
@@ -130,17 +140,25 @@ export async function getOutstandingSummary(opts?: { now?: Date }): Promise<Outs
     .select({
       totalAmount: membershipInvoice.totalAmount,
       paidAmount: membershipInvoice.paidAmount,
+      currency: membershipInvoice.currency,
       dueDate: membershipInvoice.dueDate,
     })
     .from(membershipInvoice)
     .where(eq(membershipInvoice.status, "ISSUED"))
     .limit(MAX_AGGREGATE_ROWS);
 
+  // Issue #27 (finding 2): receivables are reported in BASE_CURRENCY;
+  // foreign-currency invoices are excluded rather than mixed face-value.
   let outstandingMinor = 0;
   let overdueMinor = 0;
   let overdueCount = 0;
+  let includedCount = 0;
   for (const invoice of invoices) {
-    const balance = toMinorUnits(invoice.totalAmount) - toMinorUnits(invoice.paidAmount);
+    if ((invoice.currency ?? BASE_CURRENCY).toUpperCase() !== BASE_CURRENCY) continue;
+    includedCount += 1;
+    const balance =
+      toMinorUnits(invoice.totalAmount, invoice.currency) -
+      toMinorUnits(invoice.paidAmount, invoice.currency);
     outstandingMinor += balance;
     if (invoice.dueDate !== null && invoice.dueDate.getTime() < now.getTime()) {
       overdueMinor += balance;
@@ -149,11 +167,36 @@ export async function getOutstandingSummary(opts?: { now?: Date }): Promise<Outs
   }
 
   return {
-    invoiceCount: invoices.length,
+    invoiceCount: includedCount,
     outstandingAmount: toAmountString(outstandingMinor),
     overdueCount,
     overdueAmount: toAmountString(overdueMinor),
   };
+}
+
+/**
+ * COMPLETED transactions in a currency other than BASE_CURRENCY within the
+ * window — the rows every aggregate above excludes (issue #27, finding 2).
+ */
+export async function countExcludedForeignTransactions(opts?: {
+  months?: number;
+  now?: Date;
+}): Promise<number> {
+  const months = Math.min(Math.max(opts?.months ?? 12, 1), 36);
+  const now = opts?.now ?? new Date();
+  const since = windowStart(months, now);
+
+  const [row] = await db
+    .select({ value: count() })
+    .from(membershipTransaction)
+    .where(
+      and(
+        eq(membershipTransaction.status, "COMPLETED"),
+        ne(membershipTransaction.currency, BASE_CURRENCY),
+        gte(membershipTransaction.createdAt, since),
+      ),
+    );
+  return row?.value ?? 0;
 }
 
 /** One call for the reports dashboard: every aggregate + window metadata. */
@@ -164,13 +207,18 @@ export async function getFinanceReportSummary(opts?: {
   const months = Math.min(Math.max(opts?.months ?? 12, 1), 36);
   const now = opts?.now ?? new Date();
 
-  const [revenueByPeriod, revenueByTier, outstanding] = await Promise.all([
-    getRevenueByPeriod({ months, now }),
-    getRevenueByTier({ months, now }),
-    getOutstandingSummary({ now }),
-  ]);
+  const [revenueByPeriod, revenueByTier, outstanding, excludedForeignTransactionCount] =
+    await Promise.all([
+      getRevenueByPeriod({ months, now }),
+      getRevenueByTier({ months, now }),
+      getOutstandingSummary({ now }),
+      countExcludedForeignTransactions({ months, now }),
+    ]);
 
-  const revenueMinor = revenueByPeriod.reduce((sum, row) => sum + toMinorUnits(row.revenue), 0);
+  const revenueMinor = revenueByPeriod.reduce(
+    (sum, row) => sum + toMinorUnits(row.revenue, BASE_CURRENCY),
+    0,
+  );
   const completedTransactionCount = revenueByPeriod.reduce(
     (sum, row) => sum + row.transactionCount,
     0,
@@ -180,8 +228,10 @@ export async function getFinanceReportSummary(opts?: {
     generatedAt: now.toISOString(),
     months,
     totals: {
-      revenue: toAmountString(revenueMinor),
+      currency: BASE_CURRENCY,
+      revenue: toAmountString(revenueMinor, BASE_CURRENCY),
       completedTransactionCount,
+      excludedForeignTransactionCount,
     },
     revenueByPeriod,
     revenueByTier,

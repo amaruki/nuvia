@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "donations_transaction_id_unique" ON "donations" USING btree ("transaction_id") WHERE "donations"."transaction_id" IS NOT NULL;

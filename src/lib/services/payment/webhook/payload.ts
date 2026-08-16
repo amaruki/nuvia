@@ -24,3 +24,15 @@ export function currencyFromRaw(raw: unknown): string | null {
   const value = raw.currency;
   return typeof value === "string" && value.length >= 2 ? value.toUpperCase() : null;
 }
+
+/**
+ * Issue #27 (finding 1): the cumulative minor-unit amount refunded on a
+ * charge (`amount_refunded`). Stripe reports the running total across all
+ * refunds, not the delta for this event — the reversal logic records the
+ * cumulative figure and only reverses the difference.
+ */
+export function refundAmountFromRaw(raw: unknown): number | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const value = (raw as Record<string, unknown>).amount_refunded;
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : null;
+}

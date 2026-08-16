@@ -45,6 +45,12 @@ jobs:
   build-attest-sign:
     name: Build, attest, and sign release artifact
     runs-on: ubuntu-latest
+    # Issue #11 guardrail: a manual dispatch must target a tag, not an
+    # arbitrary branch/commit. Otherwise any actor with write access could
+    # mint a repo-signed SLSA attestation + cosign bundle for whatever ref
+    # they pick. Release publishes always satisfy this (they run on the
+    # release's tag ref).
+    if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
     services:
       # Same services and env as CI's heavy job (.github/workflows/ci.yml):
       # `next build` forces NODE_ENV=production internally regardless of the

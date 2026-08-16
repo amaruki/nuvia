@@ -34,6 +34,20 @@ const EXACT_CONTENT_TYPES = new Set([
   "text/csv",
 ]);
 
+/**
+ * Content types that can execute script when the browser renders them as a
+ * top-level document (issue #6 — stored XSS via uploaded files). SVG is a
+ * scriptable XML document, so an uploaded `<svg><script>` payload runs in
+ * the app origin whenever someone opens the media URL directly or via the
+ * preview/download `window.open` path. We reject these outright on upload.
+ */
+const SCRIPT_CAPABLE_CONTENT_TYPES = new Set(["image/svg+xml", "image/svg"]);
+
+/** True when a content type must never be rendered inline as a document. */
+export function isScriptCapableContentType(contentType: string): boolean {
+  return SCRIPT_CAPABLE_CONTENT_TYPES.has(contentType.toLowerCase());
+}
+
 export interface MediaUploadRecord {
   id: string;
   /** Storage-safe file name inside UPLOAD_DIR. */
@@ -83,6 +97,9 @@ export class MediaUploadError extends Error {
 
 function isAllowedContentType(contentType: string): boolean {
   const type = contentType.toLowerCase();
+  // Issue #6: SVG is a scriptable document; reject it outright so an
+  // uploaded `<svg><script>` payload can never be stored.
+  if (isScriptCapableContentType(type)) return false;
   return (
     type.startsWith("image/") ||
     type.startsWith("video/") ||

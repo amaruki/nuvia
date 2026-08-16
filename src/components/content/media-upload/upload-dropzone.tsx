@@ -64,7 +64,7 @@ export default function UploadDropzone({
         ref={fileInputRef}
         type="file"
         multiple
-        accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.svg,.ttf,.otf,.woff,.woff2"
+        accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.ttf,.otf,.woff,.woff2"
         onChange={(e) => {
           if (e.target.files) {
             onFilesSelected(Array.from(e.target.files));

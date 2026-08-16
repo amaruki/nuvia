@@ -5,7 +5,8 @@
  */
 
 import { db } from "@/db/client";
-import type { MembershipSubscription } from "@/db/schema";
+import { membershipTransaction, type MembershipSubscription } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
 import { BusinessLogicError, NotFoundError } from "@/lib/errors";
 import {
   toMinorUnits,
@@ -14,6 +15,7 @@ import {
 } from "@/lib/payments/gateway";
 import { getTier } from "@/lib/services/membership-tier.service";
 import {
+  activateSubscription,
   cancelSubscription,
   getSubscription,
   markSubscriptionPastDue,
@@ -123,6 +125,49 @@ export async function processVerifiedEvent(
     return { ...base, action: "none", subscriptionId: subscription.id };
   }
 
+  // Charge-level settlement guard (issue #19/#24): before ANY lifecycle runs,
+  // refuse a COMPLETED event whose provider charge already settled. The
+  // settlement-event filter dedupes the fan-out siblings of one delivery, but
+  // a REPLAYED or re-issued checkout.session.completed for the same charge
+  // (different event id) would otherwise re-enter the lifecycle — e.g. renew
+  // the freshly-ACTIVATED row and stack a second entitlement. The ledger has
+  // its own charge dedupe, but that runs AFTER the lifecycle, so it cannot
+  // prevent the stacked row.
+  if (txStatus === "COMPLETED" && event.providerTxId) {
+    const [priorSettlement] = await db
+      .select({ id: membershipTransaction.id })
+      .from(membershipTransaction)
+      .where(
+        and(
+          eq(membershipTransaction.paymentProvider, gateway.provider),
+          eq(membershipTransaction.providerTxId, event.providerTxId),
+          eq(membershipTransaction.status, "COMPLETED"),
+        ),
+      )
+      .limit(1);
+
+    if (priorSettlement) {
+      await db.transaction(async (tx) => {
+        await writeAudit(tx, {
+          userId: liveSubscription.userId,
+          eventType: "WEBHOOK_CHARGE_ALREADY_SETTLED",
+          severity: "WARN",
+          message: `Ignored repeat success event ${context.eventType} (${context.eventId}): charge ${event.providerTxId} already settled`,
+          metadata: {
+            provider: gateway.provider,
+            eventId: context.eventId,
+            eventType: context.eventType,
+            providerTxId: event.providerTxId,
+            priorTransactionId: priorSettlement.id,
+            subscriptionId: liveSubscription.id,
+          },
+          actor,
+        });
+      });
+      return { ...base, action: "none", subscriptionId: subscription.id };
+    }
+  }
+
   // Renewal swaps in a NEW subscription row (ADR-0014), but invoices were
   // issued against the row the member held when billed — reconciliation
   // must accept both ids.
@@ -139,10 +184,20 @@ export async function processVerifiedEvent(
 
   try {
     if (txStatus === "COMPLETED") {
-      const result = await renewSubscription(subscription.id, actor);
-      subscription = result.subscription;
-      applied = result.applied;
-      action = applied ? "renewed" : "recorded";
+      // Join funnel rows start PENDING_PAYMENT (issue #19): the success
+      // webhook ACTIVATES the existing row in place instead of stacking a
+      // renewal on top of it. Entitled rows keep the renewal semantics.
+      if (subscription.status === "PENDING_PAYMENT") {
+        const result = await activateSubscription(subscription.id, actor);
+        subscription = result.subscription;
+        applied = result.applied;
+        action = applied ? "activated" : "recorded";
+      } else {
+        const result = await renewSubscription(subscription.id, actor);
+        subscription = result.subscription;
+        applied = result.applied;
+        action = applied ? "renewed" : "recorded";
+      }
     } else if (txStatus === "FAILED") {
       const result = await markSubscriptionPastDue(subscription.id, actor);
       subscription = result.subscription;

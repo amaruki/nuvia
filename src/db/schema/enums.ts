@@ -17,6 +17,7 @@ export const membershipStatusEnum = pgEnum("MembershipStatus", [
   "PAST_DUE",
   "UNPAID",
   "PAUSED",
+  "PENDING_PAYMENT",
 ]);
 
 export const transactionStatusEnum = pgEnum("TransactionStatus", [

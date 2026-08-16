@@ -28,7 +28,12 @@ export type {
   SubscriptionStatus,
 } from "./types";
 export { getSubscription, listSubscriptions } from "./queries";
-export { cancelSubscription, createSubscription, renewSubscription } from "./mutations";
+export {
+  activateSubscription,
+  cancelSubscription,
+  createSubscription,
+  renewSubscription,
+} from "./mutations";
 export {
   expireSubscription,
   markSubscriptionPastDue,

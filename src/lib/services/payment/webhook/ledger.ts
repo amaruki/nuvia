@@ -5,7 +5,7 @@
  * PRINCIPLES.md "Fast vs. auditable").
  */
 
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { membershipInvoice, membershipPayment, membershipTransaction } from "@/db/schema";
 import type { MembershipSubscription } from "@/db/schema";
@@ -72,15 +72,34 @@ export async function settleWebhookLedger(
   const amount = toAmountString(amountMinor);
 
   return db.transaction(async (tx) => {
-    // Ledger idempotency (issue #24): the settlement carries the webhook
-    // event id in its metadata. If this event already settled a transaction
-    // (e.g. the lifecycle committed but settlement failed afterwards,
-    // releasing the claim so the provider retries), return the existing
-    // settlement instead of writing a second revenue row for one charge.
+    // Ledger idempotency (issue #24): two independent dedupe keys, either of
+    // which returns the existing settlement instead of writing fresh revenue.
+    //
+    // 1. Same webhook event id — the retry path where the lifecycle committed
+    //    but settlement failed afterwards (claim released, provider retries).
+    // 2. Same provider charge (provider + provider_tx_id) — the adversarial
+    //    path: a provider (or a replay) can deliver TWO distinct event ids
+    //    crediting ONE charge. Deduping by event id alone would settle both.
+    //    Scoped to COMPLETED only: failed/pending events legitimately repeat
+    //    (payment retries) and carry informational ledger rows; and completed
+    //    events must never be suppressed by an earlier failed row for the
+    //    same intent. Manual recordPayment rows are unreachable here because
+    //    they carry a different payment_provider or no provider id at all.
+    const dedupeByEvent = sql`${membershipTransaction.metadata}->>'webhookEventId' = ${context.eventId}`;
+    const dedupeConditions =
+      txStatus === "COMPLETED" && event.providerTxId
+        ? [
+            dedupeByEvent,
+            and(
+              eq(membershipTransaction.paymentProvider, gateway.provider),
+              eq(membershipTransaction.providerTxId, event.providerTxId),
+            ),
+          ]
+        : [dedupeByEvent];
     const [existing] = await tx
       .select()
       .from(membershipTransaction)
-      .where(sql`${membershipTransaction.metadata}->>'webhookEventId' = ${context.eventId}`)
+      .where(or(...dedupeConditions))
       .limit(1);
     if (existing) {
       const [existingPayment] = await tx

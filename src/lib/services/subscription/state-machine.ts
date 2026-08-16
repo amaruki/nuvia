@@ -8,6 +8,7 @@
  *   cancel@EOP ─────► (status kept, cancel_at_period_end = true) from ACTIVE | TRIALING
  *   pause ──────────► PAUSED          from ACTIVE
  *   resume ─────────► ACTIVE          from PAUSED
+ *   activate ───────► ACTIVE          from PENDING_PAYMENT (verified checkout webhook)
  *   past-due ───────► PAST_DUE        from ACTIVE | TRIALING (payment failed; grace starts)
  *   expire ─────────► CANCELED        from stale ACTIVE/TRIALING (period ran out; janitor)
  *                     CANCELED        from CANCELED (grace cut short immediately)
@@ -25,17 +26,19 @@ export type LifecycleAction =
   | "cancel-at-period-end"
   | "pause"
   | "resume"
+  | "activate"
   | "mark-past-due"
   | "expire";
 
 const LEGAL_FROM_STATES: Record<LifecycleAction, readonly SubscriptionStatus[]> = {
   renew: ["TRIALING", "ACTIVE", "PAST_DUE"],
-  cancel: ["ACTIVE", "TRIALING", "PAST_DUE", "PAUSED", "UNPAID"],
+  cancel: ["ACTIVE", "TRIALING", "PAST_DUE", "PAUSED", "UNPAID", "PENDING_PAYMENT"],
   "cancel-at-period-end": ["ACTIVE", "TRIALING"],
   pause: ["ACTIVE"],
   resume: ["PAUSED"],
+  activate: ["PENDING_PAYMENT"],
   "mark-past-due": ["ACTIVE", "TRIALING"],
-  expire: ["ACTIVE", "TRIALING", "CANCELED", "PAST_DUE"],
+  expire: ["ACTIVE", "TRIALING", "CANCELED", "PAST_DUE", "PENDING_PAYMENT"],
 };
 
 /**

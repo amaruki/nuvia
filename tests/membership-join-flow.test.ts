@@ -173,7 +173,10 @@ describe("UI-33 stripe join — mocked client, real adapter logic", () => {
     expect(result.paymentStatus).toBe("pending");
     expect(result.checkoutUrl).toBe(`https://checkout.stripe.com/c/pay/cs_test_${fx.RUN_ID}`);
     expect(result.subscription).not.toBeNull();
-    expect(result.subscription?.status).toBe("ACTIVE");
+    // Issue #19: join no longer grants entitlement before payment. The row
+    // exists only so the verified webhook can reference it — PENDING_PAYMENT
+    // derives member status "none" and confers no member role.
+    expect(result.subscription?.status).toBe("PENDING_PAYMENT");
 
     // The mocked SDK received a payment-mode session for the tier price in
     // minor units, echoing the subscription id for the webhook.
@@ -213,14 +216,16 @@ describe("UI-33 stripe join — mocked client, real adapter logic", () => {
       joinGateway?.gateway,
     );
 
-    expect(processed.action).toBe("renewed");
+    expect(processed.action).toBe("activated");
 
-    // Renewal swaps in a NEW row (ADR-0014); the member holds the latest.
+    // Issue #19: activation moves the SAME row PENDING_PAYMENT -> ACTIVE in
+    // place — exactly ONE subscription row, no stacked renewal.
     const rows = await db.query.membershipSubscription.findMany({
       where: eq(membershipSubscription.userId, userId),
       orderBy: desc(membershipSubscription.createdAt),
     });
-    expect(rows.length).toBe(2);
+    expect(rows.length).toBe(1);
+    expect(rows[0].id).toBe(subscriptionId);
     expect(rows[0].status).toBe("ACTIVE");
 
     // The ledger settled with a completed transaction for the tier price.

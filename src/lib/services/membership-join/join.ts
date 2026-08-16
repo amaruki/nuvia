@@ -101,9 +101,12 @@ export async function joinMembership(
   }
 
   // Stripe track: the session metadata must carry the subscription id so the
-  // webhook can renew it — create first, compensate on checkout failure.
+  // webhook can activate it — create first, compensate on checkout failure.
+  // pendingPayment (issue #19): the row starts PENDING_PAYMENT, so an
+  // abandoned checkout grants NOTHING — entitlement arrives only with the
+  // verified checkout.session.completed webhook.
   const { subscription } = await createSubscription(
-    { userId: input.userId, tierId: tier.id, trialDays: 0 },
+    { userId: input.userId, tierId: tier.id, trialDays: 0, pendingPayment: true },
     actor,
   );
 

@@ -91,6 +91,7 @@ export function derivedMemberStatusSql(
       when ${latest.status} = 'CANCELED' and ${latest.currentPeriodEnd} is not null and ${nowIso} <= ${latest.currentPeriodEnd} then 'in_grace'
       when ${latest.status} = 'PAST_DUE' and (${latest.currentPeriodEnd} is null or ${nowIso} <= ${graceEnd}) then 'in_grace'
       when ${latest.status} = 'PAUSED' then 'paused'
+      when ${latest.status} = 'PENDING_PAYMENT' then 'none'
       else 'expired'
     end
   `;

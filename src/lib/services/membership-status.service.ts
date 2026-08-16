@@ -97,6 +97,12 @@ export function deriveMemberStatus(
       return "expired";
     case "PAUSED":
       return "paused";
+    case "PENDING_PAYMENT":
+      // Join funnel created the row so the webhook can reference it, but no
+      // money has been confirmed yet — no entitlement, no grace, no role
+      // (issue #19). The verified checkout.session.completed webhook is the
+      // ONLY path out of this status (activateSubscription).
+      return "none";
     default: {
       // Compile-time exhaustiveness: a new enum value must update the mapping.
       const unhandled: never = subscription.status;

@@ -22,7 +22,7 @@ export interface WebhookEventContext {
 export interface WebhookProcessingResult {
   duplicate: boolean;
   eventId: string;
-  action: "renewed" | "past-due" | "canceled" | "recorded" | "none";
+  action: "renewed" | "activated" | "past-due" | "canceled" | "recorded" | "none";
   subscriptionId: string | null;
   transactionId?: string;
 }

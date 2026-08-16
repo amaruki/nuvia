@@ -158,6 +158,23 @@ export async function expireSubscription(
     });
   }
 
+  // PENDING_PAYMENT — the join funnel's checkout was never confirmed. This is
+  // the janitor path for abandoned checkouts (issue #19): terminate the row
+  // without ever granting entitlement. No money was taken, so there is no
+  // grace and no period to cut short.
+  if (current.status === "PENDING_PAYMENT") {
+    return applyTransition(current, actor, {
+      action: "expire",
+      toStatus: "CANCELED",
+      eventType: "SUBSCRIPTION_EXPIRED",
+      severity: "WARN",
+      message: "Abandoned checkout expired (PENDING_PAYMENT -> CANCELED, no payment confirmed)",
+      // Null the speculative period end: nothing was paid, so the CANCELED
+      // row must derive `expired`, never `in_grace`.
+      extraSets: { canceledAt: now, currentPeriodEnd: null },
+    });
+  }
+
   // PAST_DUE — retries exhausted; UNPAID confers no grace (ADR-0014).
   return applyTransition(current, actor, {
     action: "expire",

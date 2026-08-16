@@ -16,7 +16,9 @@ import { actorFromRequest, problemFromFinanceError } from "../_lib/helpers";
 
 const listQuerySchema = z.object({
   userId: z.string().min(1).optional(),
-  status: z.enum(["ACTIVE", "TRIALING", "CANCELED", "PAST_DUE", "UNPAID", "PAUSED"]).optional(),
+  status: z
+    .enum(["ACTIVE", "TRIALING", "CANCELED", "PAST_DUE", "UNPAID", "PAUSED", "PENDING_PAYMENT"])
+    .optional(),
   tierId: z.string().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(200).default(50),
   offset: z.coerce.number().int().min(0).default(0),

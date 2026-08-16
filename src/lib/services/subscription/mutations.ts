@@ -23,7 +23,7 @@ import type { ActorContext, LifecycleResult, RenewalResult, SubscriptionStatus }
  * (ADR-0014), so an existing live row would be shadowed by this one.
  */
 export async function createSubscription(
-  input: CreateSubscriptionInput,
+  input: CreateSubscriptionInput & { pendingPayment?: boolean },
   actor: ActorContext,
 ): Promise<LifecycleResult> {
   const member = await db.query.user.findFirst({
@@ -61,8 +61,15 @@ export async function createSubscription(
   const trialDays = input.trialDays ?? tier.trialDays;
   const trialEnd =
     input.trialEnd ?? (trialDays > 0 ? new Date(start.getTime() + trialDays * MS_PER_DAY) : null);
-  const status: SubscriptionStatus =
-    trialEnd !== null && trialEnd.getTime() > start.getTime() ? "TRIALING" : "ACTIVE";
+  // The join funnel creates rows PENDING_PAYMENT so the webhook can reference
+  // a subscription id without granting anything yet (issue #19): no
+  // entitlement, no member role, until the verified checkout webhook
+  // activates the row. Admin-created subscriptions start entitled as before.
+  const status: SubscriptionStatus = input.pendingPayment
+    ? "PENDING_PAYMENT"
+    : trialEnd !== null && trialEnd.getTime() > start.getTime()
+      ? "TRIALING"
+      : "ACTIVE";
 
   const subscription = await db.transaction(async (tx) => {
     const [row] = await tx
@@ -102,6 +109,15 @@ export async function createSubscription(
 export async function renewSubscription(
   subscriptionId: string,
   actor: ActorContext,
+  options: {
+    /**
+     * Test seam (adversarial TOCTOU regression only): runs after the
+     * pre-transaction read of the source row and before the transaction
+     * begins, letting a test interleave a competing pause/cancel exactly in
+     * the gap the old code raced on. Never set in production callers.
+     */
+    beforeTransaction?: () => Promise<void>;
+  } = {},
 ): Promise<RenewalResult> {
   const current = await getSubscription(subscriptionId);
   assertTransition("renew", current.status);
@@ -119,17 +135,25 @@ export async function renewSubscription(
       : current.currentPeriodEnd;
   const start = anchor !== null && anchor.getTime() > now.getTime() ? anchor : now;
 
+  await options.beforeTransaction?.();
+
   const outcome = await db.transaction(async (tx) => {
     // Serialize renewals of THIS source row so the read-then-insert below is
     // race-free. Two concurrent renewals of the same source (webhook fan-out
     // firing checkout.session.completed + payment_intent.succeeded +
     // charge.succeeded for ONE charge, or a double-clicked admin renew)
     // queue on this lock.
-    await tx
-      .select({ id: membershipSubscription.id })
+    const [locked] = await tx
+      .select()
       .from(membershipSubscription)
       .where(eq(membershipSubscription.id, current.id))
       .for("update");
+    if (!locked) throw new NotFoundError("MembershipSubscription", subscriptionId);
+
+    // Re-validate under the lock (TOCTOU): the pre-transaction assert ran on
+    // a stale read, so a concurrent pause/cancel/expire that committed first
+    // must veto the renewal here — not slip through on the stale status.
+    assertTransition("renew", locked.status);
 
     // Idempotency guard (issue #24/#20): a source row may produce AT MOST one
     // renewal row. If this source already has one, the event is a duplicate —
@@ -182,6 +206,68 @@ export async function renewSubscription(
 }
 
 /**
+ * Activate a PENDING_PAYMENT subscription in place (issue #19). The join
+ * funnel creates the row pending so the verified checkout webhook can
+ * reference it; THIS transition is the only one that grants the entitlement
+ * (and with it the member role, via the A3 sync). Idempotent: a repeat
+ * success event finds the row already ACTIVE and reports `applied: false`
+ * so the webhook settles no fresh entitlement.
+ */
+export async function activateSubscription(
+  subscriptionId: string,
+  actor: ActorContext,
+): Promise<RenewalResult> {
+  const current = await getSubscription(subscriptionId);
+
+  const outcome = await db.transaction(async (tx) => {
+    // Serialize concurrent success events for the same checkout on this row.
+    const [locked] = await tx
+      .select()
+      .from(membershipSubscription)
+      .where(eq(membershipSubscription.id, subscriptionId))
+      .for("update");
+    if (!locked) throw new NotFoundError("MembershipSubscription", subscriptionId);
+
+    // Idempotent fast path: the row was already activated by a duplicate
+    // event. Nothing moved — report `applied: false`.
+    if (locked.status === "ACTIVE") {
+      return { row: locked, applied: false };
+    }
+    // A checkout that expired or was canceled before payment confirmed must
+    // not come back to life from a late success event. The webhook catch
+    // turns INVALID_TRANSITION into an audit note (money still recorded,
+    // entitlement refused).
+    assertTransition("activate", locked.status);
+
+    const now = new Date();
+    const [row] = await tx
+      .update(membershipSubscription)
+      .set({ status: "ACTIVE", currentPeriodStart: now })
+      .where(eq(membershipSubscription.id, subscriptionId))
+      .returning();
+
+    await writeAudit(tx, {
+      userId: locked.userId,
+      eventType: "SUBSCRIPTION_ACTIVATED",
+      message: "Subscription activated by verified payment (PENDING_PAYMENT -> ACTIVE)",
+      metadata: {
+        subscriptionId,
+        tierId: locked.tierId,
+        fromStatus: "PENDING_PAYMENT",
+        toStatus: "ACTIVE",
+        action: "activate",
+      },
+      actor,
+    });
+
+    return { row, applied: true };
+  });
+
+  const memberSync = await syncMemberStatusFromSubscription(current.userId);
+  return { subscription: outcome.row, member: memberSync, applied: outcome.applied };
+}
+
+/**
  * Cancel. Immediate by default (status -> CANCELED, grace until period end);
  * `atPeriodEnd: true` keeps the subscription running and only sets
  * cancel_at_period_end.
@@ -196,12 +282,21 @@ export async function cancelSubscription(
   assertTransition(atPeriodEnd ? "cancel-at-period-end" : "cancel", current.status);
 
   const subscription = await db.transaction(async (tx) => {
+    // A PENDING_PAYMENT row never had a paid period (issue #19): null the
+    // speculative period end on cancel so the CANCELED row cannot derive
+    // in_grace — nothing was paid, nothing is owed.
+    const clearUnpaidPeriod = current.status === "PENDING_PAYMENT";
     const [row] = await tx
       .update(membershipSubscription)
       .set(
         atPeriodEnd
           ? { cancelAtPeriodEnd: true }
-          : { status: "CANCELED", canceledAt: new Date(), cancelAtPeriodEnd: false },
+          : {
+              status: "CANCELED",
+              canceledAt: new Date(),
+              cancelAtPeriodEnd: false,
+              ...(clearUnpaidPeriod ? { currentPeriodEnd: null } : {}),
+            },
       )
       .where(eq(membershipSubscription.id, subscriptionId))
       .returning();

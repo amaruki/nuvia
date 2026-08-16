@@ -16,9 +16,14 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import { membershipSubscription, membershipTransaction } from "@/db/schema";
+import {
+  membershipInvoice,
+  membershipPayment,
+  membershipSubscription,
+  membershipTransaction,
+} from "@/db/schema";
 import { BusinessLogicError } from "@/lib/errors";
-import { GatewayError } from "@/lib/payments/gateway";
+import { GatewayError, toMinorUnits } from "@/lib/payments/gateway";
 import { processGatewayWebhook } from "@/lib/services/payment.service";
 import { pauseSubscription, renewSubscription } from "@/lib/services/subscription.service";
 import { recordPayment } from "@/lib/services/payment.service";
@@ -164,7 +169,7 @@ describe("money integrity — webhook fan-out and renewal idempotency", () => {
 describe("money integrity — manual payment recording race (#26)", () => {
   test("two concurrent full recordings serialize: exactly one succeeds", async () => {
     const tierId = await createTestTier("mi-record", "MI Record Tier");
-    const { memberId, subscriptionId } = await createTestSubscription(tierId);
+    const { subscriptionId } = await createTestSubscription(tierId);
     const invoice = await createInvoice({ subscriptionId }, actor);
 
     const outcomes = await Promise.allSettled([
@@ -186,11 +191,91 @@ describe("money integrity — manual payment recording race (#26)", () => {
     );
 
     // The invoice is paid exactly once — never overpaid.
-    const [fresh] = await db
+    const [freshInvoice] = await db
+      .select()
+      .from(membershipInvoice)
+      .where(eq(membershipInvoice.id, invoice.id))
+      .limit(1);
+    expect(toMinorUnits(freshInvoice.paidAmount)).toBe(toMinorUnits(invoice.totalAmount));
+
+    const payments = await db
+      .select()
+      .from(membershipPayment)
+      .where(eq(membershipPayment.invoiceId, invoice.id));
+    expect(payments).toHaveLength(1);
+  });
+});
+
+describe("money integrity — adversarial round 1 breaks", () => {
+  test("renewal TOCTOU: a pause committed in the pre-transaction gap vetoes the renewal", async () => {
+    // Deterministic reproduction of the adversarial A7 break: the old code
+    // ran assertTransition on the pre-transaction read, so a pause committed
+    // after the read but before the transaction slipped through and still
+    // stacked a renewal row on a PAUSED subscription.
+    const tierId = await createTestTier("mi-toctou", "MI TOCTOU Tier");
+    const { memberId, subscriptionId } = await createTestSubscription(tierId);
+
+    await expect(
+      renewSubscription(subscriptionId, actor, {
+        beforeTransaction: async () => {
+          await pauseSubscription(subscriptionId, actor);
+        },
+      }),
+    ).rejects.toMatchObject({ code: "INVALID_TRANSITION" });
+
+    // No renewal row may exist for a source that was paused mid-flight.
+    const rows = await db
       .select()
       .from(membershipSubscription)
-      .where(eq(membershipSubscription.userId, memberId))
-      .limit(1);
-    expect(fresh.id).toBe(subscriptionId);
+      .where(eq(membershipSubscription.userId, memberId));
+    expect(rows).toHaveLength(1);
+    expect(rows[0].status).toBe("PAUSED");
+  });
+
+  test("same provider charge, two distinct event ids settles the ledger exactly once", async () => {
+    // Adversarial break: ledger idempotency keyed only on webhookEventId let
+    // two distinct event ids crediting ONE provider charge both settle. The
+    // provider+provider_tx_id dedupe key must return the first settlement.
+    const tierId = await createTestTier("mi-dualsettle", "MI Dual Settle Tier");
+    const { memberId, subscriptionId } = await createTestSubscription(tierId);
+    const charge = `pi_dualsettle_${suffix()}`;
+
+    const evtA = `evt_dual_a_${suffix()}`;
+    trackWebhookEvent("stripe", evtA);
+    const first = await processGatewayWebhook(
+      { providerTxId: charge, providerState: "complete", subscriptionId, raw: { amount: 1200 } },
+      { eventId: evtA, eventType: "checkout.session.completed" },
+      actor,
+      mockedStripe,
+    );
+
+    const evtB = `evt_dual_b_${suffix()}`;
+    trackWebhookEvent("stripe", evtB);
+    const second = await processGatewayWebhook(
+      { providerTxId: charge, providerState: "complete", subscriptionId, raw: { amount: 1200 } },
+      { eventId: evtB, eventType: "checkout.session.completed" },
+      actor,
+      mockedStripe,
+    );
+
+    expect(first.action).toBe("renewed");
+    expect(second.action).toBe("none");
+
+    // Exactly ONE ledger row and ONE renewal row for the whole charge.
+    const ledgers = await db
+      .select()
+      .from(membershipTransaction)
+      .where(eq(membershipTransaction.providerTxId, charge));
+    expect(ledgers).toHaveLength(1);
+    expect(ledgers[0].status).toBe("COMPLETED");
+
+    const rows = await db
+      .select()
+      .from(membershipSubscription)
+      .where(eq(membershipSubscription.userId, memberId));
+    const renewals = rows.filter(
+      (r) => (r.metadata as { renewedFrom?: string } | null)?.renewedFrom === subscriptionId,
+    );
+    expect(renewals).toHaveLength(1);
   });
 });

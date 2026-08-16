@@ -40,3 +40,4 @@ export {
   pauseSubscription,
   resumeSubscription,
 } from "./transitions";
+export { CHECKOUT_ABANDON_HOURS, sweepExpiredSubscriptions } from "./sweeper";

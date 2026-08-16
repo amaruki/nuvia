@@ -127,7 +127,12 @@ export async function expireSubscription(
   const periodEnd = current.currentPeriodEnd;
 
   if (current.status === "ACTIVE" || current.status === "TRIALING") {
-    if (periodEnd === null || now.getTime() <= periodEnd.getTime()) {
+    // TRIALING rows lapse at the trial anchor (trial_end, falling back to
+    // period end) — the same anchor deriveMemberStatus uses — so the raw
+    // status stops drifting from the derived one the moment the trial is
+    // over (issue #15). ACTIVE rows lapse at the period end.
+    const anchor = current.status === "TRIALING" ? (current.trialEnd ?? periodEnd) : periodEnd;
+    if (anchor === null || now.getTime() <= anchor.getTime()) {
       throw new BusinessLogicError(
         "Subscription is still inside its paid period; cancel it instead of expiring it",
         "SUBSCRIPTION_STILL_ENTITLED",

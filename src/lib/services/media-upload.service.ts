@@ -11,12 +11,20 @@
  * points clients at the API route, not at a disk path).
  */
 import { createHash, randomUUID } from "node:crypto";
-import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
+import { readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
+import {
+  UPLOAD_DIR,
+  appendManifestRecord,
+  ensureUploadDir,
+  listManifestRecords,
+  removeManifestRecord,
+  type MediaUploadRecord,
+} from "./media-manifest-store";
 
-export const UPLOAD_DIR = path.join(process.cwd(), "storage", "uploads");
-const MANIFEST_PATH = path.join(UPLOAD_DIR, "manifest.json");
 const MAX_FILENAME_LENGTH = 120;
+
+export { UPLOAD_DIR, type MediaUploadRecord } from "./media-manifest-store";
 
 /** 25 MB per file — generous for documents, small enough for local disk. */
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
@@ -46,24 +54,6 @@ const SCRIPT_CAPABLE_CONTENT_TYPES = new Set(["image/svg+xml", "image/svg"]);
 /** True when a content type must never be rendered inline as a document. */
 export function isScriptCapableContentType(contentType: string): boolean {
   return SCRIPT_CAPABLE_CONTENT_TYPES.has(contentType.toLowerCase());
-}
-
-export interface MediaUploadRecord {
-  id: string;
-  /** Storage-safe file name inside UPLOAD_DIR. */
-  filename: string;
-  /** Name the client sent. */
-  originalName: string;
-  contentType: string;
-  size: number;
-  /** sha256 of the stored bytes. */
-  checksum: string;
-  /** Absolute path on disk. */
-  storagePath: string;
-  /** Route clients use to fetch the bytes. */
-  url: string;
-  uploadedBy: string;
-  uploadedAt: string;
 }
 
 export class MediaUploadError extends Error {
@@ -119,29 +109,6 @@ export function sanitizeFilename(name: string): string {
   return cleaned || "upload";
 }
 
-async function ensureUploadDir(): Promise<void> {
-  await mkdir(UPLOAD_DIR, { recursive: true });
-}
-
-async function readManifest(): Promise<MediaUploadRecord[]> {
-  try {
-    const raw = await readFile(MANIFEST_PATH, "utf8");
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as MediaUploadRecord[]) : [];
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
-    throw error;
-  }
-}
-
-/** Atomic-ish manifest write: temp file + rename so readers never see JSON. */
-async function writeManifest(records: MediaUploadRecord[]): Promise<void> {
-  await ensureUploadDir();
-  const tmpPath = `${MANIFEST_PATH}.tmp`;
-  await writeFile(tmpPath, JSON.stringify(records, null, 2), "utf8");
-  await rename(tmpPath, MANIFEST_PATH);
-}
-
 /**
  * Persist one uploaded file to local disk and record it in the manifest.
  */
@@ -179,14 +146,18 @@ export async function saveUpload(file: File, uploadedBy: string): Promise<MediaU
     uploadedAt: new Date().toISOString(),
   };
 
-  const records = await readManifest();
-  records.push(record);
-  await writeManifest(records);
-  return record;
+  try {
+    await appendManifestRecord(record);
+    return record;
+  } catch (error) {
+    // Do not leave bytes that no manifest row can reach.
+    await unlink(storagePath).catch(() => undefined);
+    throw error;
+  }
 }
 
 export async function listUploads(): Promise<MediaUploadRecord[]> {
-  const records = await readManifest();
+  const records = await listManifestRecords();
   return records.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt));
 }
 
@@ -238,7 +209,7 @@ export async function listUploadsPaged(query: MediaListQuery): Promise<PagedMedi
 }
 
 export async function getUpload(id: string): Promise<MediaUploadRecord> {
-  const records = await readManifest();
+  const records = await listManifestRecords();
   const record = records.find((entry) => entry.id === id);
   if (!record) throw MediaUploadError.notFound();
   return record;
@@ -256,11 +227,9 @@ export async function readUploadBytes(record: MediaUploadRecord): Promise<Buffer
 }
 
 export async function deleteUpload(id: string): Promise<MediaUploadRecord> {
-  const records = await readManifest();
-  const record = records.find((entry) => entry.id === id);
+  const record = await removeManifestRecord(id);
   if (!record) throw MediaUploadError.notFound();
 
-  await writeManifest(records.filter((entry) => entry.id !== id));
   try {
     await unlink(record.storagePath);
   } catch (error) {

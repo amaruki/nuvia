@@ -125,10 +125,24 @@ export async function POST(request: NextRequest) {
     let newRole;
 
     try {
-      [newRole] = await db
-        .insert(customRole)
-        .values({ name, description, permissions, isSystem: false })
-        .returning();
+      newRole = await db.transaction(async (tx) => {
+        const [created] = await tx
+          .insert(customRole)
+          .values({ name, description, permissions, isSystem: false })
+          .returning();
+
+        await tx.insert(authLog).values({
+          userId: auth.user!.id,
+          eventType: "ROLE_CREATED",
+          severity: "INFO",
+          message: `Custom role "${name}" created with ${permissions.length} permission(s)`,
+          ipAddress: resolveClientIp(request.headers),
+          userAgent: request.headers.get("user-agent") || "unknown",
+          metadata: { roleName: name, permissions },
+        });
+
+        return created;
+      });
     } catch (insertError) {
       // Unique-constraint race between the existence check and the insert.
       if ((insertError as { code?: string })?.code === "23505") {
@@ -139,20 +153,6 @@ export async function POST(request: NextRequest) {
 
       throw insertError;
     }
-
-    await db.insert(authLog).values({
-      userId: auth.user!.id,
-      eventType: "ROLE_CREATED",
-      severity: "INFO",
-      message: `Custom role "${name}" created with ${permissions.length} permission(s)`,
-      // Issue #3: trusted-hop resolution (raw leftmost XFF read was the bug).
-      ipAddress: resolveClientIp(request.headers),
-      userAgent: request.headers.get("user-agent") || "unknown",
-      metadata: {
-        roleName: name,
-        permissions,
-      },
-    });
 
     return successResponse({ role: newRole });
   } catch (error) {

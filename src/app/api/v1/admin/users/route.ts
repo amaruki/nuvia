@@ -178,25 +178,39 @@ export async function POST(request: NextRequest) {
     let newUser;
 
     try {
-      [newUser] = await db
-        .insert(user)
-        .values({
-          username,
-          email,
-          name,
-          role,
-          passwordHash,
-          emailVerified: false,
-        })
-        .returning({
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
+      newUser = await db.transaction(async (tx) => {
+        const [created] = await tx
+          .insert(user)
+          .values({
+            username,
+            email,
+            name,
+            role,
+            passwordHash,
+            emailVerified: false,
+          })
+          .returning({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+          });
+
+        await tx.insert(authLog).values({
+          userId: created.id,
+          eventType: "USER_CREATED",
+          severity: "INFO",
+          message: `User created with role ${role}`,
+          ipAddress: resolveClientIp(request.headers),
+          userAgent: request.headers.get("user-agent") || "unknown",
+          metadata: { createdBy: auth.user!.id, role },
         });
+
+        return created;
+      });
     } catch (insertError) {
       // Unique-constraint race between the existence check above and the
       // insert. Postgres code 23505 = unique_violation.
@@ -206,20 +220,6 @@ export async function POST(request: NextRequest) {
 
       throw insertError;
     }
-
-    await db.insert(authLog).values({
-      userId: newUser.id,
-      eventType: "USER_CREATED",
-      severity: "INFO",
-      message: `User created with role ${role}`,
-      // Issue #3: trusted-hop resolution (raw leftmost XFF read was the bug).
-      ipAddress: resolveClientIp(request.headers),
-      userAgent: request.headers.get("user-agent") || "unknown",
-      metadata: {
-        createdBy: auth.user!.id,
-        role,
-      },
-    });
 
     return successResponse({ user: newUser });
   } catch (error) {

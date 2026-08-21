@@ -5,8 +5,8 @@
  *
  * NO_SHOW was a dead enum value: the dashboard rendered a badge for it and
  * cancel treated it as a recorded outcome, but nothing ever wrote it. The
- * mutation mirrors cancel's seat accounting — a no-show frees the seat the
- * confirmed registrant held and promotes the longest-waiting waitlist row.
+ * The mutation runs only after the event and reconciles attendance without
+ * promoting a waitlisted person into an event that has ended.
  *
  * Fixtures and FK-order teardown live in ./helpers.ts. Requires
  * DATABASE_URL to point at a reachable Postgres instance.
@@ -22,6 +22,7 @@ import {
   cleanupTrackedRows,
   createCategory,
   createUser,
+  endEvent,
   fetchEventCounters,
   fetchRegistrationStatus,
   inWindowTimes,
@@ -41,6 +42,7 @@ describe("markNoShowRegistration — the service core behind POST .../registrati
 
     const { registration } = await createRegistration(dto.id, attendeeId);
     trackRegistration(registration.id);
+    await endEvent(dto.id);
 
     const { registration: noShow, promoted } = await markNoShowRegistration(
       dto.id,
@@ -53,7 +55,7 @@ describe("markNoShowRegistration — the service core behind POST .../registrati
     expect(await fetchRegistrationStatus(registration.id)).toBe("NO_SHOW");
   });
 
-  test("promotes the longest-waiting registration into the freed seat", async () => {
+  test("does not promote waitlisted attendees after the event", async () => {
     const organizerId = await createUser("organizer");
     const firstAttendeeId = await createUser("attendee");
     const secondAttendeeId = await createUser("attendee");
@@ -65,13 +67,30 @@ describe("markNoShowRegistration — the service core behind POST .../registrati
     const { registration: firstWaitlisted } = await createRegistration(dto.id, secondAttendeeId);
     const { registration: secondWaitlisted } = await createRegistration(dto.id, thirdAttendeeId);
     [confirmed.id, firstWaitlisted.id, secondWaitlisted.id].forEach(trackRegistration);
+    await endEvent(dto.id);
 
     const { promoted } = await markNoShowRegistration(dto.id, confirmed.id);
 
-    expect(promoted?.id).toBe(firstWaitlisted.id);
-    expect(promoted?.status).toBe("CONFIRMED");
+    expect(promoted).toBeNull();
+    expect(await fetchRegistrationStatus(firstWaitlisted.id)).toBe("WAITLISTED");
     expect(await fetchRegistrationStatus(secondWaitlisted.id)).toBe("WAITLISTED");
-    expect(await fetchEventCounters(dto.id)).toEqual({ registeredCount: 1, waitlistCount: 1 });
+    expect(await fetchEventCounters(dto.id)).toEqual({ registeredCount: 0, waitlistCount: 2 });
+  });
+
+  test("rejects a no-show before the event ends", async () => {
+    const organizerId = await createUser("organizer");
+    const attendeeId = await createUser("attendee");
+    const category = await createCategory("noshow");
+    const dto = await seedEvent(organizerId, category.name);
+
+    const { registration } = await createRegistration(dto.id, attendeeId);
+    trackRegistration(registration.id);
+
+    const error = await markNoShowRegistration(dto.id, registration.id).catch((err) => err);
+    expect(error).toBeInstanceOf(RegistrationServiceError);
+    expect(problemStatus(error)).toBe(400);
+    expect(await fetchRegistrationStatus(registration.id)).toBe("CONFIRMED");
+    expect(await fetchEventCounters(dto.id)).toEqual({ registeredCount: 1, waitlistCount: 0 });
   });
 
   test("rejects marking the same registration twice with 409", async () => {
@@ -82,6 +101,7 @@ describe("markNoShowRegistration — the service core behind POST .../registrati
 
     const { registration } = await createRegistration(dto.id, attendeeId);
     trackRegistration(registration.id);
+    await endEvent(dto.id);
     await markNoShowRegistration(dto.id, registration.id);
 
     const error = await markNoShowRegistration(dto.id, registration.id).catch((err) => err);

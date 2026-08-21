@@ -4,24 +4,21 @@
  *
  * Before this mutation existed, `NO_SHOW` was a dead enum value: the
  * dashboard rendered a badge for it and cancel treated it as a recorded
- * outcome, but nothing ever wrote it. A no-show releases the seat the
- * confirmed registrant held, so this mirrors cancel's seat accounting:
- * `registeredCount` is decremented (floor 0) and the longest-waiting
- * WAITLISTED row is promoted into the freed seat when one exists.
+ * outcome, but nothing ever wrote it. This post-event reconciliation lowers
+ * `registeredCount`. It does not promote the waitlist after the event ends.
  */
 
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { event, eventRegistration } from "@/db/schema";
 import { problem, problems } from "@/lib/http";
 import { toEventDto, type EventDto } from "../event-write";
 import { RegistrationServiceError } from "./errors";
 import { toRegistrationDto } from "./mappers";
-import type { DbRegistrationStatus, RegistrationDto } from "./types";
+import type { RegistrationDto } from "./types";
 
 /**
- * Admin no-show: marks a CONFIRMED registration as NO_SHOW and releases
- * its seat (promoting the waitlist, exactly like cancel does).
+ * Admin no-show: mark a confirmed registration after the event ends.
  */
 export async function markNoShowRegistration(
   eventId: string,
@@ -65,6 +62,16 @@ export async function markNoShowRegistration(
     if (!eventRow) {
       throw new RegistrationServiceError(problems.notFound(`Event ${eventId} not found`));
     }
+    if (eventRow.endTime.getTime() > Date.now()) {
+      throw new RegistrationServiceError(
+        problem(
+          "business-logic-error",
+          400,
+          "Business logic error",
+          "An attendee can be marked as a no-show only after the event ends",
+        ),
+      );
+    }
 
     const [marked] = await tx
       .update(eventRegistration)
@@ -72,42 +79,13 @@ export async function markNoShowRegistration(
       .where(eq(eventRegistration.id, registration.id))
       .returning();
 
-    // A no-show frees the seat the confirmed registrant held. Mirror the
-    // cancel path: decrement with a floor, then promote the waitlist.
+    // Reconcile the final attendance count. The event is over, so waitlisted
+    // attendees must not be promoted into a seat they can no longer use.
     await tx
       .update(event)
       .set({ registeredCount: sql`GREATEST(${event.registeredCount} - 1, 0)` })
       .where(eq(event.id, eventId));
 
-    let promoted: RegistrationDto | null = null;
-    const [next] = await tx
-      .select()
-      .from(eventRegistration)
-      .where(
-        and(eq(eventRegistration.eventId, eventId), eq(eventRegistration.status, "WAITLISTED")),
-      )
-      .orderBy(asc(eventRegistration.registeredAt), asc(eventRegistration.id))
-      .limit(1);
-
-    if (next) {
-      const promotedStatus: DbRegistrationStatus = eventRow.requiresApproval
-        ? "PENDING"
-        : "CONFIRMED";
-      const [promotedRow] = await tx
-        .update(eventRegistration)
-        .set({ status: promotedStatus })
-        .where(eq(eventRegistration.id, next.id))
-        .returning();
-      await tx
-        .update(event)
-        .set({
-          waitlistCount: sql`GREATEST(${event.waitlistCount} - 1, 0)`,
-          registeredCount: sql`${event.registeredCount} + 1`,
-        })
-        .where(eq(event.id, eventId));
-      promoted = toRegistrationDto(promotedRow);
-    }
-
-    return { registration: toRegistrationDto(marked), event: toEventDto(eventRow), promoted };
+    return { registration: toRegistrationDto(marked), event: toEventDto(eventRow), promoted: null };
   });
 }

@@ -104,6 +104,17 @@ export function inWindowTimes(now: Date = new Date()): Partial<CreateEventInput>
   };
 }
 
+/** Move a seeded event into the past after registration setup is complete. */
+export async function endEvent(eventId: string, now: Date = new Date()): Promise<void> {
+  await db
+    .update(event)
+    .set({
+      startTime: new Date(now.getTime() - 2 * 60 * 60 * 1000),
+      endTime: new Date(now.getTime() - 60 * 60 * 1000),
+    })
+    .where(eq(event.id, eventId));
+}
+
 /** Creates an event through the write service and tracks it for cleanup. */
 export async function seedEvent(
   organizerId: string,

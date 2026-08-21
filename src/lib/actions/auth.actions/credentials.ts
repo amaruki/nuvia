@@ -51,11 +51,6 @@ export async function loginAction(formData: FormData): Promise<AuthResponse> {
         message: "Login successful",
         data: {
           user: transformUserToSafeUser(result.user),
-          session: {
-            accessToken: result.token,
-            refreshToken: result.token, // Better Auth might use the same token
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-          },
         },
       };
     } catch (signInError) {

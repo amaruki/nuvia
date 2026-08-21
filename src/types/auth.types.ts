@@ -146,11 +146,6 @@ export type AuthResponse = {
   message: string;
   data?: {
     user: SafeUser;
-    session?: {
-      accessToken: string;
-      refreshToken: string;
-      expiresAt: Date;
-    };
   };
   errors?: Record<string, string[]>;
   meta?: {

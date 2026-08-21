@@ -5,7 +5,7 @@
  * "finance"); this is a structural translation, not a wired integration.
  */
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -15,6 +15,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import {
   membershipStatusEnum,
@@ -52,30 +53,38 @@ export const membershipTier = pgTable("membership_tiers", {
     .$onUpdate(() => new Date()),
 });
 
-export const membershipSubscription = pgTable("membership_subscriptions", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  tierId: text("tier_id")
-    .notNull()
-    .references(() => membershipTier.id),
-  status: membershipStatusEnum("status").notNull(),
-  currentPeriodStart: timestamp("current_period_start", { withTimezone: true }).notNull(),
-  currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
-  trialStart: timestamp("trial_start", { withTimezone: true }),
-  trialEnd: timestamp("trial_end", { withTimezone: true }),
-  cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
-  canceledAt: timestamp("canceled_at", { withTimezone: true }),
-  metadata: jsonb("metadata"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-});
+export const membershipSubscription = pgTable(
+  "membership_subscriptions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    tierId: text("tier_id")
+      .notNull()
+      .references(() => membershipTier.id),
+    status: membershipStatusEnum("status").notNull(),
+    currentPeriodStart: timestamp("current_period_start", { withTimezone: true }).notNull(),
+    currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
+    trialStart: timestamp("trial_start", { withTimezone: true }),
+    trialEnd: timestamp("trial_end", { withTimezone: true }),
+    cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+    canceledAt: timestamp("canceled_at", { withTimezone: true }),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    uniqueIndex("membership_subscriptions_one_pending_per_user")
+      .on(table.userId)
+      .where(sql`${table.status} = 'PENDING_PAYMENT'`),
+  ],
+);
 
 export const membershipTransaction = pgTable("membership_transactions", {
   id: text("id")

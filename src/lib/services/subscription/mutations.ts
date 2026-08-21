@@ -43,20 +43,6 @@ export async function createSubscription(
     );
   }
 
-  const live = await db.query.membershipSubscription.findFirst({
-    where: and(
-      eq(membershipSubscription.userId, input.userId),
-      inArray(membershipSubscription.status, [...LIVE_STATUSES]),
-    ),
-    orderBy: desc(membershipSubscription.createdAt),
-  });
-  if (live) {
-    throw new BusinessLogicError(
-      "User already has a live subscription",
-      "SUBSCRIPTION_ALREADY_ACTIVE",
-    );
-  }
-
   const start = input.startDate ?? new Date();
   const trialDays = input.trialDays ?? tier.trialDays;
   const trialEnd =
@@ -72,6 +58,29 @@ export async function createSubscription(
       : "ACTIVE";
 
   const subscription = await db.transaction(async (tx) => {
+    // Serialize initial subscription creation per user. The pending-payment
+    // index is the database backstop for checkout requests, while this lock
+    // also protects the application-level live-status invariant.
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtext(${`nuvia:subscription:${input.userId}`}))`,
+    );
+
+    const existing = await tx.query.membershipSubscription.findFirst({
+      where: and(
+        eq(membershipSubscription.userId, input.userId),
+        inArray(membershipSubscription.status, [...LIVE_STATUSES, "PENDING_PAYMENT"]),
+      ),
+      orderBy: desc(membershipSubscription.createdAt),
+    });
+    if (existing) {
+      throw new BusinessLogicError(
+        existing.status === "PENDING_PAYMENT"
+          ? "User already has a payment checkout in progress"
+          : "User already has a live subscription",
+        "SUBSCRIPTION_ALREADY_ACTIVE",
+      );
+    }
+
     const [row] = await tx
       .insert(membershipSubscription)
       .values({

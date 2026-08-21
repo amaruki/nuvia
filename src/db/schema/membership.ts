@@ -5,7 +5,7 @@
  * "finance"); this is a structural translation, not a wired integration.
  */
 
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -66,6 +66,7 @@ export const membershipSubscription = pgTable(
       .notNull()
       .references(() => membershipTier.id),
     status: membershipStatusEnum("status").notNull(),
+    pendingPaymentGuard: text("pending_payment_guard"),
     currentPeriodStart: timestamp("current_period_start", { withTimezone: true }).notNull(),
     currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
     trialStart: timestamp("trial_start", { withTimezone: true }),
@@ -80,9 +81,7 @@ export const membershipSubscription = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
-    uniqueIndex("membership_subscriptions_one_pending_per_user")
-      .on(table.userId)
-      .where(sql`${table.status} = 'PENDING_PAYMENT'`),
+    uniqueIndex("membership_subscriptions_one_pending_per_user").on(table.pendingPaymentGuard),
   ],
 );
 

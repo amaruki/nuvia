@@ -1797,6 +1797,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "pending_payment_guard": {
+          "name": "pending_payment_guard",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "current_period_start": {
           "name": "current_period_start",
           "type": "timestamp with time zone",
@@ -1860,14 +1866,13 @@
           "name": "membership_subscriptions_one_pending_per_user",
           "columns": [
             {
-              "expression": "user_id",
+              "expression": "pending_payment_guard",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
           "isUnique": true,
-          "where": "\"membership_subscriptions\".\"status\" = 'PENDING_PAYMENT'",
           "concurrently": false,
           "method": "btree",
           "with": {}

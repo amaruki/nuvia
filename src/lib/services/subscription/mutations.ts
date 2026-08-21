@@ -87,6 +87,7 @@ export async function createSubscription(
         userId: input.userId,
         tierId: tier.id,
         status,
+        pendingPaymentGuard: status === "PENDING_PAYMENT" ? input.userId : null,
         currentPeriodStart: start,
         currentPeriodEnd: periodEndFor(tier.billingCycle, start),
         trialStart: trialEnd !== null ? start : null,
@@ -251,7 +252,7 @@ export async function activateSubscription(
     const now = new Date();
     const [row] = await tx
       .update(membershipSubscription)
-      .set({ status: "ACTIVE", currentPeriodStart: now })
+      .set({ status: "ACTIVE", currentPeriodStart: now, pendingPaymentGuard: null })
       .where(eq(membershipSubscription.id, subscriptionId))
       .returning();
 
@@ -304,6 +305,7 @@ export async function cancelSubscription(
               status: "CANCELED",
               canceledAt: new Date(),
               cancelAtPeriodEnd: false,
+              pendingPaymentGuard: null,
               ...(clearUnpaidPeriod ? { currentPeriodEnd: null } : {}),
             },
       )

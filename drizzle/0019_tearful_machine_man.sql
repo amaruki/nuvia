@@ -7,7 +7,7 @@ WITH ranked_pending AS (
       ORDER BY "created_at" DESC, "id" DESC
     ) AS position
   FROM "membership_subscriptions"
-  WHERE "status" = 'PENDING_PAYMENT'
+  WHERE "status"::text = 'PENDING_PAYMENT'
 )
 UPDATE "membership_subscriptions"
 SET
@@ -18,6 +18,11 @@ WHERE "id" IN (
   SELECT "id" FROM ranked_pending WHERE position > 1
 );
 --> statement-breakpoint
+ALTER TABLE "membership_subscriptions" ADD COLUMN "pending_payment_guard" text;
+--> statement-breakpoint
+UPDATE "membership_subscriptions"
+SET "pending_payment_guard" = "user_id"
+WHERE "status"::text = 'PENDING_PAYMENT';
+--> statement-breakpoint
 CREATE UNIQUE INDEX "membership_subscriptions_one_pending_per_user"
-  ON "membership_subscriptions" USING btree ("user_id")
-  WHERE "membership_subscriptions"."status" = 'PENDING_PAYMENT';
+  ON "membership_subscriptions" USING btree ("pending_payment_guard");

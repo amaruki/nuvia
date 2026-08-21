@@ -176,7 +176,7 @@ export async function expireSubscription(
       message: "Abandoned checkout expired (PENDING_PAYMENT -> CANCELED, no payment confirmed)",
       // Null the speculative period end: nothing was paid, so the CANCELED
       // row must derive `expired`, never `in_grace`.
-      extraSets: { canceledAt: now, currentPeriodEnd: null },
+      extraSets: { canceledAt: now, currentPeriodEnd: null, pendingPaymentGuard: null },
     });
   }
 

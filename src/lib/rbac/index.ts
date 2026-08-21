@@ -27,5 +27,6 @@ export {
   checkRoleAssignable,
   changeUserRole,
   isLastSuperadmin,
+  runUnlessLastSuperadmin,
 } from "./role-assignment";
 export { getRoleStatistics, getAllRoles, getUserPermissions } from "./role-queries";

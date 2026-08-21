@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { APIError } from "better-auth/api";
 import { auth } from "@/lib/auth";
 import { resolveClientIp } from "@/lib/client-ip";
-import { isLastSuperadmin } from "@/lib/rbac";
+import { runUnlessLastSuperadmin } from "@/lib/rbac";
 import { logError } from "@/lib/errors";
 import { problem, problemResponse, problems, successResponse } from "@/lib/http";
 
@@ -16,11 +16,17 @@ export async function DELETE(request: NextRequest) {
       return problemResponse(problems.authenticationRequired());
     }
 
-    // Lockout guard: the only superadmin deleting their own account would
-    // leave the deployment with no account able to grant the superadmin
-    // role again — a permanent lockout of user management. A second
-    // superadmin must exist first.
-    if (await isLastSuperadmin(session.user.id)) {
+    const body = await request.json().catch(() => ({}));
+    const password = typeof body?.password === "string" ? body.password : undefined;
+
+    const deletion = await runUnlessLastSuperadmin(session.user.id, () =>
+      auth.api.deleteUser({
+        headers: request.headers,
+        body: password ? { password } : {},
+      }),
+    );
+
+    if (!deletion.allowed) {
       return problemResponse(
         problem(
           "last-superadmin",
@@ -31,19 +37,6 @@ export async function DELETE(request: NextRequest) {
         ),
       );
     }
-
-    const body = await request.json().catch(() => ({}));
-    const password = typeof body?.password === "string" ? body.password : undefined;
-
-    // auth.api.deleteUser hard-deletes the user row (cascades to sessions,
-    // accounts, active devices, login activity, password reset tokens, and
-    // role-change history), revokes every session, and clears the session
-    // cookie. Requires either a password or a session created recently
-    // enough to count as "fresh" (better-auth's own freshAge check).
-    await auth.api.deleteUser({
-      headers: request.headers,
-      body: password ? { password } : {},
-    });
 
     return successResponse(null, { message: "Account deleted successfully" });
   } catch (error) {

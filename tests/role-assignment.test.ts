@@ -2,7 +2,13 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { eq, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import { authLog, customRole, user } from "@/db/schema";
-import { canAssignRole, canGrantPermissions, changeUserRole, isLastSuperadmin } from "@/lib/rbac";
+import {
+  canAssignRole,
+  canGrantPermissions,
+  changeUserRole,
+  isLastSuperadmin,
+  runUnlessLastSuperadmin,
+} from "@/lib/rbac";
 import type { Permission } from "@/types/role";
 
 const createdUserIds: string[] = [];
@@ -229,6 +235,23 @@ describe("changeUserRole enforcement", () => {
     const restore = await changeUserRole(secondId, "superadmin", firstId);
     expect(restore.success).toBe(true);
   });
+
+  test("concurrent mutual demotions preserve one superadmin", async () => {
+    const firstId = await createTestUser("superadmin");
+    const secondId = await createTestUser("superadmin");
+
+    const results = await Promise.all([
+      changeUserRole(firstId, "admin", secondId),
+      changeUserRole(secondId, "admin", firstId),
+    ]);
+    const rows = await db
+      .select({ role: user.role })
+      .from(user)
+      .where(inArray(user.id, [firstId, secondId]));
+
+    expect(results.filter((result) => result.success)).toHaveLength(1);
+    expect(rows.filter((row) => row.role === "superadmin")).toHaveLength(1);
+  });
 });
 
 describe("isLastSuperadmin (lockout guard)", () => {
@@ -242,5 +265,22 @@ describe("isLastSuperadmin (lockout guard)", () => {
 
     const memberId = await createTestUser("member");
     expect(await isLastSuperadmin(memberId)).toBe(false);
+  });
+
+  test("concurrent destructive operations preserve one superadmin", async () => {
+    const firstId = await createTestUser("superadmin");
+    const secondId = await createTestUser("superadmin");
+
+    const results = await Promise.all([
+      runUnlessLastSuperadmin(firstId, () => db.delete(user).where(eq(user.id, firstId))),
+      runUnlessLastSuperadmin(secondId, () => db.delete(user).where(eq(user.id, secondId))),
+    ]);
+    const rows = await db
+      .select({ id: user.id })
+      .from(user)
+      .where(inArray(user.id, [firstId, secondId]));
+
+    expect(results.filter((result) => result.allowed)).toHaveLength(1);
+    expect(rows).toHaveLength(1);
   });
 });

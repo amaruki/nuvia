@@ -7,7 +7,7 @@
  * guard.
  */
 
-import { count, eq } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { authLog, user } from "@/db/schema";
 import { logger } from "@/lib/logger";
@@ -17,11 +17,13 @@ import {
   Permission,
   ROLE_PERMISSIONS,
   Role,
+  canManageRole,
   getRoleLevel,
   isPredefinedRole,
 } from "@/types/role";
-import { canManageUserRole } from "./role-checks";
 import { getUserPermissions } from "./role-queries";
+
+const SUPERADMIN_INVARIANT_LOCK = "nuvia:superadmin-invariant";
 
 /**
  * Pure role-assignment rule. Answers one question: given the assigner's
@@ -136,73 +138,76 @@ export async function changeUserRole(
   error?: string;
 }> {
   try {
-    // Validate that the changer can manage the target user's role
-    const canManage = await canManageUserRole(changedBy, targetUserId);
+    const result = await db.transaction(async (tx) => {
+      // Serialize every role mutation with account deletion. The count and
+      // mutation must share this lock or two concurrent demotions can both
+      // observe two superadmins and remove the final two accounts.
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${SUPERADMIN_INVARIANT_LOCK}))`);
 
-    if (!canManage) {
-      return {
-        success: false,
-        error: "INSUFFICIENT_PERMISSIONS",
-      };
-    }
-
-    // Get current role for audit
-    const targetUser = await db.query.user.findFirst({
-      where: eq(user.id, targetUserId),
-      columns: { role: true },
-    });
-
-    if (!targetUser) {
-      return {
-        success: false,
-        error: "USER_NOT_FOUND",
-      };
-    }
-
-    // If role is the same, no change needed
-    if (targetUser.role === newRole) {
-      return {
-        success: true,
-      };
-    }
-
-    // The assigner must also outrank the *new* role — not just the
-    // target's current one. Before this check existed, an admin could
-    // promote anyone to superadmin: canManageUserRole only compared the
-    // assigner against the target's current role.
-    const assignable = await checkRoleAssignable(changedBy, newRole);
-
-    if (!assignable.valid) {
-      return {
-        success: false,
-        error: assignable.error,
-      };
-    }
-
-    // Lockout guard: never demote the only superadmin. On today's paths
-    // this check cannot fire — only a superadmin can demote a superadmin,
-    // so two exist while the change runs — but changeUserRole is the
-    // single role-mutation gate, and any future caller (self-service
-    // demotion, a system process) gets the protection for free.
-    if (targetUser.role === "superadmin") {
-      const [superadminCount] = await db
-        .select({ value: count() })
+      const [targetUser] = await tx
+        .select({ role: user.role })
         .from(user)
-        .where(eq(user.role, "superadmin"));
+        .where(eq(user.id, targetUserId))
+        .for("update")
+        .limit(1);
+      if (!targetUser) return { success: false, error: "USER_NOT_FOUND", changed: false };
 
-      if (superadminCount.value <= 1) {
-        return {
-          success: false,
-          error: "LAST_SUPERADMIN",
-        };
+      const [assigner] = await tx
+        .select({ role: user.role })
+        .from(user)
+        .where(eq(user.id, changedBy))
+        .limit(1);
+      if (
+        !assigner ||
+        changedBy === targetUserId ||
+        !canManageRole(assigner.role as Role, targetUser.role as Role)
+      ) {
+        return { success: false, error: "INSUFFICIENT_PERMISSIONS", changed: false };
       }
-    }
 
-    // Update the role and write the audit entry in one transaction — the
-    // original Prisma version ran these as two separate, un-transacted
-    // statements, so a failure between them could silently drop the audit
-    // trail. See docs/adr/0009-security-hardening-p0.md.
-    await db.transaction(async (tx) => {
+      if (targetUser.role === newRole) return { success: true, changed: false };
+
+      let newRolePermissions: Permission[];
+      if (isPredefinedRole(newRole)) {
+        newRolePermissions = ROLE_PERMISSIONS[newRole];
+      } else {
+        const customRoleRecord = await tx.query.customRole.findFirst({
+          where: (table, { eq: eqOp }) => eqOp(table.name, newRole),
+          columns: { permissions: true, isActive: true },
+        });
+        if (!customRoleRecord?.isActive) {
+          return { success: false, error: "INVALID_ROLE", changed: false };
+        }
+        newRolePermissions = customRoleRecord.permissions as Permission[];
+      }
+
+      let assignerPermissions: Permission[];
+      if (isPredefinedRole(assigner.role as Role)) {
+        assignerPermissions = ROLE_PERMISSIONS[assigner.role as PredefinedRole];
+      } else {
+        const assignerRoleRecord = await tx.query.customRole.findFirst({
+          where: (table, { eq: eqOp }) => eqOp(table.name, assigner.role),
+          columns: { permissions: true, isActive: true },
+        });
+        assignerPermissions = assignerRoleRecord?.isActive
+          ? (assignerRoleRecord.permissions as Permission[])
+          : [];
+      }
+
+      if (!canAssignRole(assigner.role as Role, assignerPermissions, newRole, newRolePermissions)) {
+        return { success: false, error: "ROLE_NOT_ASSIGNABLE", changed: false };
+      }
+
+      if (targetUser.role === "superadmin") {
+        const [superadminCount] = await tx
+          .select({ value: count() })
+          .from(user)
+          .where(eq(user.role, "superadmin"));
+        if (superadminCount.value <= 1) {
+          return { success: false, error: "LAST_SUPERADMIN", changed: false };
+        }
+      }
+
       await tx.update(user).set({ role: newRole }).where(eq(user.id, targetUserId));
 
       await tx.insert(authLog).values({
@@ -219,7 +224,11 @@ export async function changeUserRole(
           reason,
         },
       });
+
+      return { success: true, changed: true };
     });
+
+    if (!result.success || !result.changed) return result;
 
     // Drop the target's cached sessions (ENABLE_REDIS_CACHE deployments)
     // so a demotion takes effect immediately instead of after the 60s
@@ -230,9 +239,7 @@ export async function changeUserRole(
       logger.warn("Failed to invalidate session cache after role change", cacheError);
     }
 
-    return {
-      success: true,
-    };
+    return { success: true };
   } catch (error) {
     logger.error("Error changing user role", error);
     return {
@@ -265,4 +272,34 @@ export async function isLastSuperadmin(userId: string): Promise<boolean> {
     .where(eq(user.role, "superadmin"));
 
   return superadminCount.value <= 1;
+}
+
+/**
+ * Run a destructive account operation while holding the same invariant lock
+ * as role changes. The operation can use another database connection. The
+ * transaction-scoped advisory lock remains held until the operation returns.
+ */
+export async function runUnlessLastSuperadmin<T>(
+  userId: string,
+  operation: () => Promise<T>,
+): Promise<{ allowed: false } | { allowed: true; value: T }> {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${SUPERADMIN_INVARIANT_LOCK}))`);
+
+    const [targetUser] = await tx
+      .select({ role: user.role })
+      .from(user)
+      .where(eq(user.id, userId))
+      .limit(1);
+
+    if (targetUser?.role === "superadmin") {
+      const [superadminCount] = await tx
+        .select({ value: count() })
+        .from(user)
+        .where(eq(user.role, "superadmin"));
+      if (superadminCount.value <= 1) return { allowed: false } as const;
+    }
+
+    return { allowed: true, value: await operation() } as const;
+  });
 }

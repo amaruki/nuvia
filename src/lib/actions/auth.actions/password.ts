@@ -3,14 +3,26 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { clientSafeAuthMessage } from "@/lib/auth/common";
+import { checkRouteRateLimit, rateLimitMessage, type RateLimitRoute } from "@/lib/rate-limit";
 import { forgotPasswordSchema, resetPasswordSchema } from "@/lib/validation/auth.validation";
 import type { PasswordResetResponse } from "@/types/auth.types";
+
+async function rateLimitPasswordAction(
+  route: RateLimitRoute,
+): Promise<PasswordResetResponse | null> {
+  const requestHeaders = await headers();
+  const limit = await checkRouteRateLimit(requestHeaders, route);
+  return limit.limited ? { success: false, message: rateLimitMessage(limit) } : null;
+}
 
 /**
  * Server action for password reset request
  */
 export async function forgotPasswordAction(formData: FormData): Promise<PasswordResetResponse> {
   try {
+    const limited = await rateLimitPasswordAction("forgotPassword");
+    if (limited) return limited;
+
     // Extract form data
     const email = formData.get("email") as string;
 
@@ -43,6 +55,9 @@ export async function forgotPasswordAction(formData: FormData): Promise<Password
  */
 export async function resetPasswordAction(formData: FormData): Promise<PasswordResetResponse> {
   try {
+    const limited = await rateLimitPasswordAction("resetPassword");
+    if (limited) return limited;
+
     // Extract form data
     const token = formData.get("token") as string;
     const password = formData.get("password") as string;
@@ -80,6 +95,9 @@ export async function resetPasswordAction(formData: FormData): Promise<PasswordR
  */
 export async function changePasswordAction(formData: FormData): Promise<PasswordResetResponse> {
   try {
+    const limited = await rateLimitPasswordAction("changePassword");
+    if (limited) return limited;
+
     // Extract form data
     const currentPassword = formData.get("currentPassword") as string;
     const newPassword = formData.get("newPassword") as string;

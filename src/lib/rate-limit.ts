@@ -28,6 +28,8 @@ export interface RateLimitResult {
   resetAt: Date;
 }
 
+export type RateLimitRoute = keyof typeof RATE_LIMITS;
+
 /** Named so both the app and its tests can express intent, not raw numbers. */
 export const RATE_LIMITS = {
   // 5 attempts / 15 minutes — matches the pre-migration AUTH config.
@@ -134,20 +136,31 @@ function clientIp(headers: Headers): string {
  * Route handlers call this first and return the result immediately if
  * non-null. Keyed by IP + route, per ADR-0003.
  */
+export async function checkRouteRateLimit(
+  headers: Headers,
+  route: RateLimitRoute,
+): Promise<RateLimitResult> {
+  return checkRateLimit(`${route}:${clientIp(headers)}`, RATE_LIMITS[route]);
+}
+
+export function rateLimitRetryAfterSeconds(result: RateLimitResult): number {
+  return Math.max(1, Math.ceil((result.resetAt.getTime() - Date.now()) / 1000));
+}
+
+export function rateLimitMessage(result: RateLimitResult): string {
+  return `Too many requests. Try again in ${rateLimitRetryAfterSeconds(result)}s.`;
+}
+
 export async function rateLimitOrProblem(
   headers: Headers,
-  route: keyof typeof RATE_LIMITS,
+  route: RateLimitRoute,
 ): Promise<NextResponse | null> {
-  const result = await checkRateLimit(`${route}:${clientIp(headers)}`, RATE_LIMITS[route]);
+  const result = await checkRouteRateLimit(headers, route);
 
   if (!result.limited) return null;
 
-  const retryAfterSeconds = Math.ceil((result.resetAt.getTime() - Date.now()) / 1000);
-  return problemResponse(
-    problems.rateLimited(
-      `Too many requests. Try again in ${retryAfterSeconds}s.`,
-      retryAfterSeconds,
-    ),
-    { headers: { "Retry-After": String(retryAfterSeconds) } },
-  );
+  const retryAfterSeconds = rateLimitRetryAfterSeconds(result);
+  return problemResponse(problems.rateLimited(rateLimitMessage(result), retryAfterSeconds), {
+    headers: { "Retry-After": String(retryAfterSeconds) },
+  });
 }

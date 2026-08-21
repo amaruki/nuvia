@@ -1,6 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { Redis } from "ioredis";
-import { checkRateLimit, RATE_LIMITS, _resetClientForTests } from "@/lib/rate-limit";
+import {
+  checkRateLimit,
+  checkRouteRateLimit,
+  RATE_LIMITS,
+  _resetClientForTests,
+} from "@/lib/rate-limit";
 import { env } from "@/lib/env";
 import { POST as login } from "@/app/api/v1/auth/login/route";
 import { testIp } from "./helpers";
@@ -63,6 +68,18 @@ describe("checkRateLimit", () => {
     expect(RATE_LIMITS.forgotPassword).toBeDefined();
     expect(RATE_LIMITS.resetPassword).toBeDefined();
     expect(RATE_LIMITS.changePassword).toBeDefined();
+  });
+
+  test("named route checks use the trusted client IP and route bucket", async () => {
+    const ip = testIp();
+    const requestHeaders = new Headers({ "x-forwarded-for": ip });
+    const results = [];
+
+    for (let i = 0; i <= RATE_LIMITS.login.max; i++) {
+      results.push(await checkRouteRateLimit(requestHeaders, "login"));
+    }
+
+    expect(results.at(-1)?.limited).toBe(true);
   });
 });
 

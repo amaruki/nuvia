@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { clientSafeAuthMessage } from "@/lib/auth/common";
 import { recordLoginAttempt, resolveLoginIdentifier } from "@/lib/auth/login-activity";
+import { checkRouteRateLimit, rateLimitMessage } from "@/lib/rate-limit";
 import { loginSchema, signupSchema } from "@/lib/validation/auth.validation";
 import type { AuthResponse } from "@/types/auth.types";
 
@@ -14,6 +15,10 @@ import { transformUserToSafeUser } from "./mappers";
  */
 export async function loginAction(formData: FormData): Promise<AuthResponse> {
   try {
+    const requestHeaders = await headers();
+    const limit = await checkRouteRateLimit(requestHeaders, "login");
+    if (limit.limited) return { success: false, message: rateLimitMessage(limit) };
+
     // Extract form data
     const emailOrUsername = formData.get("emailOrUsername") as string;
     const password = formData.get("password") as string;
@@ -25,8 +30,6 @@ export async function loginAction(formData: FormData): Promise<AuthResponse> {
     // emails — resolve it first. Without this, username sign-in silently
     // failed for every user.
     const email = await resolveLoginIdentifier(validatedData.emailOrUsername);
-    const requestHeaders = await headers();
-
     try {
       // Use Better Auth API for sign in
       const result = await auth.api.signInEmail({
@@ -77,6 +80,10 @@ export async function loginAction(formData: FormData): Promise<AuthResponse> {
  */
 export async function signupAction(formData: FormData): Promise<AuthResponse> {
   try {
+    const requestHeaders = await headers();
+    const limit = await checkRouteRateLimit(requestHeaders, "signup");
+    if (limit.limited) return { success: false, message: rateLimitMessage(limit) };
+
     // Extract form data - handle both regular and numbered field names
     const email = (formData.get("email") || formData.get("1_email")) as string;
     const username = (formData.get("username") || formData.get("1_username")) as string;
